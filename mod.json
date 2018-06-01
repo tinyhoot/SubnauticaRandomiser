@@ -1,0 +1,11 @@
+﻿{
+  "Id": "theah.subnauticarandomizer",
+  "DisplayName": "Subnautica Randomizer",
+  "Author": "StephenEngland",
+  "Version": "1.0.0",
+  "Requires": [ "0Harmony.dll" ],
+  "Enable": true,
+  "AssemblyName": "SubnauticaRandomizer.dll",
+  "EntryMethod": "SubnauticaRandomizer.QPatch.Patch",
+  "Config": {}
+}
