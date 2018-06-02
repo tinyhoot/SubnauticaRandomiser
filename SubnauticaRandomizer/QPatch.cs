@@ -37,7 +37,7 @@ namespace SubnauticaRandomizer
                 Settings.Instance = new Settings();
             }
 
-            if (string.IsNullOrEmpty(Settings.Instance.RecipeSeed))
+            if (string.IsNullOrEmpty(Settings.Instance.RecipeSeed) && Settings.Instance.RandomizeMe)
             {
                 var recipes = RecipeRandomizer.Randomize(QPatch.GetSubnauticaRandomizerDirectory());
 
@@ -48,7 +48,7 @@ namespace SubnauticaRandomizer
                 }
                 Settings.Instance.Recipes = recipes;
             }
-            else
+            else if (Settings.Instance.RandomizeMe)
             {
                 try
                 {
@@ -60,6 +60,10 @@ namespace SubnauticaRandomizer
                     Settings.Instance.Recipes = new Recipes();
                 }
                 WriteSettingsFile(settingsPath);
+            }
+            else
+            {
+                Settings.Instance.Recipes = new Recipes();
             }
 
             Settings.Instance.Initialize();

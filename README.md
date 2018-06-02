@@ -1,6 +1,8 @@
 # SubnauticaRandomizer
 A Subnautica Mod that randomizes recipes and changes Blueprint Fragment requirements for replayability
 
+Warning!! This can make the game very difficult. You'll have to tweak it to get it the way you want to play the game.
+
 This mod is not released yet.
 
 ## Blueprint Fragment Requirements
@@ -48,6 +50,21 @@ If you want a much longer first half of the game, this Blueprints fragment confi
 	}
 }
 ```
+
+## Randomizer
+
+In order to use randomized recipes, you need to edit the `config.json`.
+
+Change 
+```
+	"RandomizeMe": false
+```
+to
+```
+	"RandomizeMe": true
+```
+
+And the next time you open Subnautica, it should generate a "RandomSeed" in the file. You will have random recipe ingredients that will be consistent each time you load the game.
 
 ## How to develop/build
 

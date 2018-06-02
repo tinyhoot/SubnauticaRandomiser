@@ -34,12 +34,13 @@
     },
     {
       "Type": 503,
-      "RequiredIngredients": [],
+      "RequiredIngredients": [
+        16
+      ],
       "DepthDifficulty": 0,
       "Category": "Equipment",
       "RestrictedTools": [],
       "RandomizeDifficulty": [
-        0,
         0,
         0
       ],
@@ -382,12 +383,13 @@
     },
     {
       "Type": 505,
-      "RequiredIngredients": [],
+      "RequiredIngredients": [
+        16
+      ],
       "DepthDifficulty": 0,
       "Category": "Tools",
       "RestrictedTools": [],
       "RandomizeDifficulty": [
-        0,
         0
       ],
       "Quantity": null
@@ -428,12 +430,13 @@
     },
     {
       "Type": 508,
-      "RequiredIngredients": [],
+      "RequiredIngredients": [
+        16
+      ],
       "DepthDifficulty": 0,
       "Category": "Tools",
       "RestrictedTools": [],
       "RandomizeDifficulty": [
-        0,
         0
       ],
       "Quantity": null
@@ -525,11 +528,11 @@
     {
       "Type": 1502,
       "RequiredIngredients": [],
-      "DepthDifficulty": 100,
+      "DepthDifficulty": 0,
       "Category": "Buildings",
       "RestrictedTools": [],
       "RandomizeDifficulty": [
-        100,
+        0,
         0,
         0
       ],
@@ -538,11 +541,11 @@
     {
       "Type": 1533,
       "RequiredIngredients": [],
-      "DepthDifficulty": 100,
+      "DepthDifficulty": 0,
       "Category": "Buildings",
       "RestrictedTools": [],
       "RandomizeDifficulty": [
-        100,
+        0,
         0
       ],
       "Quantity": null
@@ -757,14 +760,15 @@
     },
     {
       "Type": 504,
-      "RequiredIngredients": [],
+      "RequiredIngredients": [
+        3021,
+        3021,
+        7
+      ],
       "DepthDifficulty": 0,
       "Category": "Materials",
       "RestrictedTools": [],
-      "RandomizeDifficulty": [
-        0,
-        0
-      ],
+      "RandomizeDifficulty": [],
       "Quantity": null
     },
     {
@@ -1424,7 +1428,7 @@
     {
       "Type": 3521,
       "RequiredIngredients": [],
-      "DepthDifficulty": 500,
+      "DepthDifficulty": 0,
       "Category": "RawMaterials",
       "RestrictedTools": [
         505
@@ -1446,7 +1450,7 @@
     {
       "Type": 3523,
       "RequiredIngredients": [],
-      "DepthDifficulty": 500,
+      "DepthDifficulty": 0,
       "Category": "RawMaterials",
       "RestrictedTools": [
         505

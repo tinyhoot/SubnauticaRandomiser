@@ -16,9 +16,13 @@ namespace SubnauticaRandomizer.Randomizer
         private Dictionary<TechType, bool> _materialsThatHaveBeenUsed;
         private Recipes _recipes;
 
-        private RecipeInformation PickRawMaterialAtRandom(int depthDifficulty)
+        private RecipeInformation PickRawMaterialAtRandom(int depthDifficulty, bool excludeKnife = false)
         {
             var rawMaterial = _rawMaterials[depthDifficulty].PickRandom();
+
+            while (excludeKnife && rawMaterial.RestrictedTools.Any(tt => tt == TechType.Knife)) {
+                rawMaterial = _rawMaterials[depthDifficulty].PickRandom();
+            }
 
             _materialsThatHaveBeenUsed[rawMaterial.Type] = true;
 
@@ -50,11 +54,16 @@ namespace SubnauticaRandomizer.Randomizer
                 _recipes.RecipesByType[(int)material.Type] = new Recipe
                 {
                     CraftAmount = material.Quantity ?? 1,
-                    Ingredients = new List<GeneratedRecipeIngredient>()
+                    Ingredients = material.RequiredIngredients.GroupBy(ri => ri).Select(ri => new GeneratedRecipeIngredient
+                    {
+                        Amount = ri.Count(),
+                        TechType = (int)ri.First()
+                    }).ToList()
                 };
 
-                foreach(var materialPicked in material.RandomizeDifficulty.Select(PickRawMaterialAtRandom))
+                foreach(var difficulty in material.RandomizeDifficulty)
                 {
+                    var materialPicked = PickRawMaterialAtRandom(difficulty);
                     DecideOnAnIngredient(materialPicked, material.Type);
                 }
             }
@@ -67,10 +76,10 @@ namespace SubnauticaRandomizer.Randomizer
                 _recipes.RecipesByType[(int)equipment.Type] = new Recipe
                 {
                     CraftAmount = equipment.Quantity ?? 1,
-                    Ingredients = equipment.RequiredIngredients.Select( ri => new GeneratedRecipeIngredient
+                    Ingredients = equipment.RequiredIngredients.GroupBy(ri => ri).Select( ri => new GeneratedRecipeIngredient
                     {
-                        Amount = 1,
-                        TechType = (int)ri
+                        Amount = ri.Count(),
+                        TechType = (int)ri.First()
                     }).ToList()
                 };
 
@@ -82,7 +91,7 @@ namespace SubnauticaRandomizer.Randomizer
                     {
                         var difficulty = randomizedDifficulties.First();
                         randomizedDifficulties.RemoveAt(0);
-                        var materialPicked = PickRawMaterialAtRandom(difficulty);
+                        var materialPicked = PickRawMaterialAtRandom(difficulty, excludeKnife: equipment.Type == TechType.Knife);
                         DecideOnAnIngredient(materialPicked, equipment.Type);
                     }
                     else

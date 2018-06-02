@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
+using Oculus.Newtonsoft.Json;
 using SubnauticaRandomizer.Randomizer;
 using System.IO;
 using System.Linq;
@@ -19,7 +19,7 @@ namespace SubnauticaRandomizer.Tests
             var standardTank = recipes.FirstOrDefault(rp => rp.Type == TechType.Tank);
             Assert.IsNotNull(standardTank);
             Assert.AreEqual(standardTank.Category, "Equipment");
-            Assert.AreEqual(standardTank.RandomizeDifficulty.Count, 3);
+            Assert.AreEqual(standardTank.RandomizeDifficulty.Count, 2);
         }
 
         [TestMethod]
@@ -29,7 +29,8 @@ namespace SubnauticaRandomizer.Tests
             {
                 Recipes = RecipeInformation.ParseFromCSV("./recipeinformation.csv").ToList().Select(SerializedRecipeInformation.ConvertFrom).ToList()
             };
-            File.WriteAllText("./recipeinformation.json", JsonConvert.SerializeObject(recipes, Formatting.Indented));
+            var jsonFilepath = Path.Combine("..", "..", "..","SubnauticaRandomizer", "recipeinformation.json");
+            File.WriteAllText(jsonFilepath, JsonConvert.SerializeObject(recipes, Formatting.Indented));
         }
     }
 }

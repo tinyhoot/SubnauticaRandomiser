@@ -11,6 +11,7 @@ namespace SubnauticaRandomizer
 
         public Dictionary<string, int> Blueprints = new Dictionary<string, int>();
         public string RecipeSeed;
+        public bool RandomizeMe = false;
 
         public static Settings Instance = new Settings();
 
