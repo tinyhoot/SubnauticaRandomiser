@@ -1,0 +1,1531 @@
+{
+  "ReadMe": "This file was generated via a csv. It is not readable, dont try to edit this directly! See GitHub for more info.",
+  "Recipes": [
+    {
+      "Type": 528,
+      "RequiredIngredients": [
+        503
+      ],
+      "DepthDifficulty": 100,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 502,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 503,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 804,
+      "RequiredIngredients": [
+        528
+      ],
+      "DepthDifficulty": 250,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        250,
+        250,
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 803,
+      "RequiredIngredients": [
+        528
+      ],
+      "DepthDifficulty": 100,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 806,
+      "RequiredIngredients": [
+        502
+      ],
+      "DepthDifficulty": 100,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 805,
+      "RequiredIngredients": [
+        502
+      ],
+      "DepthDifficulty": 250,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        250,
+        250,
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 512,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 524,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 4514,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 526,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 519,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 100,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 518,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 100,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        100,
+        100,
+        100,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 515,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0
+      ],
+      "Quantity": 5
+    },
+    {
+      "Type": 522,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        500,
+        500,
+        250,
+        250,
+        100,
+        100,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 808,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "Equipment",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        250,
+        250,
+        100,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 801,
+      "RequiredIngredients": [
+        505
+      ],
+      "DepthDifficulty": 100,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 513,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 517,
+      "RequiredIngredients": [
+        504
+      ],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 754,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0
+      ],
+      "Quantity": 3
+    },
+    {
+      "Type": 507,
+      "RequiredIngredients": [
+        504
+      ],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 509,
+      "RequiredIngredients": [
+        504
+      ],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 761,
+      "RequiredIngredients": [
+        504
+      ],
+      "DepthDifficulty": 100,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        100,
+        100,
+        0,
+        0,
+        100,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 750,
+      "RequiredIngredients": [
+        504
+      ],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 523,
+      "RequiredIngredients": [
+        504
+      ],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 755,
+      "RequiredIngredients": [
+        504
+      ],
+      "DepthDifficulty": 250,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        250,
+        250
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 505,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 757,
+      "RequiredIngredients": [
+        504
+      ],
+      "DepthDifficulty": 100,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0,
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 807,
+      "RequiredIngredients": [
+        757
+      ],
+      "DepthDifficulty": 250,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        250,
+        250,
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 508,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 527,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        250,
+        250,
+        100,
+        0
+      ],
+      "Quantity": 3
+    },
+    {
+      "Type": 758,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 752,
+      "RequiredIngredients": [
+        43
+      ],
+      "DepthDifficulty": 100,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        100,
+        100,
+        0,
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 751,
+      "RequiredIngredients": [
+        504
+      ],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 759,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Tools",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 5501,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 1502,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 100,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        100,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 1533,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 100,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        100,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 1503,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 1504,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 1524,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 1536,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 5509,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 5514,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 5505,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 1517,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Buildings",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 2000,
+      "RequiredIngredients": [
+        43
+      ],
+      "DepthDifficulty": 100,
+      "Category": "Vehicles",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        100,
+        100,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 44,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 32,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 59,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        250,
+        250
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 34,
+      "RequiredIngredients": [
+        33,
+        44
+      ],
+      "DepthDifficulty": 250,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 57,
+      "RequiredIngredients": [
+        61
+      ],
+      "DepthDifficulty": 250,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 61,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        250,
+        250,
+        250
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 504,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 27,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 3,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 62,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 17,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0
+      ],
+      "Quantity": 2
+    },
+    {
+      "Type": 42,
+      "RequiredIngredients": [
+        15
+      ],
+      "DepthDifficulty": 500,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        500
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 15,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 53,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        500,
+        500,
+        500,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 41,
+      "RequiredIngredients": [
+        30
+      ],
+      "DepthDifficulty": 500,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        500,
+        500
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 30,
+      "RequiredIngredients": [
+        16
+      ],
+      "DepthDifficulty": 100,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 33,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 43,
+      "RequiredIngredients": [
+        504
+      ],
+      "DepthDifficulty": 100,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        0,
+        0,
+        0,
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 56,
+      "RequiredIngredients": [
+        53
+      ],
+      "DepthDifficulty": 500,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        500,
+        500,
+        500,
+        0,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 4210,
+      "RequiredIngredients": [
+        66
+      ],
+      "DepthDifficulty": 1000,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        900,
+        900,
+        0,
+        0,
+        100,
+        100
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 4209,
+      "RequiredIngredients": [
+        4210
+      ],
+      "DepthDifficulty": 1000,
+      "Category": "Materials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [
+        1000,
+        900,
+        250,
+        250,
+        250,
+        500,
+        500,
+        500,
+        0,
+        0,
+        100,
+        100,
+        0
+      ],
+      "Quantity": null
+    },
+    {
+      "Type": 66,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 16,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 7,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 35,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 36,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 100,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 2530,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 21,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 28,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 68,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 1000,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 8,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 40,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 100,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 54,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 2,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 69,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 900,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 1,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 52,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 9,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3063,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3504,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 100,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 23,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 900,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 63,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3502,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3505,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3021,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3034,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3520,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3518,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 100,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3503,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 2529,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 2503,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3035,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3539,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3525,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3010,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3532,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3541,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3527,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3522,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3535,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3536,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3534,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3526,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3537,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3538,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3519,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3521,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3533,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3523,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 500,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3530,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3507,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3508,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3039,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3040,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3528,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 250,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    },
+    {
+      "Type": 3501,
+      "RequiredIngredients": [],
+      "DepthDifficulty": 0,
+      "Category": "RawMaterials",
+      "RestrictedTools": [
+        505
+      ],
+      "RandomizeDifficulty": [],
+      "Quantity": null
+    }
+  ]
+}

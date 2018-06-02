@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
+using SubnauticaRandomizer.Randomizer;
 
 namespace SubnauticaRandomizer
 {
@@ -17,10 +18,15 @@ namespace SubnauticaRandomizer
             harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
 
-        private static void ManageSettingsFile()
+        public static string GetSubnauticaRandomizerDirectory()
         {
             string modDirectory = Path.Combine(Environment.CurrentDirectory, "QMods");
-            string settingsPath = Path.Combine(Path.Combine(modDirectory, "SubnauticaRandomizer"), "config.json");
+            return Path.Combine(modDirectory, "SubnauticaRandomizer");
+        }
+
+        private static void ManageSettingsFile()
+        {
+            string settingsPath = Path.Combine(GetSubnauticaRandomizerDirectory(), "config.json");
 
             if (File.Exists(settingsPath))
             {
@@ -33,9 +39,13 @@ namespace SubnauticaRandomizer
 
             if (string.IsNullOrEmpty(Settings.Instance.RecipeSeed))
             {
-                var recipes = RecipeRandomizer.Randomize();
-                Settings.Instance.RecipeSeed = recipes.ToBase64String();
-                WriteSettingsFile(settingsPath);
+                var recipes = RecipeRandomizer.Randomize(QPatch.GetSubnauticaRandomizerDirectory());
+
+                if (recipes.RecipesByType.Values.Count > 0)
+                {
+                    Settings.Instance.RecipeSeed = recipes.ToBase64String();
+                    WriteSettingsFile(settingsPath);
+                }
                 Settings.Instance.Recipes = recipes;
             }
             else
@@ -46,6 +56,7 @@ namespace SubnauticaRandomizer
                 }
                 catch(Exception ex)
                 {
+                    LogError(ex.ToString());
                     Settings.Instance.Recipes = new Recipes();
                 }
                 WriteSettingsFile(settingsPath);
@@ -57,6 +68,12 @@ namespace SubnauticaRandomizer
         private static void WriteSettingsFile(string path)
         {
             File.WriteAllText(path, JsonConvert.SerializeObject(Settings.Instance, Formatting.Indented));
+        }
+
+        public static void LogError(string text)
+        {
+            var logFile = Path.Combine(GetSubnauticaRandomizerDirectory(), "log.txt");
+            File.AppendAllText(logFile, "\r\n" + text);
         }
     }
 }
