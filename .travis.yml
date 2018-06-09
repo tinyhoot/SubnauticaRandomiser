@@ -1,5 +1,6 @@
 language: csharp
 script: 
+    - nuget restore CI.sln
     - msbuild /p:Configuration=Release    CI.sln
     - ls
     - ls bin/Release
