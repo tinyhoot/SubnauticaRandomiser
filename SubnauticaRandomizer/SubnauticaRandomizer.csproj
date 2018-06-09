@@ -32,17 +32,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>lib\0Harmony.dll</HintPath>
+      <HintPath>..\lib\0Harmony.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath Condition="Exists('..\..\Subnautica_Data\Managed\Assembly-CSharp.dll')">..\..\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
+	  <HintPath Condition="Exists('$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Assembly-CSharp.dll')">$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath Condition="Exists('..\lib\Assembly-CSharp.dll')">..\lib\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="FileHelpers, Version=3.2.7.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
       <HintPath>..\packages\FileHelpers.3.2.7\lib\net35\FileHelpers.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath Condition="Exists('..\..\Subnautica_Data\Managed\Assembly-CSharp.dll')">..\..\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
+	  <HintPath Condition="Exists('$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Assembly-CSharp.dll')">$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath Condition="Exists('..\lib\Newtonsoft.Json.dll')">..\lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
