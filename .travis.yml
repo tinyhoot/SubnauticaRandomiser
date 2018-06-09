@@ -1,6 +1,7 @@
 language: csharp
 script: 
-    - msbuild /p:Configuration=Release    SubnauticaRandomizer.sln
+    - msbuild /p:Configuration=Release    CI.sln
+    - ls
     - ls bin/Release
     - zip mod.zip bin/Release/config.json bin/Release/mod.json bin/Release/recipeinformation.json bin/Release/FileHelpers.dll bin/Release/FileHelpers.xml bin/Release/SubnauticaRandomizer.dll
 deploy:
