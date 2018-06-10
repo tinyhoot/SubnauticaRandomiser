@@ -2,10 +2,8 @@ language: csharp
 script: 
     - nuget restore CI.sln
     - msbuild /p:Configuration=Release    CI.sln
-    - ls
-    - ls bin/Release
     - ls SubnauticaRandomizer/bin/Release
-    - zip mod.zip bin/Release/config.json bin/Release/mod.json bin/Release/recipeinformation.json bin/Release/FileHelpers.dll bin/Release/FileHelpers.xml bin/Release/SubnauticaRandomizer.dll
+    - zip mod.zip SubnauticaRandomizer/bin/Release/config.json SubnauticaRandomizer/bin/Release/mod.json SubnauticaRandomizer/bin/Release/recipeinformation.json SubnauticaRandomizer/bin/Release/FileHelpers.dll SubnauticaRandomizer/bin/Release/FileHelpers.xml SubnauticaRandomizer/bin/Release/SubnauticaRandomizer.dll
 deploy:
     provider: releases
     file: mod.zip
