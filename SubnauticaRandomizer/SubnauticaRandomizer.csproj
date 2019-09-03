@@ -31,13 +31,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>..\lib\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony-1.2.0.1">
+      <HintPath>..\lib\0Harmony-1.2.0.1.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath Condition="Exists('..\..\Subnautica_Data\Managed\Assembly-CSharp.dll')">..\..\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
-	  <HintPath Condition="Exists('$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Assembly-CSharp.dll')">$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath Condition="Exists('$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Assembly-CSharp.dll')">$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
       <HintPath Condition="Exists('..\lib\Assembly-CSharp.dll')">..\lib\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="FileHelpers, Version=3.2.7.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
@@ -46,7 +46,7 @@
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath Condition="Exists('..\..\Subnautica_Data\Managed\Newtonsoft.Json.dll')">..\..\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
-	  <HintPath Condition="Exists('$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Newtonsoft.Json.dll')">$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath Condition="Exists('$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Newtonsoft.Json.dll')">$(SUBNAUTICA_DIR)\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <HintPath Condition="Exists('..\lib\Newtonsoft.Json.dll')">..\lib\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -58,21 +58,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HarmonyPatches\CraftData_Get_Patch.cs" />
-    <Compile Include="HarmonyPatches\PDAScanner_GetEntryData_Patch.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Randomizer\RandomizerExtensions.cs" />
     <Compile Include="Randomizer\RecipeInformation.cs" />
-    <Compile Include="Randomizer\Materials\PrecursorIonBattery.cs" />
-    <Compile Include="Randomizer\Materials\PrecursorIonPowerCell.cs" />
     <Compile Include="Randomizer\SerializedRecipeInformation.cs" />
     <Compile Include="Recipe.cs" />
     <Compile Include="RecipeIngredient.cs" />
     <Compile Include="Randomizer\RecipeRandomizer.cs" />
     <Compile Include="Recipes.cs" />
-    <Compile Include="ScannerData.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="SubnauticaTechTypeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\mod.json">
@@ -85,6 +80,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModConfig.cs" />
     <Content Include="recipeinformation.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

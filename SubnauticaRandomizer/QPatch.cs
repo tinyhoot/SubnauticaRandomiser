@@ -3,7 +3,6 @@ using Oculus.Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Reflection;
-using System.Collections.Generic;
 using SubnauticaRandomizer.Randomizer;
 
 namespace SubnauticaRandomizer
@@ -20,8 +19,7 @@ namespace SubnauticaRandomizer
 
         public static string GetSubnauticaRandomizerDirectory()
         {
-            string modDirectory = Path.Combine(Environment.CurrentDirectory, "QMods");
-            return Path.Combine(modDirectory, "SubnauticaRandomizer");
+            return new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
         }
 
         private static void ManageSettingsFile()
@@ -30,14 +28,23 @@ namespace SubnauticaRandomizer
 
             if (File.Exists(settingsPath))
             {
-                Settings.Instance = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(settingsPath));
+                try
+                {
+                    Settings.Instance = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(settingsPath));
+                }
+                catch(Exception ex)
+                {
+                    LogError("Error parsing config.json");
+                    LogError(ex.ToString());
+                    Settings.Instance = new Settings();
+                }
             }
             else
             {
                 Settings.Instance = new Settings();
             }
 
-            if (string.IsNullOrEmpty(Settings.Instance.RecipeSeed) && Settings.Instance.RandomizeMe)
+            if (string.IsNullOrEmpty(Settings.Instance.RecipeSeed))
             {
                 var recipes = RecipeRandomizer.Randomize(QPatch.GetSubnauticaRandomizerDirectory());
 
@@ -48,25 +55,19 @@ namespace SubnauticaRandomizer
                 }
                 Settings.Instance.Recipes = recipes;
             }
-            else if (Settings.Instance.RandomizeMe)
+            else
             {
                 try
                 {
                     Settings.Instance.Recipes = Recipes.FromBase64String(Settings.Instance.RecipeSeed);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     LogError(ex.ToString());
                     Settings.Instance.Recipes = new Recipes();
                 }
                 WriteSettingsFile(settingsPath);
             }
-            else
-            {
-                Settings.Instance.Recipes = new Recipes();
-            }
-
-            Settings.Instance.Initialize();
         }
 
         private static void WriteSettingsFile(string path)

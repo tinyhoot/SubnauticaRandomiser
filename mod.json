@@ -7,5 +7,5 @@
   "Enable": true,
   "AssemblyName": "SubnauticaRandomizer.dll",
   "EntryMethod": "SubnauticaRandomizer.QPatch.Patch",
-  "Config": {}
+  "Config": { }
 }
