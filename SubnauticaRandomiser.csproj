@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SubnauticaRandomiser</RootNamespace>
+    <AssemblyName>SubnauticaRandomiser</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp "/home/silvignus/Documents/Dev/MonoDevelopProjects/SubnauticaRandomiser/SubnauticaRandomiser/bin/Debug/SubnauticaRandomiser.dll" "/home/silvignus/lutris/epic-games-store/drive_c/Program Files/Epic Games/Subnautica/QMods/Subnautica Randomiser"</command>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp "/home/silvignus/Documents/Dev/MonoDevelopProjects/SubnauticaRandomiser/SubnauticaRandomiser/bin/Debug/mod.json" "/home/silvignus/lutris/epic-games-store/drive_c/Program Files/Epic Games/Subnautica/QMods/Subnautica Randomiser"</command>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp "/home/silvignus/Documents/Dev/MonoDevelopProjects/SubnauticaRandomiser/SubnauticaRandomiser/bin/Debug/recipeInformation.csv" "/home/silvignus/lutris/epic-games-store/drive_c/Program Files/Epic Games/Subnautica/QMods/Subnautica Randomiser"</command>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="InitMod.cs" />
+    <Compile Include="RandomiserConfig.cs" />
+    <Compile Include="Recipe.cs" />
+    <Compile Include="ProgressionManager.cs" />
+    <Compile Include="CSVReader.cs" />
+    <Compile Include="LogHandler.cs" />
+    <Compile Include="ETechTypeCategory.cs" />
+    <Compile Include="RecipeDictionary.cs" />
+    <Compile Include="RandomiserIngredient.cs" />
+    <Compile Include="ProgressionTree.cs" />
+    <Compile Include="EProgressionNode.cs" />
+    <Compile Include="ProgressionPath.cs" />
+    <Compile Include="TestRecipe.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="QModInstaller">
+      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\BepInEx\plugins\QModManager\QModInstaller.dll</HintPath>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\BepInEx\core\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="SMLHelper">
+      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="mod.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="recipeInformation.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
