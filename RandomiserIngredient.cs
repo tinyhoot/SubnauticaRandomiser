@@ -6,12 +6,12 @@ namespace SubnauticaRandomiser
     [Serializable]
     public class RandomiserIngredient
     {
-        public int TechType;
+        public int TechTypeInt;
         public int Amount;
 
         public RandomiserIngredient(int techType, int amount)
         {
-            TechType = techType;
+            TechTypeInt = techType;
             Amount = amount;
         }
 
@@ -19,7 +19,7 @@ namespace SubnauticaRandomiser
         {
             return new RecipeIngredient
             {
-                techType = (TechType)TechType,
+                techType = (TechType)TechTypeInt,
                 amount = Amount
             };
         }

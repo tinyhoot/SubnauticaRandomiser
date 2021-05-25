@@ -13,6 +13,7 @@ namespace SubnauticaRandomiser
         Tablets,
         Deployables,
         Vehicles,
-        Rocket
+        Rocket,
+        Seeds
     }
 }

@@ -15,8 +15,8 @@ namespace SubnauticaRandomiser
         internal static List<Recipe> ParseFile(string fileName)
         {
             // First, try to find and grab the file containing recipe information
-            string path = InitMod.s_modDirectory + "\\" +fileName;
-            LogHandler.Debug("Looking for recipe CSV as "+path);
+            string path = InitMod.s_modDirectory + "\\" + fileName;
+            LogHandler.Debug("Looking for recipe CSV as " + path);
 
             try
             {
@@ -47,8 +47,8 @@ namespace SubnauticaRandomiser
                 try
                 {
                     s_csvParsedList.Add(ParseLine(line));
-                } 
-                catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     LogHandler.Error("Failed to parse information from CSV!");
                     LogHandler.Error(ex.Message);
@@ -66,7 +66,7 @@ namespace SubnauticaRandomiser
             TechType type = TechType.None;
             List<Ingredient> ingredientList = new List<Ingredient>();
             ETechTypeCategory category = ETechTypeCategory.None;
-            int depthDifficulty = 0;
+            EProgressionNode depthDifficulty = EProgressionNode.None;
             List<TechType> prereqList = new List<TechType>();
             int craftAmount = 1;
 
@@ -111,7 +111,7 @@ namespace SubnauticaRandomiser
             // Column 4: Depth Difficulty
             if (!String.IsNullOrEmpty(cells[3]))
             {
-                depthDifficulty = int.Parse(cells[3]);
+                depthDifficulty = StringToEProgressionNode(cells[3]);
             }
 
             // Column 5: Prerequisites
@@ -146,10 +146,10 @@ namespace SubnauticaRandomiser
             try
             {
                 type = (TechType)Enum.Parse(typeof(TechType), str, true);
-            } 
+            }
             catch (Exception ex)
             {
-                LogHandler.Error("Failed to parse string to TechType: "+str);
+                LogHandler.Error("Failed to parse string to TechType: " + str);
                 LogHandler.Error(ex.Message);
                 type = TechType.None;
             }
@@ -173,6 +173,24 @@ namespace SubnauticaRandomiser
             }
 
             return type;
+        }
+
+        internal static EProgressionNode StringToEProgressionNode(string str)
+        {
+            EProgressionNode node;
+
+            try
+            {
+                node = (EProgressionNode)Enum.Parse(typeof(EProgressionNode), str, true);
+            }
+            catch (Exception ex)
+            {
+                LogHandler.Error("Failed to parse string to EProgressionNode: " + str);
+                LogHandler.Error(ex.Message);
+                node = EProgressionNode.None;
+            }
+
+            return node;
         }
     }
 }

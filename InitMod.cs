@@ -15,7 +15,7 @@ namespace SubnauticaRandomiser
         internal static RandomiserConfig s_config;
         internal static readonly string s_recipeFile = "recipeinformation.csv";
         // The master list of all recipes that have been modified
-        internal static RecipeDictionary s_randomisedRecipes = new RecipeDictionary();
+        internal static RecipeDictionary s_masterDict = new RecipeDictionary();
         private static readonly bool _debug_forceRandomise = false;
 
         [QModPatch]
@@ -31,7 +31,7 @@ namespace SubnauticaRandomiser
             // Try and restore a recipe state from disk
             try
             {
-                s_randomisedRecipes = RestoreRecipeStateFromDisk();
+                s_masterDict = RestoreRecipeStateFromDisk();
             }
             catch (Exception ex)
             {
@@ -40,15 +40,18 @@ namespace SubnauticaRandomiser
             }
 
             // Triple checking things here in case the save got corrupted somehow
-            if (!_debug_forceRandomise && s_randomisedRecipes != null && s_randomisedRecipes.DictionaryInstance != null && s_randomisedRecipes.DictionaryInstance.Count > 0)
+            if (!_debug_forceRandomise && s_masterDict != null && s_masterDict.DictionaryInstance != null && s_masterDict.DictionaryInstance.Count > 0)
             {
-                ProgressionManager.ApplyMasterList(s_randomisedRecipes);
+                ProgressionManager.ApplyMasterDict(s_masterDict);
                 LogHandler.Debug("Successfully loaded recipe state from disk.");
             }
             else
             {
+                if (_debug_forceRandomise)
+                    LogHandler.Warn("Set to forcibly re-randomise recipes.");
+
                 LogHandler.Debug("Failed to load recipe state from disk: dictionary empty.");
-                s_randomisedRecipes = new RecipeDictionary();
+                s_masterDict = new RecipeDictionary();
 
                 // Attempt to read and parse the CSV with all recipe information
                 List<Recipe> completeMaterialsList;
@@ -62,17 +65,16 @@ namespace SubnauticaRandomiser
                 // Try and do some randomising
                 // TODO actually make this a real thing
                 LogHandler.Debug("Attempting randomisation test...");
-                ProgressionManager pm = new ProgressionManager(1, completeMaterialsList);
-                pm.AddMaterialsToReachableList(ETechTypeCategory.RawMaterials, 0);
-                pm.AddMaterialsToReachableList(ETechTypeCategory.BasicMaterials, 0);
-                pm.AddMaterialsToReachableList(ETechTypeCategory.RawMaterials, 0);
-                pm.AddMaterialsToReachableList(completeMaterialsList.Find(x => x.ItemType.Equals(TechType.Cyclops)));
-                //pm.Randomise();
-                LogHandler.Info("Randomisation successful!");
-                TestRecipe.EditRadiationSuit(s_randomisedRecipes, completeMaterialsList);
+                ProgressionManager pm = new ProgressionManager(5, completeMaterialsList);
+                pm.AddMaterialsToReachableList(ETechTypeCategory.RawMaterials, EProgressionNode.Depth100m);
+                pm.AddMaterialsToReachableList(ETechTypeCategory.BasicMaterials, EProgressionNode.Depth100m);
+                pm.AddMaterialsToReachableList(ETechTypeCategory.AdvancedMaterials, EProgressionNode.Depth100m);
+                pm.AddMaterialsToReachableList(completeMaterialsList.Find(x => x.TechType.Equals(TechType.Cyclops)));
 
-                // pm.RandomiseTest();                            
-                // pm.ApplyMasterList(s_randomisedRecipes);
+                pm.RandomSubstituteMaterials(s_masterDict);
+                LogHandler.Info("Randomisation successful!");
+                // TestRecipe.EditRadiationSuit(s_masterDict, completeMaterialsList);
+
                 SaveRecipeStateToDisk();
             }
             LogHandler.Info("Finished loading. Ready to scramble!");
@@ -80,9 +82,9 @@ namespace SubnauticaRandomiser
 
         public static void SaveRecipeStateToDisk()
         {
-            if (s_randomisedRecipes.DictionaryInstance != null && s_randomisedRecipes.DictionaryInstance.Count > 0)
+            if (s_masterDict.DictionaryInstance != null && s_masterDict.DictionaryInstance.Count > 0)
             {
-                string base64 = s_randomisedRecipes.ToBase64String();
+                string base64 = s_masterDict.ToBase64String();
                 s_config.sBase64Seed = base64;
                 s_config.Save();
                 LogHandler.Debug("Saved recipe state to disk!");

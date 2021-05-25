@@ -81,4 +81,3 @@ RocketBaseLadder,PlasteelIngot:1;CopperWire:1;Lubricant:1,Rocket,0,,1
 RocketStage1,PlasteelIngot:1;Nickel:3;Aerogel:2;WiringKit:1,Rocket,0,,1
 RocketStage2,PlasteelIngot:1;Sulphur:4;Kyanite:4;PrecursorIonPowerCell:2,Rocket,0,PrecursorIonPowerCell,1
 RocketStage3,PlasteelIngot:1;EnameledGlass:1;ComputerChip:1;CyclopsShieldModule:1,Rocket,0,CyclopsShieldModule,1
-RadiationSuit,,BasicMaterials,0,,1

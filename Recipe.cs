@@ -7,11 +7,11 @@ namespace SubnauticaRandomiser
     [Serializable]
     public class Recipe : ITechData
     {
-        public TechType ItemType;
+        public TechType TechType;
         public List<RandomiserIngredient> Ingredients;
         public List<TechType> LinkedIngredients;
         public ETechTypeCategory Category;
-        public int DepthDifficulty = 0;
+        public EProgressionNode Node;
         public List<TechType> Prerequisites;
         public int CraftAmount = 1;
 
@@ -19,22 +19,33 @@ namespace SubnauticaRandomiser
         public int ingredientCount { get { return Ingredients.Count; } }
         public int linkedItemCount { get { return LinkedIngredients.Count; } }
 
-        public Recipe(TechType type, ETechTypeCategory category, int depthDifficulty = 0, List<TechType> prereqs = null, int craftAmount = 1)
+        public Recipe(TechType type, ETechTypeCategory category, EProgressionNode node = EProgressionNode.None, List<TechType> prereqs = null, int craftAmount = 1)
         {
             CraftAmount = craftAmount;
-            DepthDifficulty = depthDifficulty;
+            Node = node;
 
-            ItemType = type;
+            TechType = type;
             Ingredients = new List<RandomiserIngredient>();
-            //LinkedIngredients = new List<RandomiserIngredient>();
+            LinkedIngredients = new List<TechType>();
 
             // This part copies over information on linked items from the base
             // recipe already loaded by the game. Raw materials do not have any
-            // recipes to load this data from.
+            // recipes to load this data from and *will* cause a NullReference.
             TechData techdata = CraftDataHandler.GetTechData(type);
-            if (!category.Equals(ETechTypeCategory.RawMaterials) && techdata.linkedItemCount > 0)
+            if (!category.Equals(ETechTypeCategory.RawMaterials))
             {
-                LinkedIngredients = techdata.LinkedItems;
+                if (techdata.ingredientCount > 0)
+                {
+                    foreach (Ingredient i in techdata.Ingredients)
+                    {
+                        Ingredients.Add(new RandomiserIngredient((int)i.techType, i.amount));
+                    }
+                }
+
+                if (techdata.linkedItemCount > 0)
+                {
+                    LinkedIngredients = techdata.LinkedItems;
+                }
             }
 
             Category = category;
@@ -56,20 +67,20 @@ namespace SubnauticaRandomiser
             string result;
             string separator = ",";
 
-            result = ItemType.AsString() + separator;
+            result = TechType.AsString() + separator;
 
             if (ingredientCount != 0)
             {
                 foreach (RandomiserIngredient i in Ingredients)
                 {
-                    result += i.TechType + ":" + i.Amount + ";";
+                    result += i.TechTypeInt + ":" + i.Amount + ";";
                 }
                 result += separator;
             }
 
             result += Category.ToString() + separator;
 
-            result += DepthDifficulty + separator;
+            result += Node.ToString() + separator;
 
             if (Prerequisites.Count != 0)
             {

@@ -39,5 +39,16 @@ namespace SubnauticaRandomiser
                 return (RecipeDictionary)(new BinaryFormatter().Deserialize(ms));
             }
         }
+
+        public bool Add(TechType t, Recipe r)
+        {
+            if (DictionaryInstance.ContainsKey((int)t))
+            {
+                LogHandler.Warn("Tried to add duplicate key "+t.AsString()+" to master dictionary!");
+                return false;
+            }
+            DictionaryInstance.Add((int)t, r);
+            return true;
+        }
     }
 }

@@ -5,6 +5,7 @@ namespace SubnauticaRandomiser
     {
         None,
         Aurora,
+        Depth0m,
         Depth100m,
         Depth200m,
         Depth300m,

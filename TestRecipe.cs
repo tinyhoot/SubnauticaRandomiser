@@ -25,14 +25,15 @@ namespace SubnauticaRandomiser
 
         public static void EditRadiationSuit(RecipeDictionary d, List<Recipe> completeMaterialsList)
         {
-            Recipe r = completeMaterialsList.Find(x => x.ItemType.Equals(TechType.RadiationSuit));
+            Recipe r = completeMaterialsList.Find(x => x.TechType.Equals(TechType.RadiationSuit));
             LogHandler.Debug("Linked items of radiation suit: " + r.linkedItemCount);
             List<RandomiserIngredient> i = new List<RandomiserIngredient>();
             i.Add(new RandomiserIngredient((int)TechType.Titanium, 1));
             r.Ingredients = i;
 
-            d.DictionaryInstance.Add((int)TechType.RadiationSuit, r);
-            CraftDataHandler.SetTechData(TechType.RadiationSuit, r);
+            //d.Add(TechType.RadiationSuit, r);
+            //CraftDataHandler.SetTechData(TechType.RadiationSuit, r);
+            ProgressionManager.ApplyRandomisedRecipe(d, r);
         }
     }
 }
