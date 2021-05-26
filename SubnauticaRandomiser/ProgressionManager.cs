@@ -144,7 +144,27 @@ namespace SubnauticaRandomiser
 
                     if (match.Count > 0)
                     {
-                        int index = _random.Next(0, match.Count - 1);
+                        bool foundMatch = false;
+                        int index = 0;
+
+                        // Prevent duplicate ingredients
+                        while (!foundMatch)
+                        {
+                            index = _random.Next(0, match.Count - 1);
+                            if (ingredients.Exists(x => x.TechTypeInt == (int)match[index].TechType))
+                            {
+                                if (match.Count != 1)
+                                    match.RemoveAt(index);
+                                else
+                                    break;
+                            }
+                            else
+                            {
+                                foundMatch = true;
+                                break;
+                            }
+                        }
+                        
                         LogHandler.Debug("  Replacing ingredient with " + match[index].TechType.AsString());
                         randomiseMe.Ingredients[i].TechTypeInt = (int)match[index].TechType;
                     }
