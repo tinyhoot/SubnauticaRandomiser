@@ -5,6 +5,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubnauticaRandomiser", "Sub
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubnauticaRandomizer", "StephenEngland\SubnauticaRandomizer\SubnauticaRandomizer.csproj", "{38D95DEF-5DB6-4F56-8060-DC08F5CD5F10}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{14E05614-1903-437D-AD80-25E6EE173917}"
+	ProjectSection(SolutionItems) = preProject
+		mod.json = mod.json
+		recipeInformation.csv = recipeInformation.csv
+		Randomiser Ideas.txt = Randomiser Ideas.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86

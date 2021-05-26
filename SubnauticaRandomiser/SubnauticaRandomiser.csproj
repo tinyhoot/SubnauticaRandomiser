@@ -23,15 +23,9 @@
       <CustomCommands>
         <Command>
           <type>AfterBuild</type>
-          <command>cp "/home/silvignus/Documents/Dev/MonoDevelopProjects/SubnauticaRandomiser/SubnauticaRandomiser/bin/Debug/SubnauticaRandomiser.dll" "/home/silvignus/lutris/epic-games-store/drive_c/Program Files/Epic Games/Subnautica/QMods/Subnautica Randomiser"</command>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp "/home/silvignus/Documents/Dev/MonoDevelopProjects/SubnauticaRandomiser/SubnauticaRandomiser/bin/Debug/mod.json" "/home/silvignus/lutris/epic-games-store/drive_c/Program Files/Epic Games/Subnautica/QMods/Subnautica Randomiser"</command>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp "/home/silvignus/Documents/Dev/MonoDevelopProjects/SubnauticaRandomiser/SubnauticaRandomiser/bin/Debug/recipeInformation.csv" "/home/silvignus/lutris/epic-games-store/drive_c/Program Files/Epic Games/Subnautica/QMods/Subnautica Randomiser"</command>
+          <command>../CopyToSubnauticaDir.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+          <externalConsole>True</externalConsole>
         </Command>
       </CustomCommands>
     </CustomCommands>
@@ -83,14 +77,6 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="mod.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="recipeInformation.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

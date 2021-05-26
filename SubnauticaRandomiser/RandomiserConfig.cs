@@ -12,13 +12,12 @@ namespace SubnauticaRandomiser
         // Every public variable listed here will end up in the config file
         // Additionally, adding the relevant Attributes will also make them
         // show up in the in-game options menu
-        public string sBase64Seed = "";
 
-        // This option would allow for a "randomiser lite", so to speak
+        // This option would allow for a "randomiser lite", so to speak.
         // With this checked, the randomiser would not go ham on
         // everything, but rather substitute materials 1:1 for something else
-        [Toggle("Shuffle ingredients only?")]
-        public bool bShuffleRecipes = false;
+        //[Toggle("Shuffle ingredients only?")]
+        //public bool bShuffleRecipes = false;
 
         [Toggle("Use fish in logic?")]
         public bool bUseFish = false;
@@ -46,5 +45,8 @@ namespace SubnauticaRandomiser
 
             _timeButtonPressed = DateTime.UtcNow;
         }
+
+        // Way down here since it tends to take up some space and scrolling is annoying.
+        public string sBase64Seed = "";
     }
 }
