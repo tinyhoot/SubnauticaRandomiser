@@ -100,11 +100,11 @@ namespace SubnauticaRandomiser
                                                     && !x.Category.Equals(ETechTypeCategory.Seeds)
                                                     );
 
-            foreach (Recipe r in randomRecipes)
+            foreach (Recipe randomiseMe in randomRecipes)
             {
-                List<RandomiserIngredient> ingredients = r.Ingredients;
-                EProgressionNode node = r.Node;
-                LogHandler.Debug("Randomising recipe for " + r.TechType.AsString());
+                List<RandomiserIngredient> ingredients = randomiseMe.Ingredients;
+                EProgressionNode node = randomiseMe.Node;
+                LogHandler.Debug("Randomising recipe for " + randomiseMe.TechType.AsString());
 
                 for (int i=0; i<ingredients.Count; i++)
                 {
@@ -115,32 +115,46 @@ namespace SubnauticaRandomiser
                     // access to much more complete data like the item's category.
                     Recipe matchRecipe = _allMaterials.Find(x => x.TechType.Equals((TechType)ingredients[i].TechTypeInt));
 
+                    if (randomiseMe.Prerequisites != null && randomiseMe.Prerequisites.Count > i)
+                    {
+                        // In vanilla Subnautica, in a recipe where something gets
+                        // upgraded (commonly at the Modification Station), it is
+                        // always in the very first position.
+                        // Thus, we skip randomising in this case.
+                        LogHandler.Debug("  Ingredient is a prerequisite, skipping.");
+                        continue;
+                    }
+
                     // Special handling for Fish and Seeds, which are treated as 
                     // raw materials if enabled in the config.
                     List<Recipe> match = new List<Recipe>();
                     if (matchRecipe.Category.Equals(ETechTypeCategory.RawMaterials) && (useFish || useSeeds))
                     {
                         if (useFish && useSeeds)
-                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Node <= r.Node);
+                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Node <= randomiseMe.Node);
                         if (useFish && !useSeeds)
-                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish)) && x.Node <= r.Node);
+                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish)) && x.Node <= randomiseMe.Node);
                         if (!useFish && useSeeds)
-                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Node <= r.Node);
+                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Node <= randomiseMe.Node);
                     }
                     else
                     {
-                        match = _allMaterials.FindAll(x => x.Category.Equals(matchRecipe.Category) && x.Node <= r.Node);
+                        match = _allMaterials.FindAll(x => x.Category.Equals(matchRecipe.Category) && x.Node <= randomiseMe.Node);
                     }
 
                     if (match.Count > 0)
                     {
                         int index = _random.Next(0, match.Count - 1);
-                        r.Ingredients[i].TechTypeInt = (int)match[index].TechType;
-                        LogHandler.Debug("  Replacing ingredient " + ((TechType)ingredients[i].TechTypeInt).AsString() + " with " + match[index].TechType.AsString());
+                        LogHandler.Debug("  Replacing ingredient with " + match[index].TechType.AsString());
+                        randomiseMe.Ingredients[i].TechTypeInt = (int)match[index].TechType;
+                    }
+                    else
+                    {
+                        LogHandler.Debug("  Found no matching replacements for " + ingredients[i]);
                     }
                 }
-
-                ApplyRandomisedRecipe(masterDict, r);
+                
+                ApplyRandomisedRecipe(masterDict, randomiseMe);
             }
             LogHandler.Info("Finished randomising.");
             
