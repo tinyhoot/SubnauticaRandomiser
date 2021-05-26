@@ -52,33 +52,37 @@ namespace SubnauticaRandomiser
                 else
                     LogHandler.Warn("Failed to load recipe state from disk: dictionary empty.");
 
-                s_masterDict = new RecipeDictionary();
-
-                // Attempt to read and parse the CSV with all recipe information
-                List<Recipe> completeMaterialsList;
-                completeMaterialsList = CSVReader.ParseFile(s_recipeFile);
-                if (completeMaterialsList == null)
-                {
-                    LogHandler.Fatal("Failed to extract recipe information from CSV, aborting.");
-                    return;
-                }
-
-                // Try and do some randomising
-                // TODO actually make this a real thing
-                LogHandler.Debug("Attempting randomisation test...");
-                ProgressionManager pm = new ProgressionManager(5, completeMaterialsList);
-                pm.AddMaterialsToReachableList(ETechTypeCategory.RawMaterials, EProgressionNode.Depth100m);
-                pm.AddMaterialsToReachableList(ETechTypeCategory.BasicMaterials, EProgressionNode.Depth100m);
-                pm.AddMaterialsToReachableList(ETechTypeCategory.AdvancedMaterials, EProgressionNode.Depth100m);
-                pm.AddMaterialsToReachableList(completeMaterialsList.Find(x => x.TechType.Equals(TechType.Cyclops)));
-
-                pm.RandomSubstituteMaterials(s_masterDict, s_config.bUseFish, s_config.bUseSeeds);
-                LogHandler.Info("Randomisation successful!");
-                // TestRecipe.EditRadiationSuit(s_masterDict, completeMaterialsList);
-
-                SaveRecipeStateToDisk();
+                Randomise();
             }
             LogHandler.Info("Finished loading. Ready to scramble!");
+        }
+
+        public static void Randomise()
+        {
+            s_masterDict = new RecipeDictionary();
+
+            // Attempt to read and parse the CSV with all recipe information
+            List<Recipe> completeMaterialsList;
+            completeMaterialsList = CSVReader.ParseFile(s_recipeFile);
+            if (completeMaterialsList == null)
+            {
+                LogHandler.Fatal("Failed to extract recipe information from CSV, aborting.");
+                return;
+            }
+
+            // Try and do some randomising
+            LogHandler.Debug("Attempting randomisation test...");
+            ProgressionManager pm = new ProgressionManager(completeMaterialsList);
+            //pm.AddMaterialsToReachableList(ETechTypeCategory.RawMaterials, EProgressionNode.Depth100m);
+            //pm.AddMaterialsToReachableList(ETechTypeCategory.BasicMaterials, EProgressionNode.Depth100m);
+            //pm.AddMaterialsToReachableList(ETechTypeCategory.AdvancedMaterials, EProgressionNode.Depth100m);
+            //pm.AddMaterialsToReachableList(completeMaterialsList.Find(x => x.TechType.Equals(TechType.Cyclops)));
+
+            pm.RandomSubstituteMaterials(s_masterDict, s_config.bUseFish, s_config.bUseSeeds);
+            LogHandler.Info("Randomisation successful!");
+            // TestRecipe.EditRadiationSuit(s_masterDict, completeMaterialsList);
+
+            SaveRecipeStateToDisk();
         }
 
         public static void SaveRecipeStateToDisk()

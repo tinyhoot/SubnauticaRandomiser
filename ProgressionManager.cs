@@ -7,7 +7,7 @@ namespace SubnauticaRandomiser
 {
     public class ProgressionManager
     {
-        public readonly int Seed;
+        // public readonly int Seed;
         private readonly Random _random;
 
         // I was really debating making this a dictionary instead. I still made
@@ -17,10 +17,9 @@ namespace SubnauticaRandomiser
         internal List<Recipe> _allMaterials;
         private List<Recipe> _reachableMaterials;
 
-        public ProgressionManager(int seed, List<Recipe> allMaterials)
+        public ProgressionManager(List<Recipe> allMaterials)
         {
-            Seed = seed;
-            _random = new Random(seed);
+            _random = new Random();
             _allMaterials = allMaterials;
             _reachableMaterials = new List<Recipe>();
         }
@@ -173,34 +172,6 @@ namespace SubnauticaRandomiser
             // craft data, and stores a copy in the master dictionary.
             CraftDataHandler.SetTechData(recipe.TechType, recipe);
             masterDict.Add(recipe.TechType, recipe);
-        }
-        
-
-
-
-
-        public void RandomiseTest()
-        {
-            Random r = new Random(Seed);
-
-            // A test run of how randomising recipes could look like based on
-            // a seed. Of course you'd replace the hard coded lists with
-            // lists you've extracted from a recipe info CSV.
-            TechType[] testrecipes = { TechType.ComputerChip, TechType.Welder, TechType.Knife };
-
-            foreach (TechType type in testrecipes)
-            {
-                Recipe replacementRecipe = new Recipe(type, ETechTypeCategory.Tools);
-                replacementRecipe.CraftAmount = 1;
-
-                int ingredientNumber = r.Next(1, 6);
-                for (int i=1; i<=ingredientNumber; i++)
-                {
-                    replacementRecipe.Ingredients.Add(new RandomiserIngredient((int)_reachableMaterials[r.Next(0, _reachableMaterials.Count-1)].TechType, 1));
-                }
-                InitMod.s_masterDict.DictionaryInstance.Add((int)type, replacementRecipe);
-                CraftDataHandler.SetTechData(type, replacementRecipe);
-            }
         }
     }
 }

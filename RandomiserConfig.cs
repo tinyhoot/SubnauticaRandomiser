@@ -6,9 +6,12 @@ namespace SubnauticaRandomiser
     [Menu("Randomiser")]
     public class RandomiserConfig : ConfigFile
     {
-        // Every variable listed here will end up in the config file
-        // Additionally, adding the relevant Attributes will also
-        // make them show up in the in-game options menu
+        private DateTime _timeButtonPressed = new DateTime();
+        private readonly int _confirmInterval = 5;
+
+        // Every public variable listed here will end up in the config file
+        // Additionally, adding the relevant Attributes will also make them
+        // show up in the in-game options menu
         public string sBase64Seed = "";
 
         // This option would allow for a "randomiser lite", so to speak
@@ -23,10 +26,25 @@ namespace SubnauticaRandomiser
         [Toggle("Use seeds in logic?")]
         public bool bUseSeeds = false;
 
-        [Button("Reroll Seed")]
-        public void NewSeed()
+        [Button("Randomise Again")]
+        public void NewRandomisation()
         {
-            // TODO
+            // Re-randomising everything is a serious request, and it should not
+            // happen accidentally. This here ensures the button is pressed twice
+            // within a certain timeframe before actually randomising.
+            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds > _confirmInterval)
+            {
+                LogHandler.MainMenuMessage("Are you sure you wish to re-randomise all recipes?");
+                LogHandler.MainMenuMessage("Press the button again to proceed.");
+            }
+            else
+            {
+                LogHandler.MainMenuMessage("Randomising...");
+                InitMod.Randomise();
+                LogHandler.MainMenuMessage("Finished randomising!");
+            }
+
+            _timeButtonPressed = DateTime.UtcNow;
         }
     }
 }
