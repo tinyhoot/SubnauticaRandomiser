@@ -73,13 +73,11 @@ namespace SubnauticaRandomiser
             return success;
         }
 
-        public void RandomSubstituteMaterials(RecipeDictionary masterDict)
+        public void RandomSubstituteMaterials(RecipeDictionary masterDict, bool useFish, bool useSeeds)
         {
             // This is the simplest way of randomisation. Merely take all materials
             // and substitute them with other materials of the same category and
             // depth difficulty.
-            // For now, this only randomises the ingredients for basic and
-            // advanced materials.
             List<Recipe> randomRecipes = new List<Recipe>();
             LogHandler.Info("Randomising using simple substitution...");
 
@@ -87,15 +85,20 @@ namespace SubnauticaRandomiser
             // Tools and Rocket both crash as they try to replace recipes they
             // cannot pull proper data on (Bladderfish + Shield Module)
             //randomRecipes = _allMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.BasicMaterials));
-            randomRecipes = _allMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.BasicMaterials) 
-                                                    || x.Category.Equals(ETechTypeCategory.AdvancedMaterials)
-                                                    || x.Category.Equals(ETechTypeCategory.Electronics) 
-                                                    || x.Category.Equals(ETechTypeCategory.Deployables) 
-                                                    || x.Category.Equals(ETechTypeCategory.Equipment)
-                                                 //   || x.Category.Equals(ETechTypeCategory.Rocket)
-                                                    || x.Category.Equals(ETechTypeCategory.Tablets)
-                                                 //   || x.Category.Equals(ETechTypeCategory.Tools)
-                                                    || x.Category.Equals(ETechTypeCategory.Vehicles)
+            //randomRecipes = _allMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.BasicMaterials) 
+                                                    //|| x.Category.Equals(ETechTypeCategory.AdvancedMaterials)
+                                                    //|| x.Category.Equals(ETechTypeCategory.Electronics) 
+                                                    //|| x.Category.Equals(ETechTypeCategory.Deployables) 
+                                                    //|| x.Category.Equals(ETechTypeCategory.Equipment)
+                                                    //|| x.Category.Equals(ETechTypeCategory.Rocket)
+                                                    //|| x.Category.Equals(ETechTypeCategory.Tablets)
+                                                    //|| x.Category.Equals(ETechTypeCategory.Tools)
+                                                    //|| x.Category.Equals(ETechTypeCategory.Vehicles)
+                                                    //);
+
+            randomRecipes = _allMaterials.FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials)
+                                                    && !x.Category.Equals(ETechTypeCategory.Fish)
+                                                    && !x.Category.Equals(ETechTypeCategory.Seeds)
                                                     );
 
             foreach (Recipe r in randomRecipes)
@@ -106,22 +109,42 @@ namespace SubnauticaRandomiser
 
                 for (int i=0; i<ingredients.Count; i++)
                 {
-                    LogHandler.Debug("Found ingredient " + ((TechType)ingredients[i].TechTypeInt).AsString());
+                    LogHandler.Debug("  Found ingredient " + ((TechType)ingredients[i].TechTypeInt).AsString());
+
+                    // Find the Recipe object that matches the TechType of the
+                    // ingredient we aim to randomise. With the Recipe, we have
+                    // access to much more complete data like the item's category.
                     Recipe matchRecipe = _allMaterials.Find(x => x.TechType.Equals((TechType)ingredients[i].TechTypeInt));
-                    List<Recipe> match = _allMaterials.FindAll(x => x.Category.Equals(matchRecipe.Category) && x.Node <= r.Node);
+
+                    // Special handling for Fish and Seeds, which are treated as 
+                    // raw materials if enabled in the config.
+                    List<Recipe> match = new List<Recipe>();
+                    if (matchRecipe.Category.Equals(ETechTypeCategory.RawMaterials) && (useFish || useSeeds))
+                    {
+                        if (useFish && useSeeds)
+                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Node <= r.Node);
+                        if (useFish && !useSeeds)
+                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish)) && x.Node <= r.Node);
+                        if (!useFish && useSeeds)
+                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Node <= r.Node);
+                    }
+                    else
+                    {
+                        match = _allMaterials.FindAll(x => x.Category.Equals(matchRecipe.Category) && x.Node <= r.Node);
+                    }
+
                     if (match.Count > 0)
                     {
                         int index = _random.Next(0, match.Count - 1);
                         r.Ingredients[i].TechTypeInt = (int)match[index].TechType;
-                        LogHandler.Debug("We have a match: " + match[index].TechType.AsString());
-                        LogHandler.Debug("Ingredient " + ingredients[i].TechTypeInt);
+                        LogHandler.Debug("  Replacing ingredient " + ((TechType)ingredients[i].TechTypeInt).AsString() + " with " + match[index].TechType.AsString());
                     }
                 }
 
                 ApplyRandomisedRecipe(masterDict, r);
             }
             LogHandler.Info("Finished randomising.");
-
+            
             return;
         }
 

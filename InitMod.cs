@@ -49,8 +49,9 @@ namespace SubnauticaRandomiser
             {
                 if (_debug_forceRandomise)
                     LogHandler.Warn("Set to forcibly re-randomise recipes.");
+                else
+                    LogHandler.Warn("Failed to load recipe state from disk: dictionary empty.");
 
-                LogHandler.Debug("Failed to load recipe state from disk: dictionary empty.");
                 s_masterDict = new RecipeDictionary();
 
                 // Attempt to read and parse the CSV with all recipe information
@@ -71,7 +72,7 @@ namespace SubnauticaRandomiser
                 pm.AddMaterialsToReachableList(ETechTypeCategory.AdvancedMaterials, EProgressionNode.Depth100m);
                 pm.AddMaterialsToReachableList(completeMaterialsList.Find(x => x.TechType.Equals(TechType.Cyclops)));
 
-                pm.RandomSubstituteMaterials(s_masterDict);
+                pm.RandomSubstituteMaterials(s_masterDict, s_config.bUseFish, s_config.bUseSeeds);
                 LogHandler.Info("Randomisation successful!");
                 // TestRecipe.EditRadiationSuit(s_masterDict, completeMaterialsList);
 

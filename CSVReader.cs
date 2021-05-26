@@ -76,7 +76,7 @@ namespace SubnauticaRandomiser
             {
                 throw new InvalidDataException("Unexpected number of columns: " + cells.Length);
             }
-
+            
             // Now to convert the data in each cell to an object we can use
             // Column 1: TechType
             type = StringToTechType(cells[0]);
@@ -135,6 +135,7 @@ namespace SubnauticaRandomiser
                 craftAmount = int.Parse(cells[5]);
             }
 
+            LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depthDifficulty.ToString() +" ... "+ craftAmount);
             recipe = new Recipe(type, category, depthDifficulty, prereqList, craftAmount);
             return recipe;
         }

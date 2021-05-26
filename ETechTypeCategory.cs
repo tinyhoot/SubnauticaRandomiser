@@ -4,6 +4,8 @@ namespace SubnauticaRandomiser
     public enum ETechTypeCategory
     {
         None,
+        Fish,
+        Seeds,
         RawMaterials,
         BasicMaterials,
         AdvancedMaterials,
@@ -13,7 +15,14 @@ namespace SubnauticaRandomiser
         Tablets,
         Deployables,
         Vehicles,
+        VehicleUpgrades,
+        WorkBenchUpgrades,
         Rocket,
-        Seeds
+        Torpedos,
+        BaseBasePieces,
+        BaseExternalModules,
+        BaseInternalModules,
+        BaseInternalPieces,
+        BaseGenerators
     }
 }
