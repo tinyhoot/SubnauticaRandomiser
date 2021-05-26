@@ -39,6 +39,7 @@ TitaniumIngot,Titanium:10,BasicMaterials,0,,1
 AramidFibers,Benzene:1;FiberMesh:1,AdvancedMaterials,300,,1
 Aerogel,JellyPlant:1;AluminumOxide:1,AdvancedMaterials,300,,1
 Benzene,BloodOil:3,AdvancedMaterials,300,,1
+HatchingEnzymes,,AdvancedMaterials,1700,,1
 HydrochloricAcid,WhiteMushroom:3;Salt:1,AdvancedMaterials,300,,1
 Polyaniline,HydrochloricAcid:1;Gold:1,AdvancedMaterials,300,,1
 AdvancedWiringKit,WiringKit:1;Gold:2;ComputerChip:1,Electronics,100,,1
