@@ -32,7 +32,7 @@ namespace SubnauticaRandomiser
             // recipe already loaded by the game. Raw materials do not have any
             // recipes to load this data from and *will* cause a NullReference.
             TechData techdata = CraftDataHandler.GetTechData(type);
-            if (!category.Equals(ETechTypeCategory.RawMaterials))
+            if (!category.Equals(ETechTypeCategory.RawMaterials) && !category.Equals(ETechTypeCategory.Fish) && !category.Equals(ETechTypeCategory.Seeds))
             {
                 if (techdata.ingredientCount > 0)
                 {
