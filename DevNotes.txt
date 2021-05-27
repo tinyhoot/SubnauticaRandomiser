@@ -16,6 +16,8 @@
   - Prerequisites. Their usefulness is limited in a true randomiser. However,
     there might still be a use case in a less random, more casual setting of the
     randomiser, where upgrades are still treated as sequential.
+    - Also, they work well for base pieces. Having a nuclear reactor won't do
+      you much good if you cannot make any multipurpose rooms.
   - CraftAmount. A companion field to Ingredients and similarly not much more
     than a crutch for the simple randomiser. However, it could be retooled into
     a Price or Value field which assigns each item a basic value related to

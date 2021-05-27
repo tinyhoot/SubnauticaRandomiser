@@ -51,6 +51,7 @@
     <Compile Include="EProgressionNode.cs" />
     <Compile Include="ProgressionPath.cs" />
     <Compile Include="TestRecipe.cs" />
+    <Compile Include="Blueprint.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="QModInstaller">

@@ -10,7 +10,7 @@ namespace SubnauticaRandomiser
         private static string[] s_csvLines;
         internal static List<Recipe> s_csvParsedList;
 
-        private static readonly int s_expectedColumns = 6;
+        private static readonly int s_expectedColumns = 8;
 
         internal static List<Recipe> ParseFile(string fileName)
         {
@@ -70,6 +70,10 @@ namespace SubnauticaRandomiser
             List<TechType> prereqList = new List<TechType>();
             int craftAmount = 1;
 
+            Blueprint blueprint = null;
+            List<TechType> blueprintUnlockConditions = new List<TechType>();
+            int blueprintUnlockDepth = 0;
+
             string[] cells = line.Split(',');
 
             if (cells.Length != s_expectedColumns)
@@ -114,19 +118,10 @@ namespace SubnauticaRandomiser
                 depthDifficulty = StringToEProgressionNode(cells[3]);
             }
 
-            // Column 5: Prerequisites
+            // Column 5: Prerequisites. Really necessary with blueprints?
             if (!String.IsNullOrEmpty(cells[4]))
             {
-                string[] prerequisites = cells[4].Split(';');
-
-                foreach (string pre in prerequisites)
-                {
-                    if (!String.IsNullOrEmpty(pre))
-                    {
-                        TechType t = StringToTechType(pre);
-                        prereqList.Add(t);
-                    }
-                }
+                prereqList = ProcessMultipleTechTypes(cells[4].Split(';'));
             }
 
             // Column 6: Craft Amount
@@ -135,9 +130,44 @@ namespace SubnauticaRandomiser
                 craftAmount = int.Parse(cells[5]);
             }
 
+            // Column 7: Blueprint Unlock Conditions
+            if (!String.IsNullOrEmpty(cells[6]))
+            {
+                blueprintUnlockConditions = ProcessMultipleTechTypes(cells[6].Split(';'));
+            }
+
+            // Column 8: Blueprint Unlock Depth
+            if (!String.IsNullOrEmpty(cells[7]))
+            {
+                blueprintUnlockDepth = int.Parse(cells[8]);
+            }
+            
+            // Only if either of the two blueprint components yielded anything,
+            // ship the recipe with a blueprint.
+            if (blueprintUnlockConditions != null || blueprintUnlockDepth != 0)
+            {
+                blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintUnlockDepth);
+            }
+            
             LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depthDifficulty.ToString() +" ... "+ craftAmount);
-            recipe = new Recipe(type, category, depthDifficulty, prereqList, craftAmount);
+            recipe = new Recipe(type, category, depthDifficulty, prereqList, craftAmount, blueprint);
             return recipe;
+        }
+
+        internal static List<TechType> ProcessMultipleTechTypes(string[] str)
+        {
+            List<TechType> output = new List<TechType>();
+
+            foreach (string s in str)
+            {
+                if (!String.IsNullOrEmpty(s))
+                {
+                    TechType t = StringToTechType(s);
+                    output.Add(t);
+                }
+            }
+
+            return output;
         }
 
         internal static TechType StringToTechType(string str)

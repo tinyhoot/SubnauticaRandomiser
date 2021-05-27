@@ -141,7 +141,7 @@ namespace SubnauticaRandomiser
                     {
                         match = _allMaterials.FindAll(x => x.Category.Equals(matchRecipe.Category) && x.Node <= randomiseMe.Node);
                     }
-
+                    
                     if (match.Count > 0)
                     {
                         bool foundMatch = false;
