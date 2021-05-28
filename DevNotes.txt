@@ -1,0 +1,39 @@
+﻿How blueprints and the new system in general should work:
+
+- Read information from the CSV
+  - For items which have that information, create a Blueprint object and build
+    the Recipe object with that included.
+  - Blueprints can unlock in one of three ways: collect an item, craft an item,
+    or via fragment scan. A given blueprint may also unlock a chain of others.
+    - For example, Blood Oil unlocks Benzene AND Aramid Fibers, although the
+      latter do not include Blood Oil in their recipe.
+  - Many of the fields defining blueprint unlock information will have a fragment
+    listed there. 
+      
+- In the future,the CSV will likely be able to drop the following categories:
+  - Ingredients. These are used as a fallback crutch by the current system, and
+    a true logic-based system should have no need of them.
+  - CraftAmount. A companion field to Ingredients and similarly not much more
+    than a crutch for the simple randomiser. However, it could be retooled into
+    a Price or Value field which assigns each item a basic value related to
+    how difficult or annoying it is to get. Titanium would get a much lower value
+    than Lithium, for example. Even non-raw items would gain such a value, calculated
+    from their vanilla ingredients, which then provides the randomiser with a
+    rough idea of what to shoot for with the new ingredients it is selecting.
+    - As a side effect, such a system would also reduce grinding. Getting ten
+      pieces of Titanium is a very different beast to getting ten Diamonds. The
+      difficulty of the randomiser should lie in figuring out how to get *TO* an
+      ingredient, not how to find twenty of them.
+    
+- Build a dependency/progression tree which assigns each of the major milestones
+  several solutions with which to reach them.
+  - This tree does not have to be absolute. For example, while a cyclops only
+    lets you reach 500m, exploring with a rebreather and seaglide can easily let
+    you go down another one or two hundred - which could make all the difference
+    particularly where fish or seeds are concerned.
+    
+   
+   
+Additional Thoughts:
+- If fish are enabled, ensuring that the player has access to an aquarium by a
+  certain depth level would be really nice. Same goes for eggs.

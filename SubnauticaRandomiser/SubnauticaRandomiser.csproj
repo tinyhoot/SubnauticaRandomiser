@@ -23,7 +23,7 @@
       <CustomCommands>
         <Command>
           <type>AfterBuild</type>
-          <command>../CopyToSubnauticaDir.sh</command>
+          <command>../../CopyToSubnauticaDir.sh</command>
           <workingdir>${ProjectDir}</workingdir>
           <externalConsole>True</externalConsole>
         </Command>
@@ -40,17 +40,17 @@
   <ItemGroup>
     <Compile Include="InitMod.cs" />
     <Compile Include="RandomiserConfig.cs" />
-    <Compile Include="Recipe.cs" />
     <Compile Include="ProgressionManager.cs" />
     <Compile Include="CSVReader.cs" />
     <Compile Include="LogHandler.cs" />
-    <Compile Include="ETechTypeCategory.cs" />
-    <Compile Include="RecipeDictionary.cs" />
-    <Compile Include="RandomiserIngredient.cs" />
     <Compile Include="ProgressionTree.cs" />
-    <Compile Include="EProgressionNode.cs" />
     <Compile Include="ProgressionPath.cs" />
-    <Compile Include="TestRecipe.cs" />
+    <Compile Include="RandomiserObjects\Blueprint.cs" />
+    <Compile Include="RandomiserObjects\RandomiserIngredient.cs" />
+    <Compile Include="RandomiserObjects\EProgressionNode.cs" />
+    <Compile Include="RandomiserObjects\ETechTypeCategory.cs" />
+    <Compile Include="RandomiserObjects\Recipe.cs" />
+    <Compile Include="RandomiserObjects\RecipeDictionary.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="QModInstaller">
@@ -77,6 +77,9 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="RandomiserObjects\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

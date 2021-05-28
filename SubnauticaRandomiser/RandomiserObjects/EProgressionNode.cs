@@ -13,9 +13,9 @@ namespace SubnauticaRandomiser
         Depth900m = 900,
         Depth1300m = 1300,
         Depth1700m = 1700,
-        //VehicleSeaglide,
-        //VehicleSeamoth,
-        //VehicleExosuit,
-        //VehicleCyclops
+        AnyKnife,
+        Constructor,    // Mobile Vehicle Bay
+        DrillArm,
+        WorkBench       // Modification Station
     }
 }

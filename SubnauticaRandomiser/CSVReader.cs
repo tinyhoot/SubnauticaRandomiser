@@ -10,7 +10,7 @@ namespace SubnauticaRandomiser
         private static string[] s_csvLines;
         internal static List<Recipe> s_csvParsedList;
 
-        private static readonly int s_expectedColumns = 6;
+        private static readonly int s_expectedColumns = 8;
 
         internal static List<Recipe> ParseFile(string fileName)
         {
@@ -66,9 +66,15 @@ namespace SubnauticaRandomiser
             TechType type = TechType.None;
             List<Ingredient> ingredientList = new List<Ingredient>();
             ETechTypeCategory category = ETechTypeCategory.None;
-            EProgressionNode depthDifficulty = EProgressionNode.None;
+            int depth = 0;
             List<TechType> prereqList = new List<TechType>();
             int craftAmount = 1;
+
+            Blueprint blueprint = null;
+            List<TechType> blueprintUnlockConditions = new List<TechType>();
+            TechType blueprintFragment = TechType.None;
+            bool blueprintDatabox = false;
+            int blueprintUnlockDepth = 0;
 
             string[] cells = line.Split(',');
 
@@ -111,22 +117,13 @@ namespace SubnauticaRandomiser
             // Column 4: Depth Difficulty
             if (!String.IsNullOrEmpty(cells[3]))
             {
-                depthDifficulty = StringToEProgressionNode(cells[3]);
+                depth = int.Parse(cells[3]);
             }
 
             // Column 5: Prerequisites
             if (!String.IsNullOrEmpty(cells[4]))
             {
-                string[] prerequisites = cells[4].Split(';');
-
-                foreach (string pre in prerequisites)
-                {
-                    if (!String.IsNullOrEmpty(pre))
-                    {
-                        TechType t = StringToTechType(pre);
-                        prereqList.Add(t);
-                    }
-                }
+                prereqList = ProcessMultipleTechTypes(cells[4].Split(';'));
             }
 
             // Column 6: Craft Amount
@@ -135,9 +132,63 @@ namespace SubnauticaRandomiser
                 craftAmount = int.Parse(cells[5]);
             }
 
-            LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depthDifficulty.ToString() +" ... "+ craftAmount);
-            recipe = new Recipe(type, category, depthDifficulty, prereqList, craftAmount);
+            // Column 7: Blueprint Unlock Conditions
+            if (!String.IsNullOrEmpty(cells[6]))
+            {
+                //blueprintUnlockConditions = ProcessMultipleTechTypes(cells[6].Split(';'));
+                string[] conditions = cells[6].Split(';');
+
+                foreach (string str in conditions)
+                {
+                    if (str.ToLower().Contains("fragment"))
+                    {
+                        // HACK This code as-is will not handle the Cyclops properly
+                        // but I feel like that one needs special care anyways.
+                        blueprintFragment = StringToTechType(str);
+                    } 
+                    else if (str.ToLower().Contains("databox"))
+                    {
+                        blueprintDatabox = true;
+                    }
+                    else
+                    {
+                        blueprintUnlockConditions.Add(StringToTechType(str));
+                    }
+                }
+            }
+
+            // Column 8: Blueprint Unlock Depth
+            if (!String.IsNullOrEmpty(cells[7]))
+            {
+                blueprintUnlockDepth = int.Parse(cells[7]);
+            }
+            
+            // Only if any of the blueprint components yielded anything,
+            // ship the recipe with a blueprint.
+            if (blueprintUnlockConditions != null || blueprintUnlockDepth != 0 || !blueprintDatabox || !blueprintFragment.Equals(TechType.None))
+            {
+                blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragment, blueprintDatabox, blueprintUnlockDepth);
+            }
+            
+            LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depth +" ... "+ craftAmount);
+            recipe = new Recipe(type, category, depth, prereqList, craftAmount, blueprint);
             return recipe;
+        }
+
+        internal static List<TechType> ProcessMultipleTechTypes(string[] str)
+        {
+            List<TechType> output = new List<TechType>();
+
+            foreach (string s in str)
+            {
+                if (!String.IsNullOrEmpty(s))
+                {
+                    TechType t = StringToTechType(s);
+                    output.Add(t);
+                }
+            }
+
+            return output;
         }
 
         internal static TechType StringToTechType(string str)
