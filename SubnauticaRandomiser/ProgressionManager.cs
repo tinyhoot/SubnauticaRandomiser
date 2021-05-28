@@ -26,14 +26,14 @@ namespace SubnauticaRandomiser
             _depthProgressionItems = new List<TechType>();
         }
 
-        public bool AddMaterialsToReachableList(ETechTypeCategory category, EProgressionNode node)
+        public bool AddMaterialsToReachableList(ETechTypeCategory category, int reachableDepth)
         {
             bool success = false;
-            LogHandler.Debug("Updating list of reachable materials: "+category.ToString()+", "+node.ToString());
+            LogHandler.Debug("Updating list of reachable materials: "+category.ToString()+", "+reachableDepth);
             // This is a stupidly complicated expression. It uses a lambda to
             // compare the search parameters against all materials contained
             // in the _allMaterials master list.
-            List<Recipe> additions = _allMaterials.FindAll(x => x.Category.Equals(category) && x.Node.Equals(node));
+            List<Recipe> additions = _allMaterials.FindAll(x => x.Category.Equals(category) && x.Depth <= reachableDepth);
             
             // Ensure no duplicates are added to the list. This loop *must* go
             // in reverse, otherwise the computer gets very unhappy.
@@ -90,7 +90,7 @@ namespace SubnauticaRandomiser
             foreach (Recipe randomiseMe in randomRecipes)
             {
                 List<RandomiserIngredient> ingredients = randomiseMe.Ingredients;
-                EProgressionNode node = randomiseMe.Node;
+                int depth = randomiseMe.Depth;
                 LogHandler.Debug("Randomising recipe for " + randomiseMe.TechType.AsString());
 
                 for (int i=0; i<ingredients.Count; i++)
@@ -118,15 +118,15 @@ namespace SubnauticaRandomiser
                     if (matchRecipe.Category.Equals(ETechTypeCategory.RawMaterials) && (useFish || useSeeds))
                     {
                         if (useFish && useSeeds)
-                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Node <= randomiseMe.Node);
+                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Depth <= randomiseMe.Depth);
                         if (useFish && !useSeeds)
-                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish)) && x.Node <= randomiseMe.Node);
+                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish)) && x.Depth <= randomiseMe.Depth);
                         if (!useFish && useSeeds)
-                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Node <= randomiseMe.Node);
+                            match = _allMaterials.FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Depth <= randomiseMe.Depth);
                     }
                     else
                     {
-                        match = _allMaterials.FindAll(x => x.Category.Equals(matchRecipe.Category) && x.Node <= randomiseMe.Node);
+                        match = _allMaterials.FindAll(x => x.Category.Equals(matchRecipe.Category) && x.Depth <= randomiseMe.Depth);
                     }
                     
                     if (match.Count > 0)
@@ -262,7 +262,7 @@ namespace SubnauticaRandomiser
             {
                 breathTime = 75;
                 tankPenalty = 0.4;
-                double depth = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed - tankPenalty) / 2;
+                double depth = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed - tankPenalty)) / 2;
                 playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
             }
 

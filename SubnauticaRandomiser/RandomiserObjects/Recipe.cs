@@ -11,19 +11,19 @@ namespace SubnauticaRandomiser
         public List<RandomiserIngredient> Ingredients;
         public List<TechType> LinkedIngredients;
         public ETechTypeCategory Category;
-        public EProgressionNode Node;
+        public int Depth;
         public List<TechType> Prerequisites;
-        public int CraftAmount = 1;
+        public int CraftAmount;
         public Blueprint Blueprint;
 
         public int craftAmount { get { return CraftAmount; } }
         public int ingredientCount { get { return Ingredients.Count; } }
         public int linkedItemCount { get { return LinkedIngredients.Count; } }
 
-        public Recipe(TechType type, ETechTypeCategory category, EProgressionNode node = EProgressionNode.None, List<TechType> prereqs = null, int craftAmount = 1, Blueprint blueprint = null)
+        public Recipe(TechType type, ETechTypeCategory category, int depth = 0, List<TechType> prereqs = null, int craftAmount = 1, Blueprint blueprint = null)
         {
             CraftAmount = craftAmount;
-            Node = node;
+            Depth = depth;
 
             TechType = type;
             Ingredients = new List<RandomiserIngredient>();
@@ -82,7 +82,7 @@ namespace SubnauticaRandomiser
 
             result += Category.ToString() + separator;
 
-            result += Node.ToString() + separator;
+            result += Depth + separator;
 
             if (Prerequisites.Count != 0)
             {

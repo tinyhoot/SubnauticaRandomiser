@@ -66,7 +66,7 @@ namespace SubnauticaRandomiser
             TechType type = TechType.None;
             List<Ingredient> ingredientList = new List<Ingredient>();
             ETechTypeCategory category = ETechTypeCategory.None;
-            EProgressionNode depthDifficulty = EProgressionNode.None;
+            int depth = 0;
             List<TechType> prereqList = new List<TechType>();
             int craftAmount = 1;
 
@@ -115,7 +115,7 @@ namespace SubnauticaRandomiser
             // Column 4: Depth Difficulty
             if (!String.IsNullOrEmpty(cells[3]))
             {
-                depthDifficulty = StringToEProgressionNode(cells[3]);
+                depth = int.Parse(cells[3]);
             }
 
             // Column 5: Prerequisites
@@ -149,8 +149,8 @@ namespace SubnauticaRandomiser
                 blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintUnlockDepth);
             }
             
-            LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depthDifficulty.ToString() +" ... "+ craftAmount);
-            recipe = new Recipe(type, category, depthDifficulty, prereqList, craftAmount, blueprint);
+            LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depth +" ... "+ craftAmount);
+            recipe = new Recipe(type, category, depth, prereqList, craftAmount, blueprint);
             return recipe;
         }
 
