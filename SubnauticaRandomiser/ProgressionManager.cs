@@ -17,15 +17,6 @@ namespace SubnauticaRandomiser
         internal List<Recipe> _allMaterials;
         private List<Recipe> _reachableMaterials;
         private List<TechType> _depthProgressionItems;
-        // Two values for what depth the player is currently able to reach.
-        // _vehicleDepth is the lowest point any unlocked vehicles, including
-        // any depth modules, can currently reach.
-        // _diverDepth is how far the player can be expected to go beyond that
-        // "on foot". E.g. the player's seamoth only reaches 200m, but because
-        // they also have a seaglide and a rebreather, they can reach 300m-400m.
-        // TODO implement this after you have a rough draft of the logic
-        //private int _vehicleDepth = 0;
-        //private int _diverDepth = 0;
 
         public ProgressionManager(List<Recipe> allMaterials)
         {
@@ -90,21 +81,6 @@ namespace SubnauticaRandomiser
             // depth difficulty.
             List<Recipe> randomRecipes = new List<Recipe>();
             LogHandler.Info("Randomising using simple substitution...");
-
-            // This is ugly as all hell, but it will do until the CSV is more complete.
-            // Tools and Rocket both crash as they try to replace recipes they
-            // cannot pull proper data on (Bladderfish + Shield Module)
-            //randomRecipes = _allMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.BasicMaterials));
-            //randomRecipes = _allMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.BasicMaterials) 
-                                                    //|| x.Category.Equals(ETechTypeCategory.AdvancedMaterials)
-                                                    //|| x.Category.Equals(ETechTypeCategory.Electronics) 
-                                                    //|| x.Category.Equals(ETechTypeCategory.Deployables) 
-                                                    //|| x.Category.Equals(ETechTypeCategory.Equipment)
-                                                    //|| x.Category.Equals(ETechTypeCategory.Rocket)
-                                                    //|| x.Category.Equals(ETechTypeCategory.Tablets)
-                                                    //|| x.Category.Equals(ETechTypeCategory.Tools)
-                                                    //|| x.Category.Equals(ETechTypeCategory.Vehicles)
-                                                    //);
 
             randomRecipes = _allMaterials.FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials)
                                                     && !x.Category.Equals(ETechTypeCategory.Fish)
@@ -206,9 +182,10 @@ namespace SubnauticaRandomiser
             //   - Check if it has all dependencies, both as an item and as a
             //     blueprint, fulfilled. Abort and skip if not.
             //   - Randomise its ingredients using available materials
-            //   - Put it in _reachableMaterials
+            //   - Add it to _reachableMaterials
             //     - If it's a knife, also add all seeds and chunks
             //     - If it's not an item (like a base piece), skip this step
+            //   - Add it to the master dictionary
             //   - Recalculate reachable depth
             //   - Repeat
             // - Once all items have been randomised, do an integrity check for
@@ -278,7 +255,7 @@ namespace SubnauticaRandomiser
                 finSpeed = 1.88;
 
             // How deep can the player go without any tanks?
-            playerDepthRaw = (breathTime - searchTime) * (seaglide? seaglideSpeed : (swimmingSpeed + finSpeed)) / 2;
+            playerDepthRaw = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed)) / 2;
 
             // But can they go deeper with a tank? (Yes.)
             if (progressionItems.Contains(TechType.Tank))

@@ -14,6 +14,7 @@ namespace SubnauticaRandomiser
         internal static string s_modDirectory;
         internal static RandomiserConfig s_config;
         internal static readonly string s_recipeFile = "recipeinformation.csv";
+
         // The master list of all recipes that have been modified
         internal static RecipeDictionary s_masterDict = new RecipeDictionary();
         private static readonly bool _debug_forceRandomise = false;
@@ -80,7 +81,6 @@ namespace SubnauticaRandomiser
 
             pm.RandomSubstituteMaterials(s_masterDict, s_config.bUseFish, s_config.bUseSeeds);
             LogHandler.Info("Randomisation successful!");
-            // TestRecipe.EditRadiationSuit(s_masterDict, completeMaterialsList);
 
             SaveRecipeStateToDisk();
         }

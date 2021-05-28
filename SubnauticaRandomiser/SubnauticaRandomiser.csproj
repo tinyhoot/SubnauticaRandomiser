@@ -45,7 +45,6 @@
     <Compile Include="LogHandler.cs" />
     <Compile Include="ProgressionTree.cs" />
     <Compile Include="ProgressionPath.cs" />
-    <Compile Include="TestRecipe.cs" />
     <Compile Include="RandomiserObjects\Blueprint.cs" />
     <Compile Include="RandomiserObjects\RandomiserIngredient.cs" />
     <Compile Include="RandomiserObjects\EProgressionNode.cs" />
