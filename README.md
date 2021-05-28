@@ -1,5 +1,5 @@
-# SubnauticaRandomiser
-A Subnautica Mod that randomises recipes for replayability.
+# Subnautica Randomiser
+A Subnautica Mod that randomises recipes for replayability, based on the work of [stephenengland](https://github.com/stephenengland/SubnauticaRandomizer).
 
 This can make the game considerably more difficult, and the varying availability of ingredients may also make it harder to collect enough of what you need.
 
