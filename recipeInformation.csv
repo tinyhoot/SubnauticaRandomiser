@@ -59,7 +59,7 @@ LaserCutter,Battery:1;Diamond:2;Titanium:1;CrashPowder:1,Tools,200,,1,LaserCutte
 LedLight,Battery:1;Titanium:1;Glass:1,Tools,200,,1,LedLightFragment,120
 PropulsionCannon,Battery:1;Titanium:1;WiringKit:1,Tools,0,,1,PropulsionCannonFragment,0
 Scanner,Battery:1;Titanium:1,Tools,0,,1,,
-StasisRifle,Battery:1;Titanium:1;ComputerChip:1;Magnetite:2,Tools,100,,1,StatisRifleFragment,25
+StasisRifle,Battery:1;Titanium:1;ComputerChip:1;Magnetite:2,Tools,100,,1,StasisRifleFragment,25
 Knife,Silicone:1;Titanium:1,Tools,0,,1,,
 Welder,Silicone:1;Titanium:1;CrashPowder:1,Tools,0,,1,,
 PrecursorKey_Blue,PrecursorIonCrystal:1;Kyanite:2,Tablets,1300,,1,,1182
@@ -112,7 +112,6 @@ CyclopsShieldModule,,VehicleUpgrades,300,Cyclops,1,Databox;Cyclops,168
 CyclopsSonarModule,,VehicleUpgrades,300,Cyclops,1,Databox;Cyclops,198
 CyclopsThermalReactorModule,,VehicleUpgrades,900,Cyclops,1,Databox;Cyclops,120
 ExoHullModule1,,VehicleUpgrades,900,BaseUpgradeConsole,1,,
-ExoSuitClawArmModule,,VehicleUpgrades,300,BaseUpgradeConsole,1,Exosuit,
 ExoSuitDrillArmModule,,VehicleUpgrades,200,BaseUpgradeConsole,1,ExosuitDrillArmFragment,179
 ExoSuitGrapplingArmModule,,VehicleUpgrades,300,BaseUpgradeConsole,1,ExosuitGrapplingArmFragment,179
 ExoSuitJetUpgradeModule,,VehicleUpgrades,900,BaseUpgradeConsole,1,BaseUpgradeConsole,
