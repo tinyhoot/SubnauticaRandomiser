@@ -47,6 +47,8 @@ namespace SubnauticaRandomiser
             // 300m. Requires Seamoth I.
             path = new ProgressionPath(EProgressionNode.Depth300m);
             path.AddPath(new TechType[] { TechType.Seamoth, TechType.VehicleHullModule1 });
+            path.AddPath(new TechType[] { TechType.Seamoth, TechType.VehicleHullModule2 });
+            path.AddPath(new TechType[] { TechType.Seamoth, TechType.VehicleHullModule3 });
             path.AddPath(TechType.Exosuit);
             path.AddPath(TechType.Cyclops);
             SetProgressionPath(EProgressionNode.Depth300m, path);
@@ -54,6 +56,7 @@ namespace SubnauticaRandomiser
             // 500m. Reachable with Seamoth II, Prawn, or Cyclops.
             path = new ProgressionPath(EProgressionNode.Depth500m);
             path.AddPath(new TechType[] { TechType.Seamoth, TechType.VehicleHullModule2 });
+            path.AddPath(new TechType[] { TechType.Seamoth, TechType.VehicleHullModule3 });
             path.AddPath(TechType.Exosuit);
             path.AddPath(TechType.Cyclops);
             SetProgressionPath(EProgressionNode.Depth500m, path);
@@ -63,12 +66,16 @@ namespace SubnauticaRandomiser
             path.AddPath(new TechType[] {TechType.Seamoth, TechType.VehicleHullModule3 });
             path.AddPath(TechType.Exosuit);
             path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule1 });
+            path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule2 });
+            path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule3 });
             SetProgressionPath(EProgressionNode.Depth900m, path);
 
             // 1300m. Reachable with Prawn I or Cyclops II.
             path = new ProgressionPath(EProgressionNode.Depth1300m);
             path.AddPath(new TechType[] { TechType.Exosuit, TechType.ExoHullModule1 });
+            path.AddPath(new TechType[] { TechType.Exosuit, TechType.ExoHullModule2 });
             path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule2 });
+            path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule3 });
             SetProgressionPath(EProgressionNode.Depth1300m, path);
 
             // 1700m. Only Prawn II and Cyclops III can reach here.
@@ -91,6 +98,15 @@ namespace SubnauticaRandomiser
             depthProgressionItems.Add(TechType.Seamoth, true);
             depthProgressionItems.Add(TechType.Exosuit, true);
             depthProgressionItems.Add(TechType.Cyclops, true);
+
+            depthProgressionItems.Add(TechType.VehicleHullModule1, true);
+            depthProgressionItems.Add(TechType.VehicleHullModule2, true);
+            depthProgressionItems.Add(TechType.VehicleHullModule3, true);
+            depthProgressionItems.Add(TechType.ExoHullModule1, true);
+            depthProgressionItems.Add(TechType.ExoHullModule2, true);
+            depthProgressionItems.Add(TechType.CyclopsHullModule1, true);
+            depthProgressionItems.Add(TechType.CyclopsHullModule2, true);
+            depthProgressionItems.Add(TechType.CyclopsHullModule3, true);
         }
 
         public ProgressionPath GetProgressionPath(EProgressionNode node)

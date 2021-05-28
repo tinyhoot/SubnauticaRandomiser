@@ -168,13 +168,12 @@ namespace SubnauticaRandomiser
             return;
         }
 
-        public void RandomSmart()
+        public void RandomSmart(RecipeDictionary masterDict, RandomiserConfig config)
         {
-            // TODO
-            // This function should use the progression tree to randomise materials
+            // This function uses the progression tree to randomise materials
             // and game progression in an intelligent way.
-
-            // Basic structure might look something like this:
+            //
+            // Basic structure looks something like this:
             // - Set up vanilla progression tree
             // - Calculate reachable depth
             // - Put reachable raw materials and fish into _reachableMaterials
@@ -191,16 +190,165 @@ namespace SubnauticaRandomiser
             // - Once all items have been randomised, do an integrity check for
             //   safety. Rocket, vehicles, and hatching enzymes must be on the list.
 
+            LogHandler.Info("Randomising using logic-based system...");
+
+            List<TechType> toBeRandomised = new List<TechType>();
+            Dictionary<TechType, bool> unlockedProgressionItems = new Dictionary<TechType, bool>();
+            _reachableMaterials = new List<Recipe>();
+            ProgressionTree tree = new ProgressionTree();
+            int reachableDepth = 0;
+
+            tree.SetupVanillaTree();
+
+            foreach (Recipe r in _allMaterials.FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials) 
+                                                         && !x.Category.Equals(ETechTypeCategory.Fish) 
+                                                         && !x.Category.Equals(ETechTypeCategory.Seeds)))
+            {
+                toBeRandomised.Add(r.TechType);
+            }
+
+            bool newProgressionItem = true;
+            int circuitbreaker = 0;
+            while (toBeRandomised.Count > 0)
+            {
+                circuitbreaker++;
+                if (circuitbreaker > 3000)
+                {
+                    LogHandler.MainMenuMessage("Failed to randomise items: stuck in infinite loop!");
+                    LogHandler.Fatal("Encountered infinite loop, aborting!");
+                    break;
+                }
+
+                int newDepth = 0;
+                if (newProgressionItem)
+                {
+                    newDepth = CalculateReachableDepth(tree, unlockedProgressionItems);
+                    newProgressionItem = false;
+                }
+
+                // If the most recently randomised item opened up some new paths
+                // to progress, there's extra stuff to handle.
+                if (newDepth > reachableDepth)
+                {
+                    reachableDepth = newDepth;
+
+                    // Exclude creepvine and samples until a knife is obtained.
+                    if (masterDict.DictionaryInstance.ContainsKey((int)TechType.Knife))
+                    {
+                        AddMaterialsToReachableList(ETechTypeCategory.RawMaterials, reachableDepth);
+                    }
+                    else
+                    {
+                        AddMaterialsToReachableList(_allMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials) && x.Prerequisites != null && !x.Prerequisites.Contains(TechType.Knife)).ToArray());
+                    }
+
+                    if (config.bUseFish)
+                        AddMaterialsToReachableList(ETechTypeCategory.Fish, reachableDepth);
+                    if (config.bUseSeeds && unlockedProgressionItems.ContainsKey(TechType.Knife))
+                        AddMaterialsToReachableList(ETechTypeCategory.Seeds, reachableDepth);
+                }
+
+                // Grab a random recipe which has not yet been randomised.
+                TechType nextType = toBeRandomised[_random.Next(0, toBeRandomised.Count - 1)];
+                Recipe nextRecipe = _allMaterials.Find(x => x.TechType.Equals(nextType));
+
+                // Does this recipe have all of its prerequisites fulfilled?
+                if (CheckRecipeForBlueprint(masterDict, nextRecipe, reachableDepth) && CheckRecipeForPrerequisites(masterDict, nextRecipe))
+                {
+                    // Found a good recipe! Randomise it.
+                    nextRecipe = RandomiseIngredients(nextRecipe, _reachableMaterials);
+
+                    // Make sure it's not an item that cannot be an ingredient.
+                    if (CanFunctionAsIngredient(nextRecipe))
+                        _reachableMaterials.Add(nextRecipe);
+                    ApplyRandomisedRecipe(masterDict, nextRecipe);
+                    toBeRandomised.Remove(nextType);
+
+                    // Handling knives as a special case.
+                    if ((nextType.Equals(TechType.Knife) || nextType.Equals(TechType.HeatBlade)) && !unlockedProgressionItems.ContainsKey(TechType.Knife))
+                    {
+                        unlockedProgressionItems.Add(TechType.Knife, true);
+                        newProgressionItem = true;
+                        // Add raw materials like creepvine and mushroom samples.
+                        AddMaterialsToReachableList(_allMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials) && x.Prerequisites != null && x.Prerequisites.Contains(TechType.Knife)).ToArray());
+                        if (config.bUseSeeds)
+                            AddMaterialsToReachableList(ETechTypeCategory.Seeds, reachableDepth);
+                    }
+
+                    // If it is a central progression item, consider it unlocked.
+                    if (tree.depthProgressionItems.ContainsKey(nextType) && !unlockedProgressionItems.ContainsKey(nextType))
+                    {
+                        unlockedProgressionItems.Add(nextType, true);
+                        newProgressionItem = true;
+                        LogHandler.Debug("[+] Added " + nextType.AsString() + " to progression items.");
+                    }
+
+                    LogHandler.Debug("[+] Randomised recipe for [" + nextType.AsString() + "].");
+                }
+                else
+                {
+                    LogHandler.Debug("--- Recipe [" + nextType.AsString() + "] did not fulfill requirements, skipping.");
+                }
+            }
+
+            LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
+        }
+
+        // TODO: Make this more sophisticated. Value-based approach?
+        // TODO: Prevent duplicates within the same recipe.
+        public Recipe RandomiseIngredients(Recipe recipe, List<Recipe> materials)
+        {
+            List<RandomiserIngredient> ingredients = new List<RandomiserIngredient>();
+            int number = _random.Next(1, 6);
+
+            for(int i = 1; i <= number; i++)
+            {
+                TechType type = materials[_random.Next(0, materials.Count - 1)].TechType;
+                RandomiserIngredient ing = new RandomiserIngredient((int)type, _random.Next(1, 3));
+
+                ingredients.Add(ing);
+            }
+
+            recipe.Ingredients = ingredients;
+            return recipe;
+        }
+
+        // Base pieces and vehicles obviously cannot act as ingredients for
+        // recipes, so this function detects and filters them.
+        public static bool CanFunctionAsIngredient(Recipe recipe)
+        {
+            bool isIngredient = true;
+
+            ETechTypeCategory[] bad = { ETechTypeCategory.BaseBasePieces,
+                                        ETechTypeCategory.BaseExternalModules,
+                                        ETechTypeCategory.BaseGenerators,
+                                        ETechTypeCategory.BaseInternalModules,
+                                        ETechTypeCategory.BaseInternalPieces,
+                                        ETechTypeCategory.Deployables,
+                                        ETechTypeCategory.None,
+                                        ETechTypeCategory.Rocket,
+                                        ETechTypeCategory.Vehicles};
+
+            foreach (ETechTypeCategory cat in bad)
+            {
+                if (cat.Equals(recipe.Category))
+                {
+                    isIngredient = false;
+                    break;
+                }
+            }
+
+            return isIngredient;
         }
 
         // This function calculates the maximum reachable depth based on
         // what vehicles the player has attained, as well as how much
         // further they can go "on foot"
-        public static int CalculateReachableDepth(ProgressionTree tree, List<TechType> progressionItems, int depthTime = 15)
+        public static int CalculateReachableDepth(ProgressionTree tree, Dictionary<TechType, bool> progressionItems, int depthTime = 15)
         {
             double swimmingSpeed = 5.75;
             double seaglideSpeed = 11.0;
-            bool seaglide = progressionItems.Contains(TechType.Seaglide);
+            bool seaglide = progressionItems.ContainsKey(TechType.Seaglide);
             double finSpeed = 0.0;
             double tankPenalty = 0.0;
             int breathTime = 45;
@@ -220,45 +368,45 @@ namespace SubnauticaRandomiser
             // Also, this trusts that the tree is set up correctly.
             foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth200m).Pathways)
             {
-                if (CheckListForAllTechTypes(progressionItems, path))
+                if (CheckDictForAllTechTypes(progressionItems, path))
                     vehicleDepth = 200;
             }
             foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth300m).Pathways)
             {
-                if (CheckListForAllTechTypes(progressionItems, path))
+                if (CheckDictForAllTechTypes(progressionItems, path))
                     vehicleDepth = 300;
             }
             foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth500m).Pathways)
             {
-                if (CheckListForAllTechTypes(progressionItems, path))
+                if (CheckDictForAllTechTypes(progressionItems, path))
                     vehicleDepth = 500;
             }
             foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth900m).Pathways)
             {
-                if (CheckListForAllTechTypes(progressionItems, path))
+                if (CheckDictForAllTechTypes(progressionItems, path))
                     vehicleDepth = 900;
             }
             foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth1300m).Pathways)
             {
-                if (CheckListForAllTechTypes(progressionItems, path))
+                if (CheckDictForAllTechTypes(progressionItems, path))
                     vehicleDepth = 1300;
             }
             foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth1700m).Pathways)
             {
-                if (CheckListForAllTechTypes(progressionItems, path))
+                if (CheckDictForAllTechTypes(progressionItems, path))
                     vehicleDepth = 1700;
             }
 
-            if (progressionItems.Contains(TechType.Fins))
+            if (progressionItems.ContainsKey(TechType.Fins))
                 finSpeed = 1.41;
-            if (progressionItems.Contains(TechType.UltraGlideFins))
+            if (progressionItems.ContainsKey(TechType.UltraGlideFins))
                 finSpeed = 1.88;
 
             // How deep can the player go without any tanks?
             playerDepthRaw = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed)) / 2;
 
             // But can they go deeper with a tank? (Yes.)
-            if (progressionItems.Contains(TechType.Tank))
+            if (progressionItems.ContainsKey(TechType.Tank))
             {
                 breathTime = 75;
                 tankPenalty = 0.4;
@@ -266,7 +414,7 @@ namespace SubnauticaRandomiser
                 playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
             }
 
-            if (progressionItems.Contains(TechType.DoubleTank))
+            if (progressionItems.ContainsKey(TechType.DoubleTank))
             {
                 breathTime = 135;
                 tankPenalty = 0.47;
@@ -274,7 +422,7 @@ namespace SubnauticaRandomiser
                 playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
             }
 
-            if (progressionItems.Contains(TechType.HighCapacityTank))
+            if (progressionItems.ContainsKey(TechType.HighCapacityTank))
             {
                 breathTime = 225;
                 tankPenalty = 0.6;
@@ -282,7 +430,7 @@ namespace SubnauticaRandomiser
                 playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
             }
 
-            if (progressionItems.Contains(TechType.PlasteelTank))
+            if (progressionItems.ContainsKey(TechType.PlasteelTank))
             {
                 breathTime = 135;
                 tankPenalty = 0.1;
@@ -292,7 +440,7 @@ namespace SubnauticaRandomiser
 
             // The vehicle depth and whether or not the player has a rebreather
             // can modify the raw achievable diving depth.
-            if (progressionItems.Contains(TechType.Rebreather))
+            if (progressionItems.ContainsKey(TechType.Rebreather))
             {
                 totalDepth = vehicleDepth + (playerDepthRaw > maxSoloDepth ? maxSoloDepth : playerDepthRaw);
             }
@@ -339,6 +487,20 @@ namespace SubnauticaRandomiser
             return (int)totalDepth;
         }
 
+        private static bool CheckDictForAllTechTypes(Dictionary<TechType, bool> dict, TechType[] types)
+        {
+            bool allItemsPresent = true;
+
+            foreach (TechType t in types)
+            {
+                allItemsPresent &= dict.ContainsKey(t);
+                if (!allItemsPresent)
+                    break;
+            }
+
+            return allItemsPresent;
+        }
+
         private static bool CheckListForAllTechTypes(List<TechType> list, TechType[] types)
         {
             bool allItemsPresent = true;
@@ -351,6 +513,46 @@ namespace SubnauticaRandomiser
             }
 
             return allItemsPresent;
+        }
+
+        private bool CheckRecipeForBlueprint(RecipeDictionary masterDict, Recipe recipe, int depth)
+        {
+            bool fulfilled = true;
+
+            if (recipe.Blueprint == null || (recipe.Blueprint.UnlockConditions == null && recipe.Blueprint.UnlockDepth == 0))
+                return true;
+
+            foreach (TechType t in recipe.Blueprint.UnlockConditions)
+            {
+                fulfilled &= (masterDict.DictionaryInstance.ContainsKey((int)t) || _reachableMaterials.Exists(x => x.TechType.Equals(t)));
+
+                if (!fulfilled)
+                    break;
+            }
+
+            if (recipe.Blueprint.UnlockDepth > depth)
+            {
+                fulfilled = false;
+            }
+
+            return fulfilled;
+        }
+
+        private static bool CheckRecipeForPrerequisites(RecipeDictionary masterDict, Recipe recipe)
+        {
+            bool fulfilled = true;
+
+            if (recipe.Prerequisites == null)
+                return true;
+
+            foreach (TechType t in recipe.Prerequisites)
+            {
+                fulfilled &= masterDict.DictionaryInstance.ContainsKey((int)t);
+                if (!fulfilled)
+                    break;
+            }
+
+            return fulfilled;
         }
 
         // Grab a collection of all keys in the dictionary, then use them to

@@ -72,6 +72,8 @@ namespace SubnauticaRandomiser
 
             Blueprint blueprint = null;
             List<TechType> blueprintUnlockConditions = new List<TechType>();
+            TechType blueprintFragment = TechType.None;
+            bool blueprintDatabox = false;
             int blueprintUnlockDepth = 0;
 
             string[] cells = line.Split(',');
@@ -133,20 +135,39 @@ namespace SubnauticaRandomiser
             // Column 7: Blueprint Unlock Conditions
             if (!String.IsNullOrEmpty(cells[6]))
             {
-                blueprintUnlockConditions = ProcessMultipleTechTypes(cells[6].Split(';'));
+                //blueprintUnlockConditions = ProcessMultipleTechTypes(cells[6].Split(';'));
+                string[] conditions = cells[6].Split(';');
+
+                foreach (string str in conditions)
+                {
+                    if (str.ToLower().Contains("fragment"))
+                    {
+                        // HACK This code as-is will not handle the Cyclops properly
+                        // but I feel like that one needs special care anyways.
+                        blueprintFragment = StringToTechType(str);
+                    } 
+                    else if (str.ToLower().Contains("databox"))
+                    {
+                        blueprintDatabox = true;
+                    }
+                    else
+                    {
+                        blueprintUnlockConditions.Add(StringToTechType(str));
+                    }
+                }
             }
 
             // Column 8: Blueprint Unlock Depth
             if (!String.IsNullOrEmpty(cells[7]))
             {
-                blueprintUnlockDepth = int.Parse(cells[8]);
+                blueprintUnlockDepth = int.Parse(cells[7]);
             }
             
-            // Only if either of the two blueprint components yielded anything,
+            // Only if any of the blueprint components yielded anything,
             // ship the recipe with a blueprint.
-            if (blueprintUnlockConditions != null || blueprintUnlockDepth != 0)
+            if (blueprintUnlockConditions != null || blueprintUnlockDepth != 0 || !blueprintDatabox || !blueprintFragment.Equals(TechType.None))
             {
-                blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintUnlockDepth);
+                blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragment, blueprintDatabox, blueprintUnlockDepth);
             }
             
             LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depth +" ... "+ craftAmount);

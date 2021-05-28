@@ -71,15 +71,10 @@ namespace SubnauticaRandomiser
                 return;
             }
 
-            // Try and do some randomising
-            LogHandler.Debug("Attempting randomisation test...");
             ProgressionManager pm = new ProgressionManager(completeMaterialsList);
-            //pm.AddMaterialsToReachableList(ETechTypeCategory.RawMaterials, EProgressionNode.Depth100m);
-            //pm.AddMaterialsToReachableList(ETechTypeCategory.BasicMaterials, EProgressionNode.Depth100m);
-            //pm.AddMaterialsToReachableList(ETechTypeCategory.AdvancedMaterials, EProgressionNode.Depth100m);
-            //pm.AddMaterialsToReachableList(completeMaterialsList.Find(x => x.TechType.Equals(TechType.Cyclops)));
 
-            pm.RandomSubstituteMaterials(s_masterDict, s_config.bUseFish, s_config.bUseSeeds);
+            //pm.RandomSubstituteMaterials(s_masterDict, s_config.bUseFish, s_config.bUseSeeds);
+            pm.RandomSmart(s_masterDict, s_config);
             LogHandler.Info("Randomisation successful!");
 
             SaveRecipeStateToDisk();

@@ -23,7 +23,7 @@
       <CustomCommands>
         <Command>
           <type>AfterBuild</type>
-          <command>../CopyToSubnauticaDir.sh</command>
+          <command>../../CopyToSubnauticaDir.sh</command>
           <workingdir>${ProjectDir}</workingdir>
           <externalConsole>True</externalConsole>
         </Command>
