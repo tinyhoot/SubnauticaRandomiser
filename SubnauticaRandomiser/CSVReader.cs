@@ -118,7 +118,7 @@ namespace SubnauticaRandomiser
                 depthDifficulty = StringToEProgressionNode(cells[3]);
             }
 
-            // Column 5: Prerequisites. Really necessary with blueprints?
+            // Column 5: Prerequisites
             if (!String.IsNullOrEmpty(cells[4]))
             {
                 prereqList = ProcessMultipleTechTypes(cells[4].Split(';'));

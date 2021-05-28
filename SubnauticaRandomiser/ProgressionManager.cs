@@ -16,12 +16,23 @@ namespace SubnauticaRandomiser
         // advantage of making it very easy to call up a random element.
         internal List<Recipe> _allMaterials;
         private List<Recipe> _reachableMaterials;
+        private List<TechType> _depthProgressionItems;
+        // Two values for what depth the player is currently able to reach.
+        // _vehicleDepth is the lowest point any unlocked vehicles, including
+        // any depth modules, can currently reach.
+        // _diverDepth is how far the player can be expected to go beyond that
+        // "on foot". E.g. the player's seamoth only reaches 200m, but because
+        // they also have a seaglide and a rebreather, they can reach 300m-400m.
+        // TODO implement this after you have a rough draft of the logic
+        //private int _vehicleDepth = 0;
+        //private int _diverDepth = 0;
 
         public ProgressionManager(List<Recipe> allMaterials)
         {
             _random = new Random();
             _allMaterials = allMaterials;
             _reachableMaterials = new List<Recipe>();
+            _depthProgressionItems = new List<TechType>();
         }
 
         public bool AddMaterialsToReachableList(ETechTypeCategory category, EProgressionNode node)
@@ -186,12 +197,189 @@ namespace SubnauticaRandomiser
             // TODO
             // This function should use the progression tree to randomise materials
             // and game progression in an intelligent way.
+
+            // Basic structure might look something like this:
+            // - Set up vanilla progression tree
+            // - Calculate reachable depth
+            // - Put reachable raw materials and fish into _reachableMaterials
+            // - Pick a random item from _allMaterials
+            //   - Check if it has all dependencies, both as an item and as a
+            //     blueprint, fulfilled. Abort and skip if not.
+            //   - Randomise its ingredients using available materials
+            //   - Put it in _reachableMaterials
+            //     - If it's a knife, also add all seeds and chunks
+            //     - If it's not an item (like a base piece), skip this step
+            //   - Recalculate reachable depth
+            //   - Repeat
+            // - Once all items have been randomised, do an integrity check for
+            //   safety. Rocket, vehicles, and hatching enzymes must be on the list.
+
         }
 
+        // This function calculates the maximum reachable depth based on
+        // what vehicles the player has attained, as well as how much
+        // further they can go "on foot"
+        public static int CalculateReachableDepth(ProgressionTree tree, List<TechType> progressionItems, int depthTime = 15)
+        {
+            double swimmingSpeed = 5.75;
+            double seaglideSpeed = 11.0;
+            bool seaglide = progressionItems.Contains(TechType.Seaglide);
+            double finSpeed = 0.0;
+            double tankPenalty = 0.0;
+            int breathTime = 45;
+
+            // How long should the player be able to remain at this depth and
+            // still make it back just fine?
+            int searchTime = depthTime;
+            // Never assume the player has to go deeper than this on foot.
+            int maxSoloDepth = 300;
+            int vehicleDepth = 0;
+            double playerDepthRaw = 0.0;
+            double totalDepth = 0.0;
+
+            LogHandler.Debug("Recalculating reachable depth.");
+
+            // This feels like it could be simplified.
+            // Also, this trusts that the tree is set up correctly.
+            foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth200m).Pathways)
+            {
+                if (CheckListForAllTechTypes(progressionItems, path))
+                    vehicleDepth = 200;
+            }
+            foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth300m).Pathways)
+            {
+                if (CheckListForAllTechTypes(progressionItems, path))
+                    vehicleDepth = 300;
+            }
+            foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth500m).Pathways)
+            {
+                if (CheckListForAllTechTypes(progressionItems, path))
+                    vehicleDepth = 500;
+            }
+            foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth900m).Pathways)
+            {
+                if (CheckListForAllTechTypes(progressionItems, path))
+                    vehicleDepth = 900;
+            }
+            foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth1300m).Pathways)
+            {
+                if (CheckListForAllTechTypes(progressionItems, path))
+                    vehicleDepth = 1300;
+            }
+            foreach (TechType[] path in tree.GetProgressionPath(EProgressionNode.Depth1700m).Pathways)
+            {
+                if (CheckListForAllTechTypes(progressionItems, path))
+                    vehicleDepth = 1700;
+            }
+
+            if (progressionItems.Contains(TechType.Fins))
+                finSpeed = 1.41;
+            if (progressionItems.Contains(TechType.UltraGlideFins))
+                finSpeed = 1.88;
+
+            // How deep can the player go without any tanks?
+            playerDepthRaw = (breathTime - searchTime) * (seaglide? seaglideSpeed : (swimmingSpeed + finSpeed)) / 2;
+
+            // But can they go deeper with a tank? (Yes.)
+            if (progressionItems.Contains(TechType.Tank))
+            {
+                breathTime = 75;
+                tankPenalty = 0.4;
+                double depth = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed - tankPenalty) / 2;
+                playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
+            }
+
+            if (progressionItems.Contains(TechType.DoubleTank))
+            {
+                breathTime = 135;
+                tankPenalty = 0.47;
+                double depth = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed - tankPenalty)) / 2;
+                playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
+            }
+
+            if (progressionItems.Contains(TechType.HighCapacityTank))
+            {
+                breathTime = 225;
+                tankPenalty = 0.6;
+                double depth = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed - tankPenalty)) / 2;
+                playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
+            }
+
+            if (progressionItems.Contains(TechType.PlasteelTank))
+            {
+                breathTime = 135;
+                tankPenalty = 0.1;
+                double depth = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed - tankPenalty)) / 2;
+                playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
+            }
+
+            // The vehicle depth and whether or not the player has a rebreather
+            // can modify the raw achievable diving depth.
+            if (progressionItems.Contains(TechType.Rebreather))
+            {
+                totalDepth = vehicleDepth + (playerDepthRaw > maxSoloDepth ? maxSoloDepth : playerDepthRaw);
+            }
+            else
+            {
+                // Below 100 meters, air is consumed three times as fast.
+                // Below 200 meters, it is consumed five times as fast.
+                double depth = 0.0;
+
+                if (vehicleDepth == 0)
+                {
+                    if (playerDepthRaw <= 100)
+                    {
+                        depth = playerDepthRaw;
+                    }
+                    else
+                    {
+                        depth += 100;
+                        playerDepthRaw -= 100;
+
+                        // For anything between 100-200 meters, triple air consumption
+                        if (playerDepthRaw <= 100)
+                        {
+                            depth += playerDepthRaw / 3;
+                        }
+                        else
+                        {
+                            depth += 33.3;
+                            playerDepthRaw -= 100;
+                            // For anything below 200 meters, quintuple it.
+                            depth += playerDepthRaw / 5;
+                        }
+                    }
+                }
+                else
+                {
+                    depth = playerDepthRaw / 5;
+                }
+
+                totalDepth = vehicleDepth + (depth > maxSoloDepth ? maxSoloDepth : depth);
+            }
+            LogHandler.Debug("New reachable depth: " + totalDepth);
+
+            return (int)totalDepth;
+        }
+
+        private static bool CheckListForAllTechTypes(List<TechType> list, TechType[] types)
+        {
+            bool allItemsPresent = true;
+
+            foreach (TechType t in types)
+            {
+                allItemsPresent &= list.Contains(t);
+                if (!allItemsPresent)
+                    break;
+            }
+
+            return allItemsPresent;
+        }
+
+        // Grab a collection of all keys in the dictionary, then use them to
+        // apply every single one as a recipe change in the game.
         public static void ApplyMasterDict(RecipeDictionary masterDict)
         {
-            // Grab a collection of all keys in the dictionary, then use them to
-            // apply every single one as a recipe change in the game.
             Dictionary<int, Recipe>.KeyCollection keys = masterDict.DictionaryInstance.Keys;
 
             foreach (int key in keys)
@@ -200,10 +388,10 @@ namespace SubnauticaRandomiser
             }
         }
 
+        // This function handles applying a randomised recipe to the in-game
+        // craft data, and stores a copy in the master dictionary.
         public static void ApplyRandomisedRecipe(RecipeDictionary masterDict, Recipe recipe)
         {
-            // This function handles applying a randomised recipe to the in-game
-            // craft data, and stores a copy in the master dictionary.
             CraftDataHandler.SetTechData(recipe.TechType, recipe);
             masterDict.Add(recipe.TechType, recipe);
         }
