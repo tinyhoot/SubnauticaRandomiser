@@ -441,7 +441,7 @@ namespace SubnauticaRandomiser
         // further they can go "on foot"
         public static int CalculateReachableDepth(ProgressionTree tree, Dictionary<TechType, bool> progressionItems, int depthTime = 15)
         {
-            double swimmingSpeed = 5.75;
+            double swimmingSpeed = 4.7; // Assuming player is holding a tool.
             double seaglideSpeed = 11.0;
             bool seaglide = progressionItems.ContainsKey(TechType.Seaglide);
             double finSpeed = 0.0;
