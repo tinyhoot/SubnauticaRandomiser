@@ -1,4 +1,3 @@
-,,CraftBonus:,,,5,,
 TechType,IngredientList,Category,Depth,Prerequisites,Value,BlueprintUnlockCondition,BlueprintUnlockDepth
 AluminumOxide,,RawMaterials,180,,15,,
 CrashPowder,,RawMaterials,25,,10,,

@@ -85,6 +85,10 @@ namespace SubnauticaRandomiser
             
             // Now to convert the data in each cell to an object we can use
             // Column 1: TechType
+            if (String.IsNullOrEmpty(cells[0]))
+            {
+                throw new InvalidDataException("TechType is null or empty.");
+            }
             type = StringToTechType(cells[0]);
 
             // Column 2: Ingredients
