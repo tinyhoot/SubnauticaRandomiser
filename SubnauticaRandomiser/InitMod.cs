@@ -28,7 +28,7 @@ namespace SubnauticaRandomiser
             s_modDirectory = GetSubnauticaRandomiserDirectory();
             s_config = OptionsPanelHandler.Main.RegisterModOptions<RandomiserConfig>();
             LogHandler.Debug("Registered options menu.");
-
+            
             // Try and restore a recipe state from disk
             try
             {
@@ -61,6 +61,7 @@ namespace SubnauticaRandomiser
         public static void Randomise()
         {
             s_masterDict = new RecipeDictionary();
+            s_config.SanitiseConfigValues();
 
             // Attempt to read and parse the CSV with all recipe information
             List<Recipe> completeMaterialsList;

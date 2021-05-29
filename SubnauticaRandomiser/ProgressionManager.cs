@@ -249,14 +249,14 @@ namespace SubnauticaRandomiser
                 }
 
                 // Grab a random recipe which has not yet been randomised.
-                TechType nextType = toBeRandomised[_random.Next(0, toBeRandomised.Count - 1)];
+                TechType nextType = GetRandom(toBeRandomised);
                 Recipe nextRecipe = _allMaterials.Find(x => x.TechType.Equals(nextType));
 
                 // Does this recipe have all of its prerequisites fulfilled?
                 if (CheckRecipeForBlueprint(masterDict, nextRecipe, reachableDepth) && CheckRecipeForPrerequisites(masterDict, nextRecipe))
                 {
                     // Found a good recipe! Randomise it.
-                    nextRecipe = RandomiseIngredients(nextRecipe, _reachableMaterials);
+                    nextRecipe = RandomiseIngredients(nextRecipe, _reachableMaterials, config);
 
                     // Make sure it's not an item that cannot be an ingredient.
                     if (CanFunctionAsIngredient(nextRecipe))
@@ -295,18 +295,91 @@ namespace SubnauticaRandomiser
         }
 
         // TODO: Make this more sophisticated. Value-based approach?
-        // TODO: Prevent duplicates within the same recipe.
-        public Recipe RandomiseIngredients(Recipe recipe, List<Recipe> materials)
+        public Recipe RandomiseIngredients(Recipe recipe, List<Recipe> materials, RandomiserConfig config)
         {
             List<RandomiserIngredient> ingredients = new List<RandomiserIngredient>();
-            int number = _random.Next(1, 6);
-
-            for(int i = 1; i <= number; i++)
+            LogHandler.Debug("Figuring out ingredients for " + recipe.TechType.AsString());
+            
+            // Casual mode should preserve sequential upgrade lines and be a bit
+            // more directive with its recipes.
+            if (config.iRandomiserMode == 0)
             {
-                TechType type = materials[_random.Next(0, materials.Count - 1)].TechType;
-                RandomiserIngredient ing = new RandomiserIngredient((int)type, _random.Next(1, 3));
+                // TODO
+                // For figuring out if the first ingredient needs to be based on
+                // a sequential upgrade, a dictionary<upgrade, base> would be neat.
+                // Put it into the progression tree I think?
+            }
 
-                ingredients.Add(ing);
+            // Default mode still wants to randomise, but stays within reason
+            // using the rough value of each recipe defined in the CSV.
+            if (config.iRandomiserMode == 0)
+            {
+                double targetValue = recipe.Value;
+                int currentValue = 0;
+                recipe.Value = 0;
+
+                // Try at least one big ingredient first, then do smaller ones
+                List<Recipe> candidates = materials.FindAll(x => (targetValue * (config.dIngredientRatio + 0.05)) > x.Value && x.Value > (targetValue * (config.dIngredientRatio - 0.05)));
+                if (candidates.Count == 0)
+                {
+                    // If we had no luck, just pick a random one.
+                    candidates.Add(GetRandom(materials));
+                }
+
+                Recipe big = GetRandom(candidates);
+                ingredients.Add(new RandomiserIngredient((int)big.TechType, 1));
+                currentValue += big.Value;
+                recipe.Value += currentValue;
+
+                LogHandler.Debug("    Adding big ingredient " + big.TechType.AsString());
+
+                // Now fill up with random materials until the value threshold
+                // is more or less met, as defined by fuzziness.
+                while ((targetValue - currentValue) > (targetValue * config.dFuzziness / 2))
+                {
+                    Recipe r = GetRandom(materials);
+                    // Prevent duplicates.
+                    if (ingredients.Exists(x => x.TechTypeInt == (int)r.TechType))
+                        continue;
+
+                    // What's the maximum amount of this ingredient the recipe can
+                    // still sustain?
+                    int max = (int)((targetValue + targetValue * config.dFuzziness / 2) - currentValue) / r.Value;
+                    max = max > 0 ? max : 1;
+                    // Figure out how many, but no more than 5.
+                    int amount = _random.Next(1, max);
+                    amount = amount > 5 ? 5 : amount;
+
+                    RandomiserIngredient ing = new RandomiserIngredient((int)r.TechType, amount);
+                    ingredients.Add(ing);
+                    currentValue += r.Value * amount;
+                    recipe.Value += currentValue;
+
+                    LogHandler.Debug("    Adding ingredient: " + r.TechType.AsString() + ", " + amount);
+                }
+                LogHandler.Debug("    Recipe is now valued "+currentValue+" out of "+targetValue);
+            }
+
+            // True Random does not care about you. It does just the bare minimum
+            // to not softlock the player, but otherwise does whatever.
+            if (config.iRandomiserMode == 1)
+            {
+                int number = _random.Next(1, 6);
+
+                for (int i = 1; i <= number; i++)
+                {
+                    TechType type = GetRandom(materials).TechType;
+
+                    // Prevent duplicates.
+                    if (ingredients.Exists(x => x.TechTypeInt == (int)type))
+                    {
+                        i--;
+                        continue;
+                    }
+                    RandomiserIngredient ing = new RandomiserIngredient((int)type, _random.Next(1, 5));
+
+                    ingredients.Add(ing);
+                }
             }
 
             recipe.Ingredients = ingredients;
@@ -553,6 +626,26 @@ namespace SubnauticaRandomiser
             }
 
             return fulfilled;
+        }
+
+        private Recipe GetRandom(List<Recipe> list)
+        {
+            if (list == null || list.Count == 0)
+            {
+                return null;
+            }
+
+            return list[_random.Next(0, list.Count - 1)];
+        }
+
+        private TechType GetRandom(List<TechType> list)
+        {
+            if (list == null || list.Count == 0)
+            {
+                return TechType.None;
+            }
+
+            return list[_random.Next(0, list.Count - 1)];
         }
 
         // Grab a collection of all keys in the dictionary, then use them to
