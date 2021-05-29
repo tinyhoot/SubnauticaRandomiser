@@ -74,6 +74,7 @@ namespace SubnauticaRandomiser
             return success;
         }
 
+        // Deprecated.
         public void RandomSubstituteMaterials(RecipeDictionary masterDict, bool useFish, bool useSeeds)
         {
             // This is the simplest way of randomisation. Merely take all materials
@@ -202,7 +203,8 @@ namespace SubnauticaRandomiser
 
             foreach (Recipe r in _allMaterials.FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials) 
                                                          && !x.Category.Equals(ETechTypeCategory.Fish) 
-                                                         && !x.Category.Equals(ETechTypeCategory.Seeds)))
+                                                         && !x.Category.Equals(ETechTypeCategory.Seeds)
+                                                         && !x.Category.Equals(ETechTypeCategory.Eggs)))
             {
                 toBeRandomised.Add(r.TechType);
             }
@@ -246,6 +248,8 @@ namespace SubnauticaRandomiser
                         AddMaterialsToReachableList(ETechTypeCategory.Fish, reachableDepth);
                     if (config.bUseSeeds && unlockedProgressionItems.ContainsKey(TechType.Knife))
                         AddMaterialsToReachableList(ETechTypeCategory.Seeds, reachableDepth);
+                    if (config.bUseEggs && masterDict.DictionaryInstance.ContainsKey((int)TechType.BaseWaterPark))
+                        AddMaterialsToReachableList(ETechTypeCategory.Eggs, reachableDepth);
                 }
 
                 // Grab a random recipe which has not yet been randomised.
@@ -263,7 +267,7 @@ namespace SubnauticaRandomiser
                         _reachableMaterials.Add(nextRecipe);
                     ApplyRandomisedRecipe(masterDict, nextRecipe);
                     toBeRandomised.Remove(nextType);
-
+                    
                     // Handling knives as a special case.
                     if ((nextType.Equals(TechType.Knife) || nextType.Equals(TechType.HeatBlade)) && !unlockedProgressionItems.ContainsKey(TechType.Knife))
                     {
@@ -274,6 +278,9 @@ namespace SubnauticaRandomiser
                         if (config.bUseSeeds)
                             AddMaterialsToReachableList(ETechTypeCategory.Seeds, reachableDepth);
                     }
+                    // Similarly, Alien Containment is a special case for eggs.
+                    if (nextType.Equals(TechType.BaseWaterPark) && config.bUseEggs)
+                        AddMaterialsToReachableList(ETechTypeCategory.Eggs, reachableDepth);
 
                     // If it is a central progression item, consider it unlocked.
                     if (tree.depthProgressionItems.ContainsKey(nextType) && !unlockedProgressionItems.ContainsKey(nextType))
@@ -349,6 +356,9 @@ namespace SubnauticaRandomiser
                     // Figure out how many, but no more than 5.
                     int amount = _random.Next(1, max);
                     amount = amount > 5 ? 5 : amount;
+                    // Never require more than one (default) egg. That's tedious.
+                    if (r.Category.Equals(ETechTypeCategory.Eggs))
+                        amount = config.iMaxEggsAsSingleIngredient;
 
                     RandomiserIngredient ing = new RandomiserIngredient((int)r.TechType, amount);
                     ingredients.Add(ing);

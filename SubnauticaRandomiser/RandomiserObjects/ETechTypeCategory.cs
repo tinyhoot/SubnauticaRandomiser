@@ -4,6 +4,7 @@ namespace SubnauticaRandomiser
     public enum ETechTypeCategory
     {
         None,
+        Eggs,
         Fish,
         Seeds,
         RawMaterials,

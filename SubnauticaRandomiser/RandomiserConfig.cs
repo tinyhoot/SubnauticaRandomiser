@@ -17,10 +17,13 @@ namespace SubnauticaRandomiser
         public int iRandomiserMode = 0;
 
         [Toggle("Use fish in logic?")]
-        public bool bUseFish = false;
+        public bool bUseFish = true;
+
+        [Toggle("Use eggs in logic?")]
+        public bool bUseEggs = false;
 
         [Toggle("Use seeds in logic?")]
-        public bool bUseSeeds = false;
+        public bool bUseSeeds = true;
 
         [Button("Randomise Again")]
         public void NewRandomisation()
@@ -45,6 +48,7 @@ namespace SubnauticaRandomiser
             _timeButtonPressed = DateTime.UtcNow;
         }
 
+        public int iMaxEggsAsSingleIngredient = 1;
         public double dFuzziness = 0.2;
         public double dIngredientRatio = 0.5;
         // Way down here since it tends to take up some space and scrolling is annoying.
@@ -54,6 +58,8 @@ namespace SubnauticaRandomiser
         {
             if (iRandomiserMode > 1 || iRandomiserMode < 0)
                 iRandomiserMode = 0;
+            if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)
+                iMaxEggsAsSingleIngredient = 1;
             if (dFuzziness > 1 || dFuzziness < 0)
                 dFuzziness = 0.2;
             if (dIngredientRatio > 1 || dIngredientRatio < 0)
