@@ -7,11 +7,13 @@ namespace SubnauticaRandomiser
     {
         private Dictionary<EProgressionNode, ProgressionPath> _depthDifficulties;
         public Dictionary<TechType, bool> depthProgressionItems;
+        public List<TechType> essentialItems;
 
         public ProgressionTree()
         {
             _depthDifficulties = new Dictionary<EProgressionNode, ProgressionPath>();
             depthProgressionItems = new Dictionary<TechType, bool>();
+            essentialItems = new List<TechType>();
         }
 
         public void SetupVanillaTree()
@@ -107,6 +109,11 @@ namespace SubnauticaRandomiser
             depthProgressionItems.Add(TechType.CyclopsHullModule1, true);
             depthProgressionItems.Add(TechType.CyclopsHullModule2, true);
             depthProgressionItems.Add(TechType.CyclopsHullModule3, true);
+
+            // The scanner and repair tool are absolutely required to get the
+            // early game going.
+            essentialItems.Add(TechType.Scanner);
+            essentialItems.Add(TechType.Welder);
         }
 
         public ProgressionPath GetProgressionPath(EProgressionNode node)
