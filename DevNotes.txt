@@ -9,28 +9,26 @@
       latter do not include Blood Oil in their recipe.
   - Many of the fields defining blueprint unlock information will have a fragment
     listed there. 
-      
 - In the future,the CSV will likely be able to drop the following categories:
-  - Ingredients. These are used as a fallback crutch by the current system, and
+  - Ingredients. These are used as a fallback crutch by the previous system, and
     a true logic-based system should have no need of them.
-  - CraftAmount. A companion field to Ingredients and similarly not much more
-    than a crutch for the simple randomiser. However, it could be retooled into
-    a Price or Value field which assigns each item a basic value related to
-    how difficult or annoying it is to get. Titanium would get a much lower value
-    than Lithium, for example. Even non-raw items would gain such a value, calculated
-    from their vanilla ingredients, which then provides the randomiser with a
-    rough idea of what to shoot for with the new ingredients it is selecting.
-    - As a side effect, such a system would also reduce grinding. Getting ten
-      pieces of Titanium is a very different beast to getting ten Diamonds. The
-      difficulty of the randomiser should lie in figuring out how to get *TO* an
-      ingredient, not how to find twenty of them.
     
-- Build a dependency/progression tree which assigns each of the major milestones
-  several solutions with which to reach them.
-  - This tree does not have to be absolute. For example, while a cyclops only
-    lets you reach 500m, exploring with a rebreather and seaglide can easily let
-    you go down another one or two hundred - which could make all the difference
-    particularly where fish or seeds are concerned.
+- Expand on fragments and databoxes.
+  - Somehow collect a ton of data on them. Where do they spawn, how many, are they
+    looked behind wreckage doors, what tools do you need to access them, etc.
+  - From this information, make it possible to randomise the amount of fragments
+    needed for each blueprint.
+  - Is it possible to swap fragments around?
+  - What about databoxes? Can you swap those?
+  
+- Clean up saving / loading.
+  - It is not necessary to save blueprints and categories to disk. If that info
+    is needed again, it is re-read from disk anyways. Cut down on file size.
+- Seeding.
+  - This perhaps ties into the point above, but as of right now seeds are so
+    stupidly long they're nigh on unusable. Figure out a way to implement short,
+    easily shareable seeds. Bonus points if they do not rely on settings to be 
+    the very same.
     
    
    
