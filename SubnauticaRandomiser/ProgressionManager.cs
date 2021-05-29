@@ -376,7 +376,7 @@ namespace SubnauticaRandomiser
                         i--;
                         continue;
                     }
-                    RandomiserIngredient ing = new RandomiserIngredient((int)type, _random.Next(1, 5));
+                    RandomiserIngredient ing = new RandomiserIngredient((int)type, _random.Next(1, 6));
 
                     ingredients.Add(ing);
                 }
@@ -635,7 +635,7 @@ namespace SubnauticaRandomiser
                 return null;
             }
 
-            return list[_random.Next(0, list.Count - 1)];
+            return list[_random.Next(0, list.Count)];
         }
 
         private TechType GetRandom(List<TechType> list)
@@ -645,7 +645,7 @@ namespace SubnauticaRandomiser
                 return TechType.None;
             }
 
-            return list[_random.Next(0, list.Count - 1)];
+            return list[_random.Next(0, list.Count)];
         }
 
         // Grab a collection of all keys in the dictionary, then use them to
