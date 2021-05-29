@@ -38,6 +38,8 @@ namespace SubnauticaRandomiser
                 LogHandler.MainMenuMessage("Randomising...");
                 InitMod.Randomise();
                 LogHandler.MainMenuMessage("Finished randomising!");
+                _timeButtonPressed = DateTime.MinValue;
+                return;
             }
 
             _timeButtonPressed = DateTime.UtcNow;
