@@ -221,6 +221,7 @@ namespace SubnauticaRandomiser
                     break;
                 }
 
+                TechType nextType = TechType.None;
                 int newDepth = 0;
                 if (newProgressionItem)
                 {
@@ -241,7 +242,11 @@ namespace SubnauticaRandomiser
                     }
                     else
                     {
-                        AddMaterialsToReachableList(_allMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials) && x.Prerequisites != null && !x.Prerequisites.Contains(TechType.Knife)).ToArray());
+                        AddMaterialsToReachableList(_allMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials) 
+                                                                            && x.Depth <= reachableDepth
+                                                                            && x.Prerequisites != null
+                                                                            && !x.Prerequisites.Contains(TechType.Knife)
+                                                                            ).ToArray());
                     }
 
                     if (config.bUseFish)
@@ -252,8 +257,16 @@ namespace SubnauticaRandomiser
                         AddMaterialsToReachableList(ETechTypeCategory.Eggs, reachableDepth);
                 }
 
+                // Make sure the list of absolutely essential items is done first.
+                if (tree.essentialItems.Count != 0)
+                {
+                    nextType = tree.essentialItems[0];
+                    tree.essentialItems.RemoveAt(0);
+                }
+
                 // Grab a random recipe which has not yet been randomised.
-                TechType nextType = GetRandom(toBeRandomised);
+                if (nextType.Equals(TechType.None))
+                    nextType = GetRandom(toBeRandomised);
                 Recipe nextRecipe = _allMaterials.Find(x => x.TechType.Equals(nextType));
 
                 // Does this recipe have all of its prerequisites fulfilled?
@@ -301,7 +314,6 @@ namespace SubnauticaRandomiser
             LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
         }
 
-        // TODO: Make this more sophisticated. Value-based approach?
         public Recipe RandomiseIngredients(Recipe recipe, List<Recipe> materials, RandomiserConfig config)
         {
             List<RandomiserIngredient> ingredients = new List<RandomiserIngredient>();
