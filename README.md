@@ -13,18 +13,19 @@ The randomisation persists between play sessions and save games. If you decide t
 
 ## Features
 - ✔️ Randomise most items in the game
-- ✔️ Include fish and seeds in recipes
+- ✔️ Include fish, eggs and seeds in recipes (customisable in in-game menu)
+- ✔️ No softlocks 
 - ✔️ Upgrades are independent from their basic variants, so you might acquire e.g. a Seamoth Depth Module 3 long before you ever manage to get Module 1 or 2
 - ✔️ Most things you can make may also show up as an ingredient in other recipes. Do you really need that laser cutter, or do you craft it into Polyaniline?
-- ⬜ Include fish eggs and any fish bred from aquariums
-- ⬜ Balance items better based on some value system
+- ✔️ Items are balanced on an underlying value logic
+   - If you prefer pure chaos, simply turn on True Random mode!
 
 ## How to Use
 1. Install [QModManager](https://www.nexusmods.com/subnautica/mods/201)
 2. Install [SMLHelper](https://www.nexusmods.com/subnautica/mods/113)
 3. Extract this mod into your Subnautica/QMods folder
 4. (Optional) Edit the config in the in-game options menu to your liking
-   * Press the "Randomise Again" button twice
+   * Press the "Randomise Again" button
 5. Enjoy!
 
 ## How to Build
