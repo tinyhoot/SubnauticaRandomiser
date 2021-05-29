@@ -14,15 +14,17 @@ namespace SubnauticaRandomiser
         public int Depth;
         public List<TechType> Prerequisites;
         public int CraftAmount;
+        public int Value;
         public Blueprint Blueprint;
 
         public int craftAmount { get { return CraftAmount; } }
         public int ingredientCount { get { return Ingredients.Count; } }
         public int linkedItemCount { get { return LinkedIngredients.Count; } }
 
-        public Recipe(TechType type, ETechTypeCategory category, int depth = 0, List<TechType> prereqs = null, int craftAmount = 1, Blueprint blueprint = null)
+        public Recipe(TechType type, ETechTypeCategory category, int depth = 0, List<TechType> prereqs = null, int value = 0, Blueprint blueprint = null)
         {
-            CraftAmount = craftAmount;
+            CraftAmount = 1;
+            Value = value;
             Depth = depth;
 
             TechType = type;

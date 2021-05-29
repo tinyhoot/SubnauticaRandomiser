@@ -68,7 +68,7 @@ namespace SubnauticaRandomiser
             ETechTypeCategory category = ETechTypeCategory.None;
             int depth = 0;
             List<TechType> prereqList = new List<TechType>();
-            int craftAmount = 1;
+            int value = 0;
 
             Blueprint blueprint = null;
             List<TechType> blueprintUnlockConditions = new List<TechType>();
@@ -129,7 +129,7 @@ namespace SubnauticaRandomiser
             // Column 6: Craft Amount
             if (!String.IsNullOrEmpty(cells[5]))
             {
-                craftAmount = int.Parse(cells[5]);
+                value = int.Parse(cells[5]);
             }
 
             // Column 7: Blueprint Unlock Conditions
@@ -170,8 +170,8 @@ namespace SubnauticaRandomiser
                 blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragment, blueprintDatabox, blueprintUnlockDepth);
             }
             
-            LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depth +" ... "+ craftAmount);
-            recipe = new Recipe(type, category, depth, prereqList, craftAmount, blueprint);
+            LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depth +" ... "+ value);
+            recipe = new Recipe(type, category, depth, prereqList, value, blueprint);
             return recipe;
         }
 
