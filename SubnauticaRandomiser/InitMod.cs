@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
@@ -55,7 +54,7 @@ namespace SubnauticaRandomiser
 
                 Randomise();
             }
-            LogHandler.Info("Finished loading. Ready to scramble!");
+            LogHandler.Info("Finished loading.");
         }
 
         public static void Randomise()
