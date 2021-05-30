@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 
@@ -12,7 +13,8 @@ namespace SubnauticaRandomiser
     {
         internal static string s_modDirectory;
         internal static RandomiserConfig s_config;
-        internal static readonly string s_recipeFile = "recipeinformation.csv";
+        internal static readonly string s_recipeFile = "recipeInformation.csv";
+        internal static readonly string s_wreckageFile = "wreckInformation.csv";
 
         // The master list of all recipes that have been modified
         internal static RecipeDictionary s_masterDict = new RecipeDictionary();
@@ -55,6 +57,9 @@ namespace SubnauticaRandomiser
                 Randomise();
             }
             LogHandler.Info("Finished loading.");
+
+            Harmony harmony = new Harmony("SubnauticaRandomiser");
+            harmony.PatchAll();
         }
 
         public static void Randomise()
@@ -62,14 +67,20 @@ namespace SubnauticaRandomiser
             s_masterDict = new RecipeDictionary();
             s_config.SanitiseConfigValues();
 
-            // Attempt to read and parse the CSV with all recipe information
+            // Attempt to read and parse the CSV with all recipe information.
             List<Recipe> completeMaterialsList;
-            completeMaterialsList = CSVReader.ParseFile(s_recipeFile);
+            completeMaterialsList = CSVReader.ParseRecipeFile(s_recipeFile);
             if (completeMaterialsList == null)
             {
                 LogHandler.Fatal("Failed to extract recipe information from CSV, aborting.");
                 return;
             }
+
+            // Attempt to read and parse the CSV with wreckages and databox info.
+            List<Databox> databoxes;
+            databoxes = CSVReader.ParseWreckageFile(s_wreckageFile);
+            if (databoxes == null || databoxes.Count == 0)
+                LogHandler.Error("Failed to extract databox information from CSV.");
 
             ProgressionManager pm = new ProgressionManager(completeMaterialsList);
 

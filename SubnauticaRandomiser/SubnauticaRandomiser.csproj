@@ -51,6 +51,9 @@
     <Compile Include="RandomiserObjects\ETechTypeCategory.cs" />
     <Compile Include="RandomiserObjects\Recipe.cs" />
     <Compile Include="RandomiserObjects\RecipeDictionary.cs" />
+    <Compile Include="Test.cs" />
+    <Compile Include="RandomiserObjects\Databox.cs" />
+    <Compile Include="RandomiserObjects\EWreckage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="QModInstaller">
@@ -77,6 +80,9 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Assembly-CSharp_publicized">
+      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RandomiserObjects\" />
