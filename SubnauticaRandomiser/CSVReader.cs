@@ -66,7 +66,7 @@ namespace SubnauticaRandomiser
             Recipe recipe = null;
 
             TechType type = TechType.None;
-            List<Ingredient> ingredientList = new List<Ingredient>();
+            List<RandomiserIngredient> ingredientList = new List<RandomiserIngredient>();
             ETechTypeCategory category = ETechTypeCategory.None;
             int depth = 0;
             List<TechType> prereqList = new List<TechType>();

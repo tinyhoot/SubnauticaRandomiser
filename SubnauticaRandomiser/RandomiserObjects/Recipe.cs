@@ -41,7 +41,7 @@ namespace SubnauticaRandomiser
                 {
                     foreach (Ingredient i in techdata.Ingredients)
                     {
-                        Ingredients.Add(new RandomiserIngredient((int)i.techType, i.amount));
+                        Ingredients.Add(new RandomiserIngredient(i.techType, i.amount));
                     }
                 }
 
@@ -58,12 +58,12 @@ namespace SubnauticaRandomiser
 
         public IIngredient GetIngredient(int index)
         {
-            return Ingredients[index].ToIIngredient();
+            return Ingredients[index];
         }
 
         public TechType GetLinkedItem(int index)
         {
-            return (TechType)LinkedIngredients[index];
+            return LinkedIngredients[index];
         }
 
         public override string ToString()
@@ -77,7 +77,7 @@ namespace SubnauticaRandomiser
             {
                 foreach (RandomiserIngredient i in Ingredients)
                 {
-                    result += i.TechTypeInt + ":" + i.Amount + ";";
+                    result += i.techType + ":" + i.amount + ";";
                 }
                 result += separator;
             }
