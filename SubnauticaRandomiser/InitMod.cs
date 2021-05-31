@@ -58,8 +58,14 @@ namespace SubnauticaRandomiser
             }
             LogHandler.Info("Finished loading.");
 
-            Harmony harmony = new Harmony("SubnauticaRandomiser");
-            harmony.PatchAll();
+            // Only if randomising databoxes is enabled in the config, patch them
+            // with Harmony. Make sure nothing can go wrong.
+            if (s_config.bRandomiseDataboxes && s_masterDict != null && s_masterDict.Databoxes != null && s_masterDict.Databoxes.Count > 0)
+            {
+                Harmony harmony = new Harmony("SubnauticaRandomiser");
+                harmony.PatchAll();
+            }
+
         }
 
         public static void Randomise()
