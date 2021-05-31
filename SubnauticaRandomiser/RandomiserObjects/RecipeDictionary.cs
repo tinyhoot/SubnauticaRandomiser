@@ -19,6 +19,7 @@ namespace SubnauticaRandomiser
     public class RecipeDictionary
     {
         public Dictionary<int, Recipe> DictionaryInstance = new Dictionary<int, Recipe>();
+        public Dictionary<RandomiserVector, TechType> Databoxes = new Dictionary<RandomiserVector, TechType>();
 
         public string ToBase64String()
         {

@@ -25,6 +25,9 @@ namespace SubnauticaRandomiser
         [Toggle("Use seeds in logic?")]
         public bool bUseSeeds = true;
 
+        [Toggle("Randomise blueprints in databoxes?")]
+        public bool bRandomiseDataboxes = true;
+
         [Button("Randomise Again")]
         public void NewRandomisation()
         {

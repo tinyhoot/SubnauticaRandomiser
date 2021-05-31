@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using UnityEngine;
 
 namespace SubnauticaRandomiser
 {
     public class ProgressionManager
     {
         // public readonly int Seed;
-        private readonly Random _random;
+        private readonly System.Random _random;
 
         // I was really debating making this a dictionary instead. I still made
         // this into a list since the searchability of _all is important,
@@ -17,13 +18,15 @@ namespace SubnauticaRandomiser
         internal List<Recipe> _allMaterials;
         private List<Recipe> _reachableMaterials;
         private List<TechType> _depthProgressionItems;
+        private List<Databox> _databoxes;
 
-        public ProgressionManager(List<Recipe> allMaterials)
+        public ProgressionManager(List<Recipe> allMaterials, List<Databox> databoxes = null)
         {
-            _random = new Random();
+            _random = new System.Random();
             _allMaterials = allMaterials;
             _reachableMaterials = new List<Recipe>();
             _depthProgressionItems = new List<TechType>();
+            _databoxes = databoxes;
         }
 
         public bool AddMaterialsToReachableList(ETechTypeCategory category, int reachableDepth)
@@ -201,6 +204,12 @@ namespace SubnauticaRandomiser
 
             tree.SetupVanillaTree();
 
+            // If databox randomising is enabled, go and do that.
+            if (config.bRandomiseDataboxes && _databoxes != null)
+            {
+                _databoxes = RandomiseDataboxes(masterDict, _databoxes);
+            }
+
             foreach (Recipe r in _allMaterials.FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials) 
                                                          && !x.Category.Equals(ETechTypeCategory.Fish) 
                                                          && !x.Category.Equals(ETechTypeCategory.Seeds)
@@ -270,7 +279,7 @@ namespace SubnauticaRandomiser
                 Recipe nextRecipe = _allMaterials.Find(x => x.TechType.Equals(nextType));
 
                 // Does this recipe have all of its prerequisites fulfilled?
-                if (CheckRecipeForBlueprint(masterDict, nextRecipe, reachableDepth) && CheckRecipeForPrerequisites(masterDict, nextRecipe))
+                if (CheckRecipeForBlueprint(masterDict, _databoxes, nextRecipe, reachableDepth) && CheckRecipeForPrerequisites(masterDict, nextRecipe))
                 {
                     // Found a good recipe! Randomise it.
                     nextRecipe = RandomiseIngredients(nextRecipe, _reachableMaterials, config);
@@ -406,6 +415,32 @@ namespace SubnauticaRandomiser
 
             recipe.Ingredients = ingredients;
             return recipe;
+        }
+
+        // Randomise the blueprints found inside databoxes.
+        internal List<Databox> RandomiseDataboxes(RecipeDictionary masterDict, List<Databox> databoxes)
+        {
+            masterDict.Databoxes = new Dictionary<RandomiserVector, TechType>();
+            List<Databox> randomDataboxes = new List<Databox>();
+            List<Vector3> toBeRandomised = new List<Vector3>();
+
+            foreach (Databox dbox in databoxes)
+            {
+                toBeRandomised.Add(dbox.Coordinates);
+            }
+
+            foreach (Databox originalBox in databoxes)
+            {
+                int next = _random.Next(0, toBeRandomised.Count);
+                Databox replacementBox = databoxes.Find(x => x.Coordinates.Equals(toBeRandomised[next]));
+
+                randomDataboxes.Add(new Databox(originalBox.TechType, toBeRandomised[next], replacementBox.Wreck, replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
+                masterDict.Databoxes.Add(new RandomiserVector(toBeRandomised[next]), originalBox.TechType);
+                LogHandler.Debug("Databox " + toBeRandomised[next].ToString() + " with " + replacementBox.TechType.AsString() + " now contains " + originalBox.TechType.AsString());
+                toBeRandomised.RemoveAt(next);
+            }
+
+            return randomDataboxes;
         }
 
         // Base pieces and vehicles obviously cannot act as ingredients for
@@ -610,19 +645,71 @@ namespace SubnauticaRandomiser
             return allItemsPresent;
         }
 
-        private bool CheckRecipeForBlueprint(RecipeDictionary masterDict, Recipe recipe, int depth)
+        private bool CheckRecipeForBlueprint(RecipeDictionary masterDict, List<Databox> databoxes, Recipe recipe, int depth)
         {
             bool fulfilled = true;
 
             if (recipe.Blueprint == null || (recipe.Blueprint.UnlockConditions == null && recipe.Blueprint.UnlockDepth == 0))
                 return true;
 
+            // If the databox was randomised, do work to account for new locations.
+            // Cyclops hull modules need extra special treatment.
+            if (recipe.Blueprint.NeedsDatabox && databoxes != null && databoxes.Count > 0 && !recipe.TechType.Equals(TechType.CyclopsHullModule2) && !recipe.TechType.Equals(TechType.CyclopsHullModule3))
+            {
+                int total = 0;
+                int number = 0;
+                int lasercutter = 0;
+                int propulsioncannon = 0;
+
+                foreach (Databox box in databoxes.FindAll(x => x.TechType.Equals(recipe.TechType)))
+                {
+                    total += (int)Math.Abs(box.Coordinates.y);
+                    number++;
+
+                    if (box.RequiresLaserCutter)
+                        lasercutter++;
+                    if (box.RequiresPropulsionCannon)
+                        propulsioncannon++;
+                }
+
+                LogHandler.Debug("[B] Found " + number + " databoxes for " + recipe.TechType.AsString());
+
+                recipe.Blueprint.UnlockDepth = total / number;
+                if (recipe.TechType.Equals(TechType.CyclopsHullModule1))
+                {
+                    _allMaterials.Find(x => x.TechType.Equals(TechType.CyclopsHullModule2)).Blueprint.UnlockDepth = total / number;
+                    _allMaterials.Find(x => x.TechType.Equals(TechType.CyclopsHullModule3)).Blueprint.UnlockDepth = total / number;
+                }
+
+                // If more than half of all locations of this databox require a
+                // tool to access the box, add it to the requirements for the recipe
+                if (lasercutter / number >= 0.5)
+                {
+                    recipe.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
+                    if (recipe.TechType.Equals(TechType.CyclopsHullModule1))
+                    {
+                        _allMaterials.Find(x => x.TechType.Equals(TechType.CyclopsHullModule2)).Blueprint.UnlockConditions.Add(TechType.LaserCutter);
+                        _allMaterials.Find(x => x.TechType.Equals(TechType.CyclopsHullModule3)).Blueprint.UnlockConditions.Add(TechType.LaserCutter);
+                    }
+                }
+
+                if (propulsioncannon / number >= 0.5)
+                {
+                    recipe.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
+                    if (recipe.TechType.Equals(TechType.CyclopsHullModule1))
+                    {
+                        _allMaterials.Find(x => x.TechType.Equals(TechType.CyclopsHullModule2)).Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
+                        _allMaterials.Find(x => x.TechType.Equals(TechType.CyclopsHullModule3)).Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
+                    }
+                }
+            }
+
             foreach (TechType t in recipe.Blueprint.UnlockConditions)
             {
                 fulfilled &= (masterDict.DictionaryInstance.ContainsKey((int)t) || _reachableMaterials.Exists(x => x.TechType.Equals(t)));
 
                 if (!fulfilled)
-                    break;
+                    return false;
             }
 
             if (recipe.Blueprint.UnlockDepth > depth)
