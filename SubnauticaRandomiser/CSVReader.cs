@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SubnauticaRandomiser
 {
-    public static class CSVReader
+    internal static class CSVReader
     {
         private static string[] s_csvLines;
         internal static List<Recipe> s_csvParsedList;

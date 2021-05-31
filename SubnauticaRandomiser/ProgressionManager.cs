@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SubnauticaRandomiser
 {
-    public class ProgressionManager
+    internal class ProgressionManager
     {
         // public readonly int Seed;
         private readonly System.Random _random;
@@ -28,7 +28,7 @@ namespace SubnauticaRandomiser
             _databoxes = databoxes;
         }
 
-        public bool AddMaterialsToReachableList(ETechTypeCategory category, int reachableDepth)
+        internal bool AddMaterialsToReachableList(ETechTypeCategory category, int reachableDepth)
         {
             bool success = false;
             LogHandler.Debug("Updating list of reachable materials: "+category.ToString()+", "+reachableDepth);
@@ -59,7 +59,7 @@ namespace SubnauticaRandomiser
             return success;
         }
 
-        public bool AddMaterialsToReachableList(params Recipe[] additions)
+        internal bool AddMaterialsToReachableList(params Recipe[] additions)
         {
             bool success = false;
 
@@ -77,7 +77,7 @@ namespace SubnauticaRandomiser
         }
 
         // Deprecated.
-        public void RandomSubstituteMaterials(RecipeDictionary masterDict, bool useFish, bool useSeeds)
+        internal void RandomSubstituteMaterials(RecipeDictionary masterDict, bool useFish, bool useSeeds)
         {
             // This is the simplest way of randomisation. Merely take all materials
             // and substitute them with other materials of the same category and
@@ -171,7 +171,7 @@ namespace SubnauticaRandomiser
             return;
         }
 
-        public void RandomSmart(RecipeDictionary masterDict, RandomiserConfig config)
+        internal void RandomSmart(RecipeDictionary masterDict, RandomiserConfig config)
         {
             // This function uses the progression tree to randomise materials
             // and game progression in an intelligent way.
@@ -322,7 +322,7 @@ namespace SubnauticaRandomiser
             LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
         }
 
-        public Recipe RandomiseIngredients(Recipe recipe, List<Recipe> materials, RandomiserConfig config)
+        private Recipe RandomiseIngredients(Recipe recipe, List<Recipe> materials, RandomiserConfig config)
         {
             List<RandomiserIngredient> ingredients = new List<RandomiserIngredient>();
             LogHandler.Debug("Figuring out ingredients for " + recipe.TechType.AsString());
@@ -444,7 +444,7 @@ namespace SubnauticaRandomiser
 
         // Base pieces and vehicles obviously cannot act as ingredients for
         // recipes, so this function detects and filters them.
-        public static bool CanFunctionAsIngredient(Recipe recipe)
+        internal static bool CanFunctionAsIngredient(Recipe recipe)
         {
             bool isIngredient = true;
 
@@ -473,7 +473,7 @@ namespace SubnauticaRandomiser
         // This function calculates the maximum reachable depth based on
         // what vehicles the player has attained, as well as how much
         // further they can go "on foot"
-        public static int CalculateReachableDepth(ProgressionTree tree, Dictionary<TechType, bool> progressionItems, int depthTime = 15)
+        internal static int CalculateReachableDepth(ProgressionTree tree, Dictionary<TechType, bool> progressionItems, int depthTime = 15)
         {
             double swimmingSpeed = 4.7; // Assuming player is holding a tool.
             double seaglideSpeed = 11.0;
@@ -758,7 +758,7 @@ namespace SubnauticaRandomiser
 
         // Grab a collection of all keys in the dictionary, then use them to
         // apply every single one as a recipe change in the game.
-        public static void ApplyMasterDict(RecipeDictionary masterDict)
+        internal static void ApplyMasterDict(RecipeDictionary masterDict)
         {
             Dictionary<TechType, Recipe>.KeyCollection keys = masterDict.DictionaryInstance.Keys;
 
@@ -770,7 +770,7 @@ namespace SubnauticaRandomiser
 
         // This function handles applying a randomised recipe to the in-game
         // craft data, and stores a copy in the master dictionary.
-        public static void ApplyRandomisedRecipe(RecipeDictionary masterDict, Recipe recipe)
+        internal static void ApplyRandomisedRecipe(RecipeDictionary masterDict, Recipe recipe)
         {
             CraftDataHandler.SetTechData(recipe.TechType, recipe);
             masterDict.Add(recipe.TechType, recipe);

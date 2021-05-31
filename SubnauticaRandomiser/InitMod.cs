@@ -68,7 +68,7 @@ namespace SubnauticaRandomiser
 
         }
 
-        public static void Randomise()
+        internal static void Randomise()
         {
             s_masterDict = new RecipeDictionary();
             s_config.SanitiseConfigValues();
@@ -97,7 +97,7 @@ namespace SubnauticaRandomiser
             SaveRecipeStateToDisk();
         }
 
-        public static void SaveRecipeStateToDisk()
+        internal static void SaveRecipeStateToDisk()
         {
             if (s_masterDict.DictionaryInstance != null && s_masterDict.DictionaryInstance.Count > 0)
             {
@@ -112,7 +112,7 @@ namespace SubnauticaRandomiser
             }
         }
 
-        public static RecipeDictionary RestoreRecipeStateFromDisk()
+        internal static RecipeDictionary RestoreRecipeStateFromDisk()
         {
             if (String.IsNullOrEmpty(s_config.sBase64Seed))
             {
@@ -122,7 +122,7 @@ namespace SubnauticaRandomiser
             return RecipeDictionary.FromBase64String(s_config.sBase64Seed);
         }
 
-        public static string GetSubnauticaRandomiserDirectory()
+        internal static string GetSubnauticaRandomiserDirectory()
         {
             return new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
         }

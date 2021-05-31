@@ -44,7 +44,6 @@
     <Compile Include="CSVReader.cs" />
     <Compile Include="LogHandler.cs" />
     <Compile Include="ProgressionTree.cs" />
-    <Compile Include="ProgressionPath.cs" />
     <Compile Include="RandomiserObjects\Blueprint.cs" />
     <Compile Include="RandomiserObjects\RandomiserIngredient.cs" />
     <Compile Include="RandomiserObjects\EProgressionNode.cs" />
@@ -55,6 +54,7 @@
     <Compile Include="RandomiserObjects\Databox.cs" />
     <Compile Include="RandomiserObjects\EWreckage.cs" />
     <Compile Include="RandomiserObjects\RandomiserVector.cs" />
+    <Compile Include="RandomiserObjects\ProgressionPath.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="QModInstaller">
