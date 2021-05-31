@@ -15,6 +15,7 @@ namespace SubnauticaRandomiser
         internal static RandomiserConfig s_config;
         internal static readonly string s_recipeFile = "recipeInformation.csv";
         internal static readonly string s_wreckageFile = "wreckInformation.csv";
+        private static readonly int _expectedConfigSaveVersion = 1;
 
         // The master list of all recipes that have been modified
         internal static RecipeDictionary s_masterDict = new RecipeDictionary();
@@ -29,7 +30,15 @@ namespace SubnauticaRandomiser
             s_modDirectory = GetSubnauticaRandomiserDirectory();
             s_config = OptionsPanelHandler.Main.RegisterModOptions<RandomiserConfig>();
             LogHandler.Debug("Registered options menu.");
-            
+
+            // Ensure the user did not update into a save incompatibility.
+            if (s_config.iSaveVersion != _expectedConfigSaveVersion)
+            {
+                LogHandler.MainMenuMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.");
+                LogHandler.MainMenuMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json");
+                return;
+            }
+
             // Try and restore a recipe state from disk
             try
             {
@@ -45,6 +54,9 @@ namespace SubnauticaRandomiser
             if (!_debug_forceRandomise && s_masterDict != null && s_masterDict.DictionaryInstance != null && s_masterDict.DictionaryInstance.Count > 0)
             {
                 ProgressionManager.ApplyMasterDict(s_masterDict);
+                if (s_masterDict.isDataboxRandomised)
+                    EnableHarmonyPatching();
+
                 LogHandler.Debug("Successfully loaded recipe state from disk.");
             }
             else
@@ -55,23 +67,18 @@ namespace SubnauticaRandomiser
                     LogHandler.Warn("Failed to load recipe state from disk: dictionary empty.");
 
                 Randomise();
+                if (s_masterDict.isDataboxRandomised)
+                    EnableHarmonyPatching();
             }
+
             LogHandler.Info("Finished loading.");
-
-            // Only if randomising databoxes is enabled in the config, patch them
-            // with Harmony. Make sure nothing can go wrong.
-            if (s_config.bRandomiseDataboxes && s_masterDict != null && s_masterDict.Databoxes != null && s_masterDict.Databoxes.Count > 0)
-            {
-                Harmony harmony = new Harmony("SubnauticaRandomiser");
-                harmony.PatchAll();
-            }
-
         }
 
         internal static void Randomise()
         {
             s_masterDict = new RecipeDictionary();
             s_config.SanitiseConfigValues();
+            s_config.iSaveVersion = _expectedConfigSaveVersion;
 
             // Attempt to read and parse the CSV with all recipe information.
             List<Recipe> completeMaterialsList;
@@ -124,6 +131,15 @@ namespace SubnauticaRandomiser
         internal static string GetSubnauticaRandomiserDirectory()
         {
             return new FileInfo(Assembly.GetExecutingAssembly().Location).Directory.FullName;
+        }
+
+        private static void EnableHarmonyPatching()
+        {
+            if (s_masterDict != null && s_masterDict.Databoxes != null && s_masterDict.Databoxes.Count > 0)
+            {
+                Harmony harmony = new Harmony("SubnauticaRandomiser");
+                harmony.PatchAll();
+            }
         }
     }
 }

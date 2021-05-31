@@ -63,8 +63,10 @@ namespace SubnauticaRandomiser
         public int iMaxEggsAsSingleIngredient = 1;
         public double dFuzziness = 0.2;
         public double dIngredientRatio = 0.5;
+
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
+        public int iSaveVersion = 1;
 
         public void SanitiseConfigValues()
         {

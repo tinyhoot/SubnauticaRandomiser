@@ -441,6 +441,7 @@ namespace SubnauticaRandomiser
                 LogHandler.Debug("Databox " + toBeRandomised[next].ToString() + " with " + replacementBox.TechType.AsString() + " now contains " + originalBox.TechType.AsString());
                 toBeRandomised.RemoveAt(next);
             }
+            masterDict.isDataboxRandomised = true;
 
             return randomDataboxes;
         }
