@@ -2,7 +2,7 @@
     "Id": "SubnauticaRandomiser",
     "DisplayName": "SubnauticaRandomiser",
     "Author": "Raqzas",
-    "Version": "0.3.1",
+    "Version": "0.4.0",
     "Enable": true,
     "Game": "Subnautica",
     "AssemblyName": "SubnauticaRandomiser.dll"
