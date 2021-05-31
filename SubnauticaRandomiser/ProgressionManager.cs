@@ -19,9 +19,12 @@ namespace SubnauticaRandomiser
         private List<TechType> _depthProgressionItems;
         private List<Databox> _databoxes;
 
-        public ProgressionManager(List<Recipe> allMaterials, List<Databox> databoxes = null)
+        public ProgressionManager(List<Recipe> allMaterials, List<Databox> databoxes = null, int seed = 0)
         {
-            _random = new System.Random();
+            if (seed == 0)
+                _random = new System.Random();
+            else
+                _random = new System.Random(seed);
             _allMaterials = allMaterials;
             _reachableMaterials = new List<Recipe>();
             _depthProgressionItems = new List<TechType>();

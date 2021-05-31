@@ -88,9 +88,8 @@ namespace SubnauticaRandomiser
             if (databoxes == null || databoxes.Count == 0)
                 LogHandler.Error("Failed to extract databox information from CSV.");
 
-            ProgressionManager pm = new ProgressionManager(completeMaterialsList, databoxes);
+            ProgressionManager pm = new ProgressionManager(completeMaterialsList, databoxes, s_config.iSeed);
 
-            //pm.RandomSubstituteMaterials(s_masterDict, s_config.bUseFish, s_config.bUseSeeds);
             pm.RandomSmart(s_masterDict, s_config);
             LogHandler.Info("Randomisation successful!");
 

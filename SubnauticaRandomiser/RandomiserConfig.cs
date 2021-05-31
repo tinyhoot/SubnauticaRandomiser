@@ -12,6 +12,7 @@ namespace SubnauticaRandomiser
         // Every public variable listed here will end up in the config file
         // Additionally, adding the relevant Attributes will also make them
         // show up in the in-game options menu
+        public int iSeed = 0;
 
         [Choice("Mode", "Default", "True Random")]
         public int iRandomiserMode = 0;
@@ -27,6 +28,14 @@ namespace SubnauticaRandomiser
 
         [Toggle("Randomise blueprints in databoxes?")]
         public bool bRandomiseDataboxes = true;
+
+        [Button("New Seed")]
+        public void NewSeed()
+        {
+            Random ran = new Random();
+            iSeed = ran.Next();
+            LogHandler.MainMenuMessage("Changed seed to " + iSeed);
+        }
 
         [Button("Randomise Again")]
         public void NewRandomisation()
