@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using SMLHelper.V2.Crafting;
+using UnityEngine;
 
 namespace SubnauticaRandomiser
 {
-    public static class CSVReader
+    internal static class CSVReader
     {
         private static string[] s_csvLines;
         internal static List<Recipe> s_csvParsedList;
+        internal static List<Databox> s_csvDataboxList;
 
         private static readonly int s_expectedColumns = 8;
 
-        internal static List<Recipe> ParseFile(string fileName)
+        internal static List<Recipe> ParseRecipeFile(string fileName)
         {
             // First, try to find and grab the file containing recipe information
             string path = InitMod.s_modDirectory + "\\" + fileName;
@@ -46,7 +48,7 @@ namespace SubnauticaRandomiser
                 // This might very well fail if the user messed with the CSV
                 try
                 {
-                    s_csvParsedList.Add(ParseLine(line));
+                    s_csvParsedList.Add(ParseRecipeFileLine(line));
                 }
                 catch (Exception ex)
                 {
@@ -59,12 +61,12 @@ namespace SubnauticaRandomiser
         }
 
         // Parse one line of a CSV file and attempt to create a RandomiserRecipe
-        private static Recipe ParseLine(string line)
+        private static Recipe ParseRecipeFileLine(string line)
         {
             Recipe recipe = null;
 
             TechType type = TechType.None;
-            List<Ingredient> ingredientList = new List<Ingredient>();
+            List<RandomiserIngredient> ingredientList = new List<RandomiserIngredient>();
             ETechTypeCategory category = ETechTypeCategory.None;
             int depth = 0;
             List<TechType> prereqList = new List<TechType>();
@@ -139,7 +141,6 @@ namespace SubnauticaRandomiser
             // Column 7: Blueprint Unlock Conditions
             if (!String.IsNullOrEmpty(cells[6]))
             {
-                //blueprintUnlockConditions = ProcessMultipleTechTypes(cells[6].Split(';'));
                 string[] conditions = cells[6].Split(';');
 
                 foreach (string str in conditions)
@@ -177,6 +178,115 @@ namespace SubnauticaRandomiser
             LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depth +" ... "+ value);
             recipe = new Recipe(type, category, depth, prereqList, value, blueprint);
             return recipe;
+        }
+
+        internal static List<Databox> ParseWreckageFile(string fileName)
+        {
+            string path = InitMod.s_modDirectory + "\\" + fileName;
+            LogHandler.Debug("Looking for wreckage CSV as " + path);
+
+            try
+            {
+                s_csvLines = File.ReadAllLines(path);
+            }
+            catch (Exception ex)
+            {
+                LogHandler.MainMenuMessage("Failed to read wreckage CSV!");
+                LogHandler.Error(ex.Message);
+                return null;
+            }
+
+            s_csvDataboxList = new List<Databox>();
+
+            foreach (string line in s_csvLines)
+            {
+                if (line.StartsWith("TechType", StringComparison.InvariantCulture))
+                {
+                    // This is the header line. Skip.
+                    continue;
+                }
+
+                // This might very well fail if the user messed with the CSV
+                try
+                {
+                    Databox databox = ParseWreckageFileLine(line);
+                    if (databox != null)
+                        s_csvDataboxList.Add(databox);
+                }
+                catch (Exception ex)
+                {
+                    LogHandler.Error("Failed to parse information from CSV!");
+                    LogHandler.Error(ex.Message);
+                }
+            }
+
+            return s_csvDataboxList;
+        }
+
+        private static Databox ParseWreckageFileLine(string line)
+        {
+            Databox databox = null;
+
+            TechType type = TechType.None;
+            Vector3 coordinates = Vector3.zero;
+            EWreckage wreck = EWreckage.None;
+            bool laserCutter = false;
+            bool propulsionCannon = false;
+
+            string[] cells = line.Split(',');
+
+            if (cells.Length != 6)
+                throw new InvalidDataException("Unexpected number of columns: " + cells.Length);
+
+            // Column 1: TechType
+            if (String.IsNullOrEmpty(cells[0]))
+                throw new InvalidDataException("TechType is null or empty.");
+            type = StringToTechType(cells[0]);
+
+            // Column 2: Coordinates
+            if (!String.IsNullOrEmpty(cells[1]))
+            {
+                string[] str = cells[1].Split(';');
+                if (str.Length != 3)
+                    throw new InvalidDataException("Coordinates are invalid.");
+
+                float x = float.Parse(str[0]);
+                float y = float.Parse(str[1]);
+                float z = float.Parse(str[2]);
+                coordinates = new Vector3(x, y, z);
+            }
+            else
+            {
+                // The only reason this should be empty is if it is a fragment
+                // For now, skip those.
+                return null;
+            }
+
+            // Column 3: General location
+            if (!String.IsNullOrEmpty(cells[2]))
+            {
+                wreck = StringToEWreckage(cells[2]);
+            }
+
+            // Column 4: Is it a databox?
+            // Redundant until fragments are implemented.
+
+            // Column 5: Does it need a laser cutter?
+            if (!String.IsNullOrEmpty(cells[4]))
+            {
+                laserCutter = (int.Parse(cells[4]) == 1 ? true : false);
+            }
+
+            // Column 6: Does it need a propulsion cannon?
+            if (!String.IsNullOrEmpty(cells[5]))
+            {
+                propulsionCannon = (int.Parse(cells[5]) == 1 ? true : false);
+            }
+
+            LogHandler.Debug("Registering databox: " + type + ", " + coordinates.ToString() + ", " + wreck.ToString() + ", " + laserCutter + ", " + propulsionCannon);
+            databox = new Databox(type, coordinates, wreck, laserCutter, propulsionCannon);
+
+            return databox;
         }
 
         internal static List<TechType> ProcessMultipleTechTypes(string[] str)
@@ -247,6 +357,24 @@ namespace SubnauticaRandomiser
             }
 
             return node;
+        }
+
+        internal static EWreckage StringToEWreckage(string str)
+        {
+            EWreckage wreck;
+
+            try
+            {
+                wreck = (EWreckage)Enum.Parse(typeof(EWreckage), str, true);
+            }
+            catch (Exception ex)
+            {
+                LogHandler.Error("Failed to parse string to EWreckage: " + str);
+                LogHandler.Error(ex.Message);
+                wreck = EWreckage.None;
+            }
+
+            return wreck;
         }
     }
 }

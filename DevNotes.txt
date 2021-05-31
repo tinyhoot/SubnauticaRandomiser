@@ -1,34 +1,26 @@
-﻿How blueprints and the new system in general should work:
+﻿Thoughts and notes on features and issues.
 
-- Read information from the CSV
-  - For items which have that information, create a Blueprint object and build
-    the Recipe object with that included.
-  - Blueprints can unlock in one of three ways: collect an item, craft an item,
-    or via fragment scan. A given blueprint may also unlock a chain of others.
-    - For example, Blood Oil unlocks Benzene AND Aramid Fibers, although the
-      latter do not include Blood Oil in their recipe.
-  - Many of the fields defining blueprint unlock information will have a fragment
-    listed there. 
 - In the future,the CSV will likely be able to drop the following categories:
   - Ingredients. These are used as a fallback crutch by the previous system, and
     a true logic-based system should have no need of them.
     
-- Expand on fragments and databoxes.
-  - Somehow collect a ton of data on them. Where do they spawn, how many, are they
-    looked behind wreckage doors, what tools do you need to access them, etc.
-  - From this information, make it possible to randomise the amount of fragments
+- Expand on fragments.
+  - Make it possible to randomise the amount of fragments
     needed for each blueprint.
   - Is it possible to swap fragments around?
-  - What about databoxes? Can you swap those?
   
 - Clean up saving / loading.
   - It is not necessary to save blueprints and categories to disk. If that info
     is needed again, it is re-read from disk anyways. Cut down on file size.
-- Seeding.
-  - This perhaps ties into the point above, but as of right now seeds are so
-    stupidly long they're nigh on unusable. Figure out a way to implement short,
-    easily shareable seeds. Bonus points if they do not rely on settings to be 
-    the very same.
+    
+- Add a casual mode.
+  - Casual mode would respect vanilla upgrade chains and be more lenient with its
+    randomisation. Perhaps calculate depth with more searchTime? Guarantee all
+    vehicles can be made at vanilla depths?
+    
+- Add a fiendish mode.
+  - Many more recipes are locked behind databoxes scattered throughout the ocean.
+  - Databoxes can be many more places, including the cave systems in many biomes.
     
    
    

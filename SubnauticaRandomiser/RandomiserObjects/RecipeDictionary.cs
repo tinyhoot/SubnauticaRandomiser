@@ -18,7 +18,9 @@ namespace SubnauticaRandomiser
     [Serializable]
     public class RecipeDictionary
     {
-        public Dictionary<int, Recipe> DictionaryInstance = new Dictionary<int, Recipe>();
+        public Dictionary<TechType, Recipe> DictionaryInstance = new Dictionary<TechType, Recipe>();
+        public Dictionary<RandomiserVector, TechType> Databoxes = new Dictionary<RandomiserVector, TechType>();
+        public bool isDataboxRandomised = false;
 
         public string ToBase64String()
         {
@@ -40,14 +42,14 @@ namespace SubnauticaRandomiser
             }
         }
 
-        public bool Add(TechType t, Recipe r)
+        public bool Add(TechType type, Recipe r)
         {
-            if (DictionaryInstance.ContainsKey((int)t))
+            if (DictionaryInstance.ContainsKey(type))
             {
-                LogHandler.Warn("Tried to add duplicate key "+t.AsString()+" to master dictionary!");
+                LogHandler.Warn("Tried to add duplicate key " + type.AsString() + " to master dictionary!");
                 return false;
             }
-            DictionaryInstance.Add((int)t, r);
+            DictionaryInstance.Add(type, r);
             return true;
         }
     }

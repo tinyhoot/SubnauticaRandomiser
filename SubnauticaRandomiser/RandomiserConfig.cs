@@ -12,6 +12,7 @@ namespace SubnauticaRandomiser
         // Every public variable listed here will end up in the config file
         // Additionally, adding the relevant Attributes will also make them
         // show up in the in-game options menu
+        public int iSeed = 0;
 
         [Choice("Mode", "Default", "True Random")]
         public int iRandomiserMode = 0;
@@ -24,6 +25,17 @@ namespace SubnauticaRandomiser
 
         [Toggle("Use seeds in logic?")]
         public bool bUseSeeds = true;
+
+        [Toggle("Randomise blueprints in databoxes?")]
+        public bool bRandomiseDataboxes = true;
+
+        [Button("New Seed")]
+        public void NewSeed()
+        {
+            Random ran = new Random();
+            iSeed = ran.Next();
+            LogHandler.MainMenuMessage("Changed seed to " + iSeed);
+        }
 
         [Button("Randomise Again")]
         public void NewRandomisation()
@@ -51,8 +63,10 @@ namespace SubnauticaRandomiser
         public int iMaxEggsAsSingleIngredient = 1;
         public double dFuzziness = 0.2;
         public double dIngredientRatio = 0.5;
+
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
+        public int iSaveVersion = 1;
 
         public void SanitiseConfigValues()
         {

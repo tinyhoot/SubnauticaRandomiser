@@ -29,6 +29,7 @@
         </Command>
       </CustomCommands>
     </CustomCommands>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <Optimize>true</Optimize>
@@ -36,6 +37,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="InitMod.cs" />
@@ -44,13 +46,17 @@
     <Compile Include="CSVReader.cs" />
     <Compile Include="LogHandler.cs" />
     <Compile Include="ProgressionTree.cs" />
-    <Compile Include="ProgressionPath.cs" />
     <Compile Include="RandomiserObjects\Blueprint.cs" />
     <Compile Include="RandomiserObjects\RandomiserIngredient.cs" />
     <Compile Include="RandomiserObjects\EProgressionNode.cs" />
     <Compile Include="RandomiserObjects\ETechTypeCategory.cs" />
     <Compile Include="RandomiserObjects\Recipe.cs" />
     <Compile Include="RandomiserObjects\RecipeDictionary.cs" />
+    <Compile Include="DataboxPatcher.cs" />
+    <Compile Include="RandomiserObjects\Databox.cs" />
+    <Compile Include="RandomiserObjects\EWreckage.cs" />
+    <Compile Include="RandomiserObjects\RandomiserVector.cs" />
+    <Compile Include="RandomiserObjects\ProgressionPath.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="QModInstaller">
@@ -72,11 +78,13 @@
       <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp_publicized">
+      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RandomiserObjects\" />
