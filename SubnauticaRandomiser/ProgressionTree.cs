@@ -7,13 +7,15 @@ namespace SubnauticaRandomiser
     {
         private Dictionary<EProgressionNode, ProgressionPath> _depthDifficulties;
         public Dictionary<TechType, bool> depthProgressionItems;
-        public List<TechType> essentialItems;
+        private Dictionary<EProgressionNode, List<TechType>> _essentialItems;
+        private Dictionary<EProgressionNode, List<TechType[]>> _electiveItems;
 
         public ProgressionTree()
         {
             _depthDifficulties = new Dictionary<EProgressionNode, ProgressionPath>();
             depthProgressionItems = new Dictionary<TechType, bool>();
-            essentialItems = new List<TechType>();
+            _essentialItems = new Dictionary<EProgressionNode, List<TechType>>();
+            _electiveItems = new Dictionary<EProgressionNode, List<TechType[]>>();
         }
 
         public void SetupVanillaTree()
@@ -111,21 +113,32 @@ namespace SubnauticaRandomiser
             depthProgressionItems.Add(TechType.CyclopsHullModule3, true);
 
             // The scanner and repair tool are absolutely required to get the
-            // early game going.
-            essentialItems.Add(TechType.Scanner);
-            essentialItems.Add(TechType.Welder);
+            // early game going, without the others it can get tedious.
+            AddEssentialItem(EProgressionNode.Depth0m, TechType.Scanner);
+            AddEssentialItem(EProgressionNode.Depth0m, TechType.Welder);
+            AddEssentialItem(EProgressionNode.Depth0m, TechType.SmallStorage);
+            AddEssentialItem(EProgressionNode.Depth0m, TechType.BaseHatch);
+            AddEssentialItem(EProgressionNode.Depth0m, TechType.Fabricator);
+
+            AddEssentialItem(EProgressionNode.Depth100m, TechType.BaseRoom);
+
+            AddEssentialItem(EProgressionNode.Depth300m, TechType.BaseWaterPark);
+
+            // From among these, at least one has to be accessible by the provided
+            // depth level. Ensures e.g. at least one power source by 200m.
+            AddElectiveItems(EProgressionNode.Depth100m, new TechType[] { TechType.Battery, TechType.BatteryCharger });
+
+            AddElectiveItems(EProgressionNode.Depth200m, new TechType[] { TechType.BaseBioReactor, TechType.SolarPanel });
+            AddElectiveItems(EProgressionNode.Depth200m, new TechType[] { TechType.PowerCell, TechType.PowerCellCharger, TechType.SeamothSolarCharge });
+            AddElectiveItems(EProgressionNode.Depth200m, new TechType[] { TechType.BaseBulkhead, TechType.BaseFoundation, TechType.BaseReinforcement });
         }
 
         public ProgressionPath GetProgressionPath(EProgressionNode node)
         {
             if (_depthDifficulties.TryGetValue(node, out ProgressionPath path))
-            {
                 return path;
-            }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
         
         public void SetProgressionPath(EProgressionNode node, ProgressionPath path)
@@ -149,6 +162,68 @@ namespace SubnauticaRandomiser
                 p.AddPath(path);
                 _depthDifficulties.Add(node, p);
             }
+        }
+
+        public void AddEssentialItem(EProgressionNode node, TechType type)
+        {
+            if (_essentialItems.TryGetValue(node, out List<TechType> items))
+            {
+                items.Add(type);
+            }
+            else
+            {
+                List<TechType> list = new List<TechType> { type };
+                _essentialItems.Add(node, list);
+            }
+        }
+
+        public void AddElectiveItems(EProgressionNode node, TechType[] types)
+        {
+            if (_electiveItems.TryGetValue(node, out List<TechType[]> existingItems))
+            {
+                existingItems.Add(types);
+            }
+            else
+            {
+                List<TechType[]> list = new List<TechType[]> { types };
+                _electiveItems.Add(node, list);
+            }
+        }
+
+        public List<TechType> GetEssentialItems(EProgressionNode node)
+        {
+            if (_essentialItems.TryGetValue(node, out List<TechType> items))
+                return items;
+
+            return null;
+        }
+
+        public List<TechType> GetEssentialItems(int depth)
+        {
+            foreach (EProgressionNode node in _essentialItems.Keys)
+            {
+                if ((int)node < depth && _essentialItems[node].Count > 0)
+                    return _essentialItems[node];
+            }
+            return null;
+        }
+
+        public List<TechType[]> GetElectiveItems(EProgressionNode node)
+        {
+            if (_electiveItems.TryGetValue(node, out List<TechType[]> items))
+                return items;
+
+            return null;
+        }
+
+        public List<TechType[]> GetElectiveItems(int depth)
+        {
+            foreach (EProgressionNode node in _electiveItems.Keys)
+            {
+                if ((int)node < depth && _electiveItems[node].Count > 0)
+                    return _electiveItems[node];
+            }
+            return null;
         }
     }
 }

@@ -268,14 +268,45 @@ namespace SubnauticaRandomiser
                         AddMaterialsToReachableList(ETechTypeCategory.Eggs, reachableDepth);
                 }
 
-                // Make sure the list of absolutely essential items is done first.
-                if (tree.essentialItems.Count != 0)
+                // Make sure the list of absolutely essential items is done first,
+                // for each depth level. This guarantees certain recipes are done
+                // by a certain depth, e.g. waterparks by 500m.
+                List<TechType> essentialItems = tree.GetEssentialItems(reachableDepth);
+                if (essentialItems != null)
                 {
-                    nextType = tree.essentialItems[0];
-                    tree.essentialItems.RemoveAt(0);
+                    nextType = essentialItems[0];
+                    essentialItems.RemoveAt(0);
+                    LogHandler.Debug("Prioritising essential item " + nextType.AsString() + " for depth " + reachableDepth);
+
+                    // If this has already been randomised, all the better.
+                    if (masterDict.DictionaryInstance.ContainsKey(nextType))
+                    {
+                        nextType = TechType.None;
+                        LogHandler.Debug("Priority item was already randomised, skipping.");
+                    }
                 }
 
-                // Grab a random recipe which has not yet been randomised.
+                // Similarly, if all essential items are done, grab one from among
+                // the elective items and leave the rest up to chance.
+                List<TechType[]> electiveItems = tree.GetElectiveItems(reachableDepth);
+                if (nextType.Equals(TechType.None) && electiveItems != null && electiveItems.Count > 0)
+                {
+                    TechType[] electiveTypes = electiveItems[0];
+                    electiveItems.RemoveAt(0);
+
+                    if (ContainsAny(masterDict, electiveTypes))
+                    {
+                        LogHandler.Debug("Priority elective containing " + electiveTypes[0].AsString() + " was already randomised, skipping.");
+                    }
+                    else
+                    {
+                        nextType = electiveTypes[_random.Next(0, electiveTypes.Length)];
+                        LogHandler.Debug("Prioritising elective item " + nextType.AsString() + " for depth " + reachableDepth);
+                    }
+                }
+
+                // Once all essentials and electives are done, grab a random recipe 
+                // which has not yet been randomised.
                 if (nextType.Equals(TechType.None))
                     nextType = GetRandom(toBeRandomised);
                 Recipe nextRecipe = _allMaterials.Find(x => x.TechType.Equals(nextType));
@@ -326,7 +357,6 @@ namespace SubnauticaRandomiser
         }
 
         private Recipe RandomiseIngredients(Recipe recipe, List<Recipe> materials, RandomiserConfig config)
-
         {
             List<RandomiserIngredient> ingredients = new List<RandomiserIngredient>();
             LogHandler.Debug("Figuring out ingredients for " + recipe.TechType.AsString());
@@ -380,6 +410,11 @@ namespace SubnauticaRandomiser
                     // Figure out how many, but no more than 5.
                     int amount = _random.Next(1, max);
                     amount = amount > 5 ? 5 : amount;
+                    // Tools and upgrades do not stack, but if the recipe would
+                    // require several and you have more than one in inventory,
+                    // it will consume all of them.
+                    if (r.Category.Equals(ETechTypeCategory.Tools) || r.Category.Equals(ETechTypeCategory.VehicleUpgrades) || r.Category.Equals(ETechTypeCategory.WorkBenchUpgrades))
+                        amount = 1;
                     // Never require more than one (default) egg. That's tedious.
                     if (r.Category.Equals(ETechTypeCategory.Eggs))
                         amount = config.iMaxEggsAsSingleIngredient;
@@ -496,7 +531,7 @@ namespace SubnauticaRandomiser
             double playerDepthRaw = 0.0;
             double totalDepth = 0.0;
 
-            LogHandler.Debug("Recalculating reachable depth.");
+            LogHandler.Debug("===== Recalculating reachable depth =====");
 
             // This feels like it could be simplified.
             // Also, this trusts that the tree is set up correctly.
@@ -616,7 +651,7 @@ namespace SubnauticaRandomiser
 
                 totalDepth = vehicleDepth + (depth > maxSoloDepth ? maxSoloDepth : depth);
             }
-            LogHandler.Debug("New reachable depth: " + totalDepth);
+            LogHandler.Debug("===== New reachable depth: " + totalDepth + " =====");
 
             return (int)totalDepth;
         }
@@ -739,6 +774,16 @@ namespace SubnauticaRandomiser
             }
 
             return fulfilled;
+        }
+
+        private bool ContainsAny(RecipeDictionary masterDict, TechType[] types)
+        {
+            foreach (TechType type in types)
+            {
+                if (masterDict.DictionaryInstance.ContainsKey(type))
+                    return true;
+            }
+            return false;
         }
 
         private Recipe GetRandom(List<Recipe> list)
