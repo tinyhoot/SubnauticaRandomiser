@@ -12,6 +12,9 @@
 - Clean up saving / loading.
   - It is not necessary to save blueprints and categories to disk. If that info
     is needed again, it is re-read from disk anyways. Cut down on file size.
+  - Make this change when something else requires a change to masterDict anyway.
+  - Fragments are a pretty good bet.
+  - Also include save versioning as a field of masterDict.
     
 - Add a casual mode.
   - Casual mode would respect vanilla upgrade chains and be more lenient with its
@@ -23,7 +26,10 @@
   - Databoxes can be many more places, including the cave systems in many biomes.
     
    
-   
-Additional Thoughts:
-- If fish are enabled, ensuring that the player has access to an aquarium by a
-  certain depth level would be really nice. Same goes for eggs.
+  
+Thoughts from a playthrough:
+- Ensure access to food and water using one of the following:
+  - Indoor growbed (covers both)
+  - Alien Containment (covers both)
+  - Water filter (covers water, get food from surrounding fish)
+- What about land seeds? If those get added, indoor growbeds are a necessity.

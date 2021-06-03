@@ -14,7 +14,7 @@ namespace SubnauticaRandomiser
         // show up in the in-game options menu
         public int iSeed = 0;
 
-        [Choice("Mode", "Default", "True Random")]
+        [Choice("Mode", "Balanced", "True Random")]
         public int iRandomiserMode = 0;
 
         [Toggle("Use fish in logic?")]
@@ -29,35 +29,43 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise blueprints in databoxes?")]
         public bool bRandomiseDataboxes = true;
 
-        [Button("New Seed")]
-        public void NewSeed()
-        {
-            Random ran = new Random();
-            iSeed = ran.Next();
-            LogHandler.MainMenuMessage("Changed seed to " + iSeed);
-        }
+        [Choice("Include equipment as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
+        public int iEquipmentAsIngredients = 1;
 
-        [Button("Randomise Again")]
-        public void NewRandomisation()
+        [Choice("Include tools as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
+        public int iToolsAsIngredients = 1;
+
+        [Choice("Include upgrades as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
+        public int iUpgradesAsIngredients = 1;
+
+        [Button("Randomise with new seed")]
+        public void NewRandomNewSeed()
         {
             // Re-randomising everything is a serious request, and it should not
             // happen accidentally. This here ensures the button is pressed twice
             // within a certain timeframe before actually randomising.
-            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds > _confirmInterval)
+            if (EnsureButtonTime())
+            {
+                Random ran = new Random();
+                iSeed = ran.Next();
+                LogHandler.MainMenuMessage("Changed seed to " + iSeed);
+                LogHandler.MainMenuMessage("Randomising...");
+                InitMod.Randomise();
+                LogHandler.MainMenuMessage("Finished randomising!");
+            }
+            else
             {
                 LogHandler.MainMenuMessage("Are you sure you wish to re-randomise all recipes?");
                 LogHandler.MainMenuMessage("Press the button again to proceed.");
             }
-            else
-            {
-                LogHandler.MainMenuMessage("Randomising...");
-                InitMod.Randomise();
-                LogHandler.MainMenuMessage("Finished randomising!");
-                _timeButtonPressed = DateTime.MinValue;
-                return;
-            }
+        }
 
-            _timeButtonPressed = DateTime.UtcNow;
+        [Button("Randomise with same seed")]
+        public void NewRandomOldSeed()
+        {
+            LogHandler.MainMenuMessage("Randomising...");
+            InitMod.Randomise();
+            LogHandler.MainMenuMessage("Finished randomising!");
         }
 
         public int iMaxEggsAsSingleIngredient = 1;
@@ -72,12 +80,31 @@ namespace SubnauticaRandomiser
         {
             if (iRandomiserMode > 1 || iRandomiserMode < 0)
                 iRandomiserMode = 0;
+            if (iToolsAsIngredients > 2 || iToolsAsIngredients < 0)
+                iToolsAsIngredients = 1;
+            if (iUpgradesAsIngredients > 2 || iUpgradesAsIngredients < 0)
+                iUpgradesAsIngredients = 1;
             if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)
                 iMaxEggsAsSingleIngredient = 1;
             if (dFuzziness > 1 || dFuzziness < 0)
                 dFuzziness = 0.2;
             if (dIngredientRatio > 1 || dIngredientRatio < 0)
                 dIngredientRatio = 0.5;
+        }
+
+        private bool EnsureButtonTime()
+        {
+            // Re-randomising everything is a serious request, and it should not
+            // happen accidentally. This here ensures the button is pressed twice
+            // within a certain timeframe before actually randomising.
+            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds < _confirmInterval)
+            {
+                _timeButtonPressed = DateTime.MinValue;
+                return true;
+            }
+
+            _timeButtonPressed = DateTime.UtcNow;
+            return false;
         }
     }
 }
