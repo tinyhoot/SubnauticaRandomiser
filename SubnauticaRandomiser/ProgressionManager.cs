@@ -359,6 +359,19 @@ namespace SubnauticaRandomiser
         private Recipe RandomiseIngredients(Recipe recipe, List<Recipe> materials, RandomiserConfig config)
         {
             List<RandomiserIngredient> ingredients = new List<RandomiserIngredient>();
+            List<ETechTypeCategory> blacklist = new List<ETechTypeCategory>();
+
+            // Respect config values on tools and upgrades as ingredients.
+            if (config.iEquipmentAsIngredients == 0 || (config.iEquipmentAsIngredients == 1 && CanFunctionAsIngredient(recipe)))
+                blacklist.Add(ETechTypeCategory.Equipment);
+            if (config.iToolsAsIngredients == 0 || (config.iToolsAsIngredients == 1 && CanFunctionAsIngredient(recipe)))
+                blacklist.Add(ETechTypeCategory.Tools);
+            if (config.iUpgradesAsIngredients == 0 || (config.iUpgradesAsIngredients == 1 && CanFunctionAsIngredient(recipe)))
+            {
+                blacklist.Add(ETechTypeCategory.VehicleUpgrades);
+                blacklist.Add(ETechTypeCategory.WorkBenchUpgrades);
+            }
+
             LogHandler.Debug("Figuring out ingredients for " + recipe.TechType.AsString());
             
             // Casual mode should preserve sequential upgrade lines and be a bit
@@ -379,15 +392,19 @@ namespace SubnauticaRandomiser
                 int currentValue = 0;
                 recipe.Value = 0;
 
-                // Try at least one big ingredient first, then do smaller ones
-                List<Recipe> candidates = materials.FindAll(x => (targetValue * (config.dIngredientRatio + 0.05)) > x.Value && x.Value > (targetValue * (config.dIngredientRatio - 0.05)));
-                if (candidates.Count == 0)
+                // Try at least one big ingredient first, then do smaller ones.
+                List<Recipe> bigIngredientCandidates = materials.FindAll(x => (targetValue * (config.dIngredientRatio + 0.05)) > x.Value
+                                                                           && (targetValue * (config.dIngredientRatio - 0.05)) < x.Value
+                                                                           && !blacklist.Contains(x.Category)
+                                                                           );
+
+                // If we had no luck, just pick a random one.
+                if (bigIngredientCandidates.Count == 0)
                 {
-                    // If we had no luck, just pick a random one.
-                    candidates.Add(GetRandom(materials));
+                    bigIngredientCandidates.Add(GetRandom(materials, blacklist));
                 }
 
-                Recipe big = GetRandom(candidates);
+                Recipe big = GetRandom(bigIngredientCandidates);
                 ingredients.Add(new RandomiserIngredient(big.TechType, 1));
                 currentValue += big.Value;
                 recipe.Value += currentValue;
@@ -398,7 +415,8 @@ namespace SubnauticaRandomiser
                 // is more or less met, as defined by fuzziness.
                 while ((targetValue - currentValue) > (targetValue * config.dFuzziness / 2))
                 {
-                    Recipe r = GetRandom(materials);
+                    Recipe r = GetRandom(materials, blacklist);
+
                     // Prevent duplicates.
                     if (ingredients.Exists(x => x.techType == r.TechType))
                         continue;
@@ -437,7 +455,7 @@ namespace SubnauticaRandomiser
 
                 for (int i = 1; i <= number; i++)
                 {
-                    TechType type = GetRandom(materials).TechType;
+                    TechType type = GetRandom(materials, blacklist).TechType;
 
                     // Prevent duplicates.
                     if (ingredients.Exists(x => x.techType == type))
@@ -786,14 +804,27 @@ namespace SubnauticaRandomiser
             return false;
         }
 
-        private Recipe GetRandom(List<Recipe> list)
+        private Recipe GetRandom(List<Recipe> list, List<ETechTypeCategory> blacklist = null)
         {
             if (list == null || list.Count == 0)
             {
                 return null;
             }
 
-            return list[_random.Next(0, list.Count)];
+            Recipe r = null;
+            while (true)
+            {
+                r = list[_random.Next(0, list.Count)];
+
+                if (blacklist != null && blacklist.Count > 0)
+                {
+                    if (blacklist.Contains(r.Category))
+                        continue;
+                }
+                break;
+            }
+
+            return r;
         }
 
         private TechType GetRandom(List<TechType> list)

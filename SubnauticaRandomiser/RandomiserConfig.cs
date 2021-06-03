@@ -14,7 +14,7 @@ namespace SubnauticaRandomiser
         // show up in the in-game options menu
         public int iSeed = 0;
 
-        [Choice("Mode", "Default", "True Random")]
+        [Choice("Mode", "Balanced", "True Random")]
         public int iRandomiserMode = 0;
 
         [Toggle("Use fish in logic?")]
@@ -28,6 +28,15 @@ namespace SubnauticaRandomiser
 
         [Toggle("Randomise blueprints in databoxes?")]
         public bool bRandomiseDataboxes = true;
+
+        [Choice("Include equipment as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
+        public int iEquipmentAsIngredients = 1;
+
+        [Choice("Include tools as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
+        public int iToolsAsIngredients = 1;
+
+        [Choice("Include upgrades as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
+        public int iUpgradesAsIngredients = 1;
 
         [Button("Randomise with new seed")]
         public void NewRandomNewSeed()
@@ -71,6 +80,10 @@ namespace SubnauticaRandomiser
         {
             if (iRandomiserMode > 1 || iRandomiserMode < 0)
                 iRandomiserMode = 0;
+            if (iToolsAsIngredients > 2 || iToolsAsIngredients < 0)
+                iToolsAsIngredients = 1;
+            if (iUpgradesAsIngredients > 2 || iUpgradesAsIngredients < 0)
+                iUpgradesAsIngredients = 1;
             if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)
                 iMaxEggsAsSingleIngredient = 1;
             if (dFuzziness > 1 || dFuzziness < 0)
