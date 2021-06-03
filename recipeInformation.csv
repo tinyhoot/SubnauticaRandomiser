@@ -1,3 +1,4 @@
+,,CraftBonus:,,,5,,
 TechType,IngredientList,Category,Depth,Prerequisites,Value,BlueprintUnlockCondition,BlueprintUnlockDepth
 AluminumOxide,,RawMaterials,180,,15,,
 CrashPowder,,RawMaterials,25,,10,,
@@ -71,7 +72,7 @@ Fins,,Equipment,0,,35,,
 FireExtinguisher,,Equipment,0,,35,,
 FirstAidKit,,Equipment,0,,20,,
 RadiationSuit,,Equipment,100,,55,,
-Rebreather,,Equipment,100,,45,CreepVinePiece,
+Rebreather,,Equipment,100,,45,DoubleTank,
 ReinforcedDiveSuit,,Equipment,300,,110,Databox,198
 MapRoomHudChip,,Equipment,300,,95,BaseMapRoom,
 Pipe,,Equipment,0,,25,,
