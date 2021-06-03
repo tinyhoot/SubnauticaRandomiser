@@ -29,35 +29,34 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise blueprints in databoxes?")]
         public bool bRandomiseDataboxes = true;
 
-        [Button("New Seed")]
-        public void NewSeed()
-        {
-            Random ran = new Random();
-            iSeed = ran.Next();
-            LogHandler.MainMenuMessage("Changed seed to " + iSeed);
-        }
-
-        [Button("Randomise Again")]
-        public void NewRandomisation()
+        [Button("Randomise with new seed")]
+        public void NewRandomNewSeed()
         {
             // Re-randomising everything is a serious request, and it should not
             // happen accidentally. This here ensures the button is pressed twice
             // within a certain timeframe before actually randomising.
-            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds > _confirmInterval)
+            if (EnsureButtonTime())
+            {
+                Random ran = new Random();
+                iSeed = ran.Next();
+                LogHandler.MainMenuMessage("Changed seed to " + iSeed);
+                LogHandler.MainMenuMessage("Randomising...");
+                InitMod.Randomise();
+                LogHandler.MainMenuMessage("Finished randomising!");
+            }
+            else
             {
                 LogHandler.MainMenuMessage("Are you sure you wish to re-randomise all recipes?");
                 LogHandler.MainMenuMessage("Press the button again to proceed.");
             }
-            else
-            {
-                LogHandler.MainMenuMessage("Randomising...");
-                InitMod.Randomise();
-                LogHandler.MainMenuMessage("Finished randomising!");
-                _timeButtonPressed = DateTime.MinValue;
-                return;
-            }
+        }
 
-            _timeButtonPressed = DateTime.UtcNow;
+        [Button("Randomise with same seed")]
+        public void NewRandomOldSeed()
+        {
+            LogHandler.MainMenuMessage("Randomising...");
+            InitMod.Randomise();
+            LogHandler.MainMenuMessage("Finished randomising!");
         }
 
         public int iMaxEggsAsSingleIngredient = 1;
@@ -78,6 +77,21 @@ namespace SubnauticaRandomiser
                 dFuzziness = 0.2;
             if (dIngredientRatio > 1 || dIngredientRatio < 0)
                 dIngredientRatio = 0.5;
+        }
+
+        private bool EnsureButtonTime()
+        {
+            // Re-randomising everything is a serious request, and it should not
+            // happen accidentally. This here ensures the button is pressed twice
+            // within a certain timeframe before actually randomising.
+            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds < _confirmInterval)
+            {
+                _timeButtonPressed = DateTime.MinValue;
+                return true;
+            }
+
+            _timeButtonPressed = DateTime.UtcNow;
+            return false;
         }
     }
 }
