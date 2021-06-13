@@ -26,15 +26,16 @@ The randomisation persists between play sessions and save games. If you decide t
 ## How to Use
 1. Install [QModManager](https://www.nexusmods.com/subnautica/mods/201)
 2. Install [SMLHelper](https://www.nexusmods.com/subnautica/mods/113)
+   1. (Optional) Install [BlueprintTracker](https://www.nexusmods.com/subnautica/mods/22)
 3. Extract this mod into your Subnautica/QMods folder
-4. (Optional) Edit the config in the in-game options menu to your liking
-   * Press the "Randomise Again" button
-5. Enjoy!
+   1. (Optional) Edit the config in the in-game options menu to your liking
+   2. Press the "Randomise with same seed" button
+4. Enjoy!
 
 ## How to Build
 * Install QModManager and SMLHelper
 * git clone
 * In Visual Studio, update the project's assembly references to point to the correct locations on your computer.
   * For more information, see [QMod Wiki](https://github.com/SubnauticaModding/QModManager/wiki/Libraries)
-  * In addition, you'll likely need a publicised version of `Assembly-CSharp.dll`. I used [the BepinEx plugin](https://github.com/MrPurple6411/Bepinex-Tools/releases/tag/1.0.1-Publicizer) for that.
+  * In addition, you'll likely need a publicised version of Subnautica's `Assembly-CSharp.dll`. I used [the BepinEx plugin](https://github.com/MrPurple6411/Bepinex-Tools/releases/tag/1.0.1-Publicizer) for that.
 * Building in the Release configuration should leave you with a `SubnauticaRandomiser.dll` in `SubnauticaRandomiser/bin/Release/`
