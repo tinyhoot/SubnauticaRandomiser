@@ -24,6 +24,8 @@
 - Add a fiendish mode.
   - Many more recipes are locked behind databoxes scattered throughout the ocean.
   - Databoxes can be many more places, including the cave systems in many biomes.
+  - Raw materials are no longer found in their original biomes. Look into using
+    LootDistributionHandler for this?
     
    
   
@@ -33,3 +35,5 @@ Thoughts from a playthrough:
   - Alien Containment (covers both)
   - Water filter (covers water, get food from surrounding fish)
 - What about land seeds? If those get added, indoor growbeds are a necessity.
+- Add Aurora interior to logic. What parts need repair tool, laser cutter, cannon?
+- Scrap metal!
