@@ -391,6 +391,7 @@ namespace SubnauticaRandomiser
                 double targetValue = recipe.Value;
                 int currentValue = 0;
                 recipe.Value = 0;
+                int totalSize = 0;
 
                 // Try at least one big ingredient first, then do smaller ones.
                 List<Recipe> bigIngredientCandidates = materials.FindAll(x => (targetValue * (config.dIngredientRatio + 0.05)) > x.Value
@@ -436,13 +437,25 @@ namespace SubnauticaRandomiser
                     // Never require more than one (default) egg. That's tedious.
                     if (r.Category.Equals(ETechTypeCategory.Eggs))
                         amount = config.iMaxEggsAsSingleIngredient;
+                    // If a recipe starts requiring a lot of inventory space to
+                    // complete, try to minimise adding more ingredients.
+                    if (totalSize + (GetItemSize(r.TechType) * amount) > config.iMaxInventorySizePerRecipe)
+                        amount = 1;
 
                     RandomiserIngredient ing = new RandomiserIngredient(r.TechType, amount);
                     ingredients.Add(ing);
                     currentValue += r.Value * amount;
                     recipe.Value += currentValue;
+                    totalSize += GetItemSize(r.TechType) * amount;
 
                     LogHandler.Debug("    Adding ingredient: " + r.TechType.AsString() + ", " + amount);
+
+                    // If a recipe starts getting out of hand, shut it down early.
+                    if (totalSize >= config.iMaxInventorySizePerRecipe)
+                    {
+                        LogHandler.Debug("!   Recipe is getting too large, stopping.");
+                        break;
+                    }
                 }
                 LogHandler.Debug("    Recipe is now valued "+currentValue+" out of "+targetValue);
             }
@@ -452,6 +465,7 @@ namespace SubnauticaRandomiser
             if (config.iRandomiserMode == 1)
             {
                 int number = _random.Next(1, 6);
+                int totalInvSize = 0;
 
                 for (int i = 1; i <= number; i++)
                 {
@@ -466,6 +480,15 @@ namespace SubnauticaRandomiser
                     RandomiserIngredient ing = new RandomiserIngredient(type, _random.Next(1, 6));
 
                     ingredients.Add(ing);
+                    totalInvSize += GetItemSize(ing.techType) * ing.amount;
+
+                    LogHandler.Debug("    Adding ingredient: " + ing.techType.AsString() + ", " + ing.amount);
+
+                    if (totalInvSize > config.iMaxInventorySizePerRecipe)
+                    {
+                        LogHandler.Debug("!   Recipe is getting too large, stopping.");
+                        break;
+                    }
                 }
             }
 
@@ -702,6 +725,7 @@ namespace SubnauticaRandomiser
             return allItemsPresent;
         }
 
+        // Check if this recipe fulfills all conditions to have its blueprint be unlocked
         private bool CheckRecipeForBlueprint(RecipeDictionary masterDict, List<Databox> databoxes, Recipe recipe, int depth)
         {
             bool fulfilled = true;
@@ -802,6 +826,15 @@ namespace SubnauticaRandomiser
                     return true;
             }
             return false;
+        }
+
+        private int GetItemSize(TechType type)
+        {
+            int size = 0;
+
+            size = CraftData.GetItemSize(type).x * CraftData.GetItemSize(type).y;
+
+            return size;
         }
 
         private Recipe GetRandom(List<Recipe> list, List<ETechTypeCategory> blacklist = null)
