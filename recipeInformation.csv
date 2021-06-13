@@ -27,6 +27,7 @@ Floater,,RawMaterials,20,,25,,
 GasPod,,RawMaterials,0,,15,,
 JellyPlant,,RawMaterials,180,,15,,
 JeweledDiskPiece,,RawMaterials,0,Knife,15,,
+SeaTreaderPoop,,RawMaterials,230,,60,,
 StalkerTooth,,RawMaterials,50,,40,,
 WhiteMushroom,,RawMaterials,180,,10,,
 Bleach,Salt:1;CoralChunk:1,BasicMaterials,0,,20,,
@@ -34,13 +35,13 @@ EnameledGlass,Glass:1;StalkerTooth:1,BasicMaterials,0,,70,,0
 FiberMesh,CreepVinePiece:2,BasicMaterials,0,,15,CreepVinePiece,
 Glass,Quartz:2,BasicMaterials,0,,25,,
 Lubricant,CreepVineSeedCluster:1,BasicMaterials,0,,15,CreepVineSeedCluster,
-PlasteelIngot,TitaniumIngot:1;Lithium:2,BasicMaterials,200,,140,,0
+PlasteelIngot,TitaniumIngot:1;Lithium:2,BasicMaterials,200,,140,SeaMothFragment,90
 Silicone,CreepVineSeedCluster:1,BasicMaterials,0,,15,,
 TitaniumIngot,Titanium:10,BasicMaterials,0,,105,,
 AramidFibers,Benzene:1;FiberMesh:1,AdvancedMaterials,300,,55,BloodOil,
 Aerogel,JellyPlant:1;AluminumOxide:1,AdvancedMaterials,300,,35,JellyPlant,
 Benzene,BloodOil:3,AdvancedMaterials,300,,35,BloodOil,
-HatchingEnzymes,,AdvancedMaterials,1700,,120,,
+HatchingEnzymes,,AdvancedMaterials,1700,,120,,1700
 HydrochloricAcid,WhiteMushroom:3;Salt:1,AdvancedMaterials,300,,45,WhiteMushroom,
 Polyaniline,HydrochloricAcid:1;Gold:1,AdvancedMaterials,300,,60,WhiteMushroom,
 AdvancedWiringKit,WiringKit:1;Gold:2;ComputerChip:1,Electronics,100,,120,ComputerChip,
