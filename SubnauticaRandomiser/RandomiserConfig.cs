@@ -68,6 +68,7 @@ namespace SubnauticaRandomiser
             LogHandler.MainMenuMessage("Finished randomising!");
         }
 
+        public int iDepthSearchTime = 15;
         public int iMaxAmountPerIngredient = 5;
         public int iMaxEggsAsSingleIngredient = 1;
         public int iMaxInventorySizePerRecipe = 24;
@@ -86,6 +87,8 @@ namespace SubnauticaRandomiser
                 iToolsAsIngredients = 1;
             if (iUpgradesAsIngredients > 2 || iUpgradesAsIngredients < 0)
                 iUpgradesAsIngredients = 1;
+            if (iDepthSearchTime > 45 || iDepthSearchTime < 0)
+                iDepthSearchTime = 15;
             if (iMaxAmountPerIngredient > 20 || iMaxAmountPerIngredient < 1)
                 iMaxAmountPerIngredient = 5;
             if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)

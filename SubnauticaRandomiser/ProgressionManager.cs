@@ -235,7 +235,7 @@ namespace SubnauticaRandomiser
                 int newDepth = 0;
                 if (newProgressionItem)
                 {
-                    newDepth = CalculateReachableDepth(tree, unlockedProgressionItems);
+                    newDepth = CalculateReachableDepth(tree, unlockedProgressionItems, config.iDepthSearchTime);
                     newProgressionItem = false;
                 }
 
