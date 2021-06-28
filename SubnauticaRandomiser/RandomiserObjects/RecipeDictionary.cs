@@ -21,6 +21,7 @@ namespace SubnauticaRandomiser
         public Dictionary<TechType, Recipe> DictionaryInstance = new Dictionary<TechType, Recipe>();
         public Dictionary<RandomiserVector, TechType> Databoxes = new Dictionary<RandomiserVector, TechType>();
         public bool isDataboxRandomised = false;
+        public static readonly int SaveVersion = 1;
 
         public string ToBase64String()
         {

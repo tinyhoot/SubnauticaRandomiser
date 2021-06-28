@@ -14,19 +14,19 @@ namespace SubnauticaRandomiser
         // this into a list since the searchability of _all is important,
         // and _reachable often gets iterated over anyway. Plus, lists have the
         // advantage of making it very easy to call up a random element.
-        internal List<Recipe> _allMaterials;
-        private List<Recipe> _reachableMaterials;
+        internal List<RandomiserRecipe> _allMaterials;
+        private List<RandomiserRecipe> _reachableMaterials;
         private List<TechType> _depthProgressionItems;
         private List<Databox> _databoxes;
 
-        public ProgressionManager(List<Recipe> allMaterials, List<Databox> databoxes = null, int seed = 0)
+        public ProgressionManager(List<RandomiserRecipe> allMaterials, List<Databox> databoxes = null, int seed = 0)
         {
             if (seed == 0)
                 _random = new System.Random();
             else
                 _random = new System.Random(seed);
             _allMaterials = allMaterials;
-            _reachableMaterials = new List<Recipe>();
+            _reachableMaterials = new List<RandomiserRecipe>();
             _depthProgressionItems = new List<TechType>();
             _databoxes = databoxes;
         }
@@ -38,7 +38,7 @@ namespace SubnauticaRandomiser
             // This is a stupidly complicated expression. It uses a lambda to
             // compare the search parameters against all materials contained
             // in the _allMaterials master list.
-            List<Recipe> additions = _allMaterials.FindAll(x => x.Category.Equals(category) && x.Depth <= reachableDepth);
+            List<RandomiserRecipe> additions = _allMaterials.FindAll(x => x.Category.Equals(category) && x.Depth <= reachableDepth);
             
             // Ensure no duplicates are added to the list. This loop *must* go
             // in reverse, otherwise the computer gets very unhappy.
@@ -62,11 +62,11 @@ namespace SubnauticaRandomiser
             return success;
         }
 
-        internal bool AddMaterialsToReachableList(params Recipe[] additions)
+        internal bool AddMaterialsToReachableList(params RandomiserRecipe[] additions)
         {
             bool success = false;
 
-            foreach (Recipe r in additions)
+            foreach (RandomiserRecipe r in additions)
             {
                 if (!_reachableMaterials.Contains(r))
                 {
@@ -85,7 +85,7 @@ namespace SubnauticaRandomiser
             // This is the simplest way of randomisation. Merely take all materials
             // and substitute them with other materials of the same category and
             // depth difficulty.
-            List<Recipe> randomRecipes = new List<Recipe>();
+            List<RandomiserRecipe> randomRecipes = new List<RandomiserRecipe>();
             LogHandler.Info("Randomising using simple substitution...");
 
             randomRecipes = _allMaterials.FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials)
@@ -93,7 +93,7 @@ namespace SubnauticaRandomiser
                                                     && !x.Category.Equals(ETechTypeCategory.Seeds)
                                                     );
 
-            foreach (Recipe randomiseMe in randomRecipes)
+            foreach (RandomiserRecipe randomiseMe in randomRecipes)
             {
                 List<RandomiserIngredient> ingredients = randomiseMe.Ingredients;
                 int depth = randomiseMe.Depth;
@@ -106,7 +106,7 @@ namespace SubnauticaRandomiser
                     // Find the Recipe object that matches the TechType of the
                     // ingredient we aim to randomise. With the Recipe, we have
                     // access to much more complete data like the item's category.
-                    Recipe matchRecipe = _allMaterials.Find(x => x.TechType.Equals(ingredients[i].techType));
+                    RandomiserRecipe matchRecipe = _allMaterials.Find(x => x.TechType.Equals(ingredients[i].techType));
 
                     if (randomiseMe.Prerequisites != null && randomiseMe.Prerequisites.Count > i)
                     {
@@ -120,7 +120,7 @@ namespace SubnauticaRandomiser
 
                     // Special handling for Fish and Seeds, which are treated as 
                     // raw materials if enabled in the config.
-                    List<Recipe> match = new List<Recipe>();
+                    List<RandomiserRecipe> match = new List<RandomiserRecipe>();
                     if (matchRecipe.Category.Equals(ETechTypeCategory.RawMaterials) && (useFish || useSeeds))
                     {
                         if (useFish && useSeeds)
@@ -200,7 +200,7 @@ namespace SubnauticaRandomiser
 
             List<TechType> toBeRandomised = new List<TechType>();
             Dictionary<TechType, bool> unlockedProgressionItems = new Dictionary<TechType, bool>();
-            _reachableMaterials = new List<Recipe>();
+            _reachableMaterials = new List<RandomiserRecipe>();
             ProgressionTree tree = new ProgressionTree();
             int reachableDepth = 0;
 
@@ -212,7 +212,7 @@ namespace SubnauticaRandomiser
                 _databoxes = RandomiseDataboxes(masterDict, _databoxes);
             }
 
-            foreach (Recipe r in _allMaterials.FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials) 
+            foreach (RandomiserRecipe r in _allMaterials.FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials) 
                                                          && !x.Category.Equals(ETechTypeCategory.Fish) 
                                                          && !x.Category.Equals(ETechTypeCategory.Seeds)
                                                          && !x.Category.Equals(ETechTypeCategory.Eggs)))
@@ -309,7 +309,7 @@ namespace SubnauticaRandomiser
                 // which has not yet been randomised.
                 if (nextType.Equals(TechType.None))
                     nextType = GetRandom(toBeRandomised);
-                Recipe nextRecipe = _allMaterials.Find(x => x.TechType.Equals(nextType));
+                RandomiserRecipe nextRecipe = _allMaterials.Find(x => x.TechType.Equals(nextType));
 
                 // Does this recipe have all of its prerequisites fulfilled?
                 if (CheckRecipeForBlueprint(masterDict, _databoxes, nextRecipe, reachableDepth) && CheckRecipeForPrerequisites(masterDict, nextRecipe))
@@ -356,7 +356,7 @@ namespace SubnauticaRandomiser
             LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
         }
 
-        private Recipe RandomiseIngredients(Recipe recipe, List<Recipe> materials, RandomiserConfig config)
+        private RandomiserRecipe RandomiseIngredients(RandomiserRecipe recipe, List<RandomiserRecipe> materials, RandomiserConfig config)
         {
             List<RandomiserIngredient> ingredients = new List<RandomiserIngredient>();
             List<ETechTypeCategory> blacklist = new List<ETechTypeCategory>();
@@ -394,7 +394,7 @@ namespace SubnauticaRandomiser
                 int totalSize = 0;
 
                 // Try at least one big ingredient first, then do smaller ones.
-                List<Recipe> bigIngredientCandidates = materials.FindAll(x => (targetValue * (config.dIngredientRatio + 0.05)) > x.Value
+                List<RandomiserRecipe> bigIngredientCandidates = materials.FindAll(x => (targetValue * (config.dIngredientRatio + 0.05)) > x.Value
                                                                            && (targetValue * (config.dIngredientRatio - 0.05)) < x.Value
                                                                            && !blacklist.Contains(x.Category)
                                                                            );
@@ -405,7 +405,7 @@ namespace SubnauticaRandomiser
                     bigIngredientCandidates.Add(GetRandom(materials, blacklist));
                 }
 
-                Recipe big = GetRandom(bigIngredientCandidates);
+                RandomiserRecipe big = GetRandom(bigIngredientCandidates);
                 ingredients.Add(new RandomiserIngredient(big.TechType, 1));
                 currentValue += big.Value;
                 recipe.Value += currentValue;
@@ -416,7 +416,7 @@ namespace SubnauticaRandomiser
                 // is more or less met, as defined by fuzziness.
                 while ((targetValue - currentValue) > (targetValue * config.dFuzziness / 2))
                 {
-                    Recipe r = GetRandom(materials, blacklist);
+                    RandomiserRecipe r = GetRandom(materials, blacklist);
 
                     // Prevent duplicates.
                     if (ingredients.Exists(x => x.techType == r.TechType))
@@ -528,7 +528,7 @@ namespace SubnauticaRandomiser
 
         // Base pieces and vehicles obviously cannot act as ingredients for
         // recipes, so this function detects and filters them.
-        internal static bool CanFunctionAsIngredient(Recipe recipe)
+        internal static bool CanFunctionAsIngredient(RandomiserRecipe recipe)
         {
             bool isIngredient = true;
 
@@ -729,7 +729,7 @@ namespace SubnauticaRandomiser
         }
 
         // Check if this recipe fulfills all conditions to have its blueprint be unlocked
-        private bool CheckRecipeForBlueprint(RecipeDictionary masterDict, List<Databox> databoxes, Recipe recipe, int depth)
+        private bool CheckRecipeForBlueprint(RecipeDictionary masterDict, List<Databox> databoxes, RandomiserRecipe recipe, int depth)
         {
             bool fulfilled = true;
 
@@ -804,7 +804,7 @@ namespace SubnauticaRandomiser
             return fulfilled;
         }
 
-        private static bool CheckRecipeForPrerequisites(RecipeDictionary masterDict, Recipe recipe)
+        private static bool CheckRecipeForPrerequisites(RecipeDictionary masterDict, RandomiserRecipe recipe)
         {
             bool fulfilled = true;
 
@@ -840,14 +840,14 @@ namespace SubnauticaRandomiser
             return size;
         }
 
-        private Recipe GetRandom(List<Recipe> list, List<ETechTypeCategory> blacklist = null)
+        private RandomiserRecipe GetRandom(List<RandomiserRecipe> list, List<ETechTypeCategory> blacklist = null)
         {
             if (list == null || list.Count == 0)
             {
                 return null;
             }
 
-            Recipe r = null;
+            RandomiserRecipe r = null;
             while (true)
             {
                 r = list[_random.Next(0, list.Count)];
@@ -887,10 +887,10 @@ namespace SubnauticaRandomiser
 
         // This function handles applying a randomised recipe to the in-game
         // craft data, and stores a copy in the master dictionary.
-        internal static void ApplyRandomisedRecipe(RecipeDictionary masterDict, Recipe recipe)
+        internal static void ApplyRandomisedRecipe(RecipeDictionary masterDict, RandomiserRecipe recipe)
         {
             CraftDataHandler.SetTechData(recipe.TechType, recipe);
-            masterDict.Add(recipe.TechType, recipe);
+            masterDict.Add(recipe.TechType, recipe.GetBasicRecipe());
         }
     }
 }

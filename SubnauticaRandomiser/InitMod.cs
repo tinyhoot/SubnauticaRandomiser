@@ -81,7 +81,7 @@ namespace SubnauticaRandomiser
             s_config.iSaveVersion = _expectedConfigSaveVersion;
 
             // Attempt to read and parse the CSV with all recipe information.
-            List<Recipe> completeMaterialsList;
+            List<RandomiserRecipe> completeMaterialsList;
             completeMaterialsList = CSVReader.ParseRecipeFile(s_recipeFile);
             if (completeMaterialsList == null)
             {

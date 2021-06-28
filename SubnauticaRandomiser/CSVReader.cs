@@ -9,12 +9,12 @@ namespace SubnauticaRandomiser
     internal static class CSVReader
     {
         private static string[] s_csvLines;
-        internal static List<Recipe> s_csvParsedList;
+        internal static List<RandomiserRecipe> s_csvParsedList;
         internal static List<Databox> s_csvDataboxList;
 
         private static readonly int s_expectedColumns = 8;
 
-        internal static List<Recipe> ParseRecipeFile(string fileName)
+        internal static List<RandomiserRecipe> ParseRecipeFile(string fileName)
         {
             // First, try to find and grab the file containing recipe information
             string path = InitMod.s_modDirectory + "\\" + fileName;
@@ -35,7 +35,7 @@ namespace SubnauticaRandomiser
             // RandomiserRecipe objects, for later use.
             // For now, this system is not robust and expects the CSV to be read
             // pretty much as it was distributed with the mod.
-            s_csvParsedList = new List<Recipe>();
+            s_csvParsedList = new List<RandomiserRecipe>();
 
             foreach (string line in s_csvLines)
             {
@@ -61,9 +61,9 @@ namespace SubnauticaRandomiser
         }
 
         // Parse one line of a CSV file and attempt to create a RandomiserRecipe
-        private static Recipe ParseRecipeFileLine(string line)
+        private static RandomiserRecipe ParseRecipeFileLine(string line)
         {
-            Recipe recipe = null;
+            RandomiserRecipe recipe = null;
 
             TechType type = TechType.None;
             List<RandomiserIngredient> ingredientList = new List<RandomiserIngredient>();
@@ -71,6 +71,7 @@ namespace SubnauticaRandomiser
             int depth = 0;
             List<TechType> prereqList = new List<TechType>();
             int value = 0;
+            int maxUses = 0;
 
             Blueprint blueprint = null;
             List<TechType> blueprintUnlockConditions = new List<TechType>();
@@ -93,49 +94,31 @@ namespace SubnauticaRandomiser
             }
             type = StringToTechType(cells[0]);
 
-            // Column 2: Ingredients
-            // These need some special attention as they represent a complex object
-            // Disabled for now, as it seems this information could just be pulled
-            // from the game instead. Whoops.
-            //if (!String.IsNullOrEmpty(cells[1]))
-            //{
-            //    string[] ingredients = cells[1].Split(';', ':');
+            // Column 2: Category
+            category = StringToETechTypeCategory(cells[1]);
 
-            //    if (ingredients.Length % 2 != 0)
-            //    {
-            //        throw new InvalidDataException("Unexpected data in Ingredients field: "+ingredients);
-            //    }
+            // Column 3: Depth Difficulty
+            if (!String.IsNullOrEmpty(cells[2]))
+            {
+                depth = int.Parse(cells[2]);
+            }
 
-            //    for (int i = 0; i < ingredients.Length-1; i = i + 2)
-            //    {
-            //        TechType t = StringToTechType(ingredients[i]);
-            //        int amount = int.Parse(ingredients[i + 1]);
-
-            //        Ingredient ing = new Ingredient(t, amount);
-            //        ingredientList.Add(ing);
-            //        // LogHandler.Debug(type+": "+ing.techType.AsString()+":"+ing.amount);
-            //    }
-            //}
-
-            // Column 3: Category
-            category = StringToETechTypeCategory(cells[2]);
-
-            // Column 4: Depth Difficulty
+            // Column 4: Prerequisites
             if (!String.IsNullOrEmpty(cells[3]))
             {
-                depth = int.Parse(cells[3]);
+                prereqList = ProcessMultipleTechTypes(cells[3].Split(';'));
             }
 
-            // Column 5: Prerequisites
+            // Column 5: Value
             if (!String.IsNullOrEmpty(cells[4]))
             {
-                prereqList = ProcessMultipleTechTypes(cells[4].Split(';'));
+                value = int.Parse(cells[4]);
             }
 
-            // Column 6: Craft Amount
+            // Column 6: Max Uses Per Game
             if (!String.IsNullOrEmpty(cells[5]))
             {
-                value = int.Parse(cells[5]);
+                maxUses = int.Parse(cells[5]);
             }
 
             // Column 7: Blueprint Unlock Conditions
@@ -176,7 +159,7 @@ namespace SubnauticaRandomiser
             }
             
             LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depth +" ... "+ value);
-            recipe = new Recipe(type, category, depth, prereqList, value, blueprint);
+            recipe = new RandomiserRecipe(type, category, depth, prereqList, value, maxUses, blueprint);
             return recipe;
         }
 
