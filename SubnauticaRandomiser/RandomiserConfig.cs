@@ -76,7 +76,7 @@ namespace SubnauticaRandomiser
 
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
-        public int iSaveVersion = InitMod._expectedSaveVersion;
+        public int iSaveVersion = InitMod.s_expectedSaveVersion;
 
         public void SanitiseConfigValues()
         {
