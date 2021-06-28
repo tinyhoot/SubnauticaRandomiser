@@ -32,7 +32,7 @@ namespace SubnauticaRandomiser
             LogHandler.Debug("Registered options menu.");
 
             // Ensure the user did not update into a save incompatibility.
-            if (s_config.iSaveVersion != _expectedConfigSaveVersion)
+            if (s_config.iSaveVersion != _expectedSaveVersion)
             {
                 LogHandler.MainMenuMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.");
                 LogHandler.MainMenuMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json");
