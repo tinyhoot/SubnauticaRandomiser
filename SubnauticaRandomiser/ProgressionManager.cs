@@ -493,6 +493,7 @@ namespace SubnauticaRandomiser
             }
 
             recipe.Ingredients = ingredients;
+            recipe.CraftAmount = CraftDataHandler.GetTechData(recipe.TechType).craftAmount;
             return recipe;
         }
 
