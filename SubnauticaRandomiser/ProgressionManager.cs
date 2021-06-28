@@ -426,17 +426,18 @@ namespace SubnauticaRandomiser
                     // still sustain?
                     int max = (int)((targetValue + targetValue * config.dFuzziness / 2) - currentValue) / r.Value;
                     max = max > 0 ? max : 1;
-                    // Figure out how many, but no more than 5.
-                    int amount = _random.Next(1, max);
-                    amount = amount > 5 ? 5 : amount;
                     // Tools and upgrades do not stack, but if the recipe would
                     // require several and you have more than one in inventory,
                     // it will consume all of them.
                     if (r.Category.Equals(ETechTypeCategory.Tools) || r.Category.Equals(ETechTypeCategory.VehicleUpgrades) || r.Category.Equals(ETechTypeCategory.WorkBenchUpgrades))
-                        amount = 1;
+                        max = 1;
                     // Never require more than one (default) egg. That's tedious.
                     if (r.Category.Equals(ETechTypeCategory.Eggs))
-                        amount = config.iMaxEggsAsSingleIngredient;
+                        max = config.iMaxEggsAsSingleIngredient;
+
+                    // Figure out how many, but no more than 5.
+                    int amount = _random.Next(1, max);
+                    amount = amount > 5 ? 5 : amount;
                     // If a recipe starts requiring a lot of inventory space to
                     // complete, try to minimise adding more ingredients.
                     if (totalSize + (GetItemSize(r.TechType) * amount) > config.iMaxInventorySizePerRecipe)
