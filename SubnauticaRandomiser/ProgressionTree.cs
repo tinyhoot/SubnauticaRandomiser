@@ -121,6 +121,7 @@ namespace SubnauticaRandomiser
             AddEssentialItem(EProgressionNode.Depth0m, TechType.Fabricator);
 
             AddEssentialItem(EProgressionNode.Depth100m, TechType.BaseRoom);
+            AddEssentialItem(EProgressionNode.Depth100m, TechType.Tank);
 
             AddEssentialItem(EProgressionNode.Depth300m, TechType.BaseWaterPark);
 
