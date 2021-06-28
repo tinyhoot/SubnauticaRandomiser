@@ -236,6 +236,12 @@ namespace SubnauticaRandomiser
                 if (newProgressionItem)
                 {
                     newDepth = CalculateReachableDepth(tree, unlockedProgressionItems, config.iDepthSearchTime);
+                    if (SpoilerLog.s_progression.Count > 0)
+                    {
+                        KeyValuePair<TechType, int> valuePair = new KeyValuePair<TechType, int>(SpoilerLog.s_progression[SpoilerLog.s_progression.Count - 1].Key, newDepth);
+                        SpoilerLog.s_progression.RemoveAt(SpoilerLog.s_progression.Count - 1);
+                        SpoilerLog.s_progression.Add(valuePair);
+                    }
                     newProgressionItem = false;
                 }
 
@@ -340,6 +346,7 @@ namespace SubnauticaRandomiser
                     if (tree.depthProgressionItems.ContainsKey(nextType) && !unlockedProgressionItems.ContainsKey(nextType))
                     {
                         unlockedProgressionItems.Add(nextType, true);
+                        SpoilerLog.s_progression.Add(new KeyValuePair<TechType, int>(nextType, 0));
                         newProgressionItem = true;
                         LogHandler.Debug("[+] Added " + nextType.AsString() + " to progression items.");
                     }
