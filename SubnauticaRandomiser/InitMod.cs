@@ -57,7 +57,7 @@ namespace SubnauticaRandomiser
                 if (s_masterDict.isDataboxRandomised)
                     EnableHarmonyPatching();
 
-                LogHandler.Debug("Successfully loaded recipe state from disk.");
+                LogHandler.Info("Successfully loaded recipe state from disk.");
             }
             else
             {
