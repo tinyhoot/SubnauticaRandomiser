@@ -426,6 +426,7 @@ namespace SubnauticaRandomiser
                     // still sustain?
                     int max = (int)((targetValue + targetValue * config.dFuzziness / 2) - currentValue) / r.Value;
                     max = max > 0 ? max : 1;
+                    max = max > config.iMaxAmountPerIngredient ? config.iMaxAmountPerIngredient : max;
                     // Tools and upgrades do not stack, but if the recipe would
                     // require several and you have more than one in inventory,
                     // it will consume all of them.
@@ -436,7 +437,7 @@ namespace SubnauticaRandomiser
                         max = config.iMaxEggsAsSingleIngredient;
 
                     // Figure out how many, but no more than 5.
-                    int amount = _random.Next(1, max);
+                    int amount = _random.Next(1, max + 1);
                     amount = amount > config.iMaxAmountPerIngredient ? config.iMaxAmountPerIngredient : amount;
                     // If a recipe starts requiring a lot of inventory space to
                     // complete, try to minimise adding more ingredients.
