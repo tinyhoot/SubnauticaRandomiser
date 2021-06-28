@@ -437,7 +437,7 @@ namespace SubnauticaRandomiser
 
                     // Figure out how many, but no more than 5.
                     int amount = _random.Next(1, max);
-                    amount = amount > 5 ? 5 : amount;
+                    amount = amount > config.iMaxAmountPerIngredient ? config.iMaxAmountPerIngredient : amount;
                     // If a recipe starts requiring a lot of inventory space to
                     // complete, try to minimise adding more ingredients.
                     if (totalSize + (GetItemSize(r.TechType) * amount) > config.iMaxInventorySizePerRecipe)
@@ -478,7 +478,7 @@ namespace SubnauticaRandomiser
                         i--;
                         continue;
                     }
-                    RandomiserIngredient ing = new RandomiserIngredient(type, _random.Next(1, 6));
+                    RandomiserIngredient ing = new RandomiserIngredient(type, _random.Next(1, config.iMaxAmountPerIngredient + 1));
 
                     ingredients.Add(ing);
                     totalInvSize += GetItemSize(ing.techType) * ing.amount;
