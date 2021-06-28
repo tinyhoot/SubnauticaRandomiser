@@ -78,6 +78,8 @@ namespace SubnauticaRandomiser
             }
 
             LogHandler.Info("Finished loading.");
+
+            FragmentPatcher.EditLootDistribution();
         }
 
         internal static void Randomise()
