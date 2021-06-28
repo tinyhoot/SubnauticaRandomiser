@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Handlers;
 
 namespace SubnauticaRandomiser
 {
@@ -12,6 +10,7 @@ namespace SubnauticaRandomiser
         public List<TechType> Prerequisites;
         public int Value;
         public int MaxUsesPerGame;
+        internal int _usedInRecipes;
         public Blueprint Blueprint;
 
         public RandomiserRecipe(TechType type, ETechTypeCategory category, int depth = 0, List<TechType> prereqs = null, int value = 0, int maxUses = 0, Blueprint blueprint = null) : base(type)
@@ -19,13 +18,14 @@ namespace SubnauticaRandomiser
             Depth = depth;
             Value = value;
             MaxUsesPerGame = maxUses;
+            _usedInRecipes = 0;
 
             Category = category;
             Prerequisites = prereqs;
             Blueprint = blueprint;
         }
 
-        public Recipe GetBasicRecipe()
+        public Recipe GetSerializableRecipe()
         {
             return new Recipe(TechType, Ingredients, LinkedIngredients, CraftAmount);
         }

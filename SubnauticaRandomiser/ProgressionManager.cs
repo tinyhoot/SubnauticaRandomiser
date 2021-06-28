@@ -7,7 +7,6 @@ namespace SubnauticaRandomiser
 {
     internal class ProgressionManager
     {
-        // public readonly int Seed;
         private readonly System.Random _random;
 
         // I was really debating making this a dictionary instead. I still made
@@ -44,7 +43,7 @@ namespace SubnauticaRandomiser
             // in reverse, otherwise the computer gets very unhappy.
             for (int i = additions.Count - 1; i >= 0; i--)
             {
-                if (_reachableMaterials.Contains(additions[i]))
+                if (_reachableMaterials.Contains(additions[i]) || !CheckRecipeForUsesLeft(additions[i]))
                 {
                     additions.RemoveAt(i);
                 }
@@ -68,7 +67,7 @@ namespace SubnauticaRandomiser
 
             foreach (RandomiserRecipe r in additions)
             {
-                if (!_reachableMaterials.Contains(r))
+                if (!_reachableMaterials.Contains(r) && CheckRecipeForUsesLeft(r))
                 {
                     _reachableMaterials.Add(r);
                     success = true;
@@ -406,7 +405,7 @@ namespace SubnauticaRandomiser
                 }
 
                 RandomiserRecipe big = GetRandom(bigIngredientCandidates);
-                ingredients.Add(new RandomiserIngredient(big.TechType, 1));
+                AddIngredientWithMaxUsesCheck(materials, ingredients, big, 1);
                 currentValue += big.Value;
                 recipe.Value += currentValue;
 
@@ -444,8 +443,7 @@ namespace SubnauticaRandomiser
                     if (totalSize + (GetItemSize(r.TechType) * amount) > config.iMaxInventorySizePerRecipe)
                         amount = 1;
 
-                    RandomiserIngredient ing = new RandomiserIngredient(r.TechType, amount);
-                    ingredients.Add(ing);
+                    AddIngredientWithMaxUsesCheck(materials, ingredients, r, amount);
                     currentValue += r.Value * amount;
                     recipe.Value += currentValue;
                     totalSize += GetItemSize(r.TechType) * amount;
@@ -471,17 +469,17 @@ namespace SubnauticaRandomiser
 
                 for (int i = 1; i <= number; i++)
                 {
-                    TechType type = GetRandom(materials, blacklist).TechType;
+                    RandomiserRecipe r = GetRandom(materials, blacklist);
 
                     // Prevent duplicates.
-                    if (ingredients.Exists(x => x.techType == type))
+                    if (ingredients.Exists(x => x.techType == r.TechType))
                     {
                         i--;
                         continue;
                     }
-                    RandomiserIngredient ing = new RandomiserIngredient(type, _random.Next(1, config.iMaxAmountPerIngredient + 1));
+                    RandomiserIngredient ing = new RandomiserIngredient(r.TechType, _random.Next(1, config.iMaxAmountPerIngredient + 1));
 
-                    ingredients.Add(ing);
+                    AddIngredientWithMaxUsesCheck(materials, ingredients, r, ing.amount);
                     totalInvSize += GetItemSize(ing.techType) * ing.amount;
 
                     LogHandler.Debug("    Adding ingredient: " + ing.techType.AsString() + ", " + ing.amount);
@@ -804,6 +802,21 @@ namespace SubnauticaRandomiser
             return fulfilled;
         }
 
+        private static bool CheckRecipeForUsesLeft(RandomiserRecipe recipe)
+        {
+            if (recipe.MaxUsesPerGame <= 0)
+            {
+                return true;
+            }
+
+            if (recipe._usedInRecipes < recipe.MaxUsesPerGame)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         private static bool CheckRecipeForPrerequisites(RecipeDictionary masterDict, RandomiserRecipe recipe)
         {
             bool fulfilled = true;
@@ -844,7 +857,7 @@ namespace SubnauticaRandomiser
         {
             if (list == null || list.Count == 0)
             {
-                return null;
+                throw new InvalidOperationException("Failed to get valid recipe from materials list: list is null or empty.");
             }
 
             RandomiserRecipe r = null;
@@ -873,6 +886,20 @@ namespace SubnauticaRandomiser
             return list[_random.Next(0, list.Count)];
         }
 
+        // Add an ingredient to the list of ingredients used to form a recipe,
+        // but ensure its MaxUses field is respected.
+        private void AddIngredientWithMaxUsesCheck(List<RandomiserRecipe> materials, List<RandomiserIngredient> ingredients, RandomiserRecipe type, int amount)
+        {
+            ingredients.Add(new RandomiserIngredient(type.TechType, amount));
+            type._usedInRecipes++;
+            
+            if (!CheckRecipeForUsesLeft(type))
+            {
+                materials.Remove(type);
+                LogHandler.Debug("!  Removing " + type.TechType.AsString() + " from materials list due to max uses reached: " + type._usedInRecipes);
+            }
+        }
+
         // Grab a collection of all keys in the dictionary, then use them to
         // apply every single one as a recipe change in the game.
         internal static void ApplyMasterDict(RecipeDictionary masterDict)
@@ -890,7 +917,7 @@ namespace SubnauticaRandomiser
         internal static void ApplyRandomisedRecipe(RecipeDictionary masterDict, RandomiserRecipe recipe)
         {
             CraftDataHandler.SetTechData(recipe.TechType, recipe);
-            masterDict.Add(recipe.TechType, recipe.GetBasicRecipe());
+            masterDict.Add(recipe.TechType, recipe.GetSerializableRecipe());
         }
     }
 }
