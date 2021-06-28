@@ -41,7 +41,7 @@ TitaniumIngot,Titanium:10,BasicMaterials,0,,105,,
 AramidFibers,Benzene:1;FiberMesh:1,AdvancedMaterials,300,,55,BloodOil,
 Aerogel,JellyPlant:1;AluminumOxide:1,AdvancedMaterials,300,,35,JellyPlant,
 Benzene,BloodOil:3,AdvancedMaterials,300,,35,BloodOil,
-HatchingEnzymes,,AdvancedMaterials,1700,,120,,1700
+HatchingEnzymes,,AdvancedMaterials,1700,PrecursorKey_Blue,120,,1700
 HydrochloricAcid,WhiteMushroom:3;Salt:1,AdvancedMaterials,300,,45,WhiteMushroom,
 Polyaniline,HydrochloricAcid:1;Gold:1,AdvancedMaterials,300,,60,WhiteMushroom,
 AdvancedWiringKit,WiringKit:1;Gold:2;ComputerChip:1,Electronics,100,,120,ComputerChip,
@@ -65,7 +65,7 @@ Scanner,Battery:1;Titanium:1,Tools,0,,50,,
 StasisRifle,Battery:1;Titanium:1;ComputerChip:1;Magnetite:2,Tools,100,,160,StasisRifleFragment,25
 Knife,Silicone:1;Titanium:1,Tools,0,,30,,
 Welder,Silicone:1;Titanium:1;CrashPowder:1,Tools,0,,50,,
-PrecursorKey_Blue,PrecursorIonCrystal:1;Kyanite:2,Tablets,1300,,115,,1182
+PrecursorKey_Blue,PrecursorIonCrystal:1;Kyanite:2,Tablets,1300,PrecursorKey_Purple,115,,1182
 PrecursorKey_Orange,PrecursorIonCrystal:1;Nickel:2,Tablets,500,,95,,515
 PrecursorKey_Purple,PrecursorIonCrystal:1;Diamond:2,Tablets,0,,85,,0
 Compass,,Equipment,100,,55,Databox,17
