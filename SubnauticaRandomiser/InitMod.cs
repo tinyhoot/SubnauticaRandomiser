@@ -15,7 +15,7 @@ namespace SubnauticaRandomiser
         internal static RandomiserConfig s_config;
         internal static readonly string s_recipeFile = "recipeInformation.csv";
         internal static readonly string s_wreckageFile = "wreckInformation.csv";
-        private static readonly int _expectedConfigSaveVersion = 1;
+        internal static readonly int _expectedSaveVersion = 2;
 
         // The master list of all recipes that have been modified
         internal static RecipeDictionary s_masterDict = new RecipeDictionary();
@@ -78,7 +78,7 @@ namespace SubnauticaRandomiser
         {
             s_masterDict = new RecipeDictionary();
             s_config.SanitiseConfigValues();
-            s_config.iSaveVersion = _expectedConfigSaveVersion;
+            s_config.iSaveVersion = _expectedSaveVersion;
 
             // Attempt to read and parse the CSV with all recipe information.
             List<RandomiserRecipe> completeMaterialsList;
