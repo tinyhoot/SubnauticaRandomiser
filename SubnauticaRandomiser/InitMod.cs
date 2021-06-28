@@ -15,7 +15,8 @@ namespace SubnauticaRandomiser
         internal static RandomiserConfig s_config;
         internal static readonly string s_recipeFile = "recipeInformation.csv";
         internal static readonly string s_wreckageFile = "wreckInformation.csv";
-        internal static readonly int _expectedSaveVersion = 2;
+        internal static readonly int s_expectedSaveVersion = 2;
+        private static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string> { [1] = "v0.5.1" };
 
         // The master list of all recipes that have been modified
         internal static RecipeDictionary s_masterDict = new RecipeDictionary();
@@ -32,9 +33,14 @@ namespace SubnauticaRandomiser
             LogHandler.Debug("Registered options menu.");
 
             // Ensure the user did not update into a save incompatibility.
-            if (s_config.iSaveVersion != _expectedSaveVersion)
+            if (s_config.iSaveVersion != s_expectedSaveVersion)
             {
+                s_versionDict.TryGetValue(s_config.iSaveVersion, out string version);
+                if (string.IsNullOrEmpty(version))
+                    version = "unknown.";
+
                 LogHandler.MainMenuMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.");
+                LogHandler.MainMenuMessage("The last supported version for your savegame is " + version);
                 LogHandler.MainMenuMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json");
                 return;
             }
@@ -78,7 +84,7 @@ namespace SubnauticaRandomiser
         {
             s_masterDict = new RecipeDictionary();
             s_config.SanitiseConfigValues();
-            s_config.iSaveVersion = _expectedSaveVersion;
+            s_config.iSaveVersion = s_expectedSaveVersion;
 
             // Attempt to read and parse the CSV with all recipe information.
             List<RandomiserRecipe> completeMaterialsList;
