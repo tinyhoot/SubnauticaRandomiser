@@ -1,20 +1,15 @@
 ﻿Thoughts and notes on features and issues.
-
-- In the future,the CSV will likely be able to drop the following categories:
-  - Ingredients. These are used as a fallback crutch by the previous system, and
-    a true logic-based system should have no need of them.
-    
+  
+- Randomise more things.
+  - Fragments.
+  - Fish spawn points.
+  - Fish size and aggression.
+  - Raw material spawn points.
+  
 - Expand on fragments.
   - Make it possible to randomise the amount of fragments
     needed for each blueprint.
   - Is it possible to swap fragments around?
-  
-- Clean up saving / loading.
-  - It is not necessary to save blueprints and categories to disk. If that info
-    is needed again, it is re-read from disk anyways. Cut down on file size.
-  - Make this change when something else requires a change to masterDict anyway.
-  - Fragments are a pretty good bet.
-  - Also include save versioning as a field of masterDict.
     
 - Add a casual mode.
   - Casual mode would respect vanilla upgrade chains and be more lenient with its
@@ -27,6 +22,12 @@
   - Raw materials are no longer found in their original biomes. Look into using
     LootDistributionHandler for this?
     
+- Add a spoiler log.
+  - What path does the randomiser expect you to take? What are the major milestones?
+  - Where are all the databoxes?
+  - Include basic info on settings and seed so that sharing the log also turns into
+    an easy way to debug user issues.
+    
    
   
 Thoughts from a playthrough:
@@ -37,3 +38,7 @@ Thoughts from a playthrough:
 - What about land seeds? If those get added, indoor growbeds are a necessity.
 - Add Aurora interior to logic. What parts need repair tool, laser cutter, cannon?
 - Scrap metal!
+
+Thoughts from users:
+- Add console commands to reroll a specific recipe only.
+- Document the CSV.
