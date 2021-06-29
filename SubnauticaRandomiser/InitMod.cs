@@ -107,9 +107,8 @@ namespace SubnauticaRandomiser
             LogHandler.Info("Randomisation successful!");
 
             SaveRecipeStateToDisk();
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-            SpoilerLog.WriteLog();
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+            // This should run async, but we don't need the result here. It's a file.
+            _ = SpoilerLog.WriteLog();
         }
 
         internal static void SaveRecipeStateToDisk()
