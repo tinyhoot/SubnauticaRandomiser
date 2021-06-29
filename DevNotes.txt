@@ -22,11 +22,17 @@
   - Raw materials are no longer found in their original biomes. Look into using
     LootDistributionHandler for this?
     
-- Add a spoiler log.
-  - What path does the randomiser expect you to take? What are the major milestones?
-  - Where are all the databoxes?
-  - Include basic info on settings and seed so that sharing the log also turns into
-    an easy way to debug user issues.
+- Mod support.
+  - Even if autodetecting mods and their items seems impossible with how the
+    randomiser works right now, giving users the ability to do it themselves
+    should be a priority.
+  - Properly document the CSV.
+  - Perhaps expose the progression tree? This would allow for more customisation,
+    and enable modded items to act as gateways and road blocks.
+  - Make reading the CSV a lot more robust than it is right now, and implement
+    proper feedback in case things go wrong when loading.
+  - Perhaps add an MD5 check to see if the CSV was modified? Not sure what benefits
+    that would yield.
     
    
   
@@ -41,4 +47,4 @@ Thoughts from a playthrough:
 
 Thoughts from users:
 - Add console commands to reroll a specific recipe only.
-- Document the CSV.
+- Add theming to base piece recipes.
