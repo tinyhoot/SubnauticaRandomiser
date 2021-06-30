@@ -444,7 +444,6 @@ namespace SubnauticaRandomiser
 
                 AddIngredientWithMaxUsesCheck(materials, ingredients, bigIngredient, 1);
                 currentValue += bigIngredient.Value;
-                recipe.Value += currentValue;
 
                 LogHandler.Debug("    Adding big ingredient " + bigIngredient.TechType.AsString());
 
@@ -483,7 +482,6 @@ namespace SubnauticaRandomiser
 
                     AddIngredientWithMaxUsesCheck(materials, ingredients, r, amount);
                     currentValue += r.Value * amount;
-                    recipe.Value += currentValue;
                     totalSize += GetItemSize(r.TechType) * amount;
 
                     LogHandler.Debug("    Adding ingredient: " + r.TechType.AsString() + ", " + amount);
@@ -504,6 +502,7 @@ namespace SubnauticaRandomiser
 
                 if (_tree.BasicOutpostPieces.ContainsKey(recipe.TechType))
                     _basicOutpostSize += (totalSize * _tree.BasicOutpostPieces[recipe.TechType]);
+                recipe.Value = currentValue;
                 LogHandler.Debug("    Recipe is now valued "+currentValue+" out of "+targetValue);
             }
 
