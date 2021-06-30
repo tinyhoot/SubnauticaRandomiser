@@ -31,8 +31,6 @@
     and enable modded items to act as gateways and road blocks.
   - Make reading the CSV a lot more robust than it is right now, and implement
     proper feedback in case things go wrong when loading.
-  - Perhaps add an MD5 check to see if the CSV was modified? Not sure what benefits
-    that would yield.
     
    
   

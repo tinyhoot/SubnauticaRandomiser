@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using SMLHelper.V2.Crafting;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace SubnauticaRandomiser
         internal static List<RandomiserRecipe> ParseRecipeFile(string fileName)
         {
             // First, try to find and grab the file containing recipe information
-            string path = InitMod.s_modDirectory + "\\" + fileName;
+            string path = Path.Combine(InitMod.s_modDirectory, fileName);
             LogHandler.Debug("Looking for recipe CSV as " + path);
 
             try
@@ -270,6 +271,18 @@ namespace SubnauticaRandomiser
             databox = new Databox(type, coordinates, wreck, laserCutter, propulsionCannon);
 
             return databox;
+        }
+
+        internal static string CalculateMD5(string path)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                using (FileStream fileStream = File.OpenRead(path))
+                {
+                    var hash = md5.ComputeHash(fileStream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
         }
 
         internal static List<TechType> ProcessMultipleTechTypes(string[] str)

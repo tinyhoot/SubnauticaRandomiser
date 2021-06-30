@@ -10,16 +10,20 @@ namespace SubnauticaRandomiser
         internal static readonly string s_fileName = "spoilerlog.txt";
         private static readonly RandomiserConfig config = InitMod.s_config;
         internal static List<KeyValuePair<TechType, int>> s_progression = new List<KeyValuePair<TechType, int>>();
-        private static List<string> _preparedDataboxes;
-        private static List<string> _preparedProgressionPath;
+        private static List<string> s_preparedDataboxes;
+        private static List<string> s_preparedProgressionPath;
+        private static string s_preparedMD5;
 
-        private static string[] content1 = 
+        private static string[] contentHeader =
         {
             "*************************************************",
             "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
             "*************************************************",
             "",
-            "Generated on " + DateTime.Now,
+            "Generated on " + DateTime.Now
+        };
+        private static string[] contentBasics =
+        {
             "",
             "",
             "///// Basic Information /////",
@@ -31,8 +35,8 @@ namespace SubnauticaRandomiser
             "",
             "",
             "///// Depth Progression Path /////"
-            };
-        private static string[] content2 =
+        };
+        private static string[] contentDataboxes =
         {
             "",
             "",
@@ -42,57 +46,80 @@ namespace SubnauticaRandomiser
         // Grab the randomised boxes from masterDict, and sort them alphabetically.
         private static void PrepareDataboxes()
         {
-            _preparedDataboxes = new List<string>();
+            s_preparedDataboxes = new List<string>();
 
             if (InitMod.s_masterDict.isDataboxRandomised)
             {
                 foreach (KeyValuePair<RandomiserVector, TechType> entry in InitMod.s_masterDict.Databoxes){
-                    _preparedDataboxes.Add(entry.Value.AsString() + " can be found at " + entry.Key);
+                    s_preparedDataboxes.Add(entry.Value.AsString() + " can be found at " + entry.Key);
                 }
 
-                _preparedDataboxes.Sort();
+                s_preparedDataboxes.Sort();
             }
             else
             {
-                _preparedDataboxes.Add("Not randomised, all in vanilla locations.");
+                s_preparedDataboxes.Add("Not randomised, all in vanilla locations.");
+            }
+        }
+
+        // Compare the MD5 of the recipe CSV and try to see if it's still the same.
+        private static void PrepareMD5()
+        {
+            string md5 = CSVReader.CalculateMD5(Path.Combine(InitMod.s_modDirectory, InitMod.s_recipeFile));
+
+            if (md5.Equals(InitMod.s_expectedRecipeMD5))
+            {
+                s_preparedMD5 = "recipeInformation.csv is unmodified.";
+            }
+            else
+            {
+                s_preparedMD5 = "recipeInformation.csv has been modified.";
             }
         }
 
         // Make the data gathered during randomising a bit nicer for human eyes.
         private static void PrepareProgressionPath()
         {
-            _preparedProgressionPath = new List<string>();
+            s_preparedProgressionPath = new List<string>();
             int lastDepth = 0;
 
             foreach (KeyValuePair<TechType, int> pair in s_progression)
             {
                 if (pair.Value > lastDepth)
                 {
-                    _preparedProgressionPath.Add("Craft " + pair.Key.AsString() + " to reach " + pair.Value + "m");
+                    s_preparedProgressionPath.Add("Craft " + pair.Key.AsString() + " to reach " + pair.Value + "m");
                 }
                 else
                 {
-                    _preparedProgressionPath.Add("Unlocked " + pair.Key.AsString() + ".");
+                    s_preparedProgressionPath.Add("Unlocked " + pair.Key.AsString() + ".");
                 }
 
                 lastDepth = pair.Value;
             }
         }
 
-        public static async Task WriteLog()
+        internal static async Task WriteLog()
         {
             PrepareDataboxes();
+            PrepareMD5();
             PrepareProgressionPath();
 
             using (StreamWriter file = new StreamWriter(Path.Combine(InitMod.s_modDirectory, s_fileName)))
             {
-                await WriteTextToLog(file, content1);
-                await WriteTextToLog(file, _preparedProgressionPath.ToArray());
-                await WriteTextToLog(file, content2);
-                await WriteTextToLog(file, _preparedDataboxes.ToArray());
+                await WriteTextToLog(file, contentHeader);
+                await WriteTextToLog(file, s_preparedMD5);
+                await WriteTextToLog(file, contentBasics);
+                await WriteTextToLog(file, s_preparedProgressionPath.ToArray());
+                await WriteTextToLog(file, contentDataboxes);
+                await WriteTextToLog(file, s_preparedDataboxes.ToArray());
             }
 
             LogHandler.Info("Wrote spoiler log to disk.");
+        }
+
+        private static async Task WriteTextToLog(StreamWriter file, string text)
+        {
+            await file.WriteLineAsync(text);
         }
 
         private static async Task WriteTextToLog(StreamWriter file, string[] text)
