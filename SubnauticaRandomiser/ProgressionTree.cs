@@ -6,16 +6,18 @@ namespace SubnauticaRandomiser
     public class ProgressionTree
     {
         private Dictionary<EProgressionNode, ProgressionPath> _depthDifficulties;
-        public Dictionary<TechType, bool> depthProgressionItems;
         private Dictionary<EProgressionNode, List<TechType>> _essentialItems;
         private Dictionary<EProgressionNode, List<TechType[]>> _electiveItems;
+        public Dictionary<TechType, int> BasicOutpostPieces;
+        public Dictionary<TechType, bool> DepthProgressionItems;
 
         public ProgressionTree()
         {
             _depthDifficulties = new Dictionary<EProgressionNode, ProgressionPath>();
-            depthProgressionItems = new Dictionary<TechType, bool>();
             _essentialItems = new Dictionary<EProgressionNode, List<TechType>>();
             _electiveItems = new Dictionary<EProgressionNode, List<TechType[]>>();
+            BasicOutpostPieces = new Dictionary<TechType, int>();
+            DepthProgressionItems = new Dictionary<TechType, bool>();
         }
 
         public void SetupVanillaTree()
@@ -90,27 +92,37 @@ namespace SubnauticaRandomiser
 
             // Putting every item or vehicle that can help the player achieve
             // lower depths in one dictionary.
-            depthProgressionItems.Add(TechType.Fins, true);
-            depthProgressionItems.Add(TechType.UltraGlideFins, true);
-            depthProgressionItems.Add(TechType.Tank, true);
-            depthProgressionItems.Add(TechType.DoubleTank, true);
-            depthProgressionItems.Add(TechType.HighCapacityTank, true);
-            depthProgressionItems.Add(TechType.PlasteelTank, true);
-            depthProgressionItems.Add(TechType.Rebreather, true);
+            DepthProgressionItems.Add(TechType.Fins, true);
+            DepthProgressionItems.Add(TechType.UltraGlideFins, true);
+            DepthProgressionItems.Add(TechType.Tank, true);
+            DepthProgressionItems.Add(TechType.DoubleTank, true);
+            DepthProgressionItems.Add(TechType.HighCapacityTank, true);
+            DepthProgressionItems.Add(TechType.PlasteelTank, true);
+            DepthProgressionItems.Add(TechType.Rebreather, true);
 
-            depthProgressionItems.Add(TechType.Seaglide, true);
-            depthProgressionItems.Add(TechType.Seamoth, true);
-            depthProgressionItems.Add(TechType.Exosuit, true);
-            depthProgressionItems.Add(TechType.Cyclops, true);
+            DepthProgressionItems.Add(TechType.Seaglide, true);
+            DepthProgressionItems.Add(TechType.Seamoth, true);
+            DepthProgressionItems.Add(TechType.Exosuit, true);
+            DepthProgressionItems.Add(TechType.Cyclops, true);
 
-            depthProgressionItems.Add(TechType.VehicleHullModule1, true);
-            depthProgressionItems.Add(TechType.VehicleHullModule2, true);
-            depthProgressionItems.Add(TechType.VehicleHullModule3, true);
-            depthProgressionItems.Add(TechType.ExoHullModule1, true);
-            depthProgressionItems.Add(TechType.ExoHullModule2, true);
-            depthProgressionItems.Add(TechType.CyclopsHullModule1, true);
-            depthProgressionItems.Add(TechType.CyclopsHullModule2, true);
-            depthProgressionItems.Add(TechType.CyclopsHullModule3, true);
+            DepthProgressionItems.Add(TechType.VehicleHullModule1, true);
+            DepthProgressionItems.Add(TechType.VehicleHullModule2, true);
+            DepthProgressionItems.Add(TechType.VehicleHullModule3, true);
+            DepthProgressionItems.Add(TechType.ExoHullModule1, true);
+            DepthProgressionItems.Add(TechType.ExoHullModule2, true);
+            DepthProgressionItems.Add(TechType.CyclopsHullModule1, true);
+            DepthProgressionItems.Add(TechType.CyclopsHullModule2, true);
+            DepthProgressionItems.Add(TechType.CyclopsHullModule3, true);
+
+            // Assemble a dictionary of what's considered basic outpost pieces
+            // which together should not exceed the cost of config.iMaxBasicOutpostSize
+            BasicOutpostPieces.Add(TechType.BaseCorridorI, 1);
+            BasicOutpostPieces.Add(TechType.BaseHatch, 1);
+            BasicOutpostPieces.Add(TechType.BaseMapRoom, 1);
+            BasicOutpostPieces.Add(TechType.BaseWindow, 1);
+            BasicOutpostPieces.Add(TechType.Beacon, 1);
+            BasicOutpostPieces.Add(TechType.SolarPanel, 2);
+
 
             // The scanner and repair tool are absolutely required to get the
             // early game going, without the others it can get tedious.

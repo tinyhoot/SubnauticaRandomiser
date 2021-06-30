@@ -29,6 +29,9 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise blueprints in databoxes?")]
         public bool bRandomiseDataboxes = true;
 
+        [Toggle("Theme base parts around a common ingredient?")]
+        public bool bDoBaseTheming = false;
+
         [Choice("Include equipment as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
         public int iEquipmentAsIngredients = 1;
 
@@ -72,6 +75,7 @@ namespace SubnauticaRandomiser
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
         public int iDepthSearchTime = 15;
         public int iMaxAmountPerIngredient = 5;
+        public int iMaxBasicOutpostSize = 24;
         public int iMaxEggsAsSingleIngredient = 1;
         public int iMaxInventorySizePerRecipe = 24;
         public double dFuzziness = 0.2;
@@ -93,6 +97,8 @@ namespace SubnauticaRandomiser
                 iDepthSearchTime = 15;
             if (iMaxAmountPerIngredient > 20 || iMaxAmountPerIngredient < 1)
                 iMaxAmountPerIngredient = 5;
+            if (iMaxBasicOutpostSize > 48 || iMaxBasicOutpostSize < 4)
+                iMaxBasicOutpostSize = 24;
             if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)
                 iMaxEggsAsSingleIngredient = 1;
             if (iMaxInventorySizePerRecipe > 100 || iMaxInventorySizePerRecipe < 4)
