@@ -220,7 +220,7 @@ namespace SubnauticaRandomiser
             if (config.bDoBaseTheming)
             {
                 _baseTheme = ChooseBaseTheme(config, 100);
-                ChangeScrapMetalResult(_baseTheme);
+                //ChangeScrapMetalResult(_baseTheme);
                 LogHandler.Debug("Chosen " + _baseTheme.TechType.AsString() + " as base theme.");
             }
 
@@ -759,6 +759,8 @@ namespace SubnauticaRandomiser
             CraftDataHandler.SetTechData(TechType.Titanium, _allMaterials.Find(x => x.TechType.Equals(TechType.Titanium)));
             CraftDataHandler.SetTechData(replacement.TechType, replacement);
 
+            // FIXME for whatever reason, this code works for some items, but not for others????
+            // Fish seem to work, and so does lead, but salt and acid mushrooms do not?
             CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "BasicMaterials", "Titanium");
             CraftTreeHandler.AddCraftingNode(CraftTree.Type.Fabricator, replacement.TechType, "Resources", "BasicMaterials");
         }
