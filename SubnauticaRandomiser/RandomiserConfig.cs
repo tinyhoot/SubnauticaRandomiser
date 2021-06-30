@@ -64,6 +64,7 @@ namespace SubnauticaRandomiser
         public void NewRandomOldSeed()
         {
             LogHandler.MainMenuMessage("Randomising...");
+            Load();
             InitMod.Randomise();
             LogHandler.MainMenuMessage("Finished randomising!");
         }
