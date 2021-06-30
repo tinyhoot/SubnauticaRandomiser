@@ -94,7 +94,7 @@ namespace SubnauticaRandomiser
 
             Blueprint blueprint = null;
             List<TechType> blueprintUnlockConditions = new List<TechType>();
-            TechType blueprintFragment = TechType.None;
+            List<TechType> blueprintFragments = new List<TechType>();
             bool blueprintDatabox = false;
             int blueprintUnlockDepth = 0;
 
@@ -164,9 +164,7 @@ namespace SubnauticaRandomiser
                 {
                     if (str.ToLower().Contains("fragment"))
                     {
-                        // HACK This code as-is will not handle the Cyclops properly
-                        // but I feel like that one needs special care anyways.
-                        blueprintFragment = StringToTechType(str);
+                        blueprintFragments.Add(StringToTechType(str));
                     } 
                     else if (str.ToLower().Contains("databox"))
                     {
@@ -187,9 +185,9 @@ namespace SubnauticaRandomiser
             
             // Only if any of the blueprint components yielded anything,
             // ship the recipe with a blueprint.
-            if ((blueprintUnlockConditions != null && blueprintUnlockConditions.Count > 0) || blueprintUnlockDepth != 0 || !blueprintDatabox || !blueprintFragment.Equals(TechType.None))
+            if ((blueprintUnlockConditions != null && blueprintUnlockConditions.Count > 0) || blueprintUnlockDepth != 0 || !blueprintDatabox || blueprintFragments.Count > 0)
             {
-                blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragment, blueprintDatabox, blueprintUnlockDepth);
+                blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragments, blueprintDatabox, blueprintUnlockDepth);
             }
 
             LogHandler.Debug("Registering recipe: " + type.AsString() + ", " + category.ToString() + ", " + depth + ", "+ prereqList.Count + " prerequisites, " + value + ", " + maxUses + ", ...");
