@@ -69,6 +69,7 @@ namespace SubnauticaRandomiser
             LogHandler.MainMenuMessage("Finished randomising!");
         }
 
+        public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
         public int iDepthSearchTime = 15;
         public int iMaxAmountPerIngredient = 5;
         public int iMaxEggsAsSingleIngredient = 1;
@@ -94,7 +95,7 @@ namespace SubnauticaRandomiser
                 iMaxAmountPerIngredient = 5;
             if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)
                 iMaxEggsAsSingleIngredient = 1;
-            if (iMaxInventorySizePerRecipe > 42 || iMaxInventorySizePerRecipe < 4)
+            if (iMaxInventorySizePerRecipe > 100 || iMaxInventorySizePerRecipe < 4)
                 iMaxInventorySizePerRecipe = 24;
             if (dFuzziness > 1 || dFuzziness < 0)
                 dFuzziness = 0.2;
