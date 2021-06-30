@@ -22,6 +22,13 @@
   - Raw materials are no longer found in their original biomes. Look into using
     LootDistributionHandler for this?
     
+- Add support for glitches.
+  - Several glitches in the game can let you get items or blueprints much earlier.
+  - It is possible to glitch into the aurora before it even explodes.
+    - Since this would make the logic run on a timer, better not implement this.
+  - Large wrecks can be made to despawn with the building tool, skipping the need
+    for e.g. a laser cutter.
+    
 - Mod support.
   - Even if autodetecting mods and their items seems impossible with how the
     randomiser works right now, giving users the ability to do it themselves
@@ -29,8 +36,9 @@
   - Properly document the CSV.
   - Perhaps expose the progression tree? This would allow for more customisation,
     and enable modded items to act as gateways and road blocks.
-  - Make reading the CSV a lot more robust than it is right now, and implement
-    proper feedback in case things go wrong when loading.
+    
+- Internal improvements.
+  - Make reading the CSV an async function.
     
    
   

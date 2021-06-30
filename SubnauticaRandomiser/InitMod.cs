@@ -15,8 +15,8 @@ namespace SubnauticaRandomiser
         internal static RandomiserConfig s_config;
         internal static readonly string s_recipeFile = "recipeInformation.csv";
         internal static readonly string s_wreckageFile = "wreckInformation.csv";
-        internal static readonly int s_expectedSaveVersion = 2;
         internal static readonly string s_expectedRecipeMD5 = "fbddbfbc4952d218b5a5ea159d4cebab";
+        internal static readonly int s_expectedSaveVersion = 2;
         private static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string> { [1] = "v0.5.1" };
 
         // The master list of all recipes that have been modified

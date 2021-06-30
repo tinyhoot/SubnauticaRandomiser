@@ -9,51 +9,70 @@ namespace SubnauticaRandomiser
 {
     internal static class CSVReader
     {
-        private static string[] s_csvLines;
         internal static List<RandomiserRecipe> s_csvParsedList;
         internal static List<Databox> s_csvDataboxList;
+        internal static bool s_isModifiedRecipeCSV;
 
         private static readonly int s_expectedColumns = 8;
+        private static readonly int s_expectedRows = 245;
+        private static readonly int s_expectedWreckColumns = 6;
 
         internal static List<RandomiserRecipe> ParseRecipeFile(string fileName)
         {
-            // First, try to find and grab the file containing recipe information
+            // First, try to find and grab the file containing recipe information.
+            string[] csvLines;
             string path = Path.Combine(InitMod.s_modDirectory, fileName);
             LogHandler.Debug("Looking for recipe CSV as " + path);
 
             try
             {
-                s_csvLines = File.ReadAllLines(path);
+                csvLines = File.ReadAllLines(path);
             }
             catch (Exception ex)
             {
-                LogHandler.MainMenuMessage("Failed to read recipe CSV!");
+                LogHandler.MainMenuMessage("Failed to read recipe CSV! Aborting.");
                 LogHandler.Error(ex.Message);
                 return null;
             }
 
+            // If the CSV does not contain the expected amount of rows, it is
+            // likely that the user added custom items to it.
+            // If the lines are the same, but the MD5 is not, some values of
+            // existing entries must have been modified.
+            if (csvLines.Length != s_expectedRows)
+            {
+                LogHandler.Info("Recipe CSV seems to contain custom entries.");
+                s_isModifiedRecipeCSV = true;
+            }
+            else if (!CalculateMD5(path).Equals(InitMod.s_expectedRecipeMD5))
+            {
+                LogHandler.Info("Recipe CSV seems to have been modified.");
+                s_isModifiedRecipeCSV = true;
+            }
+
             // Second, read each line and try to parse that into a list of
             // RandomiserRecipe objects, for later use.
-            // For now, this system is not robust and expects the CSV to be read
-            // pretty much as it was distributed with the mod.
             s_csvParsedList = new List<RandomiserRecipe>();
 
-            foreach (string line in s_csvLines)
+            int lineCounter = 0;
+            foreach (string line in csvLines)
             {
+                lineCounter++;
                 if (line.StartsWith("TechType", StringComparison.InvariantCulture))
                 {
                     // This is the header line. Skip.
                     continue;
                 }
 
-                // This might very well fail if the user messed with the CSV
+                // ParseRecipeFileLine fails upwards, so this ensures all errors
+                // are caught in one central location.
                 try
                 {
                     s_csvParsedList.Add(ParseRecipeFileLine(line));
                 }
                 catch (Exception ex)
                 {
-                    LogHandler.Error("Failed to parse information from CSV!");
+                    LogHandler.Error("Failed to parse information from recipe CSV on line "+lineCounter);
                     LogHandler.Error(ex.Message);
                 }
             }
@@ -61,13 +80,12 @@ namespace SubnauticaRandomiser
             return s_csvParsedList;
         }
 
-        // Parse one line of a CSV file and attempt to create a RandomiserRecipe
+        // Parse one line of a CSV file and attempt to create a RandomiserRecipe.
         private static RandomiserRecipe ParseRecipeFileLine(string line)
         {
             RandomiserRecipe recipe = null;
 
             TechType type = TechType.None;
-            List<RandomiserIngredient> ingredientList = new List<RandomiserIngredient>();
             ETechTypeCategory category = ETechTypeCategory.None;
             int depth = 0;
             List<TechType> prereqList = new List<TechType>();
@@ -84,48 +102,63 @@ namespace SubnauticaRandomiser
 
             if (cells.Length != s_expectedColumns)
             {
-                throw new InvalidDataException("Unexpected number of columns: " + cells.Length);
+                throw new InvalidDataException("Unexpected number of columns: " + cells.Length + " instead of " + s_expectedColumns);
             }
+            // While ugly, this makes it much easier to react to changes in the
+            // structure of the CSV. Also less prone to accidental oversights.
+            string cellsTechType = cells[0];
+            string cellsCategory = cells[1];
+            string cellsDepth = cells[2];
+            string cellsPrereqs = cells[3];
+            string cellsValue = cells[4];
+            string cellsMaxUses = cells[5];
+            string cellsBPUnlock = cells[6];
+            string cellsBPDepth = cells[7];
             
-            // Now to convert the data in each cell to an object we can use
+            // Now to convert the data in each cell to an object we can use.
             // Column 1: TechType
-            if (String.IsNullOrEmpty(cells[0]))
+            if (string.IsNullOrEmpty(cellsTechType))
             {
-                throw new InvalidDataException("TechType is null or empty.");
+                throw new ArgumentException("TechType is null or empty, but is a required field.");
             }
-            type = StringToTechType(cells[0]);
+            type = StringToTechType(cellsTechType);
 
             // Column 2: Category
-            category = StringToETechTypeCategory(cells[1]);
+            if (string.IsNullOrEmpty(cellsCategory))
+            {
+                throw new ArgumentException("Category is null or empty, but is a required field.");
+            }
+            category = StringToETechTypeCategory(cellsCategory);
 
             // Column 3: Depth Difficulty
-            if (!String.IsNullOrEmpty(cells[2]))
+            if (!string.IsNullOrEmpty(cellsDepth))
             {
-                depth = int.Parse(cells[2]);
+                depth = StringToInt(cellsDepth, "Depth");
             }
 
             // Column 4: Prerequisites
-            if (!String.IsNullOrEmpty(cells[3]))
+            if (!string.IsNullOrEmpty(cellsPrereqs))
             {
-                prereqList = ProcessMultipleTechTypes(cells[3].Split(';'));
+                prereqList = ProcessMultipleTechTypes(cellsPrereqs.Split(';'));
             }
 
             // Column 5: Value
-            if (!String.IsNullOrEmpty(cells[4]))
+            if (string.IsNullOrEmpty(cellsValue))
             {
-                value = int.Parse(cells[4]);
+                throw new ArgumentException("Value is null or empty, but is a required field.");
             }
+            value = StringToInt(cellsValue, "Value");
 
             // Column 6: Max Uses Per Game
-            if (!String.IsNullOrEmpty(cells[5]))
+            if (!string.IsNullOrEmpty(cellsMaxUses))
             {
-                maxUses = int.Parse(cells[5]);
+                maxUses = StringToInt(cellsMaxUses, "Max Uses");
             }
 
             // Column 7: Blueprint Unlock Conditions
-            if (!String.IsNullOrEmpty(cells[6]))
+            if (!string.IsNullOrEmpty(cellsBPUnlock))
             {
-                string[] conditions = cells[6].Split(';');
+                string[] conditions = cellsBPUnlock.Split(';');
 
                 foreach (string str in conditions)
                 {
@@ -147,31 +180,34 @@ namespace SubnauticaRandomiser
             }
 
             // Column 8: Blueprint Unlock Depth
-            if (!String.IsNullOrEmpty(cells[7]))
+            if (!string.IsNullOrEmpty(cellsBPDepth))
             {
-                blueprintUnlockDepth = int.Parse(cells[7]);
+                blueprintUnlockDepth = StringToInt(cellsBPDepth, "Blueprint Unlock Depth");
             }
             
             // Only if any of the blueprint components yielded anything,
             // ship the recipe with a blueprint.
-            if (blueprintUnlockConditions != null || blueprintUnlockDepth != 0 || !blueprintDatabox || !blueprintFragment.Equals(TechType.None))
+            if ((blueprintUnlockConditions != null && blueprintUnlockConditions.Count > 0) || blueprintUnlockDepth != 0 || !blueprintDatabox || !blueprintFragment.Equals(TechType.None))
             {
                 blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragment, blueprintDatabox, blueprintUnlockDepth);
             }
-            
-            LogHandler.Debug("Registering recipe: " + type.AsString() +" "+ category.ToString() +" "+ depth +" ... "+ value);
+
+            LogHandler.Debug("Registering recipe: " + type.AsString() + ", " + category.ToString() + ", " + depth + ", "+ prereqList.Count + " prerequisites, " + value + ", " + maxUses + ", ...");
             recipe = new RandomiserRecipe(type, category, depth, prereqList, value, maxUses, blueprint);
             return recipe;
         }
 
+        // This handles everything related to the wreckage CSV and databoxes.
+        // Similar in structure to the recipe CSV parser above.
         internal static List<Databox> ParseWreckageFile(string fileName)
         {
-            string path = InitMod.s_modDirectory + "\\" + fileName;
+            string[] csvLines;
+            string path = Path.Combine(InitMod.s_modDirectory, fileName);
             LogHandler.Debug("Looking for wreckage CSV as " + path);
 
             try
             {
-                s_csvLines = File.ReadAllLines(path);
+                csvLines = File.ReadAllLines(path);
             }
             catch (Exception ex)
             {
@@ -181,16 +217,18 @@ namespace SubnauticaRandomiser
             }
 
             s_csvDataboxList = new List<Databox>();
+            int lineCounter = 0;
 
-            foreach (string line in s_csvLines)
+            foreach (string line in csvLines)
             {
+                lineCounter++;
                 if (line.StartsWith("TechType", StringComparison.InvariantCulture))
                 {
                     // This is the header line. Skip.
                     continue;
                 }
 
-                // This might very well fail if the user messed with the CSV
+                // For now, this only handles databoxes and ignores everything else.
                 try
                 {
                     Databox databox = ParseWreckageFileLine(line);
@@ -199,7 +237,7 @@ namespace SubnauticaRandomiser
                 }
                 catch (Exception ex)
                 {
-                    LogHandler.Error("Failed to parse information from CSV!");
+                    LogHandler.Error("Failed to parse information from wreckage CSV on line " + lineCounter);
                     LogHandler.Error(ex.Message);
                 }
             }
@@ -214,57 +252,75 @@ namespace SubnauticaRandomiser
             TechType type = TechType.None;
             Vector3 coordinates = Vector3.zero;
             EWreckage wreck = EWreckage.None;
+            bool isDatabox = false;
             bool laserCutter = false;
             bool propulsionCannon = false;
 
             string[] cells = line.Split(',');
 
-            if (cells.Length != 6)
-                throw new InvalidDataException("Unexpected number of columns: " + cells.Length);
+            if (cells.Length != s_expectedWreckColumns)
+            {
+                throw new InvalidDataException("Unexpected number of columns: " + cells.Length + " instead of " + s_expectedWreckColumns);
+            }
+            // As above, it's not the prettiest, but it's flexible.
+            string cellsTechType = cells[0];
+            string cellsCoordinates = cells[1];
+            string cellsEWreckage = cells[2];
+            string cellsIsDatabox = cells[3];
+            string cellsLaserCutter = cells[4];
+            string cellsPropulsionCannon = cells[5];
 
             // Column 1: TechType
-            if (String.IsNullOrEmpty(cells[0]))
-                throw new InvalidDataException("TechType is null or empty.");
-            type = StringToTechType(cells[0]);
+            if (string.IsNullOrEmpty(cellsTechType))
+            {
+                throw new ArgumentException("TechType is null or empty, but is a required field.");
+            }
+            type = StringToTechType(cellsTechType);
 
             // Column 2: Coordinates
-            if (!String.IsNullOrEmpty(cells[1]))
+            if (!string.IsNullOrEmpty(cellsCoordinates))
             {
-                string[] str = cells[1].Split(';');
+                string[] str = cellsCoordinates.Split(';');
                 if (str.Length != 3)
-                    throw new InvalidDataException("Coordinates are invalid.");
+                {
+                    throw new ArgumentException("Coordinates are not in a valid format: " + cellsCoordinates);
+                }
 
-                float x = float.Parse(str[0]);
-                float y = float.Parse(str[1]);
-                float z = float.Parse(str[2]);
+                float x = StringToFloat(str[0], "Coordinates");
+                float y = StringToFloat(str[1], "Coordinates");
+                float z = StringToFloat(str[2], "Coordinates");
                 coordinates = new Vector3(x, y, z);
             }
             else
             {
-                // The only reason this should be empty is if it is a fragment
+                // The only reason this should be empty is if it is a fragment.
                 // For now, skip those.
                 return null;
             }
 
             // Column 3: General location
-            if (!String.IsNullOrEmpty(cells[2]))
+            if (!string.IsNullOrEmpty(cellsEWreckage))
             {
-                wreck = StringToEWreckage(cells[2]);
+                wreck = StringToEWreckage(cellsEWreckage);
             }
 
             // Column 4: Is it a databox?
-            // Redundant until fragments are implemented.
+            // Redundant until fragments are implemented, so this does nothing.
+            if (!string.IsNullOrEmpty(cellsIsDatabox))
+            {
+                isDatabox = StringToBool(cellsIsDatabox, "IsDatabox");
+            }
 
             // Column 5: Does it need a laser cutter?
-            if (!String.IsNullOrEmpty(cells[4]))
+            if (!string.IsNullOrEmpty(cellsLaserCutter))
             {
-                laserCutter = (int.Parse(cells[4]) == 1 ? true : false);
+                laserCutter = StringToBool(cellsLaserCutter, "NeedsLaserCutter");
             }
 
             // Column 6: Does it need a propulsion cannon?
-            if (!String.IsNullOrEmpty(cells[5]))
+            if (!string.IsNullOrEmpty(cellsPropulsionCannon))
             {
-                propulsionCannon = (int.Parse(cells[5]) == 1 ? true : false);
+                propulsionCannon = StringToBool(cellsPropulsionCannon, "NeedsPropulsionCannon");
             }
 
             LogHandler.Debug("Registering databox: " + type + ", " + coordinates.ToString() + ", " + wreck.ToString() + ", " + laserCutter + ", " + propulsionCannon);
@@ -285,7 +341,7 @@ namespace SubnauticaRandomiser
             }
         }
 
-        internal static List<TechType> ProcessMultipleTechTypes(string[] str)
+        private static List<TechType> ProcessMultipleTechTypes(string[] str)
         {
             List<TechType> output = new List<TechType>();
 
@@ -301,7 +357,7 @@ namespace SubnauticaRandomiser
             return output;
         }
 
-        internal static TechType StringToTechType(string str)
+        private static TechType StringToTechType(string str)
         {
             TechType type;
 
@@ -309,17 +365,15 @@ namespace SubnauticaRandomiser
             {
                 type = (TechType)Enum.Parse(typeof(TechType), str, true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                LogHandler.Error("Failed to parse string to TechType: " + str);
-                LogHandler.Error(ex.Message);
-                type = TechType.None;
+                throw new ArgumentException("Failed to parse TechType from string: " + str);
             }
 
             return type;
         }
 
-        internal static ETechTypeCategory StringToETechTypeCategory(string str)
+        private static ETechTypeCategory StringToETechTypeCategory(string str)
         {
             ETechTypeCategory type;
 
@@ -327,17 +381,15 @@ namespace SubnauticaRandomiser
             {
                 type = (ETechTypeCategory)Enum.Parse(typeof(ETechTypeCategory), str, true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                LogHandler.Error("Failed to parse string to ETechTypeCategory: " + str);
-                LogHandler.Error(ex.Message);
-                type = ETechTypeCategory.None;
+                throw new ArgumentException("Failed to parse ETechTypeCategory from string: " + str);
             }
 
             return type;
         }
 
-        internal static EProgressionNode StringToEProgressionNode(string str)
+        private static EProgressionNode StringToEProgressionNode(string str)
         {
             EProgressionNode node;
 
@@ -345,17 +397,15 @@ namespace SubnauticaRandomiser
             {
                 node = (EProgressionNode)Enum.Parse(typeof(EProgressionNode), str, true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                LogHandler.Error("Failed to parse string to EProgressionNode: " + str);
-                LogHandler.Error(ex.Message);
-                node = EProgressionNode.None;
+                throw new ArgumentException("Failed to parse EProgressionNode from string: " + str);
             }
 
             return node;
         }
 
-        internal static EWreckage StringToEWreckage(string str)
+        private static EWreckage StringToEWreckage(string str)
         {
             EWreckage wreck;
 
@@ -363,14 +413,74 @@ namespace SubnauticaRandomiser
             {
                 wreck = (EWreckage)Enum.Parse(typeof(EWreckage), str, true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                LogHandler.Error("Failed to parse string to EWreckage: " + str);
-                LogHandler.Error(ex.Message);
-                wreck = EWreckage.None;
+                throw new ArgumentException("Failed to parse EWreckage from string: " + str);
             }
 
             return wreck;
+        }
+
+        private static bool StringToBool(string input, string column)
+        {
+            // If the string is "true" or "false", this just works.
+            if (bool.TryParse(input, out bool output))
+            {
+                return output;
+            }
+
+            int inputInt;
+            // Integers need a bit of extra handling.
+            try
+            {
+                inputInt = int.Parse(input);
+            }
+            catch (Exception)
+            {
+                throw new FormatException(column + " is not a valid boolean value: " + input);
+            }
+
+            switch (inputInt)
+            {
+                case 0:
+                    return false;
+                case 1:
+                    return true;
+            }
+
+            throw new FormatException(column + " is not a valid boolean value: " + input);
+        }
+
+        private static float StringToFloat(string input, string column)
+        {
+            float output;
+
+            try
+            {
+                output = float.Parse(input);
+            }
+            catch (Exception)
+            {
+                throw new FormatException(column + " does not contain a floating point value: " + input);
+            }
+
+            return output;
+        }
+
+        private static int StringToInt(string input, string column)
+        {
+            int output;
+
+            try
+            {
+                output = int.Parse(input);
+            }
+            catch (Exception)
+            {
+                throw new FormatException(column + " is not an integer: " + input);
+            }
+
+            return output;
         }
     }
 }

@@ -63,17 +63,16 @@ namespace SubnauticaRandomiser
         }
 
         // Compare the MD5 of the recipe CSV and try to see if it's still the same.
+        // Since this is done while parsing the CSV anyway, grab the value from there.
         private static void PrepareMD5()
         {
-            string md5 = CSVReader.CalculateMD5(Path.Combine(InitMod.s_modDirectory, InitMod.s_recipeFile));
-
-            if (md5.Equals(InitMod.s_expectedRecipeMD5))
+            if (CSVReader.s_isModifiedRecipeCSV)
             {
-                s_preparedMD5 = "recipeInformation.csv is unmodified.";
+                s_preparedMD5 = "recipeInformation.csv has been modified.";
             }
             else
             {
-                s_preparedMD5 = "recipeInformation.csv has been modified.";
+                s_preparedMD5 = "recipeInformation.csv is unmodified.";
             }
         }
 
