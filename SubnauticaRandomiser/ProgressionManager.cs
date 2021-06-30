@@ -15,6 +15,7 @@ namespace SubnauticaRandomiser
         // advantage of making it very easy to call up a random element.
         internal List<RandomiserRecipe> _allMaterials;
         private List<RandomiserRecipe> _reachableMaterials;
+        internal ProgressionTree _tree;
         private List<TechType> _depthProgressionItems;
         private List<Databox> _databoxes;
         private int _basicOutpostSize;
@@ -202,10 +203,12 @@ namespace SubnauticaRandomiser
             List<TechType> toBeRandomised = new List<TechType>();
             Dictionary<TechType, bool> unlockedProgressionItems = new Dictionary<TechType, bool>();
             _reachableMaterials = new List<RandomiserRecipe>();
-            ProgressionTree tree = new ProgressionTree();
+            _tree = new ProgressionTree();
             int reachableDepth = 0;
 
-            tree.SetupVanillaTree();
+            _tree.SetupVanillaTree();
+            if (config.bVanillaUpgradeChains)
+                _tree.ApplyUpgradeChainToPrerequisites(_allMaterials);
 
             // If databox randomising is enabled, go and do that.
             if (config.bRandomiseDataboxes && _databoxes != null)
@@ -217,6 +220,8 @@ namespace SubnauticaRandomiser
             if (config.bDoBaseTheming)
             {
                 _baseTheme = ChooseBaseTheme(config, 100);
+                ChangeScrapMetalResult(_baseTheme);
+                LogHandler.Debug("Chosen " + _baseTheme.TechType.AsString() + " as base theme.");
             }
 
             foreach (RandomiserRecipe r in _allMaterials.FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials) 
@@ -243,7 +248,7 @@ namespace SubnauticaRandomiser
                 int newDepth = 0;
                 if (newProgressionItem)
                 {
-                    newDepth = CalculateReachableDepth(tree, unlockedProgressionItems, config.iDepthSearchTime);
+                    newDepth = CalculateReachableDepth(_tree, unlockedProgressionItems, config.iDepthSearchTime);
                     if (SpoilerLog.s_progression.Count > 0)
                     {
                         KeyValuePair<TechType, int> valuePair = new KeyValuePair<TechType, int>(SpoilerLog.s_progression[SpoilerLog.s_progression.Count - 1].Key, newDepth);
@@ -284,7 +289,7 @@ namespace SubnauticaRandomiser
                 // Make sure the list of absolutely essential items is done first,
                 // for each depth level. This guarantees certain recipes are done
                 // by a certain depth, e.g. waterparks by 500m.
-                List<TechType> essentialItems = tree.GetEssentialItems(reachableDepth);
+                List<TechType> essentialItems = _tree.GetEssentialItems(reachableDepth);
                 if (essentialItems != null)
                 {
                     nextType = essentialItems[0];
@@ -301,7 +306,7 @@ namespace SubnauticaRandomiser
 
                 // Similarly, if all essential items are done, grab one from among
                 // the elective items and leave the rest up to chance.
-                List<TechType[]> electiveItems = tree.GetElectiveItems(reachableDepth);
+                List<TechType[]> electiveItems = _tree.GetElectiveItems(reachableDepth);
                 if (nextType.Equals(TechType.None) && electiveItems != null && electiveItems.Count > 0)
                 {
                     TechType[] electiveTypes = electiveItems[0];
@@ -328,7 +333,7 @@ namespace SubnauticaRandomiser
                 if (CheckRecipeForBlueprint(masterDict, _databoxes, nextRecipe, reachableDepth) && CheckRecipeForPrerequisites(masterDict, nextRecipe))
                 {
                     // Found a good recipe! Randomise it.
-                    nextRecipe = RandomiseIngredients(nextRecipe, _reachableMaterials, config, tree);
+                    nextRecipe = RandomiseIngredients(nextRecipe, _reachableMaterials, config);
 
                     // Make sure it's not an item that cannot be an ingredient.
                     if (CanFunctionAsIngredient(nextRecipe))
@@ -351,7 +356,7 @@ namespace SubnauticaRandomiser
                         AddMaterialsToReachableList(ETechTypeCategory.Eggs, reachableDepth);
 
                     // If it is a central progression item, consider it unlocked.
-                    if (tree.DepthProgressionItems.ContainsKey(nextType) && !unlockedProgressionItems.ContainsKey(nextType))
+                    if (_tree.DepthProgressionItems.ContainsKey(nextType) && !unlockedProgressionItems.ContainsKey(nextType))
                     {
                         unlockedProgressionItems.Add(nextType, true);
                         SpoilerLog.s_progression.Add(new KeyValuePair<TechType, int>(nextType, 0));
@@ -370,7 +375,7 @@ namespace SubnauticaRandomiser
             LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
         }
 
-        private RandomiserRecipe RandomiseIngredients(RandomiserRecipe recipe, List<RandomiserRecipe> materials, RandomiserConfig config, ProgressionTree tree)
+        private RandomiserRecipe RandomiseIngredients(RandomiserRecipe recipe, List<RandomiserRecipe> materials, RandomiserConfig config)
         {
             List<RandomiserIngredient> ingredients = new List<RandomiserIngredient>();
             List<ETechTypeCategory> blacklist = new List<ETechTypeCategory>();
@@ -426,6 +431,16 @@ namespace SubnauticaRandomiser
                 {
                     bigIngredient = _baseTheme;
                 }
+                // If vanilla upgrade chains are set to be preserved, replace
+                // this big ingredient with the base item.
+                if (config.bVanillaUpgradeChains)
+                {
+                    TechType basicUpgrade = _tree.GetUpgradeChain(recipe.TechType);
+                    if (!basicUpgrade.Equals(TechType.None))
+                    {
+                        bigIngredient = _allMaterials.Find(x => x.TechType.Equals(basicUpgrade));
+                    }
+                }
 
                 AddIngredientWithMaxUsesCheck(materials, ingredients, bigIngredient, 1);
                 currentValue += bigIngredient.Value;
@@ -435,7 +450,8 @@ namespace SubnauticaRandomiser
 
                 // Now fill up with random materials until the value threshold
                 // is more or less met, as defined by fuzziness.
-                while ((targetValue - currentValue) > (targetValue * config.dFuzziness / 2))
+                // Converted to do-while since we want this to happen at least once.
+                do
                 {
                     RandomiserRecipe r = GetRandom(materials, blacklist);
 
@@ -479,14 +495,15 @@ namespace SubnauticaRandomiser
                         break;
                     }
                     // Same thing for special case of outpost base parts
-                    if (tree.BasicOutpostPieces.ContainsKey(recipe.TechType) && _basicOutpostSize > config.iMaxBasicOutpostSize * 0.6)
+                    if (_tree.BasicOutpostPieces.ContainsKey(recipe.TechType) && _basicOutpostSize > config.iMaxBasicOutpostSize * 0.6)
                     {
                         LogHandler.Debug("!   Basic outpost size is getting too large, stopping.");
                         break;
                     }
-                }
-                if (tree.BasicOutpostPieces.ContainsKey(recipe.TechType))
-                    _basicOutpostSize += (totalSize * tree.BasicOutpostPieces[recipe.TechType]);
+                } while ((targetValue - currentValue) > (targetValue * config.dFuzziness / 2));
+
+                if (_tree.BasicOutpostPieces.ContainsKey(recipe.TechType))
+                    _basicOutpostSize += (totalSize * _tree.BasicOutpostPieces[recipe.TechType]);
                 LogHandler.Debug("    Recipe is now valued "+currentValue+" out of "+targetValue);
             }
 
@@ -728,6 +745,25 @@ namespace SubnauticaRandomiser
             return (int)totalDepth;
         }
 
+        // This function changes the output of the metal salvage recipe by removing
+        // the titanium one and replacing it with the new one.
+        // As a minor caveat, the new recipe shows up at the bottom of the tree.
+        private void ChangeScrapMetalResult(RandomiserRecipe replacement)
+        {
+            if (replacement.TechType.Equals(TechType.Titanium))
+                return;
+
+            replacement.Ingredients = new List<RandomiserIngredient>();
+            replacement.Ingredients.Add(new RandomiserIngredient(TechType.ScrapMetal, 1));
+            replacement.CraftAmount = 4;
+
+            CraftDataHandler.SetTechData(TechType.Titanium, _allMaterials.Find(x => x.TechType.Equals(TechType.Titanium)));
+            CraftDataHandler.SetTechData(replacement.TechType, replacement);
+
+            CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "BasicMaterials", "Titanium");
+            CraftTreeHandler.AddCraftingNode(CraftTree.Type.Fabricator, replacement.TechType, "Resources", "BasicMaterials");
+        }
+
         private static bool CheckDictForAllTechTypes(Dictionary<TechType, bool> dict, TechType[] types)
         {
             bool allItemsPresent = true;
@@ -818,6 +854,12 @@ namespace SubnauticaRandomiser
 
             foreach (TechType t in recipe.Blueprint.UnlockConditions)
             {
+                // Without this piece, the Air bladder will hang if fish are not
+                // enabled for the logic.
+                // HACK does not work for custom items using e.g. eggs or seeds
+                if (!InitMod.s_config.bUseFish && _allMaterials.Find(x => x.TechType.Equals(t)).Category.Equals(ETechTypeCategory.Fish))
+                    continue;
+
                 fulfilled &= (masterDict.DictionaryInstance.ContainsKey(t) || _reachableMaterials.Exists(x => x.TechType.Equals(t)));
 
                 if (!fulfilled)
@@ -883,7 +925,7 @@ namespace SubnauticaRandomiser
                                                          && x.MaxUsesPerGame == 0
                                                          && GetItemSize(x.TechType) == 1));
             }
-
+            
             return GetRandom(options);
         }
 

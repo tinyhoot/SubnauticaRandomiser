@@ -33,7 +33,6 @@
   - Even if autodetecting mods and their items seems impossible with how the
     randomiser works right now, giving users the ability to do it themselves
     should be a priority.
-  - Properly document the CSV.
   - Perhaps expose the progression tree? This would allow for more customisation,
     and enable modded items to act as gateways and road blocks.
     
@@ -53,4 +52,3 @@ Thoughts from a playthrough:
 
 Thoughts from users:
 - Add console commands to reroll a specific recipe only.
-- Add theming to base piece recipes.

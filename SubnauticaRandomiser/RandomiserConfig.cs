@@ -29,6 +29,9 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise blueprints in databoxes?")]
         public bool bRandomiseDataboxes = true;
 
+        [Toggle("Respect vanilla upgrade chains?")]
+        public bool bVanillaUpgradeChains = false;
+
         [Toggle("Theme base parts around a common ingredient?")]
         public bool bDoBaseTheming = false;
 

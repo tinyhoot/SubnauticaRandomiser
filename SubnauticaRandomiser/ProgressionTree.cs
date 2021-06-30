@@ -8,6 +8,7 @@ namespace SubnauticaRandomiser
         private Dictionary<EProgressionNode, ProgressionPath> _depthDifficulties;
         private Dictionary<EProgressionNode, List<TechType>> _essentialItems;
         private Dictionary<EProgressionNode, List<TechType[]>> _electiveItems;
+        private Dictionary<TechType, TechType> _upgradeChains;
         public Dictionary<TechType, int> BasicOutpostPieces;
         public Dictionary<TechType, bool> DepthProgressionItems;
 
@@ -90,6 +91,7 @@ namespace SubnauticaRandomiser
             path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule3 });
             SetProgressionPath(EProgressionNode.Depth1700m, path);
 
+
             // Putting every item or vehicle that can help the player achieve
             // lower depths in one dictionary.
             DepthProgressionItems.Add(TechType.Fins, true);
@@ -114,6 +116,7 @@ namespace SubnauticaRandomiser
             DepthProgressionItems.Add(TechType.CyclopsHullModule2, true);
             DepthProgressionItems.Add(TechType.CyclopsHullModule3, true);
 
+
             // Assemble a dictionary of what's considered basic outpost pieces
             // which together should not exceed the cost of config.iMaxBasicOutpostSize
             BasicOutpostPieces.Add(TechType.BaseCorridorI, 1);
@@ -137,6 +140,7 @@ namespace SubnauticaRandomiser
 
             AddEssentialItem(EProgressionNode.Depth300m, TechType.BaseWaterPark);
 
+
             // From among these, at least one has to be accessible by the provided
             // depth level. Ensures e.g. at least one power source by 200m.
             AddElectiveItems(EProgressionNode.Depth100m, new TechType[] { TechType.Battery, TechType.BatteryCharger });
@@ -144,6 +148,42 @@ namespace SubnauticaRandomiser
             AddElectiveItems(EProgressionNode.Depth200m, new TechType[] { TechType.BaseBioReactor, TechType.SolarPanel });
             AddElectiveItems(EProgressionNode.Depth200m, new TechType[] { TechType.PowerCell, TechType.PowerCellCharger, TechType.SeamothSolarCharge });
             AddElectiveItems(EProgressionNode.Depth200m, new TechType[] { TechType.BaseBulkhead, TechType.BaseFoundation, TechType.BaseReinforcement });
+
+
+            // Assemble a vanilla upgrade chain. These are the upgrades as the
+            // base game intends you to progress through them.
+            _upgradeChains = new Dictionary<TechType, TechType>();
+            AddUpgradeChain(TechType.VehicleHullModule2, TechType.VehicleHullModule1);
+            AddUpgradeChain(TechType.VehicleHullModule3, TechType.VehicleHullModule2);
+            AddUpgradeChain(TechType.ExoHullModule2, TechType.ExoHullModule1);
+            AddUpgradeChain(TechType.CyclopsHullModule2, TechType.CyclopsHullModule1);
+            AddUpgradeChain(TechType.CyclopsHullModule3, TechType.CyclopsHullModule2);
+            
+            AddUpgradeChain(TechType.HeatBlade, TechType.Knife);
+            AddUpgradeChain(TechType.RepulsionCannon, TechType.PropulsionCannon);
+            AddUpgradeChain(TechType.SwimChargeFins, TechType.Fins);
+            AddUpgradeChain(TechType.UltraGlideFins, TechType.Fins);
+            AddUpgradeChain(TechType.DoubleTank, TechType.Tank);
+            AddUpgradeChain(TechType.PlasteelTank, TechType.DoubleTank);
+            AddUpgradeChain(TechType.HighCapacityTank, TechType.DoubleTank);
+        }
+
+        // Make upgrade chains a part of those items' prerequisites to ensure the
+        // continuity is respected.
+        public void ApplyUpgradeChainToPrerequisites(List<RandomiserRecipe> materials)
+        {
+            if (materials == null || materials.Count == 0 || _upgradeChains == null || _upgradeChains.Count == 0)
+                return;
+            
+            foreach (TechType upgrade in _upgradeChains.Keys)
+            {
+                TechType ingredient = _upgradeChains[upgrade];
+                RandomiserRecipe recipe = materials.Find(x => x.TechType.Equals(upgrade));
+
+                if (recipe.Prerequisites == null)
+                    recipe.Prerequisites = new List<TechType>();
+                recipe.Prerequisites.Add(ingredient);
+            }
         }
 
         public ProgressionPath GetProgressionPath(EProgressionNode node)
@@ -203,6 +243,19 @@ namespace SubnauticaRandomiser
             }
         }
 
+        public bool AddUpgradeChain(TechType upgrade, TechType ingredient)
+        {
+            if (_upgradeChains.ContainsKey(upgrade))
+            {
+                return false;
+            }
+            else
+            {
+                _upgradeChains.Add(upgrade, ingredient);
+                return true;
+            }
+        }
+
         public List<TechType> GetEssentialItems(EProgressionNode node)
         {
             if (_essentialItems.TryGetValue(node, out List<TechType> items))
@@ -237,6 +290,16 @@ namespace SubnauticaRandomiser
                     return _electiveItems[node];
             }
             return null;
+        }
+
+        // Takes an advanced upgrade, and returns a required ingredient, if any.
+        // E.g. Seamoth Depth MK2 will return MK1.
+        public TechType GetUpgradeChain(TechType upgrade)
+        {
+            if (_upgradeChains.TryGetValue(upgrade, out TechType type))  
+                return type;
+
+            return TechType.None;
         }
     }
 }
