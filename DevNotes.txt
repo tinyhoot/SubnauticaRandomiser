@@ -1,20 +1,15 @@
 ﻿Thoughts and notes on features and issues.
-
-- In the future,the CSV will likely be able to drop the following categories:
-  - Ingredients. These are used as a fallback crutch by the previous system, and
-    a true logic-based system should have no need of them.
-    
+  
+- Randomise more things.
+  - Fragments.
+  - Fish spawn points.
+  - Fish size and aggression.
+  - Raw material spawn points.
+  
 - Expand on fragments.
   - Make it possible to randomise the amount of fragments
     needed for each blueprint.
   - Is it possible to swap fragments around?
-  
-- Clean up saving / loading.
-  - It is not necessary to save blueprints and categories to disk. If that info
-    is needed again, it is re-read from disk anyways. Cut down on file size.
-  - Make this change when something else requires a change to masterDict anyway.
-  - Fragments are a pretty good bet.
-  - Also include save versioning as a field of masterDict.
     
 - Add a casual mode.
   - Casual mode would respect vanilla upgrade chains and be more lenient with its
@@ -27,6 +22,35 @@
   - Raw materials are no longer found in their original biomes. Look into using
     LootDistributionHandler for this?
     
+- Add support for glitches.
+  - Several glitches in the game can let you get items or blueprints much earlier.
+  - It is possible to glitch into the aurora before it even explodes.
+    - Since this would make the logic run on a timer, better not implement this.
+  - Large wrecks can be made to despawn with the building tool, skipping the need
+    for e.g. a laser cutter.
+    
+- Mod support.
+  - Even if autodetecting mods and their items seems impossible with how the
+    randomiser works right now, giving users the ability to do it themselves
+    should be a priority.
+  - Perhaps expose the progression tree? This would allow for more customisation,
+    and enable modded items to act as gateways and road blocks.
+    
+- Internal improvements.
+  - Make reading the CSV an async function.
+  
+- Scrap metal!
+  - For some reason, the existing logic works on some recipes but not for others.
+    It makes no sense.
+  - Randomising anew after the crafting tree has already been built once (i.e.,
+    a fabricator has been interacted with) makes it impossible to change until
+    next game restart. The scrap metal recipe could thus persist across seeds.
+  - Savedata idea which does not lead to a breaking update:
+    - Scrap metal is never crafted. Therefore, it does not have a recipe. Because
+      of this, it also does not have an entry in masterDict.
+    - Abuse this and file the new recipe for whatever scrap metal can be turned
+      *into* under scrap metal.
+
    
   
 Thoughts from a playthrough:
@@ -36,4 +60,7 @@ Thoughts from a playthrough:
   - Water filter (covers water, get food from surrounding fish)
 - What about land seeds? If those get added, indoor growbeds are a necessity.
 - Add Aurora interior to logic. What parts need repair tool, laser cutter, cannon?
-- Scrap metal!
+
+
+Thoughts from users:
+- Add console commands to reroll a specific recipe only.
