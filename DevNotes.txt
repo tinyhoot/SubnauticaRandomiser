@@ -38,7 +38,19 @@
     
 - Internal improvements.
   - Make reading the CSV an async function.
-    
+  
+- Scrap metal!
+  - For some reason, the existing logic works on some recipes but not for others.
+    It makes no sense.
+  - Randomising anew after the crafting tree has already been built once (i.e.,
+    a fabricator has been interacted with) makes it impossible to change until
+    next game restart. The scrap metal recipe could thus persist across seeds.
+  - Savedata idea which does not lead to a breaking update:
+    - Scrap metal is never crafted. Therefore, it does not have a recipe. Because
+      of this, it also does not have an entry in masterDict.
+    - Abuse this and file the new recipe for whatever scrap metal can be turned
+      *into* under scrap metal.
+
    
   
 Thoughts from a playthrough:
@@ -48,7 +60,7 @@ Thoughts from a playthrough:
   - Water filter (covers water, get food from surrounding fish)
 - What about land seeds? If those get added, indoor growbeds are a necessity.
 - Add Aurora interior to logic. What parts need repair tool, laser cutter, cannon?
-- Scrap metal!
+
 
 Thoughts from users:
 - Add console commands to reroll a specific recipe only.

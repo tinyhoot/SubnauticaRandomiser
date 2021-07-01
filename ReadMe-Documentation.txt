@@ -82,6 +82,20 @@ not add any recipes to the boxes that are not already contained in them in vanil
 and the boxes themselves will still be found in the same locations. However, the
 blueprints you get from them will no longer be in the same boxes as they used to be.
 
+| Respect vanilla upgrade chains | Yes / No |
+--Default: No
+By default, the randomiser breaks the sequential upgrade chains present in the vanilla
+game. It is thus possible to skip some items along the way and, e.g., grab a Seamoth
+Depth Upgrade Mk.2 before Mk.1 was ever craftable.
+When enabled, this setting instead forces the randomiser to respect that progression.
+
+| Theme base parts around a common ingredient | Yes / No |
+--Default: No
+When enabled, this setting picks an ingredient to base habitats on. Basic pieces
+like corridors or rooms will then always contain this ingredient, much like in vanilla
+they always include titanium. The chosen ingredient is ensured to be common and
+easily accessible.
+
 | Include equipment as ingredients | Never / Top-level recipes only / Unrestricted |
 | Include tools as ingredients     | Never / Top-level recipes only / Unrestricted |
 | Include upgrades as ingredients  | Never / Top-level recipes only / Unrestricted |
@@ -114,7 +128,8 @@ in the mod menu. To find them, navigate to your Subnautica/QMods/SubnauticaRando
 directory and open the file config.json.
 
 These settings are meant for advanced users, and changing them may greatly impact
-your experience. Extreme values may even softlock you. Proceed with caution.
+your experience. Extreme values may even softlock you, or cause the randomiser to
+get stuck trying to figure out a valid path. Proceed with caution.
 
 | iDepthSearchTime | 0 - 45 |
 --Default: 15
@@ -126,8 +141,14 @@ since that is your maximum at the beginning of the game, without any tanks.
 | iMaxAmountPerIngredient | 1 - 20 |
 --Default: 5
 Most ingredients in a recipe may show up as multiples. For example, a Seamoth might
-require you to collect four titanium, five Gold and three Holefish. This setting
+require you to collect four Titanium, five Gold and three Holefish. This setting
 controls the maximum amount any single ingredient of a recipe can require.
+
+| iMaxBasicOutpostSize | 4 - 48 |
+--Default: 24
+The absolute essentials to establish a small scanning outpost all taken together
+will not require ingredients which exceed this much space in your inventory. This
+affects I-corridors, hatches, scanner rooms, windows, solar panels, and beacons.
 
 | iMaxEggsAsSingleIngredient | 1 - 10 |
 --Default: 1
@@ -159,13 +180,13 @@ be satisfied once the new ingredients reach any value between 90 and 110. Higher
 values of this setting thus lead to a much more random experience.
 
 | dIngredientRatio | 0.0 - 1.0 |
---Default: 0.5
+--Default: 0.45
 While trying to find ingredients to fit into a recipe, the randomiser will always
 attempt to find a major, high-value item first. This setting controls roughly how
 valuable that first ingredient should be. It represents a percentage of the total
-value of the recipe with a tolerance range of 5% of the total in each direction.
+value of the recipe with a tolerance range of 10% of the total in each direction.
 With the default value, this means that the randomiser will first try to find an
-ingredient with 45%-55% of the total value before moving on to entirely random ones.
+ingredient with 35%-55% of the total value before moving on to entirely random ones.
 Set to 0.0 to disable this behaviour.
 
 | sBase64Seed |
