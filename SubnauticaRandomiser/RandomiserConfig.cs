@@ -82,7 +82,7 @@ namespace SubnauticaRandomiser
         public int iMaxEggsAsSingleIngredient = 1;
         public int iMaxInventorySizePerRecipe = 24;
         public double dFuzziness = 0.2;
-        public double dIngredientRatio = 0.5;
+        public double dIngredientRatio = 0.45;
 
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
@@ -109,7 +109,7 @@ namespace SubnauticaRandomiser
             if (dFuzziness > 1 || dFuzziness < 0)
                 dFuzziness = 0.2;
             if (dIngredientRatio > 1 || dIngredientRatio < 0)
-                dIngredientRatio = 0.5;
+                dIngredientRatio = 0.45;
         }
 
         private bool EnsureButtonTime()
