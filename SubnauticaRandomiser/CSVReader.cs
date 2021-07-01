@@ -11,7 +11,7 @@ namespace SubnauticaRandomiser
     {
         internal static List<RandomiserRecipe> s_csvParsedList;
         internal static List<Databox> s_csvDataboxList;
-        internal static bool s_isModifiedRecipeCSV;
+        internal static string s_recipeCSVMD5;
 
         private static readonly int s_expectedColumns = 8;
         private static readonly int s_expectedRows = 245;
@@ -39,15 +39,14 @@ namespace SubnauticaRandomiser
             // likely that the user added custom items to it.
             // If the lines are the same, but the MD5 is not, some values of
             // existing entries must have been modified.
+            s_recipeCSVMD5 = CalculateMD5(path);
             if (csvLines.Length != s_expectedRows)
             {
                 LogHandler.Info("Recipe CSV seems to contain custom entries.");
-                s_isModifiedRecipeCSV = true;
             }
-            else if (!CalculateMD5(path).Equals(InitMod.s_expectedRecipeMD5))
+            else if (!s_recipeCSVMD5.Equals(InitMod.s_expectedRecipeMD5))
             {
                 LogHandler.Info("Recipe CSV seems to have been modified.");
-                s_isModifiedRecipeCSV = true;
             }
 
             // Second, read each line and try to parse that into a list of

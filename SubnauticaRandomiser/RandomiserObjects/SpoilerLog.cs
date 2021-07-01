@@ -20,7 +20,7 @@ namespace SubnauticaRandomiser
             "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
             "*************************************************",
             "",
-            "Generated on " + DateTime.Now
+            "Generated on " + DateTime.Now + " with " + InitMod.s_versionDict[InitMod.s_expectedSaveVersion]
         };
         private static string[] contentBasics =
         {
@@ -66,9 +66,9 @@ namespace SubnauticaRandomiser
         // Since this is done while parsing the CSV anyway, grab the value from there.
         private static void PrepareMD5()
         {
-            if (CSVReader.s_isModifiedRecipeCSV)
+            if (!InitMod.s_expectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
             {
-                s_preparedMD5 = "recipeInformation.csv has been modified.";
+                s_preparedMD5 = "recipeInformation.csv has been modified: " + CSVReader.s_recipeCSVMD5;
             }
             else
             {
