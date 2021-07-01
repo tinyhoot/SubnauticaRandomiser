@@ -413,8 +413,8 @@ namespace SubnauticaRandomiser
                 int totalSize = 0;
 
                 // Try at least one big ingredient first, then do smaller ones.
-                List<RandomiserRecipe> bigIngredientCandidates = materials.FindAll(x => (targetValue * (config.dIngredientRatio + 0.05)) > x.Value
-                                                                           && (targetValue * (config.dIngredientRatio - 0.05)) < x.Value
+                List<RandomiserRecipe> bigIngredientCandidates = materials.FindAll(x => (targetValue * (config.dIngredientRatio + 0.1)) > x.Value
+                                                                           && (targetValue * (config.dIngredientRatio - 0.1)) < x.Value
                                                                            && !blacklist.Contains(x.Category)
                                                                            );
 
