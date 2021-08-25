@@ -13,29 +13,34 @@ namespace SubnauticaRandomiser.Logic
             _reachableMaterials = _materials.GetReachable();
         }
 
+        // Fill a given recipe with ingredients. This algorithm mostly uses random
+        // number generation to fill in the gaps.
         internal override RandomiserRecipe RandomiseIngredients(RandomiserRecipe recipe)
         {
-            int number = _random.Next(1, 6);
+            int number = _random.Next(1, _config.iMaxIngredientsPerRecipe + 1);
             int totalInvSize = 0;
             _ingredients = new List<RandomiserIngredient>();
             UpdateBlacklist(recipe);
 
             for (int i = 1; i <= number; i++)
             {
-                RandomiserRecipe r = GetRandom(_reachableMaterials, _blacklist);
+                RandomiserRecipe randomRecipe = GetRandom(_reachableMaterials, _blacklist);
 
                 // Prevent duplicates.
-                if (_ingredients.Exists(x => x.techType == r.TechType))
+                if (_ingredients.Exists(x => x.techType == randomRecipe.TechType))
                 {
                     i--;
                     continue;
                 }
-                RandomiserIngredient ing = new RandomiserIngredient(r.TechType, _random.Next(1, _config.iMaxAmountPerIngredient + 1));
 
-                AddIngredientWithMaxUsesCheck(r, ing.amount);
-                totalInvSize += r.GetItemSize() * ing.amount;
+                int max = FindMaximum(randomRecipe);
 
-                LogHandler.Debug("    Adding ingredient: " + ing.techType.AsString() + ", " + ing.amount);
+                RandomiserIngredient ingredient = new RandomiserIngredient(randomRecipe.TechType, _random.Next(1, max + 1));
+
+                AddIngredientWithMaxUsesCheck(randomRecipe, ingredient.amount);
+                totalInvSize += randomRecipe.GetItemSize() * ingredient.amount;
+
+                LogHandler.Debug("    Adding ingredient: " + ingredient.techType.AsString() + ", " + ingredient.amount);
 
                 if (totalInvSize > _config.iMaxInventorySizePerRecipe)
                 {
@@ -47,6 +52,23 @@ namespace SubnauticaRandomiser.Logic
             recipe.Ingredients = _ingredients;
             recipe.CraftAmount = CraftDataHandler.GetTechData(recipe.TechType).craftAmount;
             return recipe;
+        }
+
+        private int FindMaximum(RandomiserRecipe recipe)
+        {
+            int max = _config.iMaxAmountPerIngredient;
+
+            // Tools and upgrades do not stack, but if the recipe would
+            // require several and you have more than one in inventory,
+            // it will consume all of them.
+            if (recipe.Category.Equals(ETechTypeCategory.Tools) || recipe.Category.Equals(ETechTypeCategory.VehicleUpgrades) || recipe.Category.Equals(ETechTypeCategory.WorkBenchUpgrades))
+                max = 1;
+
+            // Never require more than one (default) egg. That's tedious.
+            if (recipe.Category.Equals(ETechTypeCategory.Eggs))
+                max = _config.iMaxEggsAsSingleIngredient;
+
+            return max;
         }
     }
 }

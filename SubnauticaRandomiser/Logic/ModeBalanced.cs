@@ -71,10 +71,16 @@ namespace SubnauticaRandomiser.Logic
                     LogHandler.Debug("!   Recipe is getting too large, stopping.");
                     break;
                 }
-                // Same thing for special case of outpost base parts
+                // Same thing for special case of outpost base parts.
                 if (_tree.BasicOutpostPieces.ContainsKey(recipe.TechType) && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.6)
                 {
                     LogHandler.Debug("!   Basic outpost size is getting too large, stopping.");
+                    break;
+                }
+                // Also, respect the maximum number of ingredients set in the config.
+                if (_config.iMaxIngredientsPerRecipe <= _ingredients.Count)
+                {
+                    LogHandler.Debug("!   Recipe has reached maximum allowed number of ingredients, stopping.");
                     break;
                 }
             } while ((targetValue - currentValue) > (targetValue * _config.dFuzziness / 2));

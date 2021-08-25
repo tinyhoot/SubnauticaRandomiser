@@ -14,7 +14,7 @@ namespace SubnauticaRandomiser
         // show up in the in-game options menu
         public int iSeed = 0;
 
-        [Choice("Mode", "Balanced", "True Random")]
+        [Choice("Mode", "Balanced", "Random")]
         public int iRandomiserMode = 0;
 
         [Toggle("Use fish in logic?")]
@@ -43,6 +43,12 @@ namespace SubnauticaRandomiser
 
         [Choice("Include upgrades as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
         public int iUpgradesAsIngredients = 1;
+
+        [Slider("Max number of a single ingredient", 1, 10, DefaultValue = 5)]
+        public int iMaxAmountPerIngredient = 5;
+
+        [Slider("Max ingredients per recipe", 1, 10, DefaultValue = 7)]
+        public int iMaxIngredientsPerRecipe = 7;
 
         [Button("Randomise with new seed")]
         public void NewRandomNewSeed()
@@ -77,7 +83,6 @@ namespace SubnauticaRandomiser
 
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
         public int iDepthSearchTime = 15;
-        public int iMaxAmountPerIngredient = 5;
         public int iMaxBasicOutpostSize = 24;
         public int iMaxEggsAsSingleIngredient = 1;
         public int iMaxInventorySizePerRecipe = 24;
@@ -98,8 +103,10 @@ namespace SubnauticaRandomiser
                 iUpgradesAsIngredients = 1;
             if (iDepthSearchTime > 45 || iDepthSearchTime < 0)
                 iDepthSearchTime = 15;
-            if (iMaxAmountPerIngredient > 20 || iMaxAmountPerIngredient < 1)
+            if (iMaxAmountPerIngredient > 10 || iMaxAmountPerIngredient < 1)
                 iMaxAmountPerIngredient = 5;
+            if (iMaxIngredientsPerRecipe > 10 || iMaxIngredientsPerRecipe < 1)
+                iMaxIngredientsPerRecipe = 7;
             if (iMaxBasicOutpostSize > 48 || iMaxBasicOutpostSize < 4)
                 iMaxBasicOutpostSize = 24;
             if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)
