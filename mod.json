@@ -3,6 +3,7 @@
     "DisplayName": "SubnauticaRandomiser",
     "Author": "Raqzas",
     "Version": "0.6.0",
+    "Dependencies": [ "SMLHelper" ],
     "Enable": true,
     "Game": "Subnautica",
     "AssemblyName": "SubnauticaRandomiser.dll"
