@@ -503,15 +503,23 @@ namespace SubnauticaRandomiser.Logic
                 }
             }
 
-            foreach (TechType t in recipe.Blueprint.UnlockConditions)
+            foreach (TechType condition in recipe.Blueprint.UnlockConditions)
             {
+                RandomiserRecipe conditionRecipe = _materials.GetAll().Find(x => x.TechType.Equals(condition));
+
                 // Without this piece, the Air bladder will hang if fish are not
-                // enabled for the logic.
-                // HACK does not work for custom items using e.g. eggs or seeds
-                if (!_config.bUseFish && _materials.GetAll().Find(x => x.TechType.Equals(t)).Category.Equals(ETechTypeCategory.Fish))
+                // enabled for the logic, as it fruitlessly searches for a bladderfish
+                // which never enters its algorithm.
+                // Eggs and seeds are never problematic in vanilla, but are covered
+                // in case users add their own modded items with those.
+                if (!_config.bUseFish && conditionRecipe.Category.Equals(ETechTypeCategory.Fish))
+                    continue;
+                if (!_config.bUseEggs && conditionRecipe.Category.Equals(ETechTypeCategory.Eggs))
+                    continue;
+                if (!_config.bUseSeeds && conditionRecipe.Category.Equals(ETechTypeCategory.Seeds))
                     continue;
 
-                fulfilled &= (masterDict.DictionaryInstance.ContainsKey(t) || _materials.GetReachable().Exists(x => x.TechType.Equals(t)));
+                fulfilled &= (masterDict.DictionaryInstance.ContainsKey(condition) || _materials.GetReachable().Exists(x => x.TechType.Equals(condition)));
 
                 if (!fulfilled)
                     return false;
