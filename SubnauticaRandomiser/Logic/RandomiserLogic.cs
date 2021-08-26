@@ -12,7 +12,6 @@ namespace SubnauticaRandomiser.Logic
         private readonly RandomiserConfig _config;
         private Materials _materials;
         private ProgressionTree _tree;
-        private List<TechType> _depthProgressionItems;
         private List<Databox> _databoxes;
         private Mode _mode;
 
@@ -25,7 +24,6 @@ namespace SubnauticaRandomiser.Logic
 
             _config = config;
             _materials = new Materials(allMaterials);
-            _depthProgressionItems = new List<TechType>();
             _databoxes = databoxes;
             _mode = null;
         }
@@ -209,8 +207,7 @@ namespace SubnauticaRandomiser.Logic
                         unlockedProgressionItems.Add(TechType.Knife, true);
                         newProgressionItem = true;
                         // Add raw materials like creepvine and mushroom samples.
-                        // TODO This completely disregards depth restrictions.
-                        _materials.AddReachableWithPrereqs(ETechTypeCategory.RawMaterials, 2000, TechType.Knife);
+                        _materials.AddReachableWithPrereqs(ETechTypeCategory.RawMaterials, reachableDepth, TechType.Knife);
                         if (_config.bUseSeeds)
                             _materials.AddReachable(ETechTypeCategory.Seeds, reachableDepth);
                     }
@@ -511,7 +508,7 @@ namespace SubnauticaRandomiser.Logic
                 // Without this piece, the Air bladder will hang if fish are not
                 // enabled for the logic.
                 // HACK does not work for custom items using e.g. eggs or seeds
-                if (!InitMod.s_config.bUseFish && _materials.GetAll().Find(x => x.TechType.Equals(t)).Category.Equals(ETechTypeCategory.Fish))
+                if (!_config.bUseFish && _materials.GetAll().Find(x => x.TechType.Equals(t)).Category.Equals(ETechTypeCategory.Fish))
                     continue;
 
                 fulfilled &= (masterDict.DictionaryInstance.ContainsKey(t) || _materials.GetReachable().Exists(x => x.TechType.Equals(t)));
