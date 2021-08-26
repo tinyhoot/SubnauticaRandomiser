@@ -82,7 +82,6 @@ namespace SubnauticaRandomiser.Logic
             // If base theming is enabled, choose a theming ingredient.
             if (_config.bDoBaseTheming)
             {
-                //_baseTheme = ChooseBaseTheme(_config, 100);
                 // TODO Get this working.
                 //ChangeScrapMetalResult(_baseTheme);
             }
@@ -411,7 +410,7 @@ namespace SubnauticaRandomiser.Logic
         // This function changes the output of the metal salvage recipe by removing
         // the titanium one and replacing it with the new one.
         // As a minor caveat, the new recipe shows up at the bottom of the tree.
-        private void ChangeScrapMetalResult(RandomiserRecipe replacement)
+        internal static void ChangeScrapMetalResult(Recipe replacement)
         {
             if (replacement.TechType.Equals(TechType.Titanium))
                 return;
@@ -420,13 +419,22 @@ namespace SubnauticaRandomiser.Logic
             replacement.Ingredients.Add(new RandomiserIngredient(TechType.ScrapMetal, 1));
             replacement.CraftAmount = 4;
 
-            CraftDataHandler.SetTechData(TechType.Titanium, _materials.GetAll().Find(x => x.TechType.Equals(TechType.Titanium)));
-            CraftDataHandler.SetTechData(replacement.TechType, replacement);
+            //CraftDataHandler.SetTechData(TechType.Titanium, materials.GetAll().Find(x => x.TechType.Equals(TechType.Titanium)));
+            //CraftDataHandler.SetTechData(replacement.TechType, replacement);
+
+            LogHandler.Debug("!!! TechType contained in replacement: " + replacement.TechType.AsString());
+            foreach(RandomiserIngredient i in replacement.Ingredients)
+            {
+                LogHandler.Debug("!!! Ingredient: " + i.techType.AsString() + ", " + i.amount);
+            }
 
             // FIXME for whatever reason, this code works for some items, but not for others????
             // Fish seem to work, and so does lead, but salt and acid mushrooms do not?
             CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "BasicMaterials", "Titanium");
             CraftTreeHandler.AddCraftingNode(CraftTree.Type.Fabricator, replacement.TechType, "Resources", "BasicMaterials");
+
+            CraftDataHandler.RemoveFromGroup(TechGroup.Resources, TechCategory.BasicMaterials, TechType.Titanium);
+            CraftDataHandler.AddToGroup(TechGroup.Resources, TechCategory.BasicMaterials, replacement.TechType);
         }
 
         private static bool CheckDictForAllTechTypes(Dictionary<TechType, bool> dict, TechType[] types)
@@ -580,6 +588,8 @@ namespace SubnauticaRandomiser.Logic
             {
                 CraftDataHandler.SetTechData(key, masterDict.DictionaryInstance[key]);
             }
+
+            ChangeScrapMetalResult(masterDict.DictionaryInstance[TechType.Titanium]);
         }
 
         // This function handles applying a randomised recipe to the in-game

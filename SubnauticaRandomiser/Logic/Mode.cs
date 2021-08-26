@@ -22,6 +22,8 @@ namespace SubnauticaRandomiser.Logic
 
             _baseTheme = ChooseBaseTheme(100);
             LogHandler.Debug("Chosen " + _baseTheme.TechType.AsString() + " as base theme.");
+            InitMod.s_masterDict.DictionaryInstance.Add(TechType.Titanium, _baseTheme.GetSerializableRecipe());
+            RandomiserLogic.ChangeScrapMetalResult(_baseTheme);
         }
 
         internal abstract RandomiserRecipe RandomiseIngredients(RandomiserRecipe recipe);
@@ -109,6 +111,13 @@ namespace SubnauticaRandomiser.Logic
                                                          && x.MaxUsesPerGame == 0
                                                          && x.GetItemSize() == 1));
             }
+
+            LogHandler.Debug("LIST OF BASE THEME OPTIONS:");
+            foreach (RandomiserRecipe r in options)
+            {
+                LogHandler.Debug(r.TechType.AsString());
+            }
+            LogHandler.Debug("END LIST");
 
             return GetRandom(options);
         }
