@@ -22,8 +22,8 @@ namespace SubnauticaRandomiser.Logic
 
             _baseTheme = ChooseBaseTheme(100);
             LogHandler.Debug("Chosen " + _baseTheme.TechType.AsString() + " as base theme.");
-            InitMod.s_masterDict.DictionaryInstance.Add(TechType.Titanium, _baseTheme.GetSerializableRecipe());
-            RandomiserLogic.ChangeScrapMetalResult(_baseTheme);
+            //InitMod.s_masterDict.DictionaryInstance.Add(TechType.Titanium, _baseTheme.GetSerializableRecipe());
+            //RandomiserLogic.ChangeScrapMetalResult(_baseTheme);
         }
 
         internal abstract RandomiserRecipe RandomiseIngredients(RandomiserRecipe recipe);
