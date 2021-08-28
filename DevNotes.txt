@@ -64,5 +64,3 @@ Thoughts from a playthrough:
 
 Thoughts from users:
 - Add console commands to reroll a specific recipe only.
-- Expose maximum and minimum values for ingredients per recipe
-- Exclude builder tool from structure recipes

@@ -31,10 +31,14 @@ namespace SubnauticaRandomiser.Logic
 
             RandomiserRecipe primaryIngredient = ChoosePrimaryIngredient(recipe, targetValue);
 
+            // Disallow the builer tool from being used in base pieces.
+            if (recipe.Category.IsBasePiece() && primaryIngredient.TechType.Equals(TechType.Builder))
+                primaryIngredient = ReplaceWithSimilarValue(primaryIngredient);
+
             AddIngredientWithMaxUsesCheck(primaryIngredient, 1);
             currentValue += primaryIngredient.Value;
 
-            LogHandler.Debug("    Adding big ingredient " + primaryIngredient.TechType.AsString());
+            LogHandler.Debug("    Adding primary ingredient " + primaryIngredient.TechType.AsString());
 
             // Now fill up with random materials until the value threshold
             // is more or less met, as defined by fuzziness.
@@ -45,6 +49,10 @@ namespace SubnauticaRandomiser.Logic
 
                 // Prevent duplicates.
                 if (_ingredients.Exists(x => x.techType == ingredient.TechType))
+                    continue;
+
+                // Disallow the builder tool from being used in base pieces.
+                if (recipe.Category.IsBasePiece() && ingredient.TechType.Equals(TechType.Builder))
                     continue;
 
                 // What's the maximum amount of this ingredient the recipe can
@@ -143,6 +151,37 @@ namespace SubnauticaRandomiser.Logic
                 max = _config.iMaxEggsAsSingleIngredient;
 
             return max;
+        }
+
+        // Replace an undesirable ingredient with one of similar value.
+        // Start with a range of 10% in each direction, increasing if no valid
+        // replacement can be found.
+        private RandomiserRecipe ReplaceWithSimilarValue(RandomiserRecipe undesirable)
+        {
+            int value = undesirable.Value;
+            double range = 0.1;
+
+            List<RandomiserRecipe> betterOptions = new List<RandomiserRecipe>();
+            LogHandler.Debug("Replacing undesirable ingredient " + undesirable.TechType.AsString());
+
+            // Progressively increase the search radius if no replacement is found,
+            // but stop before it gets out of hand.
+            while (betterOptions.Count == 0 && range < 1.0)
+            {
+                // Add all items of the same category with value +- range%
+                betterOptions.AddRange(_reachableMaterials.FindAll(x => x.Category.Equals(undesirable.Category)
+                                                                     && x.Value < undesirable.Value + undesirable.Value * range
+                                                                     && x.Value > undesirable.Value - undesirable.Value * range
+                                                                     ));
+                range += 0.2;
+            }
+
+            // If the loop above exited due to the range getting too large, just
+            // use any unlocked raw material instead.
+            if (betterOptions.Count == 0)
+                betterOptions.AddRange(_reachableMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials)));
+
+            return GetRandom(betterOptions);
         }
     }
 }

@@ -24,21 +24,28 @@ namespace SubnauticaRandomiser.Logic
 
             for (int i = 1; i <= number; i++)
             {
-                RandomiserRecipe randomRecipe = GetRandom(_reachableMaterials, _blacklist);
+                RandomiserRecipe ingredientRecipe = GetRandom(_reachableMaterials, _blacklist);
 
                 // Prevent duplicates.
-                if (_ingredients.Exists(x => x.techType == randomRecipe.TechType))
+                if (_ingredients.Exists(x => x.techType == ingredientRecipe.TechType))
                 {
                     i--;
                     continue;
                 }
 
-                int max = FindMaximum(randomRecipe);
+                // Disallow the builder tool from being used in base pieces.
+                if (recipe.Category.IsBasePiece() && ingredientRecipe.TechType.Equals(TechType.Builder))
+                {
+                    i--;
+                    continue;
+                }
 
-                RandomiserIngredient ingredient = new RandomiserIngredient(randomRecipe.TechType, _random.Next(1, max + 1));
+                int max = FindMaximum(ingredientRecipe);
 
-                AddIngredientWithMaxUsesCheck(randomRecipe, ingredient.amount);
-                totalInvSize += randomRecipe.GetItemSize() * ingredient.amount;
+                RandomiserIngredient ingredient = new RandomiserIngredient(ingredientRecipe.TechType, _random.Next(1, max + 1));
+
+                AddIngredientWithMaxUsesCheck(ingredientRecipe, ingredient.amount);
+                totalInvSize += ingredientRecipe.GetItemSize() * ingredient.amount;
 
                 LogHandler.Debug("    Adding ingredient: " + ingredient.techType.AsString() + ", " + ingredient.amount);
 
