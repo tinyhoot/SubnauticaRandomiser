@@ -106,12 +106,11 @@ namespace SubnauticaRandomiser
                 LogHandler.Error("Failed to extract databox information from CSV.");
 
             RandomiserLogic logic = new RandomiserLogic(s_config, completeMaterialsList, databoxes, s_config.iSeed);
-            logic.RandomSmart(s_masterDict);
 
+            logic.RandomSmart(s_masterDict);
             LogHandler.Info("Randomisation successful!");
 
             SaveRecipeStateToDisk();
-
             // This should run async, but we don't need the result here. It's a file.
             _ = SpoilerLog.WriteLog();
         }
@@ -133,7 +132,7 @@ namespace SubnauticaRandomiser
 
         internal static RecipeDictionary RestoreRecipeStateFromDisk()
         {
-            if (string.IsNullOrEmpty(s_config.sBase64Seed))
+            if (String.IsNullOrEmpty(s_config.sBase64Seed))
             {
                 throw new InvalidDataException("base64 seed is empty.");
             }

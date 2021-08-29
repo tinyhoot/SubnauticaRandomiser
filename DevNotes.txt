@@ -5,7 +5,6 @@
   - Fish spawn points.
   - Fish size and aggression.
   - Raw material spawn points.
-  - Which fabricators are needed for what recipes.
   
 - Expand on fragments.
   - Make it possible to randomise the amount of fragments
@@ -51,7 +50,6 @@
       of this, it also does not have an entry in masterDict.
     - Abuse this and file the new recipe for whatever scrap metal can be turned
       *into* under scrap metal.
-    - This could potentially lead to issues with modded CSVs? But highly unlikely.
 
    
   
@@ -66,8 +64,3 @@ Thoughts from a playthrough:
 
 Thoughts from users:
 - Add console commands to reroll a specific recipe only.
-    - One way to do this would be randomising again up to the point where that
-      specific item was generated, then doing it again with a different seed. All
-      you really need is the list of materials reachable by that point.
-    - This will get more and more complicated as the randomiser gains more features,
-      so implementing this would be a considerable technical debt. Really worth it?
