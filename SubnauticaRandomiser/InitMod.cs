@@ -5,6 +5,7 @@ using System.Reflection;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.Logic;
 
 namespace SubnauticaRandomiser
 {
@@ -15,8 +16,10 @@ namespace SubnauticaRandomiser
         internal static RandomiserConfig s_config;
         internal static readonly string s_recipeFile = "recipeInformation.csv";
         internal static readonly string s_wreckageFile = "wreckInformation.csv";
+        internal static readonly string s_expectedRecipeMD5 = "ff1123bdfecfe7d473ca13c0c61a0aa3";
         internal static readonly int s_expectedSaveVersion = 2;
-        private static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string> { [1] = "v0.5.1" };
+        internal static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string> { [1] = "v0.5.1", 
+                                                                                                       [2] = "v0.6.0"};
 
         // The master list of all recipes that have been modified
         internal static RecipeDictionary s_masterDict = new RecipeDictionary();
@@ -59,7 +62,8 @@ namespace SubnauticaRandomiser
             // Triple checking things here in case the save got corrupted somehow
             if (!_debug_forceRandomise && s_masterDict != null && s_masterDict.DictionaryInstance != null && s_masterDict.DictionaryInstance.Count > 0)
             {
-                ProgressionManager.ApplyMasterDict(s_masterDict);
+                RandomiserLogic.ApplyMasterDict(s_masterDict);
+                
                 if (s_masterDict.isDataboxRandomised)
                     EnableHarmonyPatching();
 
@@ -103,12 +107,14 @@ namespace SubnauticaRandomiser
             if (databoxes == null || databoxes.Count == 0)
                 LogHandler.Error("Failed to extract databox information from CSV.");
 
-            ProgressionManager pm = new ProgressionManager(completeMaterialsList, databoxes, s_config.iSeed);
+            RandomiserLogic logic = new RandomiserLogic(s_config, completeMaterialsList, databoxes, s_config.iSeed);
 
-            pm.RandomSmart(s_masterDict, s_config);
+            logic.RandomSmart(s_masterDict);
             LogHandler.Info("Randomisation successful!");
 
             SaveRecipeStateToDisk();
+            // This should run async, but we don't need the result here. It's a file.
+            _ = SpoilerLog.WriteLog();
         }
 
         internal static void SaveRecipeStateToDisk()

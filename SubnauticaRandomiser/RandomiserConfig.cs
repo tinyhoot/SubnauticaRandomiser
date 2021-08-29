@@ -14,7 +14,7 @@ namespace SubnauticaRandomiser
         // show up in the in-game options menu
         public int iSeed = 0;
 
-        [Choice("Mode", "Balanced", "True Random")]
+        [Choice("Mode", "Balanced", "Random")]
         public int iRandomiserMode = 0;
 
         [Toggle("Use fish in logic?")]
@@ -29,6 +29,12 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise blueprints in databoxes?")]
         public bool bRandomiseDataboxes = true;
 
+        [Toggle("Respect vanilla upgrade chains?")]
+        public bool bVanillaUpgradeChains = false;
+
+        [Toggle("Theme base parts around a common ingredient?")]
+        public bool bDoBaseTheming = false;
+
         [Choice("Include equipment as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
         public int iEquipmentAsIngredients = 1;
 
@@ -37,6 +43,12 @@ namespace SubnauticaRandomiser
 
         [Choice("Include upgrades as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
         public int iUpgradesAsIngredients = 1;
+
+        [Slider("Max number of a single ingredient", 1, 10, DefaultValue = 5)]
+        public int iMaxAmountPerIngredient = 5;
+
+        [Slider("Max ingredients per recipe", 1, 10, DefaultValue = 7)]
+        public int iMaxIngredientsPerRecipe = 7;
 
         [Button("Randomise with new seed")]
         public void NewRandomNewSeed()
@@ -64,15 +76,18 @@ namespace SubnauticaRandomiser
         public void NewRandomOldSeed()
         {
             LogHandler.MainMenuMessage("Randomising...");
+            Load();
             InitMod.Randomise();
             LogHandler.MainMenuMessage("Finished randomising!");
         }
 
-        public int iMaxAmountPerIngredient = 5;
+        public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
+        public int iDepthSearchTime = 15;
+        public int iMaxBasicOutpostSize = 24;
         public int iMaxEggsAsSingleIngredient = 1;
         public int iMaxInventorySizePerRecipe = 24;
         public double dFuzziness = 0.2;
-        public double dIngredientRatio = 0.5;
+        public double dIngredientRatio = 0.45;
 
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
@@ -86,16 +101,22 @@ namespace SubnauticaRandomiser
                 iToolsAsIngredients = 1;
             if (iUpgradesAsIngredients > 2 || iUpgradesAsIngredients < 0)
                 iUpgradesAsIngredients = 1;
-            if (iMaxAmountPerIngredient > 20 || iMaxAmountPerIngredient < 1)
+            if (iDepthSearchTime > 45 || iDepthSearchTime < 0)
+                iDepthSearchTime = 15;
+            if (iMaxAmountPerIngredient > 10 || iMaxAmountPerIngredient < 1)
                 iMaxAmountPerIngredient = 5;
+            if (iMaxIngredientsPerRecipe > 10 || iMaxIngredientsPerRecipe < 1)
+                iMaxIngredientsPerRecipe = 7;
+            if (iMaxBasicOutpostSize > 48 || iMaxBasicOutpostSize < 4)
+                iMaxBasicOutpostSize = 24;
             if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)
                 iMaxEggsAsSingleIngredient = 1;
-            if (iMaxInventorySizePerRecipe > 42 || iMaxInventorySizePerRecipe < 4)
+            if (iMaxInventorySizePerRecipe > 100 || iMaxInventorySizePerRecipe < 4)
                 iMaxInventorySizePerRecipe = 24;
             if (dFuzziness > 1 || dFuzziness < 0)
                 dFuzziness = 0.2;
             if (dIngredientRatio > 1 || dIngredientRatio < 0)
-                dIngredientRatio = 0.5;
+                dIngredientRatio = 0.45;
         }
 
         private bool EnsureButtonTime()
