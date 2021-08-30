@@ -557,6 +557,11 @@ namespace SubnauticaRandomiser.Logic
         {
             bool fulfilled = true;
 
+            // The builder tool must always be randomised before any base pieces
+            // ever become accessible.
+            if (recipe.Category.IsBasePiece() && !masterDict.DictionaryInstance.ContainsKey(TechType.Builder))
+                return false;
+
             if (recipe.Prerequisites == null)
                 return true;
 

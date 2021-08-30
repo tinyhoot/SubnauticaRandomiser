@@ -49,13 +49,13 @@ The mod menu is accessible at any point under "Options --> Mods", even while
 in-game. Changes you make will not take effect until the next time you click
 one of the "Randomise with ___ seed" buttons.
 
-| Randomiser Mode | Balanced / True Random |
+| Randomiser Mode | Balanced / Chaotic |
 --Default: Balanced
 This setting affects how the randomiser chooses ingredients for recipes. Balanced
 will try to provide a challenge, but avoid unnecessary grinding and tedium. This
 is the recommended way to play the randomiser. Should you wish for a completely
-off-the-rails experience, True Random has you covered. True Random will not softlock
-you, but it does not care about you. At all.
+off-the-rails experience, Chaotic has you covered. Chaotic will not softlock
+you, but it provides very little protection from the ups and downs of random chance.
 
 | Use fish in logic | Yes / No |
 --Default: Yes
@@ -111,6 +111,23 @@ If set to 'Unrestricted', these items will not be treated any differently to any
 other item in the game and may feature prominently in recipes. Note that on Unrestricted,
 it is not uncommon to need to build a repair tool to build a laser cutter to build
 a propulsion cannon to build a cyclops.
+
+| Max number of a single ingredient | 1 - 10 |
+This number determines the maximum which may be required of any ingredient within
+the same recipe. Thus, setting this to 5 will never allow e.g. a knife to be made
+from 6 titanium and 3 copper. The titanium would be capped at 5, and other ingredients
+would be used in the 6th piece's stead.
+Reducing this number leads to "flatter" recipes which require more diverse ingredients,
+but only a few of them each. This setting is very strongly tied with the one below.
+
+| Max ingredients per recipe | 1 - 10 |
+This number determines how many different ingredient types a recipe can hold. Assuming
+you set this setting to 3, and you're trying to craft a knife. The recipe you get is
+2 copper, 4 gold and 1 stalker tooth. The setting then prevents the randomiser from
+adding e.g. 2 titanium to the list of necessary materials, which would bring the
+total of diverse types up to 4. However, it does NOT influence how many of each
+of these ingredients can be required at once.
+This setting is very strongly tied with the one above.
 
 | Randomise with new seed |
 | Randomise with same seed |

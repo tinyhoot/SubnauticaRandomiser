@@ -17,10 +17,10 @@ The randomisation persists between play sessions and save games. If you decide t
 - ✔️ Include fish, eggs and seeds in recipes (customisable in in-game menu)
 - ✔️ Randomise blueprints from databoxes
 - ✔️ No softlocks 
-- ✔️ Upgrades are independent from their basic variants, so you might acquire e.g. a Seamoth Depth Module 3 long before you ever manage to get Module 1 or 2
+- ✔️ Upgrades can be made independent from their basic variants, so you might acquire e.g. a Seamoth Depth Module 3 long before you ever manage to get Module 1 or 2
 - ✔️ Most things you can make may also show up as an ingredient in other recipes. Do you really need that laser cutter, or do you craft it into Polyaniline?
 - ✔️ Items are balanced on an underlying value logic
-   - If you prefer pure chaos, simply turn on True Random mode!
+   - If you prefer pure chaos, simply turn on Chaotic mode!
 - ✔️ Easily share your seed with friends
 
 ## How to Use
@@ -29,7 +29,7 @@ The randomisation persists between play sessions and save games. If you decide t
    1. (Optional) Install [BlueprintTracker](https://www.nexusmods.com/subnautica/mods/22)
 3. Extract this mod into your Subnautica/QMods folder
    1. (Optional) Edit the config in the in-game options menu to your liking
-   2. Press the "Randomise with same seed" button
+   2. Press the "Randomise with new seed" button
 4. Enjoy!
 
 ## How to Build

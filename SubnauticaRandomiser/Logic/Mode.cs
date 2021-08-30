@@ -32,6 +32,12 @@ namespace SubnauticaRandomiser.Logic
         // but ensure its MaxUses field is respected.
         protected void AddIngredientWithMaxUsesCheck(RandomiserRecipe recipe, int amount)
         {
+            // Ensure that limited ingredients are not overused. Particularly
+            // intended for cuddlefish.
+            int remainder = recipe.MaxUsesPerGame - recipe._usedInRecipes;
+            if (recipe.MaxUsesPerGame != 0 && remainder > 0 && remainder < amount)
+                amount = remainder;
+
             _ingredients.Add(new RandomiserIngredient(recipe.TechType, amount));
             recipe._usedInRecipes++;
 
