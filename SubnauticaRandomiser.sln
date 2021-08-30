@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubnauticaRandomiser", "SubnauticaRandomiser\SubnauticaRandomiser.csproj", "{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubnauticaRandomizer", "StephenEngland\SubnauticaRandomizer\SubnauticaRandomizer.csproj", "{38D95DEF-5DB6-4F56-8060-DC08F5CD5F10}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{14E05614-1903-437D-AD80-25E6EE173917}"
 	ProjectSection(SolutionItems) = preProject
 		mod.json = mod.json
@@ -24,8 +22,6 @@ Global
 		{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}.Debug|x86.Build.0 = Debug|x86
 		{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}.Release|x86.ActiveCfg = Release|x86
 		{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}.Release|x86.Build.0 = Release|x86
-		{38D95DEF-5DB6-4F56-8060-DC08F5CD5F10}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{38D95DEF-5DB6-4F56-8060-DC08F5CD5F10}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		outputpath = "$SUBNAUTICA_DIR/QMods/SubnauticaRandomiser"

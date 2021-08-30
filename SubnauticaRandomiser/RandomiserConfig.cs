@@ -14,35 +14,41 @@ namespace SubnauticaRandomiser
         // show up in the in-game options menu
         public int iSeed = 0;
 
-        [Choice("Mode", "Balanced", "True Random")]
-        public int iRandomiserMode = 0;
+        [Choice("Mode", "Balanced", "Chaotic")]
+        public int iRandomiserMode = ConfigDefaults.iRandomiserMode;
 
         [Toggle("Use fish in logic?")]
-        public bool bUseFish = true;
+        public bool bUseFish = ConfigDefaults.bUseFish;
 
         [Toggle("Use eggs in logic?")]
-        public bool bUseEggs = false;
+        public bool bUseEggs = ConfigDefaults.bUseEggs;
 
         [Toggle("Use seeds in logic?")]
-        public bool bUseSeeds = true;
+        public bool bUseSeeds = ConfigDefaults.bUseSeeds;
 
         [Toggle("Randomise blueprints in databoxes?")]
-        public bool bRandomiseDataboxes = true;
+        public bool bRandomiseDataboxes = ConfigDefaults.bRandomiseDataboxes;
 
         [Toggle("Respect vanilla upgrade chains?")]
-        public bool bVanillaUpgradeChains = false;
+        public bool bVanillaUpgradeChains = ConfigDefaults.bVanillaUpgradeChains;
 
         [Toggle("Theme base parts around a common ingredient?")]
-        public bool bDoBaseTheming = false;
+        public bool bDoBaseTheming = ConfigDefaults.bDoBaseTheming;
 
         [Choice("Include equipment as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
-        public int iEquipmentAsIngredients = 1;
+        public int iEquipmentAsIngredients = ConfigDefaults.iEquipmentAsIngredients;
 
         [Choice("Include tools as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
-        public int iToolsAsIngredients = 1;
+        public int iToolsAsIngredients = ConfigDefaults.iToolsAsIngredients;
 
         [Choice("Include upgrades as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
-        public int iUpgradesAsIngredients = 1;
+        public int iUpgradesAsIngredients = ConfigDefaults.iUpgradesAsIngredients;
+
+        [Slider("Max number of a single ingredient", 1, 10, DefaultValue = 5)]
+        public int iMaxAmountPerIngredient = ConfigDefaults.iMaxAmountPerIngredient;
+
+        [Slider("Max ingredients per recipe", 1, 10, DefaultValue = 7)]
+        public int iMaxIngredientsPerRecipe = ConfigDefaults.iMaxIngredientsPerRecipe;
 
         [Button("Randomise with new seed")]
         public void NewRandomNewSeed()
@@ -76,13 +82,12 @@ namespace SubnauticaRandomiser
         }
 
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
-        public int iDepthSearchTime = 15;
-        public int iMaxAmountPerIngredient = 5;
-        public int iMaxBasicOutpostSize = 24;
-        public int iMaxEggsAsSingleIngredient = 1;
-        public int iMaxInventorySizePerRecipe = 24;
-        public double dFuzziness = 0.2;
-        public double dIngredientRatio = 0.45;
+        public int iDepthSearchTime = ConfigDefaults.iDepthSearchTime;
+        public int iMaxBasicOutpostSize = ConfigDefaults.iMaxBasicOutpostSize;
+        public int iMaxEggsAsSingleIngredient = ConfigDefaults.iMaxEggsAsSingleIngredient;
+        public int iMaxInventorySizePerRecipe = ConfigDefaults.iMaxInventorySizePerRecipe;
+        public double dFuzziness = ConfigDefaults.dFuzziness;
+        public double dIngredientRatio = ConfigDefaults.dIngredientRatio;
 
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
@@ -91,25 +96,27 @@ namespace SubnauticaRandomiser
         public void SanitiseConfigValues()
         {
             if (iRandomiserMode > 1 || iRandomiserMode < 0)
-                iRandomiserMode = 0;
+                iRandomiserMode = ConfigDefaults.iRandomiserMode;
             if (iToolsAsIngredients > 2 || iToolsAsIngredients < 0)
-                iToolsAsIngredients = 1;
+                iToolsAsIngredients = ConfigDefaults.iToolsAsIngredients;
             if (iUpgradesAsIngredients > 2 || iUpgradesAsIngredients < 0)
-                iUpgradesAsIngredients = 1;
+                iUpgradesAsIngredients = ConfigDefaults.iUpgradesAsIngredients;
             if (iDepthSearchTime > 45 || iDepthSearchTime < 0)
-                iDepthSearchTime = 15;
-            if (iMaxAmountPerIngredient > 20 || iMaxAmountPerIngredient < 1)
-                iMaxAmountPerIngredient = 5;
+                iDepthSearchTime = ConfigDefaults.iDepthSearchTime;
+            if (iMaxAmountPerIngredient > 10 || iMaxAmountPerIngredient < 1)
+                iMaxAmountPerIngredient = ConfigDefaults.iMaxAmountPerIngredient;
+            if (iMaxIngredientsPerRecipe > 10 || iMaxIngredientsPerRecipe < 1)
+                iMaxIngredientsPerRecipe = ConfigDefaults.iMaxIngredientsPerRecipe;
             if (iMaxBasicOutpostSize > 48 || iMaxBasicOutpostSize < 4)
-                iMaxBasicOutpostSize = 24;
+                iMaxBasicOutpostSize = ConfigDefaults.iMaxBasicOutpostSize;
             if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)
-                iMaxEggsAsSingleIngredient = 1;
+                iMaxEggsAsSingleIngredient = ConfigDefaults.iMaxEggsAsSingleIngredient;
             if (iMaxInventorySizePerRecipe > 100 || iMaxInventorySizePerRecipe < 4)
-                iMaxInventorySizePerRecipe = 24;
+                iMaxInventorySizePerRecipe = ConfigDefaults.iMaxInventorySizePerRecipe;
             if (dFuzziness > 1 || dFuzziness < 0)
-                dFuzziness = 0.2;
+                dFuzziness = ConfigDefaults.dFuzziness;
             if (dIngredientRatio > 1 || dIngredientRatio < 0)
-                dIngredientRatio = 0.45;
+                dIngredientRatio = ConfigDefaults.dIngredientRatio;
         }
 
         private bool EnsureButtonTime()
@@ -126,5 +133,29 @@ namespace SubnauticaRandomiser
             _timeButtonPressed = DateTime.UtcNow;
             return false;
         }
+    }
+
+    // Mostly used so that the spoiler log can tell which settings to include.
+    internal static class ConfigDefaults
+    {
+        internal static readonly int iRandomiserMode = 0;
+        internal static readonly bool bUseFish = true;
+        internal static readonly bool bUseEggs = false;
+        internal static readonly bool bUseSeeds = true;
+        internal static readonly bool bRandomiseDataboxes = true;
+        internal static readonly bool bVanillaUpgradeChains = false;
+        internal static readonly bool bDoBaseTheming = false;
+        internal static readonly int iEquipmentAsIngredients = 1;
+        internal static readonly int iToolsAsIngredients = 1;
+        internal static readonly int iUpgradesAsIngredients = 1;
+        internal static readonly int iMaxAmountPerIngredient = 5;
+        internal static readonly int iMaxIngredientsPerRecipe = 7;
+
+        internal static readonly int iDepthSearchTime = 15;
+        internal static readonly int iMaxBasicOutpostSize = 24;
+        internal static readonly int iMaxEggsAsSingleIngredient = 1;
+        internal static readonly int iMaxInventorySizePerRecipe = 24;
+        internal static readonly double dFuzziness = 0.2;
+        internal static readonly double dIngredientRatio = 0.45;
     }
 }

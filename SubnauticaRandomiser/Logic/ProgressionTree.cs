@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.Logic
 {
     public class ProgressionTree
     {
@@ -137,6 +136,8 @@ namespace SubnauticaRandomiser
 
             AddEssentialItem(EProgressionNode.Depth100m, TechType.BaseRoom);
             AddEssentialItem(EProgressionNode.Depth100m, TechType.Tank);
+
+            AddEssentialItem(EProgressionNode.Depth200m, TechType.Builder);
 
             AddEssentialItem(EProgressionNode.Depth300m, TechType.BaseWaterPark);
 

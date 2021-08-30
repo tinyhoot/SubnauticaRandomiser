@@ -27,4 +27,22 @@ namespace SubnauticaRandomiser
         BaseInternalPieces,
         BaseGenerators
     }
+
+    public static class Extensions
+    {
+        public static bool IsBasePiece(this ETechTypeCategory category)
+        {
+            switch (category)
+            {
+                case (ETechTypeCategory.BaseBasePieces):
+                case (ETechTypeCategory.BaseExternalModules):
+                case (ETechTypeCategory.BaseInternalModules):
+                case (ETechTypeCategory.BaseInternalPieces):
+                case (ETechTypeCategory.BaseGenerators):
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
 }

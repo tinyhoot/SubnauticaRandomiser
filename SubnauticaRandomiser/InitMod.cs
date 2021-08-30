@@ -5,6 +5,7 @@ using System.Reflection;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.Logic;
 
 namespace SubnauticaRandomiser
 {
@@ -61,7 +62,8 @@ namespace SubnauticaRandomiser
             // Triple checking things here in case the save got corrupted somehow
             if (!_debug_forceRandomise && s_masterDict != null && s_masterDict.DictionaryInstance != null && s_masterDict.DictionaryInstance.Count > 0)
             {
-                ProgressionManager.ApplyMasterDict(s_masterDict);
+                RandomiserLogic.ApplyMasterDict(s_masterDict);
+                
                 if (s_masterDict.isDataboxRandomised)
                     EnableHarmonyPatching();
 
@@ -103,14 +105,16 @@ namespace SubnauticaRandomiser
             if (databoxes == null || databoxes.Count == 0)
                 LogHandler.Error("Failed to extract databox information from CSV.");
 
-            ProgressionManager pm = new ProgressionManager(completeMaterialsList, databoxes, s_config.iSeed);
+            RandomiserLogic logic = new RandomiserLogic(s_config, completeMaterialsList, databoxes, s_config.iSeed);
 
-            pm.RandomSmart(s_masterDict, s_config);
+            logic.RandomSmart(s_masterDict);
             LogHandler.Info("Randomisation successful!");
 
             SaveRecipeStateToDisk();
+
+            SpoilerLog spoiler = new SpoilerLog(s_config);
             // This should run async, but we don't need the result here. It's a file.
-            _ = SpoilerLog.WriteLog();
+            _ = spoiler.WriteLog();
         }
 
         internal static void SaveRecipeStateToDisk()
