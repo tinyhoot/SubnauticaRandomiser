@@ -14,7 +14,7 @@ namespace SubnauticaRandomiser
         // show up in the in-game options menu
         public int iSeed = 0;
 
-        [Choice("Mode", "Balanced", "Random")]
+        [Choice("Mode", "Balanced", "Chaotic")]
         public int iRandomiserMode = 0;
 
         [Toggle("Use fish in logic?")]
