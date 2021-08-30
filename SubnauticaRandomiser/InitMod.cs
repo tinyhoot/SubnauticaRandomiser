@@ -111,8 +111,10 @@ namespace SubnauticaRandomiser
             LogHandler.Info("Randomisation successful!");
 
             SaveRecipeStateToDisk();
+
+            SpoilerLog spoiler = new SpoilerLog(s_config);
             // This should run async, but we don't need the result here. It's a file.
-            _ = SpoilerLog.WriteLog();
+            _ = spoiler.WriteLog();
         }
 
         internal static void SaveRecipeStateToDisk()
