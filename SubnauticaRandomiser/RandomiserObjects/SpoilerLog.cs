@@ -11,13 +11,8 @@ namespace SubnauticaRandomiser
         internal static readonly string s_fileName = "spoilerlog.txt";
         private RandomiserConfig _config;
         internal static List<KeyValuePair<TechType, int>> s_progression = new List<KeyValuePair<TechType, int>>();
-        private List<string> _preparedAdvSettings;
-        private List<string> _preparedDataboxes;
-        private List<string> _preparedProgressionPath;
-        private string _preparedMD5;
 
         private List<string> _basicOptions;
-
         private string[] _contentHeader;
         private string[] _contentBasics;
         private string[] _contentAdvanced;
@@ -81,9 +76,9 @@ namespace SubnauticaRandomiser
 
         // Add advanced settings to the spoiler log, but only if they have been
         // modified.
-        private void PrepareAdvancedSettings()
+        private string[] PrepareAdvancedSettings()
         {
-            _preparedAdvSettings = new List<string>();
+            List<string> preparedAdvSettings = new List<string>();
             FieldInfo[] defaultFieldInfoArray = typeof(ConfigDefaults).GetFields(BindingFlags.NonPublic | BindingFlags.Static);
             FieldInfo[] fieldInfoArray = typeof(RandomiserConfig).GetFields(BindingFlags.Public | BindingFlags.Instance);
 
@@ -106,88 +101,92 @@ namespace SubnauticaRandomiser
                     // default value, the user must have modified it. Add it to
                     // the list in that case.
                     if (!value.Equals(defaultField.GetValue(null)))
-                        _preparedAdvSettings.Add(field.Name + ": " + value);
+                        preparedAdvSettings.Add(field.Name + ": " + value);
 
                     break;
                 }
             }
 
-            if (_preparedAdvSettings.Count == 0)
-                _preparedAdvSettings.Add("No advanced settings were modified.");
+            if (preparedAdvSettings.Count == 0)
+                preparedAdvSettings.Add("No advanced settings were modified.");
+
+            return preparedAdvSettings.ToArray();
         }
 
         // Grab the randomised boxes from masterDict, and sort them alphabetically.
-        private void PrepareDataboxes()
+        private string[] PrepareDataboxes()
         {
-            _preparedDataboxes = new List<string>();
+            if (!InitMod.s_masterDict.isDataboxRandomised)
+                return new string[] { "Not randomised, all in vanilla locations." };
 
-            if (InitMod.s_masterDict.isDataboxRandomised)
-            {
-                foreach (KeyValuePair<RandomiserVector, TechType> entry in InitMod.s_masterDict.Databoxes){
-                    _preparedDataboxes.Add(entry.Value.AsString() + " can be found at " + entry.Key);
-                }
+            List<string> preparedDataboxes = new List<string>();
 
-                _preparedDataboxes.Sort();
-            }
-            else
+            foreach (KeyValuePair<RandomiserVector, TechType> entry in InitMod.s_masterDict.Databoxes) 
             {
-                _preparedDataboxes.Add("Not randomised, all in vanilla locations.");
+                preparedDataboxes.Add(entry.Value.AsString() + " can be found at " + entry.Key);
             }
+
+            preparedDataboxes.Sort();
+
+            return preparedDataboxes.ToArray();
         }
 
         // Compare the MD5 of the recipe CSV and try to see if it's still the same.
         // Since this is done while parsing the CSV anyway, grab the value from there.
-        private void PrepareMD5()
+        private string PrepareMD5()
         {
             if (!InitMod.s_expectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
             {
-                _preparedMD5 = "recipeInformation.csv has been modified: " + CSVReader.s_recipeCSVMD5;
+                return "recipeInformation.csv has been modified: " + CSVReader.s_recipeCSVMD5;
             }
             else
             {
-                _preparedMD5 = "recipeInformation.csv is unmodified.";
+                return "recipeInformation.csv is unmodified.";
             }
         }
 
         // Make the data gathered during randomising a bit nicer for human eyes.
-        private void PrepareProgressionPath()
+        private string[] PrepareProgressionPath()
         {
-            _preparedProgressionPath = new List<string>();
+            List <string> preparedProgressionPath = new List<string>();
             int lastDepth = 0;
 
             foreach (KeyValuePair<TechType, int> pair in s_progression)
             {
                 if (pair.Value > lastDepth)
                 {
-                    _preparedProgressionPath.Add("Craft " + pair.Key.AsString() + " to reach " + pair.Value + "m");
+                    preparedProgressionPath.Add("Craft " + pair.Key.AsString() + " to reach " + pair.Value + "m");
                 }
                 else
                 {
-                    _preparedProgressionPath.Add("Unlocked " + pair.Key.AsString() + ".");
+                    preparedProgressionPath.Add("Unlocked " + pair.Key.AsString() + ".");
                 }
 
                 lastDepth = pair.Value;
             }
+
+            return preparedProgressionPath.ToArray();
         }
 
         internal async Task WriteLog()
         {
+            List<string> lines = new List<string>();
             PrepareStrings();
-            PrepareAdvancedSettings();
-            PrepareDataboxes();
-            PrepareMD5();
-            PrepareProgressionPath();
+
+            lines.AddRange(_contentHeader);
+            lines.Add(PrepareMD5());
+
+            lines.AddRange(_contentBasics);
+            lines.AddRange(PrepareAdvancedSettings());
+            lines.AddRange(_contentAdvanced);
+
+            lines.AddRange(PrepareProgressionPath());
+            lines.AddRange(_contentDataboxes);
+            lines.AddRange(PrepareDataboxes());
 
             using (StreamWriter file = new StreamWriter(Path.Combine(InitMod.s_modDirectory, s_fileName)))
             {
-                await WriteTextToLog(file, _contentHeader);
-                await WriteTextToLog(file, _preparedMD5);
-                await WriteTextToLog(file, _contentBasics);
-                await WriteTextToLog(file, _preparedAdvSettings.ToArray());
-                await WriteTextToLog(file, _contentAdvanced);
-                await WriteTextToLog(file, _preparedProgressionPath.ToArray());
-                await WriteTextToLog(file, _contentDataboxes);
-                await WriteTextToLog(file, _preparedDataboxes.ToArray());
+                await WriteTextToLog(file, lines.ToArray());
             }
 
             LogHandler.Info("Wrote spoiler log to disk.");
