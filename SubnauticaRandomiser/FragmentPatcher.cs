@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
+using HarmonyLib;
 using SMLHelper.V2.Handlers;
 using static LootDistributionData;
 
 namespace SubnauticaRandomiser
 {
+    [HarmonyPatch]
     public class FragmentPatcher
     {
+
         public FragmentPatcher()
         {
         }
@@ -72,6 +77,71 @@ namespace SubnauticaRandomiser
              * the spawns of fish. Ghost leviathan in the shallows? Suddenly possible.            
              * 
              */
+        }
+
+        // This method patches a few lines into PDAScanner.Scan() to make that
+        // massive thing do what we want. Instead of hard-coding two titanium
+        // on scanning a duplicate fragment, the game will instead call YieldMaterial()
+        // in this class here.
+        //[HarmonyDebug]
+        [HarmonyTranspiler]
+        [HarmonyPatch(typeof(PDAScanner), nameof(PDAScanner.Scan))]
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codeInstructions)
+        {
+            LogHandler.Debug("Starting transpiler for duplicate scan results.");
+
+            List<CodeInstruction> instructions = new List<CodeInstruction>(codeInstructions);
+
+            string errorMsgBeforeMethodCall = "ScannerRedundantScanned";
+            int methodArgsIndex = 0;
+
+            // Before the crucial call that adds two titanium on duplicate scan,
+            // the game actually logs an error message. We abuse this fact to
+            // easily find the code lines we need.
+            for (int i = 0; i < instructions.Count; i++)
+            {
+                if (instructions[i].Is(OpCodes.Ldstr, errorMsgBeforeMethodCall))
+                {
+                    // Found the debug error message just before the method we need to alter.
+                    // The part we're here for is somewhere in the next few lines.
+                    for (int j = 1; j < 5; j++)
+                    {
+                        // The crucial line is a four-argument call to CraftData.AddToInventory().
+                        // The first of those arguments is TechType Titanium.
+                        if (instructions[i+j].Is(OpCodes.Ldc_I4_S, 16))
+                        {
+                            // Found the instruction pushing TechType 16 (Titanium) onto the stack.
+                            methodArgsIndex = i + j;
+                            LogHandler.Debug("Found arg0 Titanium at index " + methodArgsIndex);
+
+                            // The original method takes four arguments, but the replacment needs
+                            // only one. Replace the first argument with the scan target (conveniently
+                            // stored in local variable 0) and the others with NOP to preserve continuity.
+                            instructions[methodArgsIndex].opcode = OpCodes.Ldloc_0;
+                            instructions[methodArgsIndex + 1].opcode = OpCodes.Nop;
+                            instructions[methodArgsIndex + 2].opcode = OpCodes.Nop;
+                            instructions[methodArgsIndex + 3].opcode = OpCodes.Nop;
+                            instructions[methodArgsIndex + 4].operand = typeof(FragmentPatcher).GetMethod("YieldMaterial", new Type[] { typeof(TechType) });
+
+                            LogHandler.Debug("Successfully altered CodeInstructions.");
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (methodArgsIndex == 0)
+                LogHandler.Error("Failed to find argument index while trying to transpile fragment scan rewards!");
+
+            return instructions.AsEnumerable();
+        }
+
+        public static void YieldMaterial(TechType target)
+        {
+            LogHandler.Debug("Replacing duplicate fragment scan yield of target " + target.AsString());
+
+            // TODO
         }
     }
 }
