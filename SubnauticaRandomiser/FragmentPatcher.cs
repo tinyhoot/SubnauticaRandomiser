@@ -114,7 +114,7 @@ namespace SubnauticaRandomiser
                             methodArgsIndex = i + j;
                             LogHandler.Debug("Found arg0 Titanium at index " + methodArgsIndex);
 
-                            // The original method takes four arguments, but the replacment needs
+                            // The original method takes four arguments, but the replacement needs
                             // only one. Replace the first argument with the scan target (conveniently
                             // stored in local variable 0) and the others with NOP to preserve continuity.
                             instructions[methodArgsIndex].opcode = OpCodes.Ldloc_0;
@@ -142,6 +142,7 @@ namespace SubnauticaRandomiser
             LogHandler.Debug("Replacing duplicate fragment scan yield of target " + target.AsString());
 
             // TODO
+            //CraftData.AddToInventory(TechType.None, 2, false, true);
         }
     }
 }

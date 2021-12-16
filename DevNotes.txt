@@ -10,6 +10,8 @@
   - Make it possible to randomise the amount of fragments
     needed for each blueprint.
   - Is it possible to swap fragments around?
+  - Change what resources you get upon scanning duplicate fragments
+    - Maybe you'd get one or two resources needed to build what you scanned?
     
 - Add a casual mode.
   - Casual mode would respect vanilla upgrade chains and be more lenient with its
@@ -50,6 +52,9 @@
       of this, it also does not have an entry in masterDict.
     - Abuse this and file the new recipe for whatever scrap metal can be turned
       *into* under scrap metal.
+      
+- Cleanup
+  - Deal with the mess that is InitMod.
 
    
   
@@ -64,3 +69,19 @@ Thoughts from a playthrough:
 
 Thoughts from users:
 - Add console commands to reroll a specific recipe only.
+
+Other:
+- Sea treaders are a potential anti softlock mechanism. You could change their
+  poop and shale into something useful on the fly, or make shale always contain
+  something useful in the first place.
+  
+  
+  
+WHAT NEEDS TO HAPPEN TO BE ABLE TO DO FRAGMENTS:
+- Understand which biomes support fragments, raw materials, or fish
+- Understand which biomes support which sizes of what (I *think* this mostly
+  applies to fragments and prefabs, but not sure)
+- Understand how many EntitySlots of each type there are in each biome and how
+  that impacts necessary spawn rates
+- Determine whether simply changing the BiomeData produces the desired results,
+  or if there are cases where this does nothing (Nuclear Reactor?)

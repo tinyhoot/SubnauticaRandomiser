@@ -19,7 +19,7 @@ namespace SubnauticaRandomiser
         internal static readonly string s_expectedRecipeMD5 = "ff1123bdfecfe7d473ca13c0c61a0aa3";
         internal static readonly int s_expectedSaveVersion = 2;
         internal static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string> { [1] = "v0.5.1", 
-                                                                                                       [2] = "v0.6.0"};
+                                                                                                       [2] = "v0.6.1"};
 
         // The master list of all recipes that have been modified
         internal static RecipeDictionary s_masterDict = new RecipeDictionary();
@@ -83,7 +83,9 @@ namespace SubnauticaRandomiser
 
             LogHandler.Info("Finished loading.");
 
-            FragmentPatcher.EditLootDistribution();
+            //FragmentPatcher.EditLootDistribution();
+            FragmentLogic fl = new FragmentLogic();
+            fl.Test();
         }
 
         internal static void Randomise()
