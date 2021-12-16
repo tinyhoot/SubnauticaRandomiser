@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.RandomiserObjects;
 using UnityEngine;
 
 namespace SubnauticaRandomiser.Logic
@@ -16,7 +17,7 @@ namespace SubnauticaRandomiser.Logic
         private List<Databox> _databoxes;
         private Mode _mode;
 
-        public RandomiserLogic(RandomiserConfig config, List<RandomiserRecipe> allMaterials, List<Databox> databoxes = null, int seed = 0)
+        public RandomiserLogic(RandomiserConfig config, List<LogicEntity> allMaterials, List<Databox> databoxes = null, int seed = 0)
         {
             if (seed == 0)
                 _random = new System.Random();
@@ -87,13 +88,13 @@ namespace SubnauticaRandomiser.Logic
                 //ChangeScrapMetalResult(_baseTheme);
             }
 
-            foreach (RandomiserRecipe r in _materials.GetAll().FindAll(x => 
-                                                            !x.Category.Equals(ETechTypeCategory.RawMaterials) 
-                                                         && !x.Category.Equals(ETechTypeCategory.Fish) 
-                                                         && !x.Category.Equals(ETechTypeCategory.Seeds)
-                                                         && !x.Category.Equals(ETechTypeCategory.Eggs)))
+            foreach (LogicEntity e in _materials.GetAll().FindAll(x => 
+                                                            !x.Recipe.Category.Equals(ETechTypeCategory.RawMaterials) 
+                                                         && !x.Recipe.Category.Equals(ETechTypeCategory.Fish) 
+                                                         && !x.Recipe.Category.Equals(ETechTypeCategory.Seeds)
+                                                         && !x.Recipe.Category.Equals(ETechTypeCategory.Eggs)))
             {
-                toBeRandomised.Add(r.TechType);
+                toBeRandomised.Add(e.TechType);
             }
 
             bool newProgressionItem = true;
@@ -187,18 +188,18 @@ namespace SubnauticaRandomiser.Logic
                 // which has not yet been randomised.
                 if (nextType.Equals(TechType.None))
                     nextType = GetRandom(toBeRandomised);
-                RandomiserRecipe nextRecipe = _materials.GetAll().Find(x => x.TechType.Equals(nextType));
+                LogicEntity nextEntity = _materials.GetAll().Find(x => x.TechType.Equals(nextType));
 
                 // Does this recipe have all of its prerequisites fulfilled?
-                if (CheckRecipeForBlueprint(masterDict, _databoxes, nextRecipe, reachableDepth) && CheckRecipeForPrerequisites(masterDict, nextRecipe))
+                if (CheckRecipeForBlueprint(masterDict, _databoxes, nextEntity, reachableDepth) && CheckRecipeForPrerequisites(masterDict, nextEntity))
                 {
                     // Found a good recipe! Randomise it.
-                    nextRecipe = _mode.RandomiseIngredients(nextRecipe);
+                    nextEntity = _mode.RandomiseIngredients(nextEntity);
 
                     // Make sure it's not an item that cannot be an ingredient.
-                    if (nextRecipe.CanFunctionAsIngredient())
-                        _materials.AddReachable(nextRecipe);
-                    ApplyRandomisedRecipe(masterDict, nextRecipe);
+                    if (nextEntity.Recipe.CanFunctionAsIngredient())
+                        _materials.AddReachable(nextEntity);
+                    ApplyRandomisedRecipe(masterDict, nextEntity.Recipe);
                     toBeRandomised.Remove(nextType);
                     
                     // Handling knives as a special case.
@@ -464,23 +465,23 @@ namespace SubnauticaRandomiser.Logic
         }
 
         // Check if this recipe fulfills all conditions to have its blueprint be unlocked
-        private bool CheckRecipeForBlueprint(RecipeDictionary masterDict, List<Databox> databoxes, RandomiserRecipe recipe, int depth)
+        private bool CheckRecipeForBlueprint(RecipeDictionary masterDict, List<Databox> databoxes, LogicEntity entity, int depth)
         {
             bool fulfilled = true;
 
-            if (recipe.Blueprint == null || (recipe.Blueprint.UnlockConditions == null && recipe.Blueprint.UnlockDepth == 0))
+            if (entity.Blueprint == null || (entity.Blueprint.UnlockConditions == null && entity.Blueprint.UnlockDepth == 0))
                 return true;
 
             // If the databox was randomised, do work to account for new locations.
             // Cyclops hull modules need extra special treatment.
-            if (recipe.Blueprint.NeedsDatabox && databoxes != null && databoxes.Count > 0 && !recipe.TechType.Equals(TechType.CyclopsHullModule2) && !recipe.TechType.Equals(TechType.CyclopsHullModule3))
+            if (entity.Blueprint.NeedsDatabox && databoxes != null && databoxes.Count > 0 && !entity.TechType.Equals(TechType.CyclopsHullModule2) && !entity.TechType.Equals(TechType.CyclopsHullModule3))
             {
                 int total = 0;
                 int number = 0;
                 int lasercutter = 0;
                 int propulsioncannon = 0;
 
-                foreach (Databox box in databoxes.FindAll(x => x.TechType.Equals(recipe.TechType)))
+                foreach (Databox box in databoxes.FindAll(x => x.TechType.Equals(entity.TechType)))
                 {
                     total += (int)Math.Abs(box.Coordinates.y);
                     number++;
@@ -491,10 +492,10 @@ namespace SubnauticaRandomiser.Logic
                         propulsioncannon++;
                 }
 
-                LogHandler.Debug("[B] Found " + number + " databoxes for " + recipe.TechType.AsString());
+                LogHandler.Debug("[B] Found " + number + " databoxes for " + entity.TechType.AsString());
 
-                recipe.Blueprint.UnlockDepth = total / number;
-                if (recipe.TechType.Equals(TechType.CyclopsHullModule1))
+                entity.Blueprint.UnlockDepth = total / number;
+                if (entity.TechType.Equals(TechType.CyclopsHullModule1))
                 {
                     _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2)).Blueprint.UnlockDepth = total / number;
                     _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3)).Blueprint.UnlockDepth = total / number;
@@ -504,8 +505,8 @@ namespace SubnauticaRandomiser.Logic
                 // tool to access the box, add it to the requirements for the recipe
                 if (lasercutter / number >= 0.5)
                 {
-                    recipe.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
-                    if (recipe.TechType.Equals(TechType.CyclopsHullModule1))
+                    entity.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
+                    if (entity.TechType.Equals(TechType.CyclopsHullModule1))
                     {
                         _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2)).Blueprint.UnlockConditions.Add(TechType.LaserCutter);
                         _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3)).Blueprint.UnlockConditions.Add(TechType.LaserCutter);
@@ -514,8 +515,8 @@ namespace SubnauticaRandomiser.Logic
 
                 if (propulsioncannon / number >= 0.5)
                 {
-                    recipe.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
-                    if (recipe.TechType.Equals(TechType.CyclopsHullModule1))
+                    entity.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
+                    if (entity.TechType.Equals(TechType.CyclopsHullModule1))
                     {
                         _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2)).Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
                         _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3)).Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
@@ -523,20 +524,20 @@ namespace SubnauticaRandomiser.Logic
                 }
             }
 
-            foreach (TechType condition in recipe.Blueprint.UnlockConditions)
+            foreach (TechType condition in entity.Blueprint.UnlockConditions)
             {
-                RandomiserRecipe conditionRecipe = _materials.GetAll().Find(x => x.TechType.Equals(condition));
+                LogicEntity conditionEntity = _materials.GetAll().Find(x => x.TechType.Equals(condition));
 
                 // Without this piece, the Air bladder will hang if fish are not
                 // enabled for the logic, as it fruitlessly searches for a bladderfish
                 // which never enters its algorithm.
                 // Eggs and seeds are never problematic in vanilla, but are covered
                 // in case users add their own modded items with those.
-                if (!_config.bUseFish && conditionRecipe.Category.Equals(ETechTypeCategory.Fish))
+                if (!_config.bUseFish && conditionEntity.Recipe.Category.Equals(ETechTypeCategory.Fish))
                     continue;
-                if (!_config.bUseEggs && conditionRecipe.Category.Equals(ETechTypeCategory.Eggs))
+                if (!_config.bUseEggs && conditionEntity.Recipe.Category.Equals(ETechTypeCategory.Eggs))
                     continue;
-                if (!_config.bUseSeeds && conditionRecipe.Category.Equals(ETechTypeCategory.Seeds))
+                if (!_config.bUseSeeds && conditionEntity.Recipe.Category.Equals(ETechTypeCategory.Seeds))
                     continue;
 
                 fulfilled &= (masterDict.DictionaryInstance.ContainsKey(condition) || _materials.GetReachable().Exists(x => x.TechType.Equals(condition)));
@@ -545,7 +546,7 @@ namespace SubnauticaRandomiser.Logic
                     return false;
             }
 
-            if (recipe.Blueprint.UnlockDepth > depth)
+            if (entity.Blueprint.UnlockDepth > depth)
             {
                 fulfilled = false;
             }
@@ -553,19 +554,19 @@ namespace SubnauticaRandomiser.Logic
             return fulfilled;
         }
 
-        private static bool CheckRecipeForPrerequisites(RecipeDictionary masterDict, RandomiserRecipe recipe)
+        private static bool CheckRecipeForPrerequisites(RecipeDictionary masterDict, LogicEntity entity)
         {
             bool fulfilled = true;
 
             // The builder tool must always be randomised before any base pieces
             // ever become accessible.
-            if (recipe.Category.IsBasePiece() && !masterDict.DictionaryInstance.ContainsKey(TechType.Builder))
+            if (entity.Recipe.Category.IsBasePiece() && !masterDict.DictionaryInstance.ContainsKey(TechType.Builder))
                 return false;
 
-            if (recipe.Prerequisites == null)
+            if (entity.Recipe.Prerequisites == null)
                 return true;
 
-            foreach (TechType t in recipe.Prerequisites)
+            foreach (TechType t in entity.Recipe.Prerequisites)
             {
                 fulfilled &= masterDict.DictionaryInstance.ContainsKey(t);
                 if (!fulfilled)

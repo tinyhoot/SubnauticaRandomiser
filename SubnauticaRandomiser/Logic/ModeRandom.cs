@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser.Logic
 {
     internal class ModeRandom : Mode
     {
-        private List<RandomiserRecipe> _reachableMaterials;
+        private List<LogicEntity> _reachableMaterials;
 
         internal ModeRandom(RandomiserConfig config, Materials materials, ProgressionTree tree, Random random) : base(config, materials, tree, random)
         {
@@ -15,37 +16,37 @@ namespace SubnauticaRandomiser.Logic
 
         // Fill a given recipe with ingredients. This algorithm mostly uses random
         // number generation to fill in the gaps.
-        internal override RandomiserRecipe RandomiseIngredients(RandomiserRecipe recipe)
+        internal override LogicEntity RandomiseIngredients(LogicEntity entity)
         {
             int number = _random.Next(1, _config.iMaxIngredientsPerRecipe + 1);
             int totalInvSize = 0;
             _ingredients = new List<RandomiserIngredient>();
-            UpdateBlacklist(recipe);
+            UpdateBlacklist(entity.Recipe);
 
             for (int i = 1; i <= number; i++)
             {
-                RandomiserRecipe ingredientRecipe = GetRandom(_reachableMaterials, _blacklist);
+                LogicEntity ingredientEntity = GetRandom(_reachableMaterials, _blacklist);
 
                 // Prevent duplicates.
-                if (_ingredients.Exists(x => x.techType == ingredientRecipe.TechType))
+                if (_ingredients.Exists(x => x.techType == ingredientEntity.TechType))
                 {
                     i--;
                     continue;
                 }
 
                 // Disallow the builder tool from being used in base pieces.
-                if (recipe.Category.IsBasePiece() && ingredientRecipe.TechType.Equals(TechType.Builder))
+                if (entity.Category.IsBasePiece() && ingredientEntity.TechType.Equals(TechType.Builder))
                 {
                     i--;
                     continue;
                 }
 
-                int max = FindMaximum(ingredientRecipe);
+                int max = FindMaximum(ingredientEntity);
 
-                RandomiserIngredient ingredient = new RandomiserIngredient(ingredientRecipe.TechType, _random.Next(1, max + 1));
+                RandomiserIngredient ingredient = new RandomiserIngredient(ingredientEntity.TechType, _random.Next(1, max + 1));
 
-                AddIngredientWithMaxUsesCheck(ingredientRecipe, ingredient.amount);
-                totalInvSize += ingredientRecipe.GetItemSize() * ingredient.amount;
+                AddIngredientWithMaxUsesCheck(ingredientEntity, ingredient.amount);
+                totalInvSize += ingredientEntity.Recipe.GetItemSize() * ingredient.amount;
 
                 LogHandler.Debug("    Adding ingredient: " + ingredient.techType.AsString() + ", " + ingredient.amount);
 
@@ -56,23 +57,23 @@ namespace SubnauticaRandomiser.Logic
                 }
             }
 
-            recipe.Ingredients = _ingredients;
-            recipe.CraftAmount = CraftDataHandler.GetTechData(recipe.TechType).craftAmount;
-            return recipe;
+            entity.Recipe.Ingredients = _ingredients;
+            entity.Recipe.CraftAmount = CraftDataHandler.GetTechData(entity.TechType).craftAmount;
+            return entity;
         }
 
-        private int FindMaximum(RandomiserRecipe recipe)
+        private int FindMaximum(LogicEntity entity)
         {
             int max = _config.iMaxAmountPerIngredient;
 
             // Tools and upgrades do not stack, but if the recipe would
             // require several and you have more than one in inventory,
             // it will consume all of them.
-            if (recipe.Category.Equals(ETechTypeCategory.Tools) || recipe.Category.Equals(ETechTypeCategory.VehicleUpgrades) || recipe.Category.Equals(ETechTypeCategory.WorkBenchUpgrades))
+            if (entity.Category.Equals(ETechTypeCategory.Tools) || entity.Category.Equals(ETechTypeCategory.VehicleUpgrades) || entity.Category.Equals(ETechTypeCategory.WorkBenchUpgrades))
                 max = 1;
 
             // Never require more than one (default) egg. That's tedious.
-            if (recipe.Category.Equals(ETechTypeCategory.Eggs))
+            if (entity.Category.Equals(ETechTypeCategory.Eggs))
                 max = _config.iMaxEggsAsSingleIngredient;
 
             return max;

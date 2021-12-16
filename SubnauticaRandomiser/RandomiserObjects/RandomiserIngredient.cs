@@ -1,5 +1,5 @@
 ﻿using System;
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.RandomiserObjects
 {
     [Serializable]
     public class RandomiserIngredient : IIngredient

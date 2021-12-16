@@ -68,32 +68,32 @@
     <Compile Include="RandomiserObjects\SpawnData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="QModInstaller">
-      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\BepInEx\plugins\QModManager\QModInstaller.dll</HintPath>
-    </Reference>
-    <Reference Include="0Harmony">
-      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\BepInEx\core\0Harmony.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="SMLHelper">
-      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
-    </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    <Reference Include="System" />
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp_publicized">
-      <HintPath>..\..\..\..\..\lutris\epic-games-store\drive_c\Program Files\Epic Games\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="System" />
+    <Reference Include="Assembly-CSharp-firstpass_publicized">
+      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
+    </Reference>
+    <Reference Include="QModInstaller">
+      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\BepInEx\plugins\QModManager\QModInstaller.dll</HintPath>
+    </Reference>
+    <Reference Include="SMLHelper">
+      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="RandomiserObjects\" />

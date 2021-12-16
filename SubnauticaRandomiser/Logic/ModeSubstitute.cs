@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -24,18 +25,18 @@ namespace SubnauticaRandomiser.Logic
         // but fall back on substitution for choosing ingredients.
         internal void RandomSubstituteMaterials(RecipeDictionary masterDict, bool useFish, bool useSeeds)
         {
-            List<RandomiserRecipe> randomRecipes = new List<RandomiserRecipe>();
+            List<LogicEntity> randomEntities = new List<LogicEntity>();
             LogHandler.Info("Randomising using simple substitution...");
 
-            randomRecipes = _materials.GetAll().FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials)
+            randomEntities = _materials.GetAll().FindAll(x => !x.Category.Equals(ETechTypeCategory.RawMaterials)
                                                     && !x.Category.Equals(ETechTypeCategory.Fish)
                                                     && !x.Category.Equals(ETechTypeCategory.Seeds)
                                                     );
 
-            foreach (RandomiserRecipe randomiseMe in randomRecipes)
+            foreach (LogicEntity randomiseMe in randomEntities)
             {
-                List<RandomiserIngredient> ingredients = randomiseMe.Ingredients;
-                int depth = randomiseMe.Depth;
+                List<RandomiserIngredient> ingredients = randomiseMe.Recipe.Ingredients;
+                int depth = randomiseMe.AccessibleDepth;
                 LogHandler.Debug("Randomising recipe for " + randomiseMe.TechType.AsString());
 
                 for (int i = 0; i < ingredients.Count; i++)
@@ -45,9 +46,9 @@ namespace SubnauticaRandomiser.Logic
                     // Find the Recipe object that matches the TechType of the
                     // ingredient we aim to randomise. With the Recipe, we have
                     // access to much more complete data like the item's category.
-                    RandomiserRecipe matchRecipe = _materials.GetAll().Find(x => x.TechType.Equals(ingredients[i].techType));
+                    LogicEntity matchRecipe = _materials.GetAll().Find(x => x.TechType.Equals(ingredients[i].techType));
 
-                    if (randomiseMe.Prerequisites != null && randomiseMe.Prerequisites.Count > i)
+                    if (randomiseMe.Recipe.Prerequisites != null && randomiseMe.Recipe.Prerequisites.Count > i)
                     {
                         // In vanilla Subnautica, in a recipe where something gets
                         // upgraded (commonly at the Modification Station), it is
@@ -59,19 +60,19 @@ namespace SubnauticaRandomiser.Logic
 
                     // Special handling for Fish and Seeds, which are treated as 
                     // raw materials if enabled in the config.
-                    List<RandomiserRecipe> match = new List<RandomiserRecipe>();
+                    List<LogicEntity> match = new List<LogicEntity>();
                     if (matchRecipe.Category.Equals(ETechTypeCategory.RawMaterials) && (useFish || useSeeds))
                     {
                         if (useFish && useSeeds)
-                            match = _materials.GetAll().FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Depth <= randomiseMe.Depth);
+                            match = _materials.GetAll().FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.AccessibleDepth <= randomiseMe.AccessibleDepth);
                         if (useFish && !useSeeds)
-                            match = _materials.GetAll().FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish)) && x.Depth <= randomiseMe.Depth);
+                            match = _materials.GetAll().FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Fish)) && x.AccessibleDepth <= randomiseMe.AccessibleDepth);
                         if (!useFish && useSeeds)
-                            match = _materials.GetAll().FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.Depth <= randomiseMe.Depth);
+                            match = _materials.GetAll().FindAll(x => (x.Category.Equals(matchRecipe.Category) || x.Category.Equals(ETechTypeCategory.Seeds)) && x.AccessibleDepth <= randomiseMe.AccessibleDepth);
                     }
                     else
                     {
-                        match = _materials.GetAll().FindAll(x => x.Category.Equals(matchRecipe.Category) && x.Depth <= randomiseMe.Depth);
+                        match = _materials.GetAll().FindAll(x => x.Category.Equals(matchRecipe.Category) && x.AccessibleDepth <= randomiseMe.AccessibleDepth);
                     }
 
                     if (match.Count > 0)
@@ -98,7 +99,7 @@ namespace SubnauticaRandomiser.Logic
                         }
 
                         LogHandler.Debug("  Replacing ingredient with " + match[index].TechType.AsString());
-                        randomiseMe.Ingredients[i].techType = match[index].TechType;
+                        randomiseMe.Recipe.Ingredients[i].techType = match[index].TechType;
                     }
                     else
                     {
@@ -106,7 +107,7 @@ namespace SubnauticaRandomiser.Logic
                     }
                 }
 
-                RandomiserLogic.ApplyRandomisedRecipe(masterDict, randomiseMe);
+                RandomiserLogic.ApplyRandomisedRecipe(masterDict, randomiseMe.Recipe);
             }
             LogHandler.Info("Finished randomising.");
 

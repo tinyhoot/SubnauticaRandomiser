@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser.Logic
 {
     internal class ModeBalanced : Mode
     {
         private int _basicOutpostSize;
-        private List<RandomiserRecipe> _reachableMaterials;
+        private List<LogicEntity> _reachableMaterials;
 
         internal ModeBalanced(RandomiserConfig config, Materials materials, ProgressionTree tree, Random random) : base(config, materials, tree, random)
         {
@@ -18,21 +19,21 @@ namespace SubnauticaRandomiser.Logic
         // Fill a given recipe with ingredients. This class uses a value arithmetic
         // to balance hard to reach materials against easier ones, and tries to
         // provide a well-rounded, curated experience.
-        internal override RandomiserRecipe RandomiseIngredients(RandomiserRecipe recipe)
+        internal override LogicEntity RandomiseIngredients(LogicEntity entity)
         {
             _ingredients = new List<RandomiserIngredient>();
-            UpdateBlacklist(recipe);
-            double targetValue = recipe.Value;
+            UpdateBlacklist(entity.Recipe);
+            double targetValue = entity.Value;
             int currentValue = 0;
-            recipe.Value = 0;
+            entity.Value = 0;
             int totalSize = 0;
 
-            LogHandler.Debug("Figuring out ingredients for " + recipe.TechType.AsString());
+            LogHandler.Debug("Figuring out ingredients for " + entity.TechType.AsString());
 
-            RandomiserRecipe primaryIngredient = ChoosePrimaryIngredient(recipe, targetValue);
+            LogicEntity primaryIngredient = ChoosePrimaryIngredient(entity, targetValue);
 
             // Disallow the builer tool from being used in base pieces.
-            if (recipe.Category.IsBasePiece() && primaryIngredient.TechType.Equals(TechType.Builder))
+            if (entity.Category.IsBasePiece() && primaryIngredient.TechType.Equals(TechType.Builder))
                 primaryIngredient = ReplaceWithSimilarValue(primaryIngredient);
 
             AddIngredientWithMaxUsesCheck(primaryIngredient, 1);
@@ -45,14 +46,14 @@ namespace SubnauticaRandomiser.Logic
             // Converted to do-while since we want this to happen at least once.
             do
             {
-                RandomiserRecipe ingredient = GetRandom(_reachableMaterials, _blacklist);
+                LogicEntity ingredient = GetRandom(_reachableMaterials, _blacklist);
 
                 // Prevent duplicates.
                 if (_ingredients.Exists(x => x.techType == ingredient.TechType))
                     continue;
 
                 // Disallow the builder tool from being used in base pieces.
-                if (recipe.Category.IsBasePiece() && ingredient.TechType.Equals(TechType.Builder))
+                if (entity.Category.IsBasePiece() && ingredient.TechType.Equals(TechType.Builder))
                     continue;
 
                 // What's the maximum amount of this ingredient the recipe can
@@ -64,12 +65,12 @@ namespace SubnauticaRandomiser.Logic
 
                 // If a recipe starts requiring a lot of inventory space to
                 // complete, try to minimise adding more ingredients.
-                if (totalSize + (ingredient.GetItemSize() * number) > _config.iMaxInventorySizePerRecipe)
+                if (totalSize + (ingredient.Recipe.GetItemSize() * number) > _config.iMaxInventorySizePerRecipe)
                     number = 1;
 
                 AddIngredientWithMaxUsesCheck(ingredient, number);
                 currentValue += ingredient.Value * number;
-                totalSize += ingredient.GetItemSize() * number;
+                totalSize += ingredient.Recipe.GetItemSize() * number;
 
                 LogHandler.Debug("    Adding ingredient: " + ingredient.TechType.AsString() + ", " + number);
 
@@ -80,7 +81,7 @@ namespace SubnauticaRandomiser.Logic
                     break;
                 }
                 // Same thing for special case of outpost base parts.
-                if (_tree.BasicOutpostPieces.ContainsKey(recipe.TechType) && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.6)
+                if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType) && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.6)
                 {
                     LogHandler.Debug("!   Basic outpost size is getting too large, stopping.");
                     break;
@@ -94,23 +95,23 @@ namespace SubnauticaRandomiser.Logic
             } while ((targetValue - currentValue) > (targetValue * _config.dFuzziness / 2));
 
             // Update the total size of everything needed to build a basic outpost.
-            if (_tree.BasicOutpostPieces.ContainsKey(recipe.TechType))
-                _basicOutpostSize += (totalSize * _tree.BasicOutpostPieces[recipe.TechType]);
+            if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType))
+                _basicOutpostSize += (totalSize * _tree.BasicOutpostPieces[entity.TechType]);
 
-            recipe.Value = currentValue;
+            entity.Value = currentValue;
             LogHandler.Debug("    Recipe is now valued " + currentValue + " out of " + targetValue);
 
-            recipe.Ingredients = _ingredients;
-            recipe.CraftAmount = CraftDataHandler.GetTechData(recipe.TechType).craftAmount;
-            return recipe;
+            entity.Recipe.Ingredients = _ingredients;
+            entity.Recipe.CraftAmount = CraftDataHandler.GetTechData(entity.TechType).craftAmount;
+            return entity;
         }
 
         // Find a primary ingredient for the recipe. Its value should be a
         // percentage of the total value of the entire recipe as defined in
         // the config, +-10%.
-        private RandomiserRecipe ChoosePrimaryIngredient(RandomiserRecipe recipe, double targetValue)
+        private LogicEntity ChoosePrimaryIngredient(LogicEntity entity, double targetValue)
         {
-            List<RandomiserRecipe> pIngredientCandidates = _reachableMaterials.FindAll(
+            List<LogicEntity> pIngredientCandidates = _reachableMaterials.FindAll(
                                                                      x => (targetValue * (_config.dIngredientRatio + 0.1)) > x.Value
                                                                        && (targetValue * (_config.dIngredientRatio - 0.1)) < x.Value
                                                                        && !_blacklist.Contains(x.Category)
@@ -120,21 +121,21 @@ namespace SubnauticaRandomiser.Logic
             if (pIngredientCandidates.Count == 0)
                 pIngredientCandidates.Add(GetRandom(_reachableMaterials, _blacklist));
 
-            RandomiserRecipe primaryIngredient = GetRandom(pIngredientCandidates);
+            LogicEntity primaryIngredient = GetRandom(pIngredientCandidates);
 
             // If base theming is enabled and this is a base piece, replace
             // the primary ingredient with a theming ingredient.
-            primaryIngredient = CheckForBaseTheming(recipe) ?? primaryIngredient;
+            primaryIngredient = CheckForBaseTheming(entity) ?? primaryIngredient;
 
             // If vanilla upgrade chains are set to be preserved, replace
             // the primary ingredient with the base item.
-            primaryIngredient = CheckForVanillaUpgrades(recipe) ?? primaryIngredient;
+            primaryIngredient = CheckForVanillaUpgrades(entity) ?? primaryIngredient;
 
             return primaryIngredient;
         }
 
         // What is the maximum amount of this ingredient the recipe can sustain?
-        private int FindMaximum(RandomiserRecipe ingredient, double targetValue, double currentValue)
+        private int FindMaximum(LogicEntity ingredient, double targetValue, double currentValue)
         {
             int max = (int)((targetValue + targetValue * _config.dFuzziness / 2) - currentValue) / ingredient.Value;
             max = max > 0 ? max : 1;
@@ -156,12 +157,12 @@ namespace SubnauticaRandomiser.Logic
         // Replace an undesirable ingredient with one of similar value.
         // Start with a range of 10% in each direction, increasing if no valid
         // replacement can be found.
-        private RandomiserRecipe ReplaceWithSimilarValue(RandomiserRecipe undesirable)
+        private LogicEntity ReplaceWithSimilarValue(LogicEntity undesirable)
         {
             int value = undesirable.Value;
             double range = 0.1;
 
-            List<RandomiserRecipe> betterOptions = new List<RandomiserRecipe>();
+            List<LogicEntity> betterOptions = new List<LogicEntity>();
             LogHandler.Debug("Replacing undesirable ingredient " + undesirable.TechType.AsString());
 
             // Progressively increase the search radius if no replacement is found,

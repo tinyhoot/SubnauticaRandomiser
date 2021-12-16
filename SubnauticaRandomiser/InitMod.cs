@@ -6,6 +6,7 @@ using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Logic;
+using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser
 {
@@ -91,7 +92,7 @@ namespace SubnauticaRandomiser
             s_config.iSaveVersion = s_expectedSaveVersion;
 
             // Attempt to read and parse the CSV with all recipe information.
-            List<RandomiserRecipe> completeMaterialsList;
+            List<LogicEntity> completeMaterialsList;
             completeMaterialsList = CSVReader.ParseRecipeFile(s_recipeFile);
             if (completeMaterialsList == null)
             {
