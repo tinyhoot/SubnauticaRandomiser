@@ -64,6 +64,8 @@
     <Compile Include="Logic\ModeBalanced.cs" />
     <Compile Include="Logic\Mode.cs" />
     <Compile Include="Logic\ModeRandom.cs" />
+    <Compile Include="RandomiserObjects\LogicEntity.cs" />
+    <Compile Include="RandomiserObjects\SpawnData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="QModInstaller">
