@@ -51,7 +51,7 @@ namespace SubnauticaRandomiser
             }
 
             // Second, read each line and try to parse that into a list of
-            // RandomiserRecipe objects, for later use.
+            // LogicEntity objects, for later use.
             s_csvParsedList = new List<LogicEntity>();
 
             int lineCounter = 0;
@@ -80,7 +80,7 @@ namespace SubnauticaRandomiser
             return s_csvParsedList;
         }
 
-        // Parse one line of a CSV file and attempt to create a RandomiserRecipe.
+        // Parse one line of a CSV file and attempt to create a LogicEntity.
         private static LogicEntity ParseRecipeFileLine(string line)
         {
             LogicEntity entity = null;
@@ -185,15 +185,22 @@ namespace SubnauticaRandomiser
             }
             
             // Only if any of the blueprint components yielded anything,
-            // ship the recipe with a blueprint.
+            // ship the entity with a blueprint.
             if ((blueprintUnlockConditions != null && blueprintUnlockConditions.Count > 0) || blueprintUnlockDepth != 0 || !blueprintDatabox || blueprintFragments.Count > 0)
             {
                 blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragments, blueprintDatabox, blueprintUnlockDepth);
             }
 
-            LogHandler.Debug("Registering recipe: " + type.AsString() + ", " + category.ToString() + ", " + depth + ", "+ prereqList.Count + " prerequisites, " + value + ", " + maxUses + ", ...");
-            recipe = new RandomiserRecipe(type, category, depth, prereqList, value, maxUses);
-            entity = new LogicEntity(type, category, blueprint, recipe, null, false, value);
+            // Only if the category corresponds to a techtype commonly associated
+            // with a craftable thing, ship the entity with a recipe.
+            if (!(category.Equals(ETechTypeCategory.RawMaterials) || category.Equals(ETechTypeCategory.Fish) || category.Equals(ETechTypeCategory.Eggs) || category.Equals(ETechTypeCategory.Seeds)))
+            {
+                recipe = new RandomiserRecipe(type, category, depth, value, maxUses);
+            }
+
+            LogHandler.Debug("Registering entity: " + type.AsString() + ", " + category.ToString() + ", " + depth + ", "+ prereqList.Count + " prerequisites, " + value + ", " + maxUses + ", ...");
+
+            entity = new LogicEntity(type, category, blueprint, recipe, null, prereqList, false, value);
             entity.AccessibleDepth = depth;
             entity.MaxUsesPerGame = maxUses;
             return entity;

@@ -182,9 +182,9 @@ namespace SubnauticaRandomiser.Logic
                 TechType ingredient = _upgradeChains[upgrade];
                 LogicEntity entity = materials.Find(x => x.TechType.Equals(upgrade));
 
-                if (entity.Recipe.Prerequisites == null)
-                    entity.Recipe.Prerequisites = new List<TechType>();
-                entity.Recipe.Prerequisites.Add(ingredient);
+                if (!entity.HasPrerequisites)
+                    entity.Prerequisites = new List<TechType>();
+                entity.Prerequisites.Add(ingredient);
             }
         }
 

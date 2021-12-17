@@ -46,7 +46,7 @@ namespace SubnauticaRandomiser.Logic
                 RandomiserIngredient ingredient = new RandomiserIngredient(ingredientEntity.TechType, _random.Next(1, max + 1));
 
                 AddIngredientWithMaxUsesCheck(ingredientEntity, ingredient.amount);
-                totalInvSize += ingredientEntity.Recipe.GetItemSize() * ingredient.amount;
+                totalInvSize += ingredientEntity.GetItemSize() * ingredient.amount;
 
                 LogHandler.Debug("    Adding ingredient: " + ingredient.techType.AsString() + ", " + ingredient.amount);
 

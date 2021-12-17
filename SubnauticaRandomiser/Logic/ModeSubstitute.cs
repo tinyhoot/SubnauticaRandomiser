@@ -48,7 +48,7 @@ namespace SubnauticaRandomiser.Logic
                     // access to much more complete data like the item's category.
                     LogicEntity matchRecipe = _materials.GetAll().Find(x => x.TechType.Equals(ingredients[i].techType));
 
-                    if (randomiseMe.Recipe.Prerequisites != null && randomiseMe.Recipe.Prerequisites.Count > i)
+                    if (randomiseMe.Prerequisites != null && randomiseMe.Prerequisites.Count > i)
                     {
                         // In vanilla Subnautica, in a recipe where something gets
                         // upgraded (commonly at the Modification Station), it is

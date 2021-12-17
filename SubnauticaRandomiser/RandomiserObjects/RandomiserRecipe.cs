@@ -6,14 +6,12 @@ namespace SubnauticaRandomiser.RandomiserObjects
     {
         public ETechTypeCategory Category;
         public int Depth;
-        public List<TechType> Prerequisites;
 
-        public RandomiserRecipe(TechType type, ETechTypeCategory category, int depth = 0, List<TechType> prereqs = null, int value = 0, int maxUses = 0) : base(type)
+        public RandomiserRecipe(TechType type, ETechTypeCategory category, int depth = 0, int value = 0, int maxUses = 0) : base(type)
         {
             Depth = depth;
 
             Category = category;
-            Prerequisites = prereqs;
         }
 
         public Recipe GetSerializableRecipe()
@@ -42,15 +40,6 @@ namespace SubnauticaRandomiser.RandomiserObjects
             }
 
             return true;
-        }
-
-        public int GetItemSize()
-        {
-            int size = 0;
-
-            size = CraftData.GetItemSize(TechType).x * CraftData.GetItemSize(TechType).y;
-
-            return size;
         }
     }
 }

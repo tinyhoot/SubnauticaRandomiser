@@ -65,12 +65,12 @@ namespace SubnauticaRandomiser.Logic
 
                 // If a recipe starts requiring a lot of inventory space to
                 // complete, try to minimise adding more ingredients.
-                if (totalSize + (ingredient.Recipe.GetItemSize() * number) > _config.iMaxInventorySizePerRecipe)
+                if (totalSize + (ingredient.GetItemSize() * number) > _config.iMaxInventorySizePerRecipe)
                     number = 1;
 
                 AddIngredientWithMaxUsesCheck(ingredient, number);
                 currentValue += ingredient.Value * number;
-                totalSize += ingredient.Recipe.GetItemSize() * number;
+                totalSize += ingredient.GetItemSize() * number;
 
                 LogHandler.Debug("    Adding ingredient: " + ingredient.TechType.AsString() + ", " + number);
 

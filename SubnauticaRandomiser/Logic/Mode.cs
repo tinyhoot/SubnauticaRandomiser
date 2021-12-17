@@ -106,17 +106,17 @@ namespace SubnauticaRandomiser.Logic
 
             options.AddRange(_materials.GetAll().FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials)
                                                      && x.AccessibleDepth < depth
-                                                     && (x.Recipe.Prerequisites == null || x.Recipe.Prerequisites.Count == 0)
+                                                     && !x.HasPrerequisites
                                                      && x.MaxUsesPerGame == 0
-                                                     && x.Recipe.GetItemSize() == 1));
+                                                     && x.GetItemSize() == 1));
 
             if (_config.bUseFish)
             {
                 options.AddRange(_materials.GetAll().FindAll(x => x.Category.Equals(ETechTypeCategory.Fish)
                                                          && x.AccessibleDepth < depth
-                                                         && (x.Recipe.Prerequisites == null || x.Recipe.Prerequisites.Count == 0)
+                                                         && !x.HasPrerequisites
                                                          && x.MaxUsesPerGame == 0
-                                                         && x.Recipe.GetItemSize() == 1));
+                                                         && x.GetItemSize() == 1));
             }
 
             LogHandler.Debug("LIST OF BASE THEME OPTIONS:");

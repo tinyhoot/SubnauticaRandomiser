@@ -28,7 +28,7 @@ namespace SubnauticaRandomiser.Logic
 
             // Use a lambda expression to find every object where the search
             // parameters match.
-            additions.AddRange(_allMaterials.FindAll(x => ContainsCategory(categories, x.Recipe.Category) && x.AccessibleDepth <= maxDepth));
+            additions.AddRange(_allMaterials.FindAll(x => ContainsCategory(categories, x.Category) && x.AccessibleDepth <= maxDepth));
 
             return AddToReachableList(additions);
         }
@@ -40,18 +40,18 @@ namespace SubnauticaRandomiser.Logic
 
             if (invert)
             {
-                additions.AddRange(_allMaterials.FindAll(x => ContainsCategory(categories, x.Recipe.Category)
+                additions.AddRange(_allMaterials.FindAll(x => ContainsCategory(categories, x.Category)
                                                            && x.AccessibleDepth <= maxDepth
-                                                           && x.Recipe.Prerequisites != null
-                                                           && !x.Recipe.Prerequisites.Contains(prerequisite)
+                                                           && x.HasPrerequisites
+                                                           && !x.Prerequisites.Contains(prerequisite)
                                                            ));
             }
             else
             {
-                additions.AddRange(_allMaterials.FindAll(x => ContainsCategory(categories, x.Recipe.Category)
+                additions.AddRange(_allMaterials.FindAll(x => ContainsCategory(categories, x.Category)
                                                            && x.AccessibleDepth <= maxDepth
-                                                           && x.Recipe.Prerequisites != null
-                                                           && x.Recipe.Prerequisites.Contains(prerequisite)
+                                                           && x.HasPrerequisites
+                                                           && x.Prerequisites.Contains(prerequisite)
                                                            ));
             }
 
