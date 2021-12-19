@@ -10,26 +10,28 @@ namespace SubnauticaRandomiser.Logic
     {
         private readonly System.Random _random;
 
+        private readonly RecipeDictionary _masterDict;
         private readonly RandomiserConfig _config;
         private Materials _materials;
         private ProgressionTree _tree;
         private List<Databox> _databoxes;
         private Mode _mode;
 
-        public RandomiserLogic(RandomiserConfig config, List<LogicEntity> allMaterials, List<Databox> databoxes = null, int seed = 0)
+        public RandomiserLogic(RecipeDictionary masterDict, RandomiserConfig config, List<LogicEntity> allMaterials, List<Databox> databoxes = null, int seed = 0)
         {
             if (seed == 0)
                 _random = new System.Random();
             else
                 _random = new System.Random(seed);
 
+            _masterDict = masterDict;
             _config = config;
             _materials = new Materials(allMaterials);
             _databoxes = databoxes;
             _mode = null;
         }
 
-        internal void RandomSmart(RecipeDictionary masterDict)
+        internal void RandomSmart()
         {
             // This function uses the progression tree to randomise materials
             // and game progression in an intelligent way.
@@ -77,7 +79,7 @@ namespace SubnauticaRandomiser.Logic
             // If databox randomising is enabled, go and do that.
             if (_config.bRandomiseDataboxes && _databoxes != null)
             {
-                _databoxes = RandomiseDataboxes(masterDict, _databoxes);
+                _databoxes = RandomiseDataboxes(_masterDict, _databoxes);
             }
 
             foreach (LogicEntity e in _materials.GetAll().FindAll(x => 
@@ -115,49 +117,36 @@ namespace SubnauticaRandomiser.Logic
                         SpoilerLog.s_progression.RemoveAt(SpoilerLog.s_progression.Count - 1);
                         SpoilerLog.s_progression.Add(valuePair);
                     }
-                    newProgressionItem = false;
                 }
 
                 // If the most recently randomised entity opened up some new paths
-                // to progress, there's extra stuff to handle.
-                if (newDepth > reachableDepth)
+                // to progress, update the list of reachable materials.
+                if (newProgressionItem || (newDepth > reachableDepth))
                 {
-                    reachableDepth = newDepth;
-
-                    // Exclude creepvine and samples until a knife is obtained.
-                    if (masterDict.DictionaryInstance.ContainsKey(TechType.Knife))
-                    {
-                        _materials.AddReachable(ETechTypeCategory.RawMaterials, reachableDepth);
-                    }
-                    else
-                    {
-                        _materials.AddReachableWithPrereqs(ETechTypeCategory.RawMaterials, reachableDepth, TechType.Knife, true);
-                    }
-
-                    if (_config.bUseFish)
-                        _materials.AddReachable(ETechTypeCategory.Fish, reachableDepth);
-                    if (_config.bUseSeeds && unlockedProgressionItems.ContainsKey(TechType.Knife))
-                        _materials.AddReachable(ETechTypeCategory.Seeds, reachableDepth);
-                    if (_config.bUseEggs && masterDict.DictionaryInstance.ContainsKey(TechType.BaseWaterPark))
-                        _materials.AddReachable(ETechTypeCategory.Eggs, reachableDepth);
+                    reachableDepth = newDepth > reachableDepth ? newDepth : reachableDepth;
+                    UpdateReachableMaterials(reachableDepth);
                 }
 
                 LogicEntity nextEntity = null;
+                newProgressionItem = false;
 
                 // Make sure the list of absolutely essential items is done first,
                 // for each depth level. This guarantees certain recipes are done
                 // by a certain depth, e.g. waterparks by 500m.
                 List<TechType> essentialItems = _tree.GetEssentialItems(reachableDepth);
+                bool isPriority = false;
                 if (essentialItems != null)
                 {
                     nextEntity = _materials.GetAll().Find(x => x.TechType.Equals(essentialItems[0]));
                     essentialItems.RemoveAt(0);
+                    isPriority = true;
                     LogHandler.Debug("Prioritising essential item " + nextEntity.TechType.AsString() + " for depth " + reachableDepth);
 
                     // If this has already been randomised, all the better.
-                    if (masterDict.DictionaryInstance.ContainsKey(nextEntity.TechType))
+                    if (_masterDict.DictionaryInstance.ContainsKey(nextEntity.TechType))
                     {
                         nextEntity = null;
+                        isPriority = false;
                         LogHandler.Debug("Priority item was already randomised, skipping.");
                     }
                 }
@@ -170,7 +159,7 @@ namespace SubnauticaRandomiser.Logic
                     TechType[] electiveTypes = electiveItems[0];
                     electiveItems.RemoveAt(0);
 
-                    if (ContainsAny(masterDict, electiveTypes))
+                    if (ContainsAny(_masterDict, electiveTypes))
                     {
                         LogHandler.Debug("Priority elective containing " + electiveTypes[0].AsString() + " was already randomised, skipping.");
                     }
@@ -178,6 +167,7 @@ namespace SubnauticaRandomiser.Logic
                     {
                         TechType nextType = GetRandom(new List<TechType>(electiveTypes));
                         nextEntity = _materials.GetAll().Find(x => x.TechType.Equals(nextType));
+                        isPriority = true;
                         LogHandler.Debug("Prioritising elective item " + nextEntity.TechType.AsString() + " for depth " + reachableDepth);
                     }
                 }
@@ -187,46 +177,18 @@ namespace SubnauticaRandomiser.Logic
                 if (nextEntity is null)
                     nextEntity = GetRandom(toBeRandomised);
 
-                // HACK improve this.
+                // HACK improve this. Currently makes logic only consider recipes.
                 if (!nextEntity.HasRecipe)
                     continue;
 
                 // Does this recipe have all of its prerequisites fulfilled?
-                if (CheckRecipeForBlueprint(masterDict, _databoxes, nextEntity, reachableDepth) && CheckRecipeForPrerequisites(masterDict, nextEntity))
+                // Skip this check if the recipe is a priority (essential or elective)
+                if (isPriority || (CheckRecipeForBlueprint(_masterDict, _databoxes, nextEntity, reachableDepth) && CheckRecipeForPrerequisites(_masterDict, nextEntity)))
                 {
                     // Found a good recipe! Randomise it.
-                    nextEntity = _mode.RandomiseIngredients(nextEntity);
-
-                    // Make sure it's not an item that cannot be an ingredient.
-                    if (nextEntity.CanFunctionAsIngredient())
-                        _materials.AddReachable(nextEntity);
-                    ApplyRandomisedRecipe(masterDict, nextEntity.Recipe);
                     toBeRandomised.Remove(nextEntity);
-                    
-                    // Handling knives as a special case.
-                    if ((nextEntity.Equals(TechType.Knife) || nextEntity.Equals(TechType.HeatBlade)) && !unlockedProgressionItems.ContainsKey(TechType.Knife))
-                    {
-                        unlockedProgressionItems.Add(TechType.Knife, true);
-                        newProgressionItem = true;
-                        // Add raw materials like creepvine and mushroom samples.
-                        _materials.AddReachableWithPrereqs(ETechTypeCategory.RawMaterials, reachableDepth, TechType.Knife);
-                        if (_config.bUseSeeds)
-                            _materials.AddReachable(ETechTypeCategory.Seeds, reachableDepth);
-                    }
-                    // Similarly, Alien Containment is a special case for eggs.
-                    if (nextEntity.Equals(TechType.BaseWaterPark) && _config.bUseEggs)
-                        _materials.AddReachable(ETechTypeCategory.Eggs, reachableDepth);
+                    newProgressionItem = RandomiseRecipeEntity(nextEntity, unlockedProgressionItems, reachableDepth);
 
-                    // If it is a central progression item, consider it unlocked.
-                    if (_tree.DepthProgressionItems.ContainsKey(nextEntity.TechType) && !unlockedProgressionItems.ContainsKey(nextEntity.TechType))
-                    {
-                        unlockedProgressionItems.Add(nextEntity.TechType, true);
-                        SpoilerLog.s_progression.Add(new KeyValuePair<TechType, int>(nextEntity.TechType, 0));
-                        newProgressionItem = true;
-                        LogHandler.Debug("[+] Added " + nextEntity.TechType.AsString() + " to progression items.");
-                    }
-
-                    nextEntity.InLogic = true;
                     LogHandler.Debug("[+] Randomised recipe for [" + nextEntity.TechType.AsString() + "].");
                 }
                 else
@@ -236,6 +198,49 @@ namespace SubnauticaRandomiser.Logic
             }
 
             LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
+        }
+
+        // Handle everything related to actually randomising the recipe itself,
+        // and ensure all special cases are covered.
+        // Returns true if a new progression item was unlocked.
+        private bool RandomiseRecipeEntity(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems, int reachableDepth)
+        {
+            bool newProgressionItem = false;
+
+            entity = _mode.RandomiseIngredients(entity);
+            ApplyRandomisedRecipe(_masterDict, entity.Recipe);
+
+            // Only add this entity to the materials list if it can be an ingredient.
+            if (entity.CanFunctionAsIngredient())
+                _materials.AddReachable(entity);
+
+            // Knives are a special case that open up a lot of new materials.
+            if ((entity.TechType.Equals(TechType.Knife) || entity.TechType.Equals(TechType.HeatBlade)) && !unlockedProgressionItems.ContainsKey(TechType.Knife))
+            {
+                unlockedProgressionItems.Add(TechType.Knife, true);
+                newProgressionItem = true;
+            }
+
+            // Similarly, Alien Containment is a special case for eggs.
+            if (entity.TechType.Equals(TechType.BaseWaterPark) && _config.bUseEggs)
+            {
+                unlockedProgressionItems.Add(TechType.BaseWaterPark, true);
+                newProgressionItem = true;
+            }
+
+            // If it is a central depth progression item, consider it unlocked.
+            if (_tree.DepthProgressionItems.ContainsKey(entity.TechType) && !unlockedProgressionItems.ContainsKey(entity.TechType))
+            {
+                unlockedProgressionItems.Add(entity.TechType, true);
+                SpoilerLog.s_progression.Add(new KeyValuePair<TechType, int>(entity.TechType, 0));
+                newProgressionItem = true;
+
+                LogHandler.Debug("[+] Added " + entity.TechType.AsString() + " to progression items.");
+            }
+
+            entity.InLogic = true;
+
+            return newProgressionItem;
         }
 
         // Randomise the blueprints found inside databoxes.
@@ -263,6 +268,27 @@ namespace SubnauticaRandomiser.Logic
             masterDict.isDataboxRandomised = true;
 
             return randomDataboxes;
+        }
+
+        // Add all reachable materials to the list, taking into account depth and
+        // any config options.
+        internal void UpdateReachableMaterials(int depth)
+        {
+            if (_masterDict.ContainsKnife())
+            {
+                _materials.AddReachable(ETechTypeCategory.RawMaterials, depth);
+            }
+            else
+            {
+                _materials.AddReachableWithPrereqs(ETechTypeCategory.RawMaterials, depth, TechType.Knife, true);
+            }
+
+            if (_config.bUseFish)
+                _materials.AddReachable(ETechTypeCategory.Fish, depth);
+            if (_config.bUseSeeds && _masterDict.ContainsKnife())
+                _materials.AddReachable(ETechTypeCategory.Seeds, depth);
+            if (_config.bUseEggs && _masterDict.DictionaryInstance.ContainsKey(TechType.BaseWaterPark))
+                _materials.AddReachable(ETechTypeCategory.Eggs, depth);
         }
 
         // This function calculates the maximum reachable depth based on

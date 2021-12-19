@@ -99,9 +99,9 @@ namespace SubnauticaRandomiser
             if (databoxes is null || databoxes.Count == 0)
                 LogHandler.Error("Failed to extract databox information from CSV.");
 
-            RandomiserLogic logic = new RandomiserLogic(s_config, completeMaterialsList, databoxes, s_config.iSeed);
+            RandomiserLogic logic = new RandomiserLogic(s_masterDict, s_config, completeMaterialsList, databoxes, s_config.iSeed);
 
-            logic.RandomSmart(s_masterDict);
+            logic.RandomSmart();
             LogHandler.Info("Randomisation successful!");
 
             SaveRecipeStateToDisk();

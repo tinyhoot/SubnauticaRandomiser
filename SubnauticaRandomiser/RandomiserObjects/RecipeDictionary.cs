@@ -53,5 +53,11 @@ namespace SubnauticaRandomiser.RandomiserObjects
             DictionaryInstance.Add(type, r);
             return true;
         }
+
+        // Does the recipe dictionary contain any knife? Used for progression.
+        public bool ContainsKnife()
+        {
+            return DictionaryInstance.ContainsKey(TechType.Knife) || DictionaryInstance.ContainsKey(TechType.HeatBlade);
+        }
     }
 }

@@ -53,9 +53,6 @@
       of this, it also does not have an entry in masterDict.
     - Abuse this and file the new recipe for whatever scrap metal can be turned
       *into* under scrap metal.
-      
-- Cleanup
-  - Deal with the mess that is InitMod.
 
    
   

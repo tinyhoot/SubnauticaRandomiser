@@ -42,8 +42,8 @@ namespace SubnauticaRandomiser.Logic
             {
                 additions.AddRange(_allMaterials.FindAll(x => ContainsCategory(categories, x.Category)
                                                            && x.AccessibleDepth <= maxDepth
-                                                           && x.HasPrerequisites
-                                                           && !x.Prerequisites.Contains(prerequisite)
+                                                           && (!x.HasPrerequisites
+                                                           || !x.Prerequisites.Contains(prerequisite))
                                                            ));
             }
             else
