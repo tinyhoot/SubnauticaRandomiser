@@ -10,7 +10,8 @@ namespace SubnauticaRandomiser
 {
     internal static class CSVReader
     {
-        internal static List<LogicEntity> s_csvParsedList;
+        internal static List<LogicEntity> s_csvRecipeList;
+        internal static List<BiomeCollection> s_csvBiomeList;
         internal static List<Databox> s_csvDataboxList;
         internal static string s_recipeCSVMD5;
 
@@ -52,7 +53,7 @@ namespace SubnauticaRandomiser
 
             // Second, read each line and try to parse that into a list of
             // LogicEntity objects, for later use.
-            s_csvParsedList = new List<LogicEntity>();
+            s_csvRecipeList = new List<LogicEntity>();
 
             int lineCounter = 0;
             foreach (string line in csvLines)
@@ -68,7 +69,7 @@ namespace SubnauticaRandomiser
                 // are caught in one central location.
                 try
                 {
-                    s_csvParsedList.Add(ParseRecipeFileLine(line));
+                    s_csvRecipeList.Add(ParseRecipeFileLine(line));
                 }
                 catch (Exception ex)
                 {
@@ -77,7 +78,7 @@ namespace SubnauticaRandomiser
                 }
             }
 
-            return s_csvParsedList;
+            return s_csvRecipeList;
         }
 
         // Parse one line of a CSV file and attempt to create a LogicEntity.
@@ -204,6 +205,113 @@ namespace SubnauticaRandomiser
             entity.AccessibleDepth = depth;
             entity.MaxUsesPerGame = maxUses;
             return entity;
+        }
+
+        // This handles everything related to the biome CSV.
+        internal static List<BiomeCollection> ParseBiomeFile(string fileName)
+        {
+            // Try and grab the file containing biome information.
+            string[] csvLines;
+            string path = Path.Combine(InitMod.s_modDirectory, fileName);
+            LogHandler.Debug("Looking for biome CSV as " + path);
+
+            try
+            {
+                csvLines = File.ReadAllLines(path);
+            }
+            catch (Exception ex)
+            {
+                LogHandler.MainMenuMessage("Failed to read biome CSV! Aborting.");
+                LogHandler.Error(ex.Message);
+                return null;
+            }
+
+            s_csvBiomeList = new List<BiomeCollection>();
+
+            int lineCounter = 0;
+            foreach (string line in csvLines)
+            {
+                lineCounter++;
+                if (line.StartsWith("biomeType", StringComparison.InvariantCulture))
+                {
+                    // This is the header line. Skip.
+                    continue;
+                }
+
+                // ParseBiomeFileLine fails upwards, so this ensures all errors
+                // are caught in one central location.
+                try
+                {
+                    Biome biome = ParseBiomeFileLine(line);
+                    BiomeCollection collection = s_csvBiomeList.Find(x => x.BiomeType.Equals(biome.BiomeType));
+
+                    // Initiate a BiomeCollection if it does not alread exist.
+                    if (collection is null)
+                    {
+                        collection = new BiomeCollection(biome.BiomeType);
+                        s_csvBiomeList.Add(collection);
+                    }
+
+                    collection.Add(biome);
+                }
+                catch (Exception ex)
+                {
+                    LogHandler.Error("Failed to parse information from biome CSV on line " + lineCounter);
+                    LogHandler.Error(ex.Message);
+                }
+            }
+
+            return s_csvBiomeList;
+        }
+
+        private static Biome ParseBiomeFileLine(string line)
+        {
+            Biome biome = null;
+            int smallCount = 0;
+            int mediumCount = 0;
+            int creatureCount = 0;
+            float fragmentRate = 0f;
+
+            string[] cells = line.Split(',');
+
+            string name = cells[0];
+            string cellsSmallCount = cells[1];
+            string cellsMediumCount = cells[2];
+            string cellsCreatureCount = cells[3];
+            string cellsFragmentRate = cells[4];
+
+            // Column 1: The internal name of the biome. Does not have to be
+            // processed at all, the string itself is good enough.
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentException("BiomeType is null or empty, but is a required field.");
+            EBiomeType biomeType = StringToEBiomeType(name);
+
+            // Column 2: The number of small slots.
+            if (string.IsNullOrEmpty(cellsSmallCount))
+                throw new ArgumentException("smallCount is null or empty, but is a required field.");
+            smallCount = StringToInt(cellsSmallCount, "smallCount");
+            smallCount = (int)Math.Ceiling((double)smallCount / 100);
+
+            // Column 3: The number of medium slots.
+            if (string.IsNullOrEmpty(cellsMediumCount))
+                throw new ArgumentException("mediumCount is null or empty, but is a required field.");
+            mediumCount = StringToInt(cellsMediumCount, "mediumCount");
+            mediumCount = (int)Math.Ceiling((double)mediumCount / 100);
+
+            // Column 4: The number of creature slots.
+            if (string.IsNullOrEmpty(cellsCreatureCount))
+                throw new ArgumentException("creatureCount is null or empty, but is a required field.");
+            creatureCount = StringToInt(cellsCreatureCount, "creatureCount");
+            creatureCount = (int)Math.Ceiling((double)creatureCount / 100);
+
+            // Column 5: The total chance of fragments in vanilla Subnautica.
+            if (!string.IsNullOrEmpty(cellsFragmentRate))
+                fragmentRate = StringToFloat(cellsFragmentRate, "fragmentRate");
+
+            biome = new Biome(name, biomeType, creatureCount, mediumCount, smallCount);
+            LogHandler.Debug("Registering biome: " + name + ", " + biomeType.ToString() + ", " + creatureCount + ", " + mediumCount + ", " + smallCount);
+
+            return biome;
         }
 
         // This handles everything related to the wreckage CSV and databoxes.
@@ -412,6 +520,26 @@ namespace SubnauticaRandomiser
             }
 
             return node;
+        }
+
+        private static EBiomeType StringToEBiomeType(string str)
+        {
+            foreach (string type in Enum.GetNames(typeof(EBiomeType)))
+            {
+                if (str.Contains(type))
+                {
+                    try
+                    {
+                        return (EBiomeType)Enum.Parse(typeof(EBiomeType), type);
+                    }
+                    catch (Exception)
+                    {
+                        throw new ArgumentException("Failed to parse EBiomeType from string: " + str);
+                    }
+                }
+            }
+
+            return EBiomeType.None;
         }
 
         private static EWreckage StringToEWreckage(string str)

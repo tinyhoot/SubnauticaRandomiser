@@ -77,6 +77,9 @@
     <Compile Include="FragmentPatcher.cs" />
     <Compile Include="Logic\FragmentLogic.cs" />
     <Compile Include="EntitySerializer.cs" />
+    <Compile Include="RandomiserObjects\Biome.cs" />
+    <Compile Include="RandomiserObjects\BiomeCollection.cs" />
+    <Compile Include="RandomiserObjects\EBiomeType.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

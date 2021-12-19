@@ -15,6 +15,7 @@ namespace SubnauticaRandomiser
     {
         internal static string s_modDirectory;
         internal static RandomiserConfig s_config;
+        internal static readonly string s_biomeFile = "biomeSlots.csv";
         internal static readonly string s_recipeFile = "recipeInformation.csv";
         internal static readonly string s_wreckageFile = "wreckInformation.csv";
         internal static readonly string s_expectedRecipeMD5 = "ff1123bdfecfe7d473ca13c0c61a0aa3";
@@ -87,6 +88,15 @@ namespace SubnauticaRandomiser
             s_masterDict = new EntitySerializer();
             s_config.SanitiseConfigValues();
             s_config.iSaveVersion = s_expectedSaveVersion;
+
+            // Attempt to read and parse the CSV with all biome information.
+            List<BiomeCollection> completeBiomeList;
+            completeBiomeList = CSVReader.ParseBiomeFile(s_biomeFile);
+            if (completeBiomeList is null)
+            {
+                LogHandler.Fatal("Failed to extract biome information from CSV, aborting.");
+                return;
+            }
 
             // Attempt to read and parse the CSV with all recipe information.
             List<LogicEntity> completeMaterialsList;
