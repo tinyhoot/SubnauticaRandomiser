@@ -59,7 +59,6 @@
     <Compile Include="RandomiserObjects\EProgressionNode.cs" />
     <Compile Include="RandomiserObjects\ETechTypeCategory.cs" />
     <Compile Include="RandomiserObjects\Recipe.cs" />
-    <Compile Include="RandomiserObjects\RecipeDictionary.cs" />
     <Compile Include="DataboxPatcher.cs" />
     <Compile Include="RandomiserObjects\Databox.cs" />
     <Compile Include="RandomiserObjects\EWreckage.cs" />
@@ -77,6 +76,7 @@
     <Compile Include="RandomiserObjects\SpawnData.cs" />
     <Compile Include="FragmentPatcher.cs" />
     <Compile Include="Logic\FragmentLogic.cs" />
+    <Compile Include="EntitySerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

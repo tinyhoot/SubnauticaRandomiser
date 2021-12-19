@@ -5,12 +5,12 @@ namespace SubnauticaRandomiser.Logic
 {
     internal class ModeSubstitute
     {
-        private RecipeDictionary _masterDict;
+        private EntitySerializer _masterDict;
         private RandomiserConfig _config;
         private Materials _materials = null;
         private System.Random _random = null;
 
-        internal ModeSubstitute(RecipeDictionary masterDict, RandomiserConfig config)
+        internal ModeSubstitute(EntitySerializer masterDict, RandomiserConfig config)
         {
             _masterDict = masterDict;
             _config = config;
@@ -23,7 +23,7 @@ namespace SubnauticaRandomiser.Logic
         // for a neat setting at some point in the future.
         // In that case, make this use the general smart logic of randomising,
         // but fall back on substitution for choosing ingredients.
-        internal void RandomSubstituteMaterials(RecipeDictionary masterDict, bool useFish, bool useSeeds)
+        internal void RandomSubstituteMaterials(EntitySerializer masterDict, bool useFish, bool useSeeds)
         {
             List<LogicEntity> randomEntities = new List<LogicEntity>();
             LogHandler.Info("Randomising using simple substitution...");

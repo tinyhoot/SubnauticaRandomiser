@@ -10,14 +10,14 @@ namespace SubnauticaRandomiser.Logic
     {
         private readonly System.Random _random;
 
-        private readonly RecipeDictionary _masterDict;
+        private readonly EntitySerializer _masterDict;
         private readonly RandomiserConfig _config;
         private Materials _materials;
         private ProgressionTree _tree;
         private List<Databox> _databoxes;
         private Mode _mode;
 
-        public RandomiserLogic(RecipeDictionary masterDict, RandomiserConfig config, List<LogicEntity> allMaterials, List<Databox> databoxes = null, int seed = 0)
+        public RandomiserLogic(EntitySerializer masterDict, RandomiserConfig config, List<LogicEntity> allMaterials, List<Databox> databoxes = null, int seed = 0)
         {
             if (seed == 0)
                 _random = new System.Random();
@@ -210,7 +210,7 @@ namespace SubnauticaRandomiser.Logic
         }
 
         // Randomise the blueprints found inside databoxes.
-        internal List<Databox> RandomiseDataboxes(RecipeDictionary masterDict, List<Databox> databoxes)
+        internal List<Databox> RandomiseDataboxes(EntitySerializer masterDict, List<Databox> databoxes)
         {
             masterDict.Databoxes = new Dictionary<RandomiserVector, TechType>();
             List<Databox> randomDataboxes = new List<Databox>();
@@ -251,7 +251,7 @@ namespace SubnauticaRandomiser.Logic
                 LogHandler.Debug("Prioritising essential item " + entity.TechType.AsString() + " for depth " + depth);
 
                 // If this has already been randomised, all the better.
-                if (_masterDict.DictionaryInstance.ContainsKey(entity.TechType))
+                if (_masterDict.RecipeDict.ContainsKey(entity.TechType))
                 {
                     entity = null;
                     LogHandler.Debug("Priority item was already randomised, skipping.");
@@ -297,7 +297,7 @@ namespace SubnauticaRandomiser.Logic
                 _materials.AddReachable(ETechTypeCategory.Fish, depth);
             if (_config.bUseSeeds && _masterDict.ContainsKnife())
                 _materials.AddReachable(ETechTypeCategory.Seeds, depth);
-            if (_config.bUseEggs && _masterDict.DictionaryInstance.ContainsKey(TechType.BaseWaterPark))
+            if (_config.bUseEggs && _masterDict.RecipeDict.ContainsKey(TechType.BaseWaterPark))
                 _materials.AddReachable(ETechTypeCategory.Eggs, depth);
         }
 
@@ -463,7 +463,7 @@ namespace SubnauticaRandomiser.Logic
         }
 
         // Check if this recipe fulfills all conditions to have its blueprint be unlocked
-        private bool CheckRecipeForBlueprint(RecipeDictionary masterDict, List<Databox> databoxes, LogicEntity entity, int depth)
+        private bool CheckRecipeForBlueprint(EntitySerializer masterDict, List<Databox> databoxes, LogicEntity entity, int depth)
         {
             bool fulfilled = true;
 
@@ -538,7 +538,7 @@ namespace SubnauticaRandomiser.Logic
                 if (!_config.bUseSeeds && conditionEntity.Category.Equals(ETechTypeCategory.Seeds))
                     continue;
 
-                fulfilled &= (masterDict.DictionaryInstance.ContainsKey(condition) || _materials.GetReachable().Exists(x => x.TechType.Equals(condition)));
+                fulfilled &= (masterDict.RecipeDict.ContainsKey(condition) || _materials.GetReachable().Exists(x => x.TechType.Equals(condition)));
 
                 if (!fulfilled)
                     return false;
@@ -552,13 +552,13 @@ namespace SubnauticaRandomiser.Logic
             return fulfilled;
         }
 
-        private static bool CheckRecipeForPrerequisites(RecipeDictionary masterDict, LogicEntity entity)
+        private static bool CheckRecipeForPrerequisites(EntitySerializer masterDict, LogicEntity entity)
         {
             bool fulfilled = true;
 
             // The builder tool must always be randomised before any base pieces
             // ever become accessible.
-            if (entity.Category.IsBasePiece() && !masterDict.DictionaryInstance.ContainsKey(TechType.Builder))
+            if (entity.Category.IsBasePiece() && !masterDict.RecipeDict.ContainsKey(TechType.Builder))
                 return false;
 
             if (entity.Prerequisites == null)
@@ -566,7 +566,7 @@ namespace SubnauticaRandomiser.Logic
 
             foreach (TechType t in entity.Prerequisites)
             {
-                fulfilled &= masterDict.DictionaryInstance.ContainsKey(t);
+                fulfilled &= masterDict.RecipeDict.ContainsKey(t);
                 if (!fulfilled)
                     break;
             }
@@ -574,11 +574,11 @@ namespace SubnauticaRandomiser.Logic
             return fulfilled;
         }
 
-        private bool ContainsAny(RecipeDictionary masterDict, TechType[] types)
+        private bool ContainsAny(EntitySerializer masterDict, TechType[] types)
         {
             foreach (TechType type in types)
             {
-                if (masterDict.DictionaryInstance.ContainsKey(type))
+                if (masterDict.RecipeDict.ContainsKey(type))
                     return true;
             }
             return false;
@@ -596,13 +596,13 @@ namespace SubnauticaRandomiser.Logic
 
         // Grab a collection of all keys in the dictionary, then use them to
         // apply every single one as a recipe change in the game.
-        internal static void ApplyMasterDict(RecipeDictionary masterDict)
+        internal static void ApplyMasterDict(EntitySerializer masterDict)
         {
-            Dictionary<TechType, Recipe>.KeyCollection keys = masterDict.DictionaryInstance.Keys;
+            Dictionary<TechType, Recipe>.KeyCollection keys = masterDict.RecipeDict.Keys;
 
             foreach (TechType key in keys)
             {
-                CraftDataHandler.SetTechData(key, masterDict.DictionaryInstance[key]);
+                CraftDataHandler.SetTechData(key, masterDict.RecipeDict[key]);
             }
 
             // TODO Once scrap metal is working, un-commenting this will apply the
@@ -612,10 +612,10 @@ namespace SubnauticaRandomiser.Logic
 
         // This function handles applying a randomised recipe to the in-game
         // craft data, and stores a copy in the master dictionary.
-        internal static void ApplyRandomisedRecipe(RecipeDictionary masterDict, Recipe recipe)
+        internal static void ApplyRandomisedRecipe(EntitySerializer masterDict, Recipe recipe)
         {
             CraftDataHandler.SetTechData(recipe.TechType, recipe);
-            masterDict.Add(recipe.TechType, recipe);
+            masterDict.AddRecipe(recipe.TechType, recipe);
         }
     }
 }

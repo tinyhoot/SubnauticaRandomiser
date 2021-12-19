@@ -23,7 +23,7 @@ namespace SubnauticaRandomiser
                                                                                                        [2] = "v0.6.1"};
 
         // The master list of all recipes that have been modified
-        internal static RecipeDictionary s_masterDict = new RecipeDictionary();
+        internal static EntitySerializer s_masterDict = new EntitySerializer();
         private static readonly bool _debug_forceRandomise = false;
 
         [QModPatch]
@@ -53,7 +53,7 @@ namespace SubnauticaRandomiser
             }
 
             // Triple checking things here in case the save got corrupted somehow
-            if (!_debug_forceRandomise && s_masterDict != null && s_masterDict.DictionaryInstance != null && s_masterDict.DictionaryInstance.Count > 0)
+            if (!_debug_forceRandomise && s_masterDict != null && s_masterDict.RecipeDict != null && s_masterDict.RecipeDict.Count > 0)
             {
                 RandomiserLogic.ApplyMasterDict(s_masterDict);
                 
@@ -84,7 +84,7 @@ namespace SubnauticaRandomiser
         // Randomise the game, discarding any earlier randomisation data.
         internal static void Randomise()
         {
-            s_masterDict = new RecipeDictionary();
+            s_masterDict = new EntitySerializer();
             s_config.SanitiseConfigValues();
             s_config.iSaveVersion = s_expectedSaveVersion;
 
@@ -135,7 +135,7 @@ namespace SubnauticaRandomiser
 
         internal static void SaveRecipeStateToDisk()
         {
-            if (s_masterDict.DictionaryInstance != null && s_masterDict.DictionaryInstance.Count > 0)
+            if (s_masterDict.RecipeDict != null && s_masterDict.RecipeDict.Count > 0)
             {
                 string base64 = s_masterDict.ToBase64String();
                 s_config.sBase64Seed = base64;
@@ -148,7 +148,7 @@ namespace SubnauticaRandomiser
             }
         }
 
-        internal static RecipeDictionary RestoreRecipeStateFromDisk()
+        internal static EntitySerializer RestoreRecipeStateFromDisk()
         {
             if (String.IsNullOrEmpty(s_config.sBase64Seed))
             {
@@ -156,9 +156,9 @@ namespace SubnauticaRandomiser
             }
 
             LogHandler.Debug("Trying to decode base64 string...");
-            RecipeDictionary dictionary = RecipeDictionary.FromBase64String(s_config.sBase64Seed);
+            EntitySerializer dictionary = EntitySerializer.FromBase64String(s_config.sBase64Seed);
 
-            if (dictionary is null || dictionary.DictionaryInstance is null || dictionary.DictionaryInstance.Count == 0)
+            if (dictionary is null || dictionary.RecipeDict is null || dictionary.RecipeDict.Count == 0)
             {
                 throw new InvalidDataException("base64 seed is invalid; could not deserialize Dictionary.");
             }
