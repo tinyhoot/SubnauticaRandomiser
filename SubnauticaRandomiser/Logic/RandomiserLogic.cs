@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
 using UnityEngine;
@@ -79,14 +78,6 @@ namespace SubnauticaRandomiser.Logic
             if (_config.bRandomiseDataboxes && _databoxes != null)
             {
                 _databoxes = RandomiseDataboxes(masterDict, _databoxes);
-            }
-
-            // If base theming is enabled, choose a theming ingredient.
-            // FIXME Overlap with Mode.ChooseBaseTheme()
-            if (_config.bDoBaseTheming)
-            {
-                // TODO Get this working.
-                //ChangeScrapMetalResult(_baseTheme);
             }
 
             foreach (LogicEntity e in _materials.GetAll().FindAll(x => 
@@ -419,47 +410,6 @@ namespace SubnauticaRandomiser.Logic
             LogHandler.Debug("===== New reachable depth: " + totalDepth + " =====");
 
             return (int)totalDepth;
-        }
-
-        // This function changes the output of the metal salvage recipe by removing
-        // the titanium one and replacing it with the new one.
-        // As a minor caveat, the new recipe shows up at the bottom of the tree.
-        internal static void ChangeScrapMetalResult(Recipe replacement)
-        {
-            if (replacement.TechType.Equals(TechType.Titanium))
-                return;
-
-            // This techdata was used as a futile and desparate attempt to get things
-            // working. It acts just like a RandomiserRecipe would though.
-            TechData td = new TechData();
-            td.Ingredients = new List<Ingredient>();
-            td.Ingredients.Add(new Ingredient(TechType.ScrapMetal, 1));
-            td.craftAmount = 1;
-            TechType yeet = TechType.GasPod;
-
-            replacement.Ingredients = new List<RandomiserIngredient>();
-            replacement.Ingredients.Add(new RandomiserIngredient(TechType.ScrapMetal, 1));
-            replacement.CraftAmount = 4;
-
-            //CraftDataHandler.SetTechData(replacement.TechType, replacement);
-            CraftDataHandler.SetTechData(yeet, td);
-
-            LogHandler.Debug("!!! TechType contained in replacement: " + replacement.TechType.AsString());
-            foreach(RandomiserIngredient i in replacement.Ingredients)
-            {
-                LogHandler.Debug("!!! Ingredient: " + i.techType.AsString() + ", " + i.amount);
-            }
-
-            // FIXME for whatever reason, this code works for some items, but not for others????
-            // Fish seem to work, and so does lead, but every other raw material does not?
-            // What's worse, CC2 has no issues with this at all despite apparently doing nothing different???
-            CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "BasicMaterials", "Titanium");
-
-            //CraftTreeHandler.AddCraftingNode(CraftTree.Type.Fabricator, replacement.TechType, "Resources", "BasicMaterials");
-            CraftTreeHandler.AddCraftingNode(CraftTree.Type.Fabricator, yeet, "Resources", "BasicMaterials");
-
-            CraftDataHandler.RemoveFromGroup(TechGroup.Resources, TechCategory.BasicMaterials, TechType.Titanium);
-            CraftDataHandler.AddToGroup(TechGroup.Resources, TechCategory.BasicMaterials, yeet);
         }
 
         private static bool CheckDictForAllTechTypes(Dictionary<TechType, bool> dict, TechType[] types)
