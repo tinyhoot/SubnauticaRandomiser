@@ -1,5 +1,5 @@
 ﻿using System;
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.RandomiserObjects
 {
     public enum ETechTypeCategory
     {
@@ -25,7 +25,8 @@ namespace SubnauticaRandomiser
         BaseExternalModules,
         BaseInternalModules,
         BaseInternalPieces,
-        BaseGenerators
+        BaseGenerators,
+        Fragments
     }
 
     public static class Extensions

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.RandomiserObjects
 {
     [Serializable]
     public class Blueprint

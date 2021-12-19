@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -171,7 +172,7 @@ namespace SubnauticaRandomiser.Logic
 
         // Make upgrade chains a part of those items' prerequisites to ensure the
         // continuity is respected.
-        public void ApplyUpgradeChainToPrerequisites(List<RandomiserRecipe> materials)
+        public void ApplyUpgradeChainToPrerequisites(List<LogicEntity> materials)
         {
             if (materials == null || materials.Count == 0 || _upgradeChains == null || _upgradeChains.Count == 0)
                 return;
@@ -179,11 +180,11 @@ namespace SubnauticaRandomiser.Logic
             foreach (TechType upgrade in _upgradeChains.Keys)
             {
                 TechType ingredient = _upgradeChains[upgrade];
-                RandomiserRecipe recipe = materials.Find(x => x.TechType.Equals(upgrade));
+                LogicEntity entity = materials.Find(x => x.TechType.Equals(upgrade));
 
-                if (recipe.Prerequisites == null)
-                    recipe.Prerequisites = new List<TechType>();
-                recipe.Prerequisites.Add(ingredient);
+                if (!entity.HasPrerequisites)
+                    entity.Prerequisites = new List<TechType>();
+                entity.Prerequisites.Add(ingredient);
             }
         }
 

@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.RandomiserObjects
 {
     public class SpoilerLog
     {

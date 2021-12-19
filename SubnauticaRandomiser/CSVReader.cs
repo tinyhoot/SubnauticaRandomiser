@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using SMLHelper.V2.Crafting;
+using SubnauticaRandomiser.RandomiserObjects;
 using UnityEngine;
 
 namespace SubnauticaRandomiser
 {
     internal static class CSVReader
     {
-        internal static List<RandomiserRecipe> s_csvParsedList;
+        internal static List<LogicEntity> s_csvParsedList;
         internal static List<Databox> s_csvDataboxList;
         internal static string s_recipeCSVMD5;
 
@@ -17,7 +18,7 @@ namespace SubnauticaRandomiser
         private static readonly int s_expectedRows = 245;
         private static readonly int s_expectedWreckColumns = 6;
 
-        internal static List<RandomiserRecipe> ParseRecipeFile(string fileName)
+        internal static List<LogicEntity> ParseRecipeFile(string fileName)
         {
             // First, try to find and grab the file containing recipe information.
             string[] csvLines;
@@ -50,8 +51,8 @@ namespace SubnauticaRandomiser
             }
 
             // Second, read each line and try to parse that into a list of
-            // RandomiserRecipe objects, for later use.
-            s_csvParsedList = new List<RandomiserRecipe>();
+            // LogicEntity objects, for later use.
+            s_csvParsedList = new List<LogicEntity>();
 
             int lineCounter = 0;
             foreach (string line in csvLines)
@@ -79,14 +80,15 @@ namespace SubnauticaRandomiser
             return s_csvParsedList;
         }
 
-        // Parse one line of a CSV file and attempt to create a RandomiserRecipe.
-        private static RandomiserRecipe ParseRecipeFileLine(string line)
+        // Parse one line of a CSV file and attempt to create a LogicEntity.
+        private static LogicEntity ParseRecipeFileLine(string line)
         {
-            RandomiserRecipe recipe = null;
+            LogicEntity entity = null;
 
             TechType type = TechType.None;
             ETechTypeCategory category = ETechTypeCategory.None;
             int depth = 0;
+            Recipe recipe = null;
             List<TechType> prereqList = new List<TechType>();
             int value = 0;
             int maxUses = 0;
@@ -183,15 +185,25 @@ namespace SubnauticaRandomiser
             }
             
             // Only if any of the blueprint components yielded anything,
-            // ship the recipe with a blueprint.
+            // ship the entity with a blueprint.
             if ((blueprintUnlockConditions != null && blueprintUnlockConditions.Count > 0) || blueprintUnlockDepth != 0 || !blueprintDatabox || blueprintFragments.Count > 0)
             {
                 blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragments, blueprintDatabox, blueprintUnlockDepth);
             }
 
-            LogHandler.Debug("Registering recipe: " + type.AsString() + ", " + category.ToString() + ", " + depth + ", "+ prereqList.Count + " prerequisites, " + value + ", " + maxUses + ", ...");
-            recipe = new RandomiserRecipe(type, category, depth, prereqList, value, maxUses, blueprint);
-            return recipe;
+            // Only if the category corresponds to a techtype commonly associated
+            // with a craftable thing, ship the entity with a recipe.
+            if (!(category.Equals(ETechTypeCategory.RawMaterials) || category.Equals(ETechTypeCategory.Fish) || category.Equals(ETechTypeCategory.Eggs) || category.Equals(ETechTypeCategory.Seeds)))
+            {
+                recipe = new Recipe(type);
+            }
+
+            LogHandler.Debug("Registering entity: " + type.AsString() + ", " + category.ToString() + ", " + depth + ", "+ prereqList.Count + " prerequisites, " + value + ", " + maxUses + ", ...");
+
+            entity = new LogicEntity(type, category, blueprint, recipe, null, prereqList, false, value);
+            entity.AccessibleDepth = depth;
+            entity.MaxUsesPerGame = maxUses;
+            return entity;
         }
 
         // This handles everything related to the wreckage CSV and databoxes.

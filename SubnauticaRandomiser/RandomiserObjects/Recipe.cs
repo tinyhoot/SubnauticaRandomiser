@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.RandomiserObjects
 {
     [Serializable]
     public class Recipe : ITechData
