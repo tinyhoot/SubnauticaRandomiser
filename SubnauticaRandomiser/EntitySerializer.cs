@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using SubnauticaRandomiser.RandomiserObjects;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser
 {
     // This class does three things.
     //
