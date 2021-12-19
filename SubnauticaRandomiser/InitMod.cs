@@ -24,7 +24,7 @@ namespace SubnauticaRandomiser
 
         // The master list of all recipes that have been modified
         internal static RecipeDictionary s_masterDict = new RecipeDictionary();
-        private static readonly bool _debug_forceRandomise = true;
+        private static readonly bool _debug_forceRandomise = false;
 
         [QModPatch]
         public static void Initialise()
@@ -36,18 +36,10 @@ namespace SubnauticaRandomiser
             s_config = OptionsPanelHandler.Main.RegisterModOptions<RandomiserConfig>();
             LogHandler.Debug("Registered options menu.");
 
-            // Ensure the user did not update into a save incompatibility.
-            if (s_config.iSaveVersion != s_expectedSaveVersion)
-            {
-                s_versionDict.TryGetValue(s_config.iSaveVersion, out string version);
-                if (string.IsNullOrEmpty(version))
-                    version = "unknown.";
-
-                LogHandler.MainMenuMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.");
-                LogHandler.MainMenuMessage("The last supported version for your savegame is " + version);
-                LogHandler.MainMenuMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json");
+            // Ensure the user did not update into a save incompatibility, and
+            // abort if they did to preserve a prior version's state.
+            if (!CheckSaveCompatibility())
                 return;
-            }
 
             // Try and restore a recipe state from disk
             try
@@ -85,6 +77,7 @@ namespace SubnauticaRandomiser
             LogHandler.Info("Finished loading.");
         }
 
+        // Randomise the game, discarding any earlier randomisation data.
         internal static void Randomise()
         {
             s_masterDict = new RecipeDictionary();
@@ -94,7 +87,7 @@ namespace SubnauticaRandomiser
             // Attempt to read and parse the CSV with all recipe information.
             List<LogicEntity> completeMaterialsList;
             completeMaterialsList = CSVReader.ParseRecipeFile(s_recipeFile);
-            if (completeMaterialsList == null)
+            if (completeMaterialsList is null)
             {
                 LogHandler.Fatal("Failed to extract recipe information from CSV, aborting.");
                 return;
@@ -103,7 +96,7 @@ namespace SubnauticaRandomiser
             // Attempt to read and parse the CSV with wreckages and databox info.
             List<Databox> databoxes;
             databoxes = CSVReader.ParseWreckageFile(s_wreckageFile);
-            if (databoxes == null || databoxes.Count == 0)
+            if (databoxes is null || databoxes.Count == 0)
                 LogHandler.Error("Failed to extract databox information from CSV.");
 
             RandomiserLogic logic = new RandomiserLogic(s_config, completeMaterialsList, databoxes, s_config.iSeed);
@@ -116,6 +109,24 @@ namespace SubnauticaRandomiser
             SpoilerLog spoiler = new SpoilerLog(s_config);
             // This should run async, but we don't need the result here. It's a file.
             _ = spoiler.WriteLog();
+        }
+
+        // Ensure the user did not update into a save incompatibility.
+        private static bool CheckSaveCompatibility()
+        {
+            if (s_config.iSaveVersion != s_expectedSaveVersion)
+            {
+                s_versionDict.TryGetValue(s_config.iSaveVersion, out string version);
+                if (string.IsNullOrEmpty(version))
+                    version = "unknown.";
+
+                LogHandler.MainMenuMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.");
+                LogHandler.MainMenuMessage("The last supported version for your savegame is " + version);
+                LogHandler.MainMenuMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json");
+                return false;
+            }
+
+            return true;
         }
 
         internal static void SaveRecipeStateToDisk()
@@ -139,8 +150,16 @@ namespace SubnauticaRandomiser
             {
                 throw new InvalidDataException("base64 seed is empty.");
             }
+
             LogHandler.Debug("Trying to decode base64 string...");
-            return RecipeDictionary.FromBase64String(s_config.sBase64Seed);
+            RecipeDictionary dictionary = RecipeDictionary.FromBase64String(s_config.sBase64Seed);
+
+            if (dictionary is null || dictionary.DictionaryInstance is null || dictionary.DictionaryInstance.Count == 0)
+            {
+                throw new InvalidDataException("base64 seed is invalid; could not deserialize Dictionary.");
+            }
+
+            return dictionary;
         }
 
         internal static string GetSubnauticaRandomiserDirectory()
