@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.RandomiserObjects
 {
     [Serializable]
     public class Databox

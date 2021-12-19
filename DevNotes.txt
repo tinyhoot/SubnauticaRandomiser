@@ -1,3 +1,4 @@
+﻿
 ﻿Thoughts and notes on features and issues.
   
 - Randomise more things.

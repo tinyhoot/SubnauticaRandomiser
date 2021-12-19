@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.RandomiserObjects
 {
     // This class does three things.
     //
@@ -52,6 +52,12 @@ namespace SubnauticaRandomiser
             }
             DictionaryInstance.Add(type, r);
             return true;
+        }
+
+        // Does the recipe dictionary contain any knife? Used for progression.
+        public bool ContainsKnife()
+        {
+            return DictionaryInstance.ContainsKey(TechType.Knife) || DictionaryInstance.ContainsKey(TechType.HeatBlade);
         }
     }
 }
