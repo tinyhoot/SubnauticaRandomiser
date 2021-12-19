@@ -21,7 +21,7 @@ namespace SubnauticaRandomiser.Logic
             int number = _random.Next(1, _config.iMaxIngredientsPerRecipe + 1);
             int totalInvSize = 0;
             _ingredients = new List<RandomiserIngredient>();
-            UpdateBlacklist(entity.Recipe);
+            UpdateBlacklist(entity);
 
             for (int i = 1; i <= number; i++)
             {

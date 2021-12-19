@@ -129,15 +129,15 @@ namespace SubnauticaRandomiser.Logic
             return GetRandom(options);
         }
 
-        protected void UpdateBlacklist(RandomiserRecipe recipe)
+        protected void UpdateBlacklist(LogicEntity entity)
         {
             _blacklist = new List<ETechTypeCategory>();
 
-            if (_config.iEquipmentAsIngredients == 0 || (_config.iEquipmentAsIngredients == 1 && recipe.CanFunctionAsIngredient()))
+            if (_config.iEquipmentAsIngredients == 0 || (_config.iEquipmentAsIngredients == 1 && entity.CanFunctionAsIngredient()))
                 _blacklist.Add(ETechTypeCategory.Equipment);
-            if (_config.iToolsAsIngredients == 0 || (_config.iToolsAsIngredients == 1 && recipe.CanFunctionAsIngredient()))
+            if (_config.iToolsAsIngredients == 0 || (_config.iToolsAsIngredients == 1 && entity.CanFunctionAsIngredient()))
                 _blacklist.Add(ETechTypeCategory.Tools);
-            if (_config.iUpgradesAsIngredients == 0 || (_config.iUpgradesAsIngredients == 1 && recipe.CanFunctionAsIngredient()))
+            if (_config.iUpgradesAsIngredients == 0 || (_config.iUpgradesAsIngredients == 1 && entity.CanFunctionAsIngredient()))
             {
                 _blacklist.Add(ETechTypeCategory.VehicleUpgrades);
                 _blacklist.Add(ETechTypeCategory.WorkBenchUpgrades);

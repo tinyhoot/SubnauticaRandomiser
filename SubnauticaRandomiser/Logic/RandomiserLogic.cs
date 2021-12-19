@@ -207,7 +207,7 @@ namespace SubnauticaRandomiser.Logic
                     nextEntity = _mode.RandomiseIngredients(nextEntity);
 
                     // Make sure it's not an item that cannot be an ingredient.
-                    if (nextEntity.Recipe.CanFunctionAsIngredient())
+                    if (nextEntity.CanFunctionAsIngredient())
                         _materials.AddReachable(nextEntity);
                     ApplyRandomisedRecipe(masterDict, nextEntity.Recipe);
                     toBeRandomised.Remove(nextEntity);
@@ -626,10 +626,10 @@ namespace SubnauticaRandomiser.Logic
 
         // This function handles applying a randomised recipe to the in-game
         // craft data, and stores a copy in the master dictionary.
-        internal static void ApplyRandomisedRecipe(RecipeDictionary masterDict, RandomiserRecipe recipe)
+        internal static void ApplyRandomisedRecipe(RecipeDictionary masterDict, Recipe recipe)
         {
             CraftDataHandler.SetTechData(recipe.TechType, recipe);
-            masterDict.Add(recipe.TechType, recipe.GetSerializableRecipe());
+            masterDict.Add(recipe.TechType, recipe);
         }
     }
 }

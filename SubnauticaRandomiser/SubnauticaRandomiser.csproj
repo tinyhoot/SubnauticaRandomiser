@@ -55,7 +55,6 @@
     <Compile Include="RandomiserObjects\EWreckage.cs" />
     <Compile Include="RandomiserObjects\RandomiserVector.cs" />
     <Compile Include="RandomiserObjects\ProgressionPath.cs" />
-    <Compile Include="RandomiserObjects\RandomiserRecipe.cs" />
     <Compile Include="RandomiserObjects\SpoilerLog.cs" />
     <Compile Include="Logic\RandomiserLogic.cs" />
     <Compile Include="Logic\ProgressionTree.cs" />

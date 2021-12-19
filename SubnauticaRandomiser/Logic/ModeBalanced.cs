@@ -22,7 +22,7 @@ namespace SubnauticaRandomiser.Logic
         internal override LogicEntity RandomiseIngredients(LogicEntity entity)
         {
             _ingredients = new List<RandomiserIngredient>();
-            UpdateBlacklist(entity.Recipe);
+            UpdateBlacklist(entity);
             double targetValue = entity.Value;
             int currentValue = 0;
             entity.Value = 0;

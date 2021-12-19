@@ -88,7 +88,7 @@ namespace SubnauticaRandomiser
             TechType type = TechType.None;
             ETechTypeCategory category = ETechTypeCategory.None;
             int depth = 0;
-            RandomiserRecipe recipe = null;
+            Recipe recipe = null;
             List<TechType> prereqList = new List<TechType>();
             int value = 0;
             int maxUses = 0;
@@ -195,7 +195,7 @@ namespace SubnauticaRandomiser
             // with a craftable thing, ship the entity with a recipe.
             if (!(category.Equals(ETechTypeCategory.RawMaterials) || category.Equals(ETechTypeCategory.Fish) || category.Equals(ETechTypeCategory.Eggs) || category.Equals(ETechTypeCategory.Seeds)))
             {
-                recipe = new RandomiserRecipe(type, category, depth, value, maxUses);
+                recipe = new Recipe(type);
             }
 
             LogHandler.Debug("Registering entity: " + type.AsString() + ", " + category.ToString() + ", " + depth + ", "+ prereqList.Count + " prerequisites, " + value + ", " + maxUses + ", ...");

@@ -8,7 +8,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         public readonly TechType TechType;
         public readonly ETechTypeCategory Category;
         public Blueprint Blueprint;             // For making it show up in the PDA
-        public RandomiserRecipe Recipe;         // For actually crafting it
+        public Recipe Recipe;                   // For actually crafting it
         public SpawnData SpawnData;             // For spawning it naturally in the world
         public List<TechType> Prerequisites;    // What is absolutely mandatory before getting this?
         public bool InLogic;                    // Is this available for randomising other entities?
@@ -29,7 +29,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
          * that it is considered accessible within the game.
          */
 
-        public LogicEntity(TechType type, ETechTypeCategory category, Blueprint blueprint = null, RandomiserRecipe recipe = null, SpawnData spawnData = null, List<TechType> prerequisites = null, bool inLogic = false, int value = 0)
+        public LogicEntity(TechType type, ETechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null, SpawnData spawnData = null, List<TechType> prerequisites = null, bool inLogic = false, int value = 0)
         {
             TechType = type;
             Category = category;
@@ -43,6 +43,30 @@ namespace SubnauticaRandomiser.RandomiserObjects
             Value = value;
             MaxUsesPerGame = 0;
             _usedInRecipes = 0;
+        }
+
+        // Base pieces and vehicles obviously cannot act as ingredients for
+        // recipes, so this function detects and filters them.
+        public bool CanFunctionAsIngredient()
+        {
+            ETechTypeCategory[] bad = { ETechTypeCategory.BaseBasePieces,
+                                        ETechTypeCategory.BaseExternalModules,
+                                        ETechTypeCategory.BaseGenerators,
+                                        ETechTypeCategory.BaseInternalModules,
+                                        ETechTypeCategory.BaseInternalPieces,
+                                        ETechTypeCategory.Deployables,
+                                        ETechTypeCategory.None,
+                                        ETechTypeCategory.Rocket,
+                                        ETechTypeCategory.Vehicles,
+                                        ETechTypeCategory.Fragments};
+
+            foreach (ETechTypeCategory cat in bad)
+            {
+                if (cat.Equals(Category))
+                    return false;
+            }
+
+            return true;
         }
 
         // How big is this entity in the inventory?
