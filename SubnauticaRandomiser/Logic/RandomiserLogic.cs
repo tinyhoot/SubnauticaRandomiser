@@ -129,53 +129,19 @@ namespace SubnauticaRandomiser.Logic
 
                 LogicEntity nextEntity = null;
                 newProgressionItem = false;
+                bool isPriority = false;
 
                 // Make sure the list of absolutely essential items is done first,
                 // for each depth level. This guarantees certain recipes are done
                 // by a certain depth, e.g. waterparks by 500m.
-                List<TechType> essentialItems = _tree.GetEssentialItems(reachableDepth);
-                bool isPriority = false;
-                if (essentialItems != null)
-                {
-                    nextEntity = _materials.GetAll().Find(x => x.TechType.Equals(essentialItems[0]));
-                    essentialItems.RemoveAt(0);
-                    isPriority = true;
-                    LogHandler.Debug("Prioritising essential item " + nextEntity.TechType.AsString() + " for depth " + reachableDepth);
-
-                    // If this has already been randomised, all the better.
-                    if (_masterDict.DictionaryInstance.ContainsKey(nextEntity.TechType))
-                    {
-                        nextEntity = null;
-                        isPriority = false;
-                        LogHandler.Debug("Priority item was already randomised, skipping.");
-                    }
-                }
-
-                // Similarly, if all essential items are done, grab one from among
-                // the elective items and leave the rest up to chance.
-                List<TechType[]> electiveItems = _tree.GetElectiveItems(reachableDepth);
-                if (nextEntity is null && electiveItems != null && electiveItems.Count > 0)
-                {
-                    TechType[] electiveTypes = electiveItems[0];
-                    electiveItems.RemoveAt(0);
-
-                    if (ContainsAny(_masterDict, electiveTypes))
-                    {
-                        LogHandler.Debug("Priority elective containing " + electiveTypes[0].AsString() + " was already randomised, skipping.");
-                    }
-                    else
-                    {
-                        TechType nextType = GetRandom(new List<TechType>(electiveTypes));
-                        nextEntity = _materials.GetAll().Find(x => x.TechType.Equals(nextType));
-                        isPriority = true;
-                        LogHandler.Debug("Prioritising elective item " + nextEntity.TechType.AsString() + " for depth " + reachableDepth);
-                    }
-                }
+                nextEntity = GetPriorityEntity(reachableDepth);
 
                 // Once all essentials and electives are done, grab a random entity 
                 // which has not yet been randomised.
                 if (nextEntity is null)
                     nextEntity = GetRandom(toBeRandomised);
+                else
+                    isPriority = true;
 
                 // HACK improve this. Currently makes logic only consider recipes.
                 if (!nextEntity.HasRecipe)
@@ -268,6 +234,50 @@ namespace SubnauticaRandomiser.Logic
             masterDict.isDataboxRandomised = true;
 
             return randomDataboxes;
+        }
+
+        // Grab an essential or elective entity for the currently reachable depth.
+        private LogicEntity GetPriorityEntity(int depth)
+        {
+            List<TechType> essentialItems = _tree.GetEssentialItems(depth);
+            List<TechType[]> electiveItems = _tree.GetElectiveItems(depth);
+            LogicEntity entity = null;
+
+            // Always get one of the essential items first, if available.
+            if (essentialItems != null && essentialItems.Count > 0)
+            {
+                entity = _materials.GetAll().Find(x => x.TechType.Equals(essentialItems[0]));
+                essentialItems.RemoveAt(0);
+                LogHandler.Debug("Prioritising essential item " + entity.TechType.AsString() + " for depth " + depth);
+
+                // If this has already been randomised, all the better.
+                if (_masterDict.DictionaryInstance.ContainsKey(entity.TechType))
+                {
+                    entity = null;
+                    LogHandler.Debug("Priority item was already randomised, skipping.");
+                }
+            }
+
+            // Similarly, if all essential items are done, grab one from among
+            // the elective items and leave the rest up to chance.
+            if (entity is null && electiveItems != null && electiveItems.Count > 0)
+            {
+                TechType[] electiveTypes = electiveItems[0];
+                electiveItems.RemoveAt(0);
+
+                if (ContainsAny(_masterDict, electiveTypes))
+                {
+                    LogHandler.Debug("Priority elective containing " + electiveTypes[0].AsString() + " was already randomised, skipping.");
+                }
+                else
+                {
+                    TechType nextType = GetRandom(new List<TechType>(electiveTypes));
+                    entity = _materials.GetAll().Find(x => x.TechType.Equals(nextType));
+                    LogHandler.Debug("Prioritising elective item " + entity.TechType.AsString() + " for depth " + depth);
+                }
+            }
+
+            return entity;
         }
 
         // Add all reachable materials to the list, taking into account depth and
