@@ -17,13 +17,9 @@ namespace SubnauticaRandomiser.Logic
         private List<Databox> _databoxes;
         private Mode _mode;
 
-        public RandomiserLogic(EntitySerializer masterDict, RandomiserConfig config, List<LogicEntity> allMaterials, List<Databox> databoxes = null, int seed = 0)
+        public RandomiserLogic(System.Random random, EntitySerializer masterDict, RandomiserConfig config, List<LogicEntity> allMaterials, List<Databox> databoxes = null)
         {
-            if (seed == 0)
-                _random = new System.Random();
-            else
-                _random = new System.Random(seed);
-
+            _random = random;
             _masterDict = masterDict;
             _config = config;
             _materials = new Materials(allMaterials);
@@ -31,7 +27,7 @@ namespace SubnauticaRandomiser.Logic
             _mode = null;
         }
 
-        internal void RandomSmart()
+        internal void RandomSmart(FragmentLogic fragmentLogic)
         {
             // This function uses the progression tree to randomise materials
             // and game progression in an intelligent way.
@@ -142,6 +138,15 @@ namespace SubnauticaRandomiser.Logic
                     nextEntity = GetRandom(toBeRandomised);
                 else
                     isPriority = true;
+
+                // If the entity is a fragment, go handle that.
+                // TODO implement proper depth restrictions and config options.
+                if (nextEntity.Category.Equals(ETechTypeCategory.Fragments))
+                {
+                    fragmentLogic.RandomiseFragment(nextEntity, 100);
+                    nextEntity.InLogic = true;
+                    continue;
+                }
 
                 // HACK improve this. Currently makes logic only consider recipes.
                 if (!nextEntity.HasRecipe)

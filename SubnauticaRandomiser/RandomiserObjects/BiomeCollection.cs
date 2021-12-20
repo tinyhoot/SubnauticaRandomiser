@@ -9,6 +9,8 @@ namespace SubnauticaRandomiser.RandomiserObjects
         public int AverageDepth;
         public readonly EBiomeType BiomeType;
 
+        public bool HasBiomes { get { return BiomeList.Count > 0; } }
+
         public BiomeCollection(EBiomeType biomeType)
         {
             BiomeType = biomeType;

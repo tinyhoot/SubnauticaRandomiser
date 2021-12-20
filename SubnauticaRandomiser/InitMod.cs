@@ -78,7 +78,7 @@ namespace SubnauticaRandomiser
             LogHandler.Info("Finished loading.");
 
             //FragmentPatcher.EditLootDistribution();
-            FragmentLogic fl = new FragmentLogic();
+            //FragmentLogic fl = new FragmentLogic();
             //fl.Test();
         }
 
@@ -113,9 +113,18 @@ namespace SubnauticaRandomiser
             if (databoxes is null || databoxes.Count == 0)
                 LogHandler.Error("Failed to extract databox information from CSV.");
 
-            RandomiserLogic logic = new RandomiserLogic(s_masterDict, s_config, completeMaterialsList, databoxes, s_config.iSeed);
+            // Create a new seed if the current one is just a default
+            Random random;
+            if (s_config.iSeed == 0)
+                random = new System.Random();
+            else
+                random = new System.Random(s_config.iSeed);
 
-            logic.RandomSmart();
+            RandomiserLogic logic = new RandomiserLogic(random, s_masterDict, s_config, completeMaterialsList, databoxes);
+            FragmentLogic fragmentLogic = new FragmentLogic(s_masterDict, completeBiomeList, random);
+            fragmentLogic.Init();
+
+            logic.RandomSmart(fragmentLogic);
             LogHandler.Info("Randomisation successful!");
 
             SaveRecipeStateToDisk();

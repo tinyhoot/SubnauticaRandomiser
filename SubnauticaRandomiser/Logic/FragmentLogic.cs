@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.RandomiserObjects;
 using static LootDistributionData;
 
 namespace SubnauticaRandomiser.Logic
@@ -9,6 +10,9 @@ namespace SubnauticaRandomiser.Logic
     internal class FragmentLogic
     {
         private Dictionary<TechType, List<string>> _classIdDatabase;
+        private readonly EntitySerializer _entitySerializer;
+        private readonly Random _random;
+        private List<Biome> _availableBiomes;
         private readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
         {
             { "BaseBioReactor_Fragment", TechType.BaseBioReactorFragment },
@@ -40,15 +44,53 @@ namespace SubnauticaRandomiser.Logic
             { "ThermalPlant_Fragment", TechType.ThermalPlantFragment },
             { "Workbench_Fragment", TechType.WorkbenchFragment }
         };
+        public List<SpawnData> AllSpawnData;
 
-        internal FragmentLogic()
+        internal FragmentLogic(EntitySerializer serializer, List<BiomeCollection> biomeList, Random random)
         {
-            // This forces SMLHelper (and the game) to cache the classIds.
-            // Without this, anything below will fail.
-            _ = GetClassId(TechType.Titanium);
+            _entitySerializer = serializer;
+            _availableBiomes = GetAvailableFragmentBiomes(biomeList);
+            _random = random;
+            AllSpawnData = new List<SpawnData>();
+        }
 
-            PrepareClassIdDatabase();
-            ResetFragmentSpawns();
+        // Randomise the spawn points for a given fragment.
+        // TODO Make much of this available to the config.
+        internal SpawnData RandomiseFragment(LogicEntity entity, int depth)
+        {
+            if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList)){
+                throw new ArgumentException("Failed to find fragment '" + entity.TechType.AsString() + "' in classId database!");
+            }
+            LogHandler.Debug("Randomising fragment " + entity.TechType.AsString() + " for depth " + depth);
+
+            // HACK for now, only consider the first entry in the ID list.
+            string classId = idList[0];
+            SpawnData spawnData = new SpawnData(classId);
+
+            // Determine how many different biomes the fragment should spawn in.
+            int biomeCount = _random.Next(3, 6);
+
+            for (int i = 0; i < biomeCount; i++)
+            {
+                Biome biome = GetRandom(_availableBiomes.FindAll(x => x.AverageDepth < depth));
+                biome.Used++;
+
+                // Remove the biome from the pool if it gets too populated.
+                if (biome.Used > 3)
+                    _availableBiomes.Remove(biome);
+
+                BiomeData data = new BiomeData();
+                data.biome = (BiomeType)Enum.Parse(typeof(BiomeType), biome.Name);
+                data.count = 1;
+                data.probability = (float)_random.NextDouble() * 0.45f;
+
+                spawnData.AddBiomeData(data);
+                LogHandler.Debug("  Adding fragment to biome: " + data.biome.AsString() + ", " + data.probability);
+            }
+
+            AllSpawnData.Add(spawnData);
+            entity.SpawnData = spawnData;
+            return spawnData;
         }
 
         // Go through all the BiomeData in the game and reset any fragment spawn
@@ -86,14 +128,25 @@ namespace SubnauticaRandomiser.Logic
             LogHandler.Debug("---Completed resetting vanilla fragment spawn rates---");
         }
 
-        internal void EditBiomeData(string classId, List<LootDistributionData.BiomeData> distribution)
+        // Get all biomes that have fragment rate data, i.e. which contained
+        // fragments in vanilla. 
+        // TODO: Can be expanded to include non-vanilla ones.
+        private List<Biome> GetAvailableFragmentBiomes(List<BiomeCollection> collections)
         {
-            LootDistributionHandler.EditLootDistributionData(classId, distribution);
-        }
+            List<Biome> biomes = new List<Biome>();
 
-        internal string GetClassId(TechType type)
-        {
-            return CraftData.GetClassIdForTechType(type);
+            foreach (BiomeCollection col in collections)
+            {
+                if (!col.HasBiomes)
+                    continue;
+                foreach (Biome b in col.BiomeList)
+                {
+                    if (b.FragmentRate != null)
+                        biomes.Add(b);
+                }
+            }
+
+            return biomes;
         }
 
         // Assemble a dictionary of all relevant prefabs with their unique classId
@@ -146,6 +199,33 @@ namespace SubnauticaRandomiser.Logic
             return database;
         }
 
+        internal void EditBiomeData(string classId, List<LootDistributionData.BiomeData> distribution)
+        {
+            LootDistributionHandler.EditLootDistributionData(classId, distribution);
+        }
+
+        internal string GetClassId(TechType type)
+        {
+            return CraftData.GetClassIdForTechType(type);
+        }
+
+        private T GetRandom<T>(List<T> list)
+        {
+            if (list is null || list.Count == 0)
+                return default(T);
+
+            return list[_random.Next(0, list.Count)];
+        }
+
+        public void Init()
+        {
+            // This forces SMLHelper (and the game) to cache the classIds.
+            // Without this, anything below will fail.
+            _ = GetClassId(TechType.Titanium);
+
+            PrepareClassIdDatabase();
+            ResetFragmentSpawns();
+        }
 
         // -------------------------------------------
         // -------------------------------------------
