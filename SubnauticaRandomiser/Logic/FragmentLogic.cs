@@ -43,35 +43,47 @@ namespace SubnauticaRandomiser.Logic
 
         internal FragmentLogic()
         {
-        }
-
-        internal void Test()
-        {
-            LogHandler.Debug("titanium "+GetClassId(TechType.Titanium));
-            LogHandler.Debug("peeper "+GetClassId(TechType.Peeper));
-            LogHandler.Debug("reaper " +GetClassId(TechType.ReaperLeviathan));
-            LogHandler.Debug("acid "+GetClassId(TechType.AcidMushroom));
-            LogHandler.Debug("seamothfragment "+GetClassId(TechType.SeamothFragment));
-            LogHandler.Debug("cyclopshullfragment "+GetClassId(TechType.CyclopsHullFragment));
+            // This forces SMLHelper (and the game) to cache the classIds.
+            // Without this, anything below will fail.
+            _ = GetClassId(TechType.Titanium);
 
             PrepareClassIdDatabase();
+            ResetFragmentSpawns();
+        }
 
-            BiomeData b = new BiomeData();
-            b.biome = BiomeType.SafeShallows_Grass;
-            b.count = 1;
-            b.probability = 0.8f;
+        // Go through all the BiomeData in the game and reset any fragment spawn
+        // rates to 0.0f, effectively "deleting" them from the game until the
+        // randomiser has decided on a new distribution.
+        internal void ResetFragmentSpawns()
+        {
+            LogHandler.Debug("---Resetting vanilla fragment spawn rates---");
 
-            BiomeData b2 = new BiomeData();
-            b2.biome = BiomeType.GrassyPlateaus_TechSite_Scattered;
-            b2.count = 1;
-            b2.probability = 0.9f;
+            // For the rest of all the randomisation, we need TechTypes to classId.
+            // Unfortunately, for just this once, we need the opposite.
+            Dictionary<string, TechType> fragmentDatabase = ReverseClassIdDatabase();
 
-            List<BiomeData> list = new List<BiomeData>();
-            list.Add(b);
-            list.Add(b2);
+            // Grab a copy of all vanilla BiomeData. This loads it fresh from disk
+            // and will thus be unaffected by any existing randomisation.
+            LootDistributionData loot = LootDistributionData.Load(LootDistributionData.dataPath);
 
-            EditBiomeData(_classIdDatabase[TechType.BaseNuclearReactorFragment][0], list);
-            DumpBiomeDataEntities();
+            foreach (KeyValuePair<BiomeType, DstData> keyValuePair in loot.dstDistribution)
+            {
+                BiomeType biome = keyValuePair.Key;
+                DstData dstData = keyValuePair.Value;
+
+                foreach (PrefabData prefab in dstData.prefabs)
+                {
+                    // Ensure the prefab is actually a fragment.
+                    if (fragmentDatabase.ContainsKey(prefab.classId))
+                    {
+                        // Whatever spawn chance there was before, set it to 0.
+                        LootDistributionHandler.EditLootDistributionData(prefab.classId, biome, 0f, 0);
+                        LogHandler.Debug("Reset spawn chance to 0 for " + fragmentDatabase[prefab.classId].AsString() + " in " + biome.AsString());
+                    }
+                }
+            }
+
+            LogHandler.Debug("---Completed resetting vanilla fragment spawn rates---");
         }
 
         internal void EditBiomeData(string classId, List<LootDistributionData.BiomeData> distribution)
@@ -81,11 +93,7 @@ namespace SubnauticaRandomiser.Logic
 
         internal string GetClassId(TechType type)
         {
-            string classId = null;
-
-            classId = CraftData.GetClassIdForTechType(type);
-
-            return classId;
+            return CraftData.GetClassIdForTechType(type);
         }
 
         // Assemble a dictionary of all relevant prefabs with their unique classId
@@ -113,10 +121,35 @@ namespace SubnauticaRandomiser.Logic
                 else
                     _classIdDatabase[type].Add(classId);
 
-                LogHandler.Debug("KEY: " + classId + ", VALUE: " + UWE.PrefabDatabase.prefabFiles[classId] + ", TECHTYPE: " + type.AsString());
+                //LogHandler.Debug("KEY: " + classId + ", VALUE: " + UWE.PrefabDatabase.prefabFiles[classId] + ", TECHTYPE: " + type.AsString());
             }
         }
 
+        // Rarely, a reversed variant of the classId dictionary is useful.
+        internal Dictionary<string, TechType> ReverseClassIdDatabase()
+        {
+            Dictionary<string, TechType> database = new Dictionary<string, TechType>();
+
+            foreach (KeyValuePair<TechType, List<string>> kv in _classIdDatabase)
+            {
+                foreach (string classId in kv.Value)
+                {
+                    // Ensure no duplicates.
+                    if (!database.ContainsKey(classId))
+                    {
+                        database.Add(classId, kv.Key);
+                        //LogHandler.Debug("Added to reversed fragment database: " + kv.Key.AsString());
+                    }
+                }
+            }
+
+            return database;
+        }
+
+
+        // -------------------------------------------
+        // -------------------------------------------
+        // -------------------------------------------
         // This is really just for testing purposes.
         internal void DumpBiomeDataEntities()
         {
@@ -138,7 +171,7 @@ namespace SubnauticaRandomiser.Logic
                 // the board and is thus "empty".
                 LogHandler.Debug("KEY: " + classId + ", VALUE: " + UWE.PrefabDatabase.prefabFiles[classId]);
             }
-
+            
             LogHandler.Debug("---Dumping Biomes");
             BiomeType[] biomes = (BiomeType[])Enum.GetValues(typeof(BiomeType));
             foreach (BiomeType biome in biomes)
@@ -174,6 +207,35 @@ namespace SubnauticaRandomiser.Logic
                     LogHandler.Debug(string.Format("{0}\tNONE\t\t", biome.AsString()));
                 }
             }
+        }
+
+        internal void Test()
+        {
+            LogHandler.Debug("titanium " + GetClassId(TechType.Titanium));
+            LogHandler.Debug("peeper " + GetClassId(TechType.Peeper));
+            LogHandler.Debug("reaper " + GetClassId(TechType.ReaperLeviathan));
+            LogHandler.Debug("acid " + GetClassId(TechType.AcidMushroom));
+            LogHandler.Debug("seamothfragment " + GetClassId(TechType.SeamothFragment));
+            LogHandler.Debug("cyclopshullfragment " + GetClassId(TechType.CyclopsHullFragment));
+
+            PrepareClassIdDatabase();
+
+            BiomeData b = new BiomeData();
+            b.biome = BiomeType.SafeShallows_Grass;
+            b.count = 1;
+            b.probability = 0.8f;
+
+            BiomeData b2 = new BiomeData();
+            b2.biome = BiomeType.GrassyPlateaus_TechSite_Scattered;
+            b2.count = 1;
+            b2.probability = 0.9f;
+
+            List<BiomeData> list = new List<BiomeData>();
+            list.Add(b);
+            list.Add(b2);
+
+            EditBiomeData(_classIdDatabase[TechType.BaseNuclearReactorFragment][0], list);
+            //DumpBiomeDataEntities();
         }
     }
 }

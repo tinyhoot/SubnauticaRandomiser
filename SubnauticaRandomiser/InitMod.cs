@@ -79,7 +79,7 @@ namespace SubnauticaRandomiser
 
             //FragmentPatcher.EditLootDistribution();
             FragmentLogic fl = new FragmentLogic();
-            fl.Test();
+            //fl.Test();
         }
 
         // Randomise the game, discarding any earlier randomisation data.

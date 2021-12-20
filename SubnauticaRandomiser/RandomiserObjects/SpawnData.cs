@@ -20,6 +20,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         {
             _classId = classId;
             AccessibleDepth = depth;
+            _biomeData = new List<BiomeData>();
         }
 
         public void EditBiomeData()
