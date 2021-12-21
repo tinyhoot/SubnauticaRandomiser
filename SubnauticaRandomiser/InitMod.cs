@@ -25,7 +25,7 @@ namespace SubnauticaRandomiser
 
         // The master list of all recipes that have been modified
         internal static EntitySerializer s_masterDict = new EntitySerializer();
-        private static readonly bool _debug_forceRandomise = false;
+        private static readonly bool _debug_forceRandomise = true;
 
         [QModPatch]
         public static void Initialise()

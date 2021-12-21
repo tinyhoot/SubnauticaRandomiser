@@ -68,21 +68,23 @@ namespace SubnauticaRandomiser.Logic
             SpawnData spawnData = new SpawnData(classId);
 
             // Determine how many different biomes the fragment should spawn in.
-            int biomeCount = _random.Next(3, 6);
+            int biomeCount = _random.Next(1, 3);
 
             for (int i = 0; i < biomeCount; i++)
             {
-                Biome biome = GetRandom(_availableBiomes.FindAll(x => x.AverageDepth < depth));
+                Biome biome = GetRandom(_availableBiomes.FindAll(x => x.AverageDepth <= depth));
+                if (biome is null)
+                    biome = GetRandom(_availableBiomes);
                 biome.Used++;
 
                 // Remove the biome from the pool if it gets too populated.
-                if (biome.Used > 3)
+                if (biome.Used >= 5)
                     _availableBiomes.Remove(biome);
 
                 BiomeData data = new BiomeData();
                 data.biome = (BiomeType)Enum.Parse(typeof(BiomeType), biome.Name);
                 data.count = 1;
-                data.probability = (float)_random.NextDouble() * 0.45f;
+                data.probability = (float)_random.NextDouble() * 0.30f;
 
                 spawnData.AddBiomeData(data);
                 LogHandler.Debug("  Adding fragment to biome: " + data.biome.AsString() + ", " + data.probability);
@@ -90,6 +92,7 @@ namespace SubnauticaRandomiser.Logic
 
             AllSpawnData.Add(spawnData);
             entity.SpawnData = spawnData;
+            EditBiomeData(classId, spawnData.BiomeData);
             return spawnData;
         }
 
@@ -120,7 +123,7 @@ namespace SubnauticaRandomiser.Logic
                     {
                         // Whatever spawn chance there was before, set it to 0.
                         LootDistributionHandler.EditLootDistributionData(prefab.classId, biome, 0f, 0);
-                        LogHandler.Debug("Reset spawn chance to 0 for " + fragmentDatabase[prefab.classId].AsString() + " in " + biome.AsString());
+                        //LogHandler.Debug("Reset spawn chance to 0 for " + fragmentDatabase[prefab.classId].AsString() + " in " + biome.AsString());
                     }
                 }
             }
@@ -139,13 +142,14 @@ namespace SubnauticaRandomiser.Logic
             {
                 if (!col.HasBiomes)
                     continue;
+
                 foreach (Biome b in col.BiomeList)
                 {
                     if (b.FragmentRate != null)
                         biomes.Add(b);
                 }
             }
-
+            LogHandler.Debug("---Total biomes suitable for fragments: "+biomes.Count);
             return biomes;
         }
 

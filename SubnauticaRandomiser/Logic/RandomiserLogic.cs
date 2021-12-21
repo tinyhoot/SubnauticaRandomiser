@@ -143,7 +143,8 @@ namespace SubnauticaRandomiser.Logic
                 // TODO implement proper depth restrictions and config options.
                 if (nextEntity.Category.Equals(ETechTypeCategory.Fragments))
                 {
-                    fragmentLogic.RandomiseFragment(nextEntity, 100);
+                    toBeRandomised.Remove(nextEntity);
+                    fragmentLogic.RandomiseFragment(nextEntity, reachableDepth);
                     nextEntity.InLogic = true;
                     continue;
                 }

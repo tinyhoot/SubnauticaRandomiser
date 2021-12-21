@@ -270,7 +270,7 @@ namespace SubnauticaRandomiser
             int smallCount = 0;
             int mediumCount = 0;
             int creatureCount = 0;
-            float fragmentRate = 0f;
+            float? fragmentRate = null;
 
             string[] cells = line.Split(',');
 
@@ -308,7 +308,7 @@ namespace SubnauticaRandomiser
             if (!string.IsNullOrEmpty(cellsFragmentRate))
                 fragmentRate = StringToFloat(cellsFragmentRate, "fragmentRate");
 
-            biome = new Biome(name, biomeType, creatureCount, mediumCount, smallCount);
+            biome = new Biome(name, biomeType, creatureCount, mediumCount, smallCount, fragmentRate);
             LogHandler.Debug("Registering biome: " + name + ", " + biomeType.ToString() + ", " + creatureCount + ", " + mediumCount + ", " + smallCount);
 
             return biome;

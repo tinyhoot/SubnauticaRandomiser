@@ -27,7 +27,8 @@ namespace SubnauticaRandomiser.RandomiserObjects
         {
             if (BiomeData.Find(x => x.biome.Equals(bd.biome)) != null)
             {
-                throw new ArgumentException("Tried to add duplicate biome " + bd.biome.AsString() + " to SpawnData ID " + _classId);
+                LogHandler.Warn("Tried to add duplicate biome " + bd.biome.AsString() + " to SpawnData ID " + _classId);
+                return;
             }
             BiomeData.Add(bd);
         }

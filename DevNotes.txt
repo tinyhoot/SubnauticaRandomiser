@@ -86,3 +86,6 @@ WHAT NEEDS TO HAPPEN TO BE ABLE TO DO FRAGMENTS:
   that impacts necessary spawn rates
 - Determine whether simply changing the BiomeData produces the desired results,
   or if there are cases where this does nothing (Nuclear Reactor?)
+  
+- Save fragments in masterDict
+- Do proper balancing
