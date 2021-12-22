@@ -10,6 +10,7 @@ namespace SubnauticaRandomiser.Logic
     internal class FragmentLogic
     {
         private Dictionary<TechType, List<string>> _classIdDatabase;
+        private readonly RandomiserConfig _config;
         private readonly EntitySerializer _entitySerializer;
         private readonly Random _random;
         private List<Biome> _availableBiomes;
@@ -46,8 +47,9 @@ namespace SubnauticaRandomiser.Logic
         };
         internal List<SpawnData> AllSpawnData;
 
-        internal FragmentLogic(EntitySerializer serializer, List<BiomeCollection> biomeList, Random random)
+        internal FragmentLogic(RandomiserConfig config, EntitySerializer serializer, List<BiomeCollection> biomeList, Random random)
         {
+            _config = config;
             _entitySerializer = serializer;
             _availableBiomes = GetAvailableFragmentBiomes(biomeList);
             _random = random;
@@ -55,7 +57,6 @@ namespace SubnauticaRandomiser.Logic
         }
 
         // Randomise the spawn points for a given fragment.
-        // TODO Make much of this available to the config.
         internal SpawnData RandomiseFragment(LogicEntity entity, int depth)
         {
             if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList)){
@@ -68,7 +69,7 @@ namespace SubnauticaRandomiser.Logic
             SpawnData spawnData = new SpawnData(classId);
 
             // Determine how many different biomes the fragment should spawn in.
-            int biomeCount = _random.Next(2, 4);
+            int biomeCount = _random.Next(1, _config.iMaxBiomesPerFragment);
 
             for (int i = 0; i < biomeCount; i++)
             {
@@ -95,7 +96,7 @@ namespace SubnauticaRandomiser.Logic
                 {
                     Biome = biomeType,
                     Count = 1,
-                    Probability = (float)_random.NextDouble() * 0.30f
+                    Probability = (float)_random.NextDouble() * _config.fFragmentSpawnChance
                 };
 
                 spawnData.AddBiomeData(data);

@@ -82,10 +82,6 @@ namespace SubnauticaRandomiser
             }
 
             LogHandler.Info("Finished loading.");
-
-            //FragmentPatcher.EditLootDistribution();
-            //FragmentLogic fl = new FragmentLogic();
-            //fl.Test();
         }
 
         // Randomise the game, discarding any earlier randomisation data.
@@ -130,7 +126,7 @@ namespace SubnauticaRandomiser
             FragmentLogic fragmentLogic = null;
             if (s_config.bRandomiseFragments)
             {
-                fragmentLogic = new FragmentLogic(s_masterDict, completeBiomeList, random);
+                fragmentLogic = new FragmentLogic(s_config, s_masterDict, completeBiomeList, random);
                 fragmentLogic.Init();
             }
 
