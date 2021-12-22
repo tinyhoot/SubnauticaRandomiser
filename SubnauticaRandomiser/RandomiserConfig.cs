@@ -29,6 +29,9 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise blueprints in databoxes?")]
         public bool bRandomiseDataboxes = ConfigDefaults.bRandomiseDataboxes;
 
+        [Toggle("Randomise Fragments?")]
+        public bool bRandomiseFragments = ConfigDefaults.bRandomiseFragments;
+
         [Toggle("Respect vanilla upgrade chains?")]
         public bool bVanillaUpgradeChains = ConfigDefaults.bVanillaUpgradeChains;
 
@@ -143,6 +146,7 @@ namespace SubnauticaRandomiser
         internal static readonly bool bUseEggs = false;
         internal static readonly bool bUseSeeds = true;
         internal static readonly bool bRandomiseDataboxes = true;
+        internal static readonly bool bRandomiseFragments = true;
         internal static readonly bool bVanillaUpgradeChains = false;
         internal static readonly bool bDoBaseTheming = false;
         internal static readonly int iEquipmentAsIngredients = 1;
@@ -151,6 +155,7 @@ namespace SubnauticaRandomiser
         internal static readonly int iMaxAmountPerIngredient = 5;
         internal static readonly int iMaxIngredientsPerRecipe = 7;
 
+        // Advanced setting defaults start here.
         internal static readonly int iDepthSearchTime = 15;
         internal static readonly int iMaxBasicOutpostSize = 24;
         internal static readonly int iMaxEggsAsSingleIngredient = 1;

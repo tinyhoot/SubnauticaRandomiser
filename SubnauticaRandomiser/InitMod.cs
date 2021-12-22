@@ -127,8 +127,12 @@ namespace SubnauticaRandomiser
                 random = new System.Random(s_config.iSeed);
 
             RandomiserLogic logic = new RandomiserLogic(random, s_masterDict, s_config, completeMaterialsList, databoxes);
-            FragmentLogic fragmentLogic = new FragmentLogic(s_masterDict, completeBiomeList, random);
-            fragmentLogic.Init();
+            FragmentLogic fragmentLogic = null;
+            if (s_config.bRandomiseFragments)
+            {
+                fragmentLogic = new FragmentLogic(s_masterDict, completeBiomeList, random);
+                fragmentLogic.Init();
+            }
 
             logic.RandomSmart(fragmentLogic);
             LogHandler.Info("Randomisation successful!");
