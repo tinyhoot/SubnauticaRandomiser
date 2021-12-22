@@ -25,7 +25,7 @@ namespace SubnauticaRandomiser
 
         // The master list of all recipes that have been modified
         internal static EntitySerializer s_masterDict = new EntitySerializer();
-        private static readonly bool _debug_forceRandomise = true;
+        private static readonly bool _debug_forceRandomise = false;
 
         [QModPatch]
         public static void Initialise()
@@ -42,14 +42,14 @@ namespace SubnauticaRandomiser
             if (!CheckSaveCompatibility())
                 return;
 
-            // Try and restore a recipe state from disk
+            // Try and restore a game state from disk.
             try
             {
-                s_masterDict = RestoreRecipeStateFromDisk();
+                s_masterDict = RestoreGameStateFromDisk();
             }
             catch (Exception ex)
             {
-                LogHandler.Warn("Could not load recipe state from disk.");
+                LogHandler.Warn("Could not load game state from disk.");
                 LogHandler.Warn(ex.Message);
             }
 
@@ -57,18 +57,24 @@ namespace SubnauticaRandomiser
             if (!_debug_forceRandomise && s_masterDict != null && s_masterDict.RecipeDict != null && s_masterDict.RecipeDict.Count > 0)
             {
                 RandomiserLogic.ApplyMasterDict(s_masterDict);
-                
+
+                if (s_masterDict.SpawnDataDict != null && s_masterDict.SpawnDataDict.Count > 0)
+                {
+                    FragmentLogic.ApplyMasterDict(s_masterDict);
+                    LogHandler.Info("Loaded fragment state.");
+                }
+
                 if (s_masterDict.isDataboxRandomised)
                     EnableHarmonyPatching();
 
-                LogHandler.Info("Successfully loaded recipe state from disk.");
+                LogHandler.Info("Successfully loaded game state from disk.");
             }
             else
             {
                 if (_debug_forceRandomise)
                     LogHandler.Warn("Set to forcibly re-randomise recipes.");
                 else
-                    LogHandler.Warn("Failed to load recipe state from disk: dictionary empty.");
+                    LogHandler.Warn("Failed to load game state from disk: dictionary empty.");
 
                 Randomise();
                 if (s_masterDict.isDataboxRandomised)
@@ -127,7 +133,7 @@ namespace SubnauticaRandomiser
             logic.RandomSmart(fragmentLogic);
             LogHandler.Info("Randomisation successful!");
 
-            SaveRecipeStateToDisk();
+            SaveGameStateToDisk();
 
             SpoilerLog spoiler = new SpoilerLog(s_config);
             // This should run async, but we don't need the result here. It's a file.
@@ -152,24 +158,24 @@ namespace SubnauticaRandomiser
             return true;
         }
 
-        internal static void SaveRecipeStateToDisk()
+        internal static void SaveGameStateToDisk()
         {
             if (s_masterDict.RecipeDict != null && s_masterDict.RecipeDict.Count > 0)
             {
                 string base64 = s_masterDict.ToBase64String();
                 s_config.sBase64Seed = base64;
                 s_config.Save();
-                LogHandler.Debug("Saved recipe state to disk!");
+                LogHandler.Debug("Saved game state to disk!");
             }
             else
             {
-                LogHandler.Error("Could not save recipe state to disk: Dictionary empty.");
+                LogHandler.Error("Could not save game state to disk: Dictionary empty.");
             }
         }
 
-        internal static EntitySerializer RestoreRecipeStateFromDisk()
+        internal static EntitySerializer RestoreGameStateFromDisk()
         {
-            if (String.IsNullOrEmpty(s_config.sBase64Seed))
+            if (string.IsNullOrEmpty(s_config.sBase64Seed))
             {
                 throw new InvalidDataException("base64 seed is empty.");
             }

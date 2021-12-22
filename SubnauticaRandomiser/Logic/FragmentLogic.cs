@@ -44,7 +44,7 @@ namespace SubnauticaRandomiser.Logic
             { "ThermalPlant_Fragment", TechType.ThermalPlantFragment },
             { "Workbench_Fragment", TechType.WorkbenchFragment }
         };
-        public List<SpawnData> AllSpawnData;
+        internal List<SpawnData> AllSpawnData;
 
         internal FragmentLogic(EntitySerializer serializer, List<BiomeCollection> biomeList, Random random)
         {
@@ -68,31 +68,41 @@ namespace SubnauticaRandomiser.Logic
             SpawnData spawnData = new SpawnData(classId);
 
             // Determine how many different biomes the fragment should spawn in.
-            int biomeCount = _random.Next(1, 3);
+            int biomeCount = _random.Next(2, 4);
 
             for (int i = 0; i < biomeCount; i++)
             {
+                // Choose a suitable biome which is also accessible at this depth.
                 Biome biome = GetRandom(_availableBiomes.FindAll(x => x.AverageDepth <= depth));
+                // In case no good biome is available, just choose any.
                 if (biome is null)
                     biome = GetRandom(_availableBiomes);
+
+                // Ensure the biome can actually be used for creating valid BiomeData.
+                if (!Enum.TryParse(biome.Name, out BiomeType biomeType))
+                {
+                    LogHandler.Warn("  Failed to parse biome to enum: " + biome.Name);
+                    // i--;
+                    continue;
+                }
                 biome.Used++;
 
                 // Remove the biome from the pool if it gets too populated.
                 if (biome.Used >= 5)
                     _availableBiomes.Remove(biome);
 
-                BiomeData data = new BiomeData();
-                data.biome = (BiomeType)Enum.Parse(typeof(BiomeType), biome.Name);
-                data.count = 1;
-                data.probability = (float)_random.NextDouble() * 0.30f;
+                RandomiserBiomeData data = new RandomiserBiomeData
+                {
+                    Biome = biomeType,
+                    Count = 1,
+                    Probability = (float)_random.NextDouble() * 0.30f
+                };
 
                 spawnData.AddBiomeData(data);
-                LogHandler.Debug("  Adding fragment to biome: " + data.biome.AsString() + ", " + data.probability);
+                LogHandler.Debug("  Adding fragment to biome: " + data.Biome.AsString() + ", " + data.Probability);
             }
 
-            AllSpawnData.Add(spawnData);
-            entity.SpawnData = spawnData;
-            EditBiomeData(classId, spawnData.BiomeData);
+            ApplyRandomisedFragment(entity, spawnData);
             return spawnData;
         }
 
@@ -203,6 +213,29 @@ namespace SubnauticaRandomiser.Logic
             return database;
         }
 
+        // Re-apply spawnData from a saved game.
+        internal static void ApplyMasterDict(EntitySerializer masterDict)
+        {
+            foreach (TechType key in masterDict.SpawnDataDict.Keys)
+            {
+                SpawnData spawnData = masterDict.SpawnDataDict[key];
+                LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
+            }
+        }
+
+        // Add modified spawnData to the game and any place it needs to go to
+        // be stored for later use.
+        internal void ApplyRandomisedFragment(LogicEntity entity, SpawnData spawnData)
+        {
+            entity.SpawnData = spawnData;
+
+            AllSpawnData.Add(spawnData);
+            _entitySerializer.AddSpawnData(entity.TechType, spawnData);
+
+            LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
+        }
+
+        // This is kinda redundant and a leftover from early testing.
         internal void EditBiomeData(string classId, List<LootDistributionData.BiomeData> distribution)
         {
             LootDistributionHandler.EditLootDistributionData(classId, distribution);

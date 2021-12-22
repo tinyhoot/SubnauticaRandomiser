@@ -8,34 +8,37 @@ namespace SubnauticaRandomiser.RandomiserObjects
     [Serializable]
     public class SpawnData
     {
-        private readonly string _classId;
-        public int AccessibleDepth;             // Approximate depth needed to encounter this
-        public List<BiomeData> BiomeData;     // All the biomes this can appear in
-
-        // TODO:
-        // - Grab list of all biomes this thing already spawns in from a fresh LootDistributionData
-        //   - Edit everything except the biomes we change stuff *to* to 0
+        public readonly string ClassId;
+        public int AccessibleDepth;                         // Approximate depth needed to encounter this
+        public List<RandomiserBiomeData> BiomeDataList;     // All the biomes this can appear in
 
         public SpawnData(string classId, int depth = 0)
         {
-            _classId = classId;
+            ClassId = classId;
             AccessibleDepth = depth;
-            BiomeData = new List<BiomeData>();
+            BiomeDataList = new List<RandomiserBiomeData>();
         }
 
-        public void AddBiomeData(BiomeData bd)
+        public void AddBiomeData(RandomiserBiomeData bd)
         {
-            if (BiomeData.Find(x => x.biome.Equals(bd.biome)) != null)
+            if (BiomeDataList.Find(x => x.Biome.Equals(bd.Biome)) != null)
             {
-                LogHandler.Warn("Tried to add duplicate biome " + bd.biome.AsString() + " to SpawnData ID " + _classId);
+                LogHandler.Warn("Tried to add duplicate biome " + bd.Biome.AsString() + " to SpawnData ID " + ClassId);
                 return;
             }
-            BiomeData.Add(bd);
+            BiomeDataList.Add(bd);
         }
 
-        public void EditBiomeData()
+        public List<BiomeData> GetBaseBiomeData()
         {
-            LootDistributionHandler.EditLootDistributionData(_classId, BiomeData);
+            List<BiomeData> list = new List<BiomeData>();
+
+            foreach (RandomiserBiomeData data in BiomeDataList)
+            {
+                list.Add(data.GetBaseBiomeData());
+            }
+
+            return list;
         }
     }
 }

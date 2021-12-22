@@ -80,6 +80,7 @@
     <Compile Include="RandomiserObjects\Biome.cs" />
     <Compile Include="RandomiserObjects\BiomeCollection.cs" />
     <Compile Include="RandomiserObjects\EBiomeType.cs" />
+    <Compile Include="RandomiserObjects\RandomiserBiomeData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
