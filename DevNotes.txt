@@ -2,7 +2,6 @@
 ﻿Thoughts and notes on features and issues.
   
 - Randomise more things.
-  - Fragments.
   - Fish spawn points.
   - Fish size and aggression.
   - Raw material spawn points.
@@ -53,9 +52,6 @@
       of this, it also does not have an entry in masterDict.
     - Abuse this and file the new recipe for whatever scrap metal can be turned
       *into* under scrap metal.
-      
-- Cleanup
-  - Deal with the mess that is InitMod.
 
    
   
@@ -76,16 +72,3 @@ Other:
   poop and shale into something useful on the fly, or make shale always contain
   something useful in the first place.
   
-  
-  
-WHAT NEEDS TO HAPPEN TO BE ABLE TO DO FRAGMENTS:
-- Understand which biomes support fragments, raw materials, or fish
-- Understand which biomes support which sizes of what (I *think* this mostly
-  applies to fragments and prefabs, but not sure)
-- Understand how many EntitySlots of each type there are in each biome and how
-  that impacts necessary spawn rates
-- Determine whether simply changing the BiomeData produces the desired results,
-  or if there are cases where this does nothing (Nuclear Reactor?)
-  
-- Save fragments in masterDict
-- Do proper balancing
