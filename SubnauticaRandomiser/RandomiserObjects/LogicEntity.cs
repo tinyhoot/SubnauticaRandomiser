@@ -20,6 +20,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
         public bool HasPrerequisites { get { return !(Prerequisites is null) && Prerequisites.Count > 0; } }
         public bool HasRecipe { get { return !(Recipe is null); } }
+        public bool HasSpawnData { get { return !(SpawnData is null); } }
 
         /* 
          * This class acts an abstract representation of anything that could or

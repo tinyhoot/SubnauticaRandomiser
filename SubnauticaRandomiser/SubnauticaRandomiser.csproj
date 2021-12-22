@@ -38,6 +38,16 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>AfterBuild</type>
+          <command>../../CopyToSubnauticaDir.sh</command>
+          <workingdir>${ProjectDir}</workingdir>
+          <externalConsole>True</externalConsole>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="InitMod.cs" />
@@ -49,7 +59,6 @@
     <Compile Include="RandomiserObjects\EProgressionNode.cs" />
     <Compile Include="RandomiserObjects\ETechTypeCategory.cs" />
     <Compile Include="RandomiserObjects\Recipe.cs" />
-    <Compile Include="RandomiserObjects\RecipeDictionary.cs" />
     <Compile Include="DataboxPatcher.cs" />
     <Compile Include="RandomiserObjects\Databox.cs" />
     <Compile Include="RandomiserObjects\EWreckage.cs" />
@@ -65,6 +74,13 @@
     <Compile Include="Logic\ModeRandom.cs" />
     <Compile Include="RandomiserObjects\LogicEntity.cs" />
     <Compile Include="RandomiserObjects\SpawnData.cs" />
+    <Compile Include="FragmentPatcher.cs" />
+    <Compile Include="Logic\FragmentLogic.cs" />
+    <Compile Include="EntitySerializer.cs" />
+    <Compile Include="RandomiserObjects\Biome.cs" />
+    <Compile Include="RandomiserObjects\BiomeCollection.cs" />
+    <Compile Include="RandomiserObjects\EBiomeType.cs" />
+    <Compile Include="RandomiserObjects\RandomiserBiomeData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

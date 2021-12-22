@@ -8,23 +8,37 @@ namespace SubnauticaRandomiser.RandomiserObjects
     [Serializable]
     public class SpawnData
     {
-        private List<BiomeData> _biomeData;     // All the biomes this can appear in
-        private readonly string _classId;
-        public int AccessibleDepth;             // Approximate depth needed to encounter this
-
-        // TODO:
-        // - Grab list of all biomes this thing already spawns in from a fresh LootDistributionData
-        //   - Edit everything except the biomes we change stuff *to* to 0
+        public readonly string ClassId;
+        public int AccessibleDepth;                         // Approximate depth needed to encounter this
+        public List<RandomiserBiomeData> BiomeDataList;     // All the biomes this can appear in
 
         public SpawnData(string classId, int depth = 0)
         {
-            _classId = classId;
+            ClassId = classId;
             AccessibleDepth = depth;
+            BiomeDataList = new List<RandomiserBiomeData>();
         }
 
-        public void EditBiomeData()
+        public void AddBiomeData(RandomiserBiomeData bd)
         {
-            LootDistributionHandler.EditLootDistributionData(_classId, _biomeData);
+            if (BiomeDataList.Find(x => x.Biome.Equals(bd.Biome)) != null)
+            {
+                LogHandler.Warn("Tried to add duplicate biome " + bd.Biome.AsString() + " to SpawnData ID " + ClassId);
+                return;
+            }
+            BiomeDataList.Add(bd);
+        }
+
+        public List<BiomeData> GetBaseBiomeData()
+        {
+            List<BiomeData> list = new List<BiomeData>();
+
+            foreach (RandomiserBiomeData data in BiomeDataList)
+            {
+                list.Add(data.GetBaseBiomeData());
+            }
+
+            return list;
         }
     }
 }
