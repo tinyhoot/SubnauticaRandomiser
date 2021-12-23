@@ -32,10 +32,12 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "iRandomiserMode",
                 "bUseFish", "bUseEggs", "bUseSeeds",
                 "bRandomiseDataboxes",
+                "bRandomiseFragments",
                 "bVanillaUpgradeChains",
                 "bDoBaseTheming",
                 "iEquipmentAsIngredients", "iToolsAsIngredients", "iUpgradesAsIngredients",
-                "iMaxIngredientsPerRecipe", "iMaxAmountPerIngredient"
+                "iMaxIngredientsPerRecipe", "iMaxAmountPerIngredient",
+                "bMaxBiomesPerFragments", "fFragmentSpawnChance"
             };
             _contentHeader = new string[]
             {
@@ -53,11 +55,14 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "Seed: " + _config.iSeed,
                 "Mode: " + _config.iRandomiserMode,
                 "Fish, Eggs, Seeds: " + _config.bUseFish + ", " + _config.bUseEggs + ", " + _config.bUseSeeds,
-                "Databoxes: " + _config.bRandomiseDataboxes,
+                "Random Databoxes: " + _config.bRandomiseDataboxes,
+                "Random Fragments: " + _config.bRandomiseFragments,
                 "Vanilla Upgrade Chains: " + _config.bVanillaUpgradeChains,
                 "Base Theming: " + _config.bDoBaseTheming,
                 "Equipment, Tools, Upgrades: " + _config.iEquipmentAsIngredients + ", " + _config.iToolsAsIngredients + ", " + _config.iUpgradesAsIngredients,
                 "Max Ingredients: " + _config.iMaxIngredientsPerRecipe + " per recipe, " + _config.iMaxAmountPerIngredient + " per ingredient",
+                "Max Biomes per Fragment: " + _config.iMaxBiomesPerFragment,
+                "Fragment Spawn Chance: " + _config.fFragmentSpawnChance,
                 ""
             };
             _contentAdvanced = new string[]

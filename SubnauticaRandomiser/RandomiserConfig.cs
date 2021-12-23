@@ -29,7 +29,7 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise blueprints in databoxes?")]
         public bool bRandomiseDataboxes = ConfigDefaults.bRandomiseDataboxes;
 
-        [Toggle("Randomise Fragments?")]
+        [Toggle("Randomise fragments?")]
         public bool bRandomiseFragments = ConfigDefaults.bRandomiseFragments;
 
         [Toggle("Respect vanilla upgrade chains?")]
