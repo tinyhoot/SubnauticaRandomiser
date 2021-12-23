@@ -37,7 +37,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "bDoBaseTheming",
                 "iEquipmentAsIngredients", "iToolsAsIngredients", "iUpgradesAsIngredients",
                 "iMaxIngredientsPerRecipe", "iMaxAmountPerIngredient",
-                "bMaxBiomesPerFragments", "fFragmentSpawnChance"
+                "bMaxBiomesPerFragments"
             };
             _contentHeader = new string[]
             {
@@ -62,7 +62,6 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "Equipment, Tools, Upgrades: " + _config.iEquipmentAsIngredients + ", " + _config.iToolsAsIngredients + ", " + _config.iUpgradesAsIngredients,
                 "Max Ingredients: " + _config.iMaxIngredientsPerRecipe + " per recipe, " + _config.iMaxAmountPerIngredient + " per ingredient",
                 "Max Biomes per Fragment: " + _config.iMaxBiomesPerFragment,
-                "Fragment Spawn Chance: " + _config.fFragmentSpawnChance,
                 ""
             };
             _contentAdvanced = new string[]
