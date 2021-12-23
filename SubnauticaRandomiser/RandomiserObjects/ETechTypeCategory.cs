@@ -29,7 +29,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         Fragments
     }
 
-    public static class Extensions
+    public static class TTCategoryExtensions
     {
         public static bool IsBasePiece(this ETechTypeCategory category)
         {
@@ -43,6 +43,21 @@ namespace SubnauticaRandomiser.RandomiserObjects
                     return true;
                 default:
                     return false;
+            }
+        }
+
+        public static bool CanHaveRecipe(this ETechTypeCategory category)
+        {
+            switch (category)
+            {
+                case (ETechTypeCategory.Eggs):
+                case (ETechTypeCategory.Fish):
+                case (ETechTypeCategory.Seeds):
+                case (ETechTypeCategory.RawMaterials):
+                case (ETechTypeCategory.Fragments):
+                    return false;
+                default:
+                    return true;
             }
         }
     }
