@@ -1,5 +1,5 @@
 # Subnautica Randomiser
-A Subnautica Mod that randomises recipes for replayability, based on [the work of stephenengland](https://github.com/stephenengland/SubnauticaRandomizer).
+A Subnautica Mod that randomises recipes for replayability, originally based on [the work of stephenengland](https://github.com/stephenengland/SubnauticaRandomizer).
 
 This can make the game considerably more difficult, and the varying availability of ingredients may also make it harder to collect enough of what you need. Since ingredients can vary so wildly, use of a blueprint tracker mod like [this one on nexus](https://www.nexusmods.com/subnautica/mods/22) is recommended.
 
@@ -11,11 +11,13 @@ The randomisation persists between play sessions and save games. If you decide t
 * Most ingredients required for base building
   * Decorative pieces like chairs or beds are unaffected
 * The blueprints found in databoxes
+* Fragment spawn rates and locations
 
 ## Features
 - ✔️ Randomise most items in the game
 - ✔️ Include fish, eggs and seeds in recipes (customisable in in-game menu)
 - ✔️ Randomise blueprints from databoxes
+- ✔️ Randomise fragments
 - ✔️ No softlocks 
 - ✔️ Upgrades can be made independent from their basic variants, so you might acquire e.g. a Seamoth Depth Module 3 long before you ever manage to get Module 1 or 2
 - ✔️ Most things you can make may also show up as an ingredient in other recipes. Do you really need that laser cutter, or do you craft it into Polyaniline?
@@ -30,6 +32,7 @@ The randomisation persists between play sessions and save games. If you decide t
 3. Extract this mod into your Subnautica/QMods folder
    1. (Optional) Edit the config in the in-game options menu to your liking
    2. Press the "Randomise with new seed" button
+   3. Restart the game to apply your changes
 4. Enjoy!
 
 ## How to Build
