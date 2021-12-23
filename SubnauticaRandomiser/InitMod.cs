@@ -118,9 +118,11 @@ namespace SubnauticaRandomiser
             // Create a new seed if the current one is just a default
             Random random;
             if (s_config.iSeed == 0)
+            {
                 random = new System.Random();
-            else
-                random = new System.Random(s_config.iSeed);
+                s_config.iSeed = random.Next();
+            }
+            random = new System.Random(s_config.iSeed);
 
             RandomiserLogic logic = new RandomiserLogic(random, s_masterDict, s_config, completeMaterialsList, databoxes);
             FragmentLogic fragmentLogic = null;

@@ -69,6 +69,7 @@ namespace SubnauticaRandomiser
             {
                 Random ran = new Random();
                 iSeed = ran.Next();
+                ran = new Random(iSeed);
                 LogHandler.MainMenuMessage("Changed seed to " + iSeed);
                 LogHandler.MainMenuMessage("Randomising...");
                 InitMod.Randomise();
