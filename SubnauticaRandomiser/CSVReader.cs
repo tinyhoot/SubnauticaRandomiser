@@ -284,7 +284,7 @@ namespace SubnauticaRandomiser
             // processed at all, the string itself is good enough.
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("BiomeType is null or empty, but is a required field.");
-            EBiomeType biomeType = StringToEnum<EBiomeType>(name);
+            EBiomeType biomeType = StringToEBiomeType(name);
 
             // Column 2: The number of small slots.
             if (string.IsNullOrEmpty(cellsSmallCount))
@@ -483,6 +483,26 @@ namespace SubnauticaRandomiser
             }
 
             return result;
+        }
+
+        private static EBiomeType StringToEBiomeType(string str)
+        {
+            foreach (string type in Enum.GetNames(typeof(EBiomeType)))
+            {
+                if (str.Contains(type))
+                {
+                    try
+                    {
+                        return (EBiomeType)Enum.Parse(typeof(EBiomeType), type);
+                    }
+                    catch (Exception)
+                    {
+                        throw new ArgumentException("Failed to parse EBiomeType from string: " + str);
+                    }
+                }
+            }
+
+            return EBiomeType.None;
         }
 
         private static bool StringToBool(string input, string column)
