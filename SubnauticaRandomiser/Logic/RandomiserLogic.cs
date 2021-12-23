@@ -552,7 +552,19 @@ namespace SubnauticaRandomiser.Logic
                     return false;
             }
 
-            if (entity.Blueprint.UnlockDepth > depth)
+            // Ensure that necessary fragments have already been randomised.
+            if (_config.bRandomiseFragments && entity.Blueprint.Fragments != null && entity.Blueprint.Fragments.Count > 0)
+            {
+                foreach (TechType fragment in entity.Blueprint.Fragments)
+                {
+                    if (!_masterDict.SpawnDataDict.ContainsKey(fragment))
+                    {
+                        LogHandler.Debug("[B] Entity " + entity.TechType.AsString() + " missing fragment " + fragment.AsString());
+                        return false;
+                    }
+                }
+            }
+            else if (entity.Blueprint.UnlockDepth > depth)
             {
                 fulfilled = false;
             }

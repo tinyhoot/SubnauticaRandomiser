@@ -18,10 +18,11 @@ namespace SubnauticaRandomiser
         internal static readonly string s_biomeFile = "biomeSlots.csv";
         internal static readonly string s_recipeFile = "recipeInformation.csv";
         internal static readonly string s_wreckageFile = "wreckInformation.csv";
-        internal static readonly string s_expectedRecipeMD5 = "ff1123bdfecfe7d473ca13c0c61a0aa3";
-        internal static readonly int s_expectedSaveVersion = 2;
+        internal static readonly string s_expectedRecipeMD5 = "4ab1b7a019037f76c0d508f1c2aee5f8";
+        internal static readonly int s_expectedSaveVersion = 3;
         internal static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string> { [1] = "v0.5.1", 
-                                                                                                       [2] = "v0.6.1"};
+                                                                                                       [2] = "v0.6.1",
+                                                                                                       [3] = "v0.7.0"};
 
         // The master list of all recipes that have been modified
         internal static EntitySerializer s_masterDict = new EntitySerializer();
@@ -118,9 +119,11 @@ namespace SubnauticaRandomiser
             // Create a new seed if the current one is just a default
             Random random;
             if (s_config.iSeed == 0)
+            {
                 random = new System.Random();
-            else
-                random = new System.Random(s_config.iSeed);
+                s_config.iSeed = random.Next();
+            }
+            random = new System.Random(s_config.iSeed);
 
             RandomiserLogic logic = new RandomiserLogic(random, s_masterDict, s_config, completeMaterialsList, databoxes);
             FragmentLogic fragmentLogic = null;

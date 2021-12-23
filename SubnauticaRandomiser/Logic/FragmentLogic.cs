@@ -26,6 +26,7 @@ namespace SubnauticaRandomiser.Logic
             { "CyclopsEngine_Fragment", TechType.CyclopsEngineFragment },
             { "CyclopsHull_Fragment_Large", TechType.CyclopsHullFragment },
             { "CyclopsHull_Fragment_Medium", TechType.CyclopsHullFragment },
+            { "Exosuit_Fragment", TechType.ExosuitFragment },
             { "ExosuitDrillArmfragment", TechType.ExosuitDrillArmFragment },
             { "ExosuitGrapplingArmfragment", TechType.ExosuitGrapplingArmFragment },
             { "ExosuitPropulsionArmfragment", TechType.ExosuitPropulsionArmFragment },

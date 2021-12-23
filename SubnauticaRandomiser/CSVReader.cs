@@ -123,14 +123,14 @@ namespace SubnauticaRandomiser
             {
                 throw new ArgumentException("TechType is null or empty, but is a required field.");
             }
-            type = StringToTechType(cellsTechType);
+            type = StringToEnum<TechType>(cellsTechType);
 
             // Column 2: Category
             if (string.IsNullOrEmpty(cellsCategory))
             {
                 throw new ArgumentException("Category is null or empty, but is a required field.");
             }
-            category = StringToETechTypeCategory(cellsCategory);
+            category = StringToEnum<ETechTypeCategory>(cellsCategory);
 
             // Column 3: Depth Difficulty
             if (!string.IsNullOrEmpty(cellsDepth))
@@ -166,7 +166,7 @@ namespace SubnauticaRandomiser
                 {
                     if (str.ToLower().Contains("fragment"))
                     {
-                        blueprintFragments.Add(StringToTechType(str));
+                        blueprintFragments.Add(StringToEnum<TechType>(str));
                     } 
                     else if (str.ToLower().Contains("databox"))
                     {
@@ -174,7 +174,7 @@ namespace SubnauticaRandomiser
                     }
                     else
                     {
-                        blueprintUnlockConditions.Add(StringToTechType(str));
+                        blueprintUnlockConditions.Add(StringToEnum<TechType>(str));
                     }
                 }
             }
@@ -194,7 +194,7 @@ namespace SubnauticaRandomiser
 
             // Only if the category corresponds to a techtype commonly associated
             // with a craftable thing, ship the entity with a recipe.
-            if (!(category.Equals(ETechTypeCategory.RawMaterials) || category.Equals(ETechTypeCategory.Fish) || category.Equals(ETechTypeCategory.Eggs) || category.Equals(ETechTypeCategory.Seeds)))
+            if (category.CanHaveRecipe())
             {
                 recipe = new Recipe(type);
             }
@@ -392,7 +392,7 @@ namespace SubnauticaRandomiser
             {
                 throw new ArgumentException("TechType is null or empty, but is a required field.");
             }
-            type = StringToTechType(cellsTechType);
+            type = StringToEnum<TechType>(cellsTechType);
 
             // Column 2: Coordinates
             if (!string.IsNullOrEmpty(cellsCoordinates))
@@ -418,7 +418,7 @@ namespace SubnauticaRandomiser
             // Column 3: General location
             if (!string.IsNullOrEmpty(cellsEWreckage))
             {
-                wreck = StringToEWreckage(cellsEWreckage);
+                wreck = StringToEnum<EWreckage>(cellsEWreckage);
             }
 
             // Column 4: Is it a databox?
@@ -466,7 +466,7 @@ namespace SubnauticaRandomiser
             {
                 if (!String.IsNullOrEmpty(s))
                 {
-                    TechType t = StringToTechType(s);
+                    TechType t = StringToEnum<TechType>(s);
                     output.Add(t);
                 }
             }
@@ -474,52 +474,15 @@ namespace SubnauticaRandomiser
             return output;
         }
 
-        private static TechType StringToTechType(string str)
+        private static TEnum StringToEnum<TEnum>(string str)
+            where TEnum : struct
         {
-            TechType type;
-
-            try
+            if (!Enum.TryParse(str, true, out TEnum result))
             {
-                type = (TechType)Enum.Parse(typeof(TechType), str, true);
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException("Failed to parse TechType from string: " + str);
+                throw new ArgumentException("Failed to parse " + typeof(TEnum) + " from string: " + str);
             }
 
-            return type;
-        }
-
-        private static ETechTypeCategory StringToETechTypeCategory(string str)
-        {
-            ETechTypeCategory type;
-
-            try
-            {
-                type = (ETechTypeCategory)Enum.Parse(typeof(ETechTypeCategory), str, true);
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException("Failed to parse ETechTypeCategory from string: " + str);
-            }
-
-            return type;
-        }
-
-        private static EProgressionNode StringToEProgressionNode(string str)
-        {
-            EProgressionNode node;
-
-            try
-            {
-                node = (EProgressionNode)Enum.Parse(typeof(EProgressionNode), str, true);
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException("Failed to parse EProgressionNode from string: " + str);
-            }
-
-            return node;
+            return result;
         }
 
         private static EBiomeType StringToEBiomeType(string str)
@@ -540,22 +503,6 @@ namespace SubnauticaRandomiser
             }
 
             return EBiomeType.None;
-        }
-
-        private static EWreckage StringToEWreckage(string str)
-        {
-            EWreckage wreck;
-
-            try
-            {
-                wreck = (EWreckage)Enum.Parse(typeof(EWreckage), str, true);
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException("Failed to parse EWreckage from string: " + str);
-            }
-
-            return wreck;
         }
 
         private static bool StringToBool(string input, string column)

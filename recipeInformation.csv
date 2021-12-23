@@ -134,8 +134,8 @@ VehiclePowerUpgradeModule,VehicleUpgrades,300,BaseUpgradeConsole,135,3,BaseUpgra
 VehicleStorageModule,VehicleUpgrades,200,BaseUpgradeConsole,50,3,BaseUpgradeConsole,
 GasTorpedo,Torpedos,0,BaseUpgradeConsole,30,,BaseUpgradeConsole,
 WhirlpoolTorpedo,Torpedos,300,BaseUpgradeConsole,35,,BaseUpgradeConsole,
-BaseBioReactor,BaseGenerators,100,BaseRoom,75,,BioReactorFragment,90
-BaseNuclearReactor,BaseGenerators,300,BaseRoom,295,,NuclearReactorFragment,264
+BaseBioReactor,BaseGenerators,100,BaseRoom,75,,BaseBioReactorFragment,90
+BaseNuclearReactor,BaseGenerators,300,BaseRoom,295,,BaseNuclearReactorFragment,264
 SolarPanel,BaseGenerators,0,,55,,,
 ThermalPlant,BaseGenerators,300,,130,,ThermalPlantFragment,208
 BaseConnector,BaseBasePieces,0,,25,,,
@@ -172,7 +172,7 @@ PowerCellCharger,BaseInternalModules,300,,175,,PowerCellChargerFragment,208
 Radio,BaseInternalModules,0,,25,,,
 SmallLocker,BaseInternalModules,0,,25,,,
 WorkBench,BaseInternalModules,200,,110,,WorkBenchFragment,120
-BaseBulkHead,BaseInternalPieces,0,,50,,BaseBulkHeadFragment,0
+BaseBulkHead,BaseInternalPieces,0,,50,,,0
 BaseFiltrationMachine,BaseInternalPieces,300,BaseRoom,95,,,264
 BaseLadder,BaseInternalPieces,0,,25,,,
 BaseUpgradeConsole,BaseInternalPieces,200,BaseMoonPool,130,,Databox;BaseMoonPool,72
@@ -251,6 +251,7 @@ ConstructorFragment,Fragments,,,215,,,
 CyclopsBridgeFragment,Fragments,,,800,,,
 CyclopsEngineFragment,Fragments,,,800,,,
 CyclopsHullFragment,Fragments,,,800,,,
+ExosuitFragment,Fragments,,,475,,,
 ExosuitDrillArmFragment,Fragments,,,130,,,
 ExosuitGrapplingArmFragment,Fragments,,,225,,,
 ExosuitPropulsionArmFragment,Fragments,,,180,,,

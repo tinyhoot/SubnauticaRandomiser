@@ -12,7 +12,6 @@
   - Is it possible to swap fragments around?
   - Change what resources you get upon scanning duplicate fragments
     - Maybe you'd get one or two resources needed to build what you scanned?
-  - Add fragments to prerequisites for regular items.
     
 - Add a casual mode.
   - Casual mode would respect vanilla upgrade chains and be more lenient with its
