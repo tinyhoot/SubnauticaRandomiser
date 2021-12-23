@@ -8,9 +8,17 @@ using static LootDistributionData;
 
 namespace SubnauticaRandomiser
 {
-    [HarmonyPatch]
+    //[HarmonyPatch]
     public class FragmentPatcher
     {
+        private static List<TechType> _rawMaterials = new List<TechType> { 
+                            TechType.Titanium,
+                            TechType.Copper,
+                            TechType.Silver,
+                            TechType.Gold,
+                            TechType.ScrapMetal,
+                            TechType.Peeper
+            };
 
         public FragmentPatcher()
         {
@@ -83,9 +91,8 @@ namespace SubnauticaRandomiser
         // massive thing do what we want. Instead of hard-coding two titanium
         // on scanning a duplicate fragment, the game will instead call YieldMaterial()
         // in this class here.
-        //[HarmonyDebug]
-        [HarmonyTranspiler]
-        [HarmonyPatch(typeof(PDAScanner), nameof(PDAScanner.Scan))]
+        //[HarmonyTranspiler]
+        //[HarmonyPatch(typeof(PDAScanner), nameof(PDAScanner.Scan))]
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codeInstructions)
         {
             LogHandler.Debug("Starting transpiler for duplicate scan results.");
@@ -143,6 +150,10 @@ namespace SubnauticaRandomiser
 
             // TODO
             //CraftData.AddToInventory(TechType.None, 2, false, true);
+            Random r = new Random();
+
+            TechType type = _rawMaterials[r.Next(_rawMaterials.Count)];
+            CraftData.AddToInventory(type, 2, false, true);
         }
     }
 }
