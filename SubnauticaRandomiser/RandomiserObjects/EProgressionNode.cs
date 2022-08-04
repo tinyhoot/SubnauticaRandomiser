@@ -1,5 +1,4 @@
-﻿using System;
-namespace SubnauticaRandomiser.RandomiserObjects
+﻿namespace SubnauticaRandomiser.RandomiserObjects
 {
     public enum EProgressionNode
     {

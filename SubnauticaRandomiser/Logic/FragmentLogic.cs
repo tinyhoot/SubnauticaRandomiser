@@ -48,6 +48,9 @@ namespace SubnauticaRandomiser.Logic
         };
         internal List<SpawnData> AllSpawnData;
 
+        /// <summary>
+        /// Handle the logic for everything related to fragments.
+        /// </summary>
         internal FragmentLogic(RandomiserConfig config, EntitySerializer serializer, List<BiomeCollection> biomeList, Random random)
         {
             _config = config;
@@ -56,13 +59,19 @@ namespace SubnauticaRandomiser.Logic
             _random = random;
             AllSpawnData = new List<SpawnData>();
         }
-
-        // Randomise the spawn points for a given fragment.
+        
+        /// <summary>
+        /// Randomise the spawn points for a given fragment.
+        /// </summary>
+        /// <param name="entity">The fragment entity to randomise.</param>
+        /// <param name="depth">The maximum depth to consider.</param>
+        /// <returns>The SpawnData that was newly added to the EntitySerializer.</returns>
+        /// <exception cref="ArgumentException">Raised if the fragment name is invalid.</exception>
         internal SpawnData RandomiseFragment(LogicEntity entity, int depth)
         {
-            if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList)){
+            if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList))
                 throw new ArgumentException("Failed to find fragment '" + entity.TechType.AsString() + "' in classId database!");
-            }
+            
             LogHandler.Debug("Randomising fragment " + entity.TechType.AsString() + " for depth " + depth);
 
             // HACK for now, only consider the first entry in the ID list.
@@ -77,8 +86,7 @@ namespace SubnauticaRandomiser.Logic
                 // Choose a suitable biome which is also accessible at this depth.
                 Biome biome = GetRandom(_availableBiomes.FindAll(x => x.AverageDepth <= depth));
                 // In case no good biome is available, just choose any.
-                if (biome is null)
-                    biome = GetRandom(_availableBiomes);
+                biome ??= GetRandom(_availableBiomes);
 
                 // Ensure the biome can actually be used for creating valid BiomeData.
                 if (!Enum.TryParse(biome.Name, out BiomeType biomeType))
@@ -107,10 +115,11 @@ namespace SubnauticaRandomiser.Logic
             ApplyRandomisedFragment(entity, spawnData);
             return spawnData;
         }
-
-        // Go through all the BiomeData in the game and reset any fragment spawn
-        // rates to 0.0f, effectively "deleting" them from the game until the
-        // randomiser has decided on a new distribution.
+        
+        /// <summary>
+        /// Go through all the BiomeData in the game and reset any fragment spawn rates to 0.0f, effectively "deleting"
+        /// them from the game until the randomiser has decided on a new distribution.
+        /// </summary>
         internal void ResetFragmentSpawns()
         {
             LogHandler.Debug("---Resetting vanilla fragment spawn rates---");
@@ -142,10 +151,13 @@ namespace SubnauticaRandomiser.Logic
 
             LogHandler.Debug("---Completed resetting vanilla fragment spawn rates---");
         }
-
-        // Get all biomes that have fragment rate data, i.e. which contained
-        // fragments in vanilla. 
-        // TODO: Can be expanded to include non-vanilla ones.
+        
+        /// <summary>
+        /// Get all biomes that have fragment rate data, i.e. which contained fragments in vanilla.
+        /// TODO: Can be expanded to include non-vanilla ones.
+        /// </summary>
+        /// <param name="collections">A list of all biomes in the game.</param>
+        /// <returns>A list of Biomes with active fragment spawn rates.</returns>
         private List<Biome> GetAvailableFragmentBiomes(List<BiomeCollection> collections)
         {
             List<Biome> biomes = new List<Biome>();
@@ -164,9 +176,10 @@ namespace SubnauticaRandomiser.Logic
             LogHandler.Debug("---Total biomes suitable for fragments: "+biomes.Count);
             return biomes;
         }
-
-        // Assemble a dictionary of all relevant prefabs with their unique classId
-        // identifier.
+        
+        /// <summary>
+        /// Assemble a dictionary of all relevant prefabs with their unique classId identifier.
+        /// </summary>
         private void PrepareClassIdDatabase()
         {
             _classIdDatabase = new Dictionary<TechType, List<string>>();
@@ -193,8 +206,11 @@ namespace SubnauticaRandomiser.Logic
                 //LogHandler.Debug("KEY: " + classId + ", VALUE: " + UWE.PrefabDatabase.prefabFiles[classId] + ", TECHTYPE: " + type.AsString());
             }
         }
-
-        // Rarely, a reversed variant of the classId dictionary is useful.
+        
+        /// <summary>
+        /// Reverse the classId dictionary to allow for ID to TechType matching.
+        /// </summary>
+        /// <returns>The inverted dictionary.</returns>
         internal Dictionary<string, TechType> ReverseClassIdDatabase()
         {
             Dictionary<string, TechType> database = new Dictionary<string, TechType>();
@@ -214,8 +230,10 @@ namespace SubnauticaRandomiser.Logic
 
             return database;
         }
-
-        // Re-apply spawnData from a saved game.
+        
+        /// <summary>
+        /// Re-apply spawnData from a saved game.
+        /// </summary>
         internal static void ApplyMasterDict(EntitySerializer masterDict)
         {
             foreach (TechType key in masterDict.SpawnDataDict.Keys)
@@ -224,9 +242,12 @@ namespace SubnauticaRandomiser.Logic
                 LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
             }
         }
-
-        // Add modified spawnData to the game and any place it needs to go to
-        // be stored for later use.
+        
+        /// <summary>
+        /// Add modified SpawnData to the game and any place it needs to go to be stored for later use.
+        /// </summary>
+        /// <param name="entity">The entity to modify spawn rates for.</param>
+        /// <param name="spawnData">The modified SpawnData to use.</param>
         internal void ApplyRandomisedFragment(LogicEntity entity, SpawnData spawnData)
         {
             entity.SpawnData = spawnData;
@@ -237,17 +258,20 @@ namespace SubnauticaRandomiser.Logic
             LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
         }
 
-        // This is kinda redundant and a leftover from early testing.
-        internal void EditBiomeData(string classId, List<LootDistributionData.BiomeData> distribution)
-        {
-            LootDistributionHandler.EditLootDistributionData(classId, distribution);
-        }
-
+        /// <summary>
+        /// Get the classId for the given TechType.
+        /// </summary>
         internal string GetClassId(TechType type)
         {
             return CraftData.GetClassIdForTechType(type);
         }
 
+        /// <summary>
+        /// Get a random element from the given list.
+        /// </summary>
+        /// <param name="list">The list to choose a member from.</param>
+        /// <typeparam name="T">The type of the objects contained in the list.</typeparam>
+        /// <returns>A random element of the list.</returns>
         private T GetRandom<T>(List<T> list)
         {
             if (list is null || list.Count == 0)
@@ -256,6 +280,10 @@ namespace SubnauticaRandomiser.Logic
             return list[_random.Next(0, list.Count)];
         }
 
+        /// <summary>
+        /// Force Subnautica and SMLHelper to index and cache the classIds, setup the databases, and prepare a blank
+        /// slate by removing all existing fragment spawns from the game.
+        /// </summary>
         public void Init()
         {
             // This forces SMLHelper (and the game) to cache the classIds.
@@ -326,6 +354,12 @@ namespace SubnauticaRandomiser.Logic
                     LogHandler.Debug(string.Format("{0}\tNONE\t\t", biome.AsString()));
                 }
             }
+        }
+        
+        // This is kinda redundant and a leftover from early testing.
+        internal void EditBiomeData(string classId, List<LootDistributionData.BiomeData> distribution)
+        {
+            LootDistributionHandler.EditLootDistributionData(classId, distribution);
         }
 
         internal void Test()

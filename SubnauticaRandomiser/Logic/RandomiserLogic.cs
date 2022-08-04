@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
 using UnityEngine;
@@ -74,15 +75,13 @@ namespace SubnauticaRandomiser.Logic
 
             // If databox randomising is enabled, go and do that.
             if (_config.bRandomiseDataboxes && _databoxes != null)
-            {
                 _databoxes = RandomiseDataboxes(_masterDict, _databoxes);
-            }
 
             foreach (LogicEntity e in _materials.GetAll().FindAll(x => 
-                                                            !x.Category.Equals(ETechTypeCategory.RawMaterials) 
-                                                         && !x.Category.Equals(ETechTypeCategory.Fish) 
-                                                         && !x.Category.Equals(ETechTypeCategory.Seeds)
-                                                         && !x.Category.Equals(ETechTypeCategory.Eggs)))
+                         !x.Category.Equals(ETechTypeCategory.RawMaterials) 
+                         && !x.Category.Equals(ETechTypeCategory.Fish) 
+                         && !x.Category.Equals(ETechTypeCategory.Seeds)
+                         && !x.Category.Equals(ETechTypeCategory.Eggs)))
             {
                 toBeRandomised.Add(e);
             }
@@ -109,7 +108,8 @@ namespace SubnauticaRandomiser.Logic
                     newDepth = CalculateReachableDepth(_tree, unlockedProgressionItems, _config.iDepthSearchTime);
                     if (SpoilerLog.s_progression.Count > 0)
                     {
-                        KeyValuePair<TechType, int> valuePair = new KeyValuePair<TechType, int>(SpoilerLog.s_progression[SpoilerLog.s_progression.Count - 1].Key, newDepth);
+                        KeyValuePair<TechType, int> valuePair = new KeyValuePair<TechType, int>
+                            (SpoilerLog.s_progression[SpoilerLog.s_progression.Count - 1].Key, newDepth);
                         SpoilerLog.s_progression.RemoveAt(SpoilerLog.s_progression.Count - 1);
                         SpoilerLog.s_progression.Add(valuePair);
                     }
@@ -123,14 +123,13 @@ namespace SubnauticaRandomiser.Logic
                     UpdateReachableMaterials(reachableDepth);
                 }
 
-                LogicEntity nextEntity = null;
                 newProgressionItem = false;
                 bool isPriority = false;
 
                 // Make sure the list of absolutely essential items is done first,
                 // for each depth level. This guarantees certain recipes are done
                 // by a certain depth, e.g. waterparks by 500m.
-                nextEntity = GetPriorityEntity(reachableDepth);
+                LogicEntity nextEntity = GetPriorityEntity(reachableDepth);
 
                 // Once all essentials and electives are done, grab a random entity 
                 // which has not yet been randomised.
@@ -173,10 +172,14 @@ namespace SubnauticaRandomiser.Logic
 
             LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
         }
-
-        // Handle everything related to actually randomising the recipe itself,
-        // and ensure all special cases are covered.
-        // Returns true if a new progression item was unlocked.
+        
+        /// <summary>
+        /// Handle everything related to actually randomising the recipe itself, and ensure all special cases are covered.
+        /// </summary>
+        /// <param name="entity">The recipe to randomise.</param>
+        /// <param name="unlockedProgressionItems">The available materials to use as potential ingredients.</param>
+        /// <param name="reachableDepth">The currently reachable depth.</param>
+        /// <returns>True if a new progression item was unlocked, false otherwise.</returns>
         private bool RandomiseRecipeEntity(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems, int reachableDepth)
         {
             bool newProgressionItem = false;
@@ -216,8 +219,14 @@ namespace SubnauticaRandomiser.Logic
 
             return newProgressionItem;
         }
-
-        // Randomise the blueprints found inside databoxes.
+        
+        /// <summary>
+        /// Randomise (shuffle) the blueprints found inside databoxes.
+        /// </summary>
+        /// <param name="masterDict">The master dictionary.</param>
+        /// <param name="databoxes">A list of all databoxes.</param>
+        /// <returns>The list of newly randomised databoxes.</returns>
+        [NotNull]
         internal List<Databox> RandomiseDataboxes(EntitySerializer masterDict, List<Databox> databoxes)
         {
             masterDict.Databoxes = new Dictionary<RandomiserVector, TechType>();
@@ -234,17 +243,24 @@ namespace SubnauticaRandomiser.Logic
                 int next = _random.Next(0, toBeRandomised.Count);
                 Databox replacementBox = databoxes.Find(x => x.Coordinates.Equals(toBeRandomised[next]));
 
-                randomDataboxes.Add(new Databox(originalBox.TechType, toBeRandomised[next], replacementBox.Wreck, replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
+                randomDataboxes.Add(new Databox(originalBox.TechType, toBeRandomised[next], replacementBox.Wreck, 
+                    replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
                 masterDict.Databoxes.Add(new RandomiserVector(toBeRandomised[next]), originalBox.TechType);
-                LogHandler.Debug("Databox " + toBeRandomised[next].ToString() + " with " + replacementBox.TechType.AsString() + " now contains " + originalBox.TechType.AsString());
+                LogHandler.Debug("Databox " + toBeRandomised[next].ToString() + " with "
+                                 + replacementBox.TechType.AsString() + " now contains " + originalBox.TechType.AsString());
                 toBeRandomised.RemoveAt(next);
             }
             masterDict.isDataboxRandomised = true;
 
             return randomDataboxes;
         }
-
-        // Grab an essential or elective entity for the currently reachable depth.
+        
+        /// <summary>
+        /// Get an essential or elective entity for the currently reachable depth, prioritising essential ones.
+        /// </summary>
+        /// <param name="depth">The maximum depth to consider.</param>
+        /// <returns>A LogicEntity, or null if all have been processed already.</returns>
+        [CanBeNull]
         private LogicEntity GetPriorityEntity(int depth)
         {
             List<TechType> essentialItems = _tree.GetEssentialItems(depth);
@@ -287,19 +303,17 @@ namespace SubnauticaRandomiser.Logic
 
             return entity;
         }
-
-        // Add all reachable materials to the list, taking into account depth and
-        // any config options.
+        
+        /// <summary>
+        /// Add all reachable materials to the list, taking into account depth and any config options.
+        /// </summary>
+        /// <param name="depth">The maximum depth to consider.</param>
         internal void UpdateReachableMaterials(int depth)
         {
             if (_masterDict.ContainsKnife())
-            {
                 _materials.AddReachable(ETechTypeCategory.RawMaterials, depth);
-            }
             else
-            {
                 _materials.AddReachableWithPrereqs(ETechTypeCategory.RawMaterials, depth, TechType.Knife, true);
-            }
 
             if (_config.bUseFish)
                 _materials.AddReachable(ETechTypeCategory.Fish, depth);
@@ -308,11 +322,17 @@ namespace SubnauticaRandomiser.Logic
             if (_config.bUseEggs && _masterDict.RecipeDict.ContainsKey(TechType.BaseWaterPark))
                 _materials.AddReachable(ETechTypeCategory.Eggs, depth);
         }
-
-        // This function calculates the maximum reachable depth based on
-        // what vehicles the player has attained, as well as how much
-        // further they can go "on foot"
-        // TODO: Simplify this.
+        
+        /// <summary>
+        /// This function calculates the maximum reachable depth based on what vehicles the player has attained, as well
+        /// as how much further they can go "on foot"
+        /// TODO: Simplify this.
+        /// </summary>
+        /// <param name="tree">The progression tree.</param>
+        /// <param name="progressionItems">A list of all currently reachable items relevant for progression.</param>
+        /// <param name="depthTime">The minimum time that it must be possible to spend at the reachable depth before
+        /// resurfacing.</param>
+        /// <returns>The reachable depth.</returns>
         internal static int CalculateReachableDepth(ProgressionTree tree, Dictionary<TechType, bool> progressionItems, int depthTime = 15)
         {
             double swimmingSpeed = 4.7; // Assuming player is holding a tool.
@@ -322,14 +342,13 @@ namespace SubnauticaRandomiser.Logic
             double tankPenalty = 0.0;
             int breathTime = 45;
 
-            // How long should the player be able to remain at this depth and
-            // still make it back just fine?
+            // How long should the player be able to remain at this depth and still make it back just fine?
             int searchTime = depthTime;
             // Never assume the player has to go deeper than this on foot.
             int maxSoloDepth = 300;
             int vehicleDepth = 0;
-            double playerDepthRaw = 0.0;
-            double totalDepth = 0.0;
+            double playerDepthRaw;
+            double totalDepth;
 
             LogHandler.Debug("===== Recalculating reachable depth =====");
 
@@ -407,8 +426,7 @@ namespace SubnauticaRandomiser.Logic
                 playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
             }
 
-            // The vehicle depth and whether or not the player has a rebreather
-            // can modify the raw achievable diving depth.
+            // The vehicle depth and whether or not the player has a rebreather can modify the raw achievable diving depth.
             if (progressionItems.ContainsKey(TechType.Rebreather))
             {
                 totalDepth = vehicleDepth + (playerDepthRaw > maxSoloDepth ? maxSoloDepth : playerDepthRaw);
@@ -456,6 +474,12 @@ namespace SubnauticaRandomiser.Logic
             return (int)totalDepth;
         }
 
+        /// <summary>
+        /// Check whether all TechTypes given in the array are present in the given dictionary.
+        /// </summary>
+        /// <param name="dict">The dictionary to check.</param>
+        /// <param name="types">The array of TechTypes.</param>
+        /// <returns>True if all TechTypes are present in the dictionary, false otherwise.</returns>
         private static bool CheckDictForAllTechTypes(Dictionary<TechType, bool> dict, TechType[] types)
         {
             bool allItemsPresent = true;
@@ -469,18 +493,28 @@ namespace SubnauticaRandomiser.Logic
 
             return allItemsPresent;
         }
-
-        // Check if this recipe fulfills all conditions to have its blueprint be unlocked
+        
+        /// <summary>
+        /// Check if this recipe fulfills all conditions to have its blueprint be unlocked.
+        /// </summary>
+        /// <param name="masterDict">The master dictionary.</param>
+        /// <param name="databoxes">The list of all databoxes.</param>
+        /// <param name="entity">The recipe to check.</param>
+        /// <param name="depth">The maximum depth to consider.</param>
+        /// <returns>True if the recipe fulfills all conditions, false otherwise.</returns>
         private bool CheckRecipeForBlueprint(EntitySerializer masterDict, List<Databox> databoxes, LogicEntity entity, int depth)
         {
             bool fulfilled = true;
 
-            if (entity.Blueprint == null || (entity.Blueprint.UnlockConditions == null && entity.Blueprint.UnlockDepth == 0))
+            if (entity.Blueprint == null || (entity.Blueprint.UnlockConditions == null 
+                                             && entity.Blueprint.UnlockDepth == 0))
                 return true;
 
             // If the databox was randomised, do work to account for new locations.
             // Cyclops hull modules need extra special treatment.
-            if (entity.Blueprint.NeedsDatabox && databoxes != null && databoxes.Count > 0 && !entity.TechType.Equals(TechType.CyclopsHullModule2) && !entity.TechType.Equals(TechType.CyclopsHullModule3))
+            if (entity.Blueprint.NeedsDatabox && databoxes?.Count > 0 
+                                              && !entity.TechType.Equals(TechType.CyclopsHullModule2) 
+                                              && !entity.TechType.Equals(TechType.CyclopsHullModule3))
             {
                 int total = 0;
                 int number = 0;
@@ -503,8 +537,10 @@ namespace SubnauticaRandomiser.Logic
                 entity.Blueprint.UnlockDepth = total / number;
                 if (entity.TechType.Equals(TechType.CyclopsHullModule1))
                 {
-                    _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2)).Blueprint.UnlockDepth = total / number;
-                    _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3)).Blueprint.UnlockDepth = total / number;
+                    _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2))
+                        .Blueprint.UnlockDepth = total / number;
+                    _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3))
+                        .Blueprint.UnlockDepth = total / number;
                 }
 
                 // If more than half of all locations of this databox require a
@@ -514,8 +550,10 @@ namespace SubnauticaRandomiser.Logic
                     entity.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
                     if (entity.TechType.Equals(TechType.CyclopsHullModule1))
                     {
-                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2)).Blueprint.UnlockConditions.Add(TechType.LaserCutter);
-                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3)).Blueprint.UnlockConditions.Add(TechType.LaserCutter);
+                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2))
+                            .Blueprint.UnlockConditions.Add(TechType.LaserCutter);
+                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3))
+                            .Blueprint.UnlockConditions.Add(TechType.LaserCutter);
                     }
                 }
 
@@ -524,8 +562,10 @@ namespace SubnauticaRandomiser.Logic
                     entity.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
                     if (entity.TechType.Equals(TechType.CyclopsHullModule1))
                     {
-                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2)).Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
-                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3)).Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
+                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2))
+                            .Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
+                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3))
+                            .Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
                     }
                 }
             }
@@ -546,7 +586,8 @@ namespace SubnauticaRandomiser.Logic
                 if (!_config.bUseSeeds && conditionEntity.Category.Equals(ETechTypeCategory.Seeds))
                     continue;
 
-                fulfilled &= (masterDict.RecipeDict.ContainsKey(condition) || _materials.GetReachable().Exists(x => x.TechType.Equals(condition)));
+                fulfilled &= (masterDict.RecipeDict.ContainsKey(condition) 
+                              || _materials.GetReachable().Exists(x => x.TechType.Equals(condition)));
 
                 if (!fulfilled)
                     return false;
@@ -559,7 +600,8 @@ namespace SubnauticaRandomiser.Logic
                 {
                     if (!_masterDict.SpawnDataDict.ContainsKey(fragment))
                     {
-                        LogHandler.Debug("[B] Entity " + entity.TechType.AsString() + " missing fragment " + fragment.AsString());
+                        LogHandler.Debug("[B] Entity " + entity.TechType.AsString() + " missing fragment " 
+                                         + fragment.AsString());
                         return false;
                     }
                 }
@@ -572,6 +614,12 @@ namespace SubnauticaRandomiser.Logic
             return fulfilled;
         }
 
+        /// <summary>
+        /// Check whether all prerequisites for this recipe have already been randomised.
+        /// </summary>
+        /// <param name="masterDict">The master dictionary.</param>
+        /// <param name="entity">The recipe to check.</param>
+        /// <returns>True if all conditions are fulfilled, false otherwise.</returns>
         private static bool CheckRecipeForPrerequisites(EntitySerializer masterDict, LogicEntity entity)
         {
             bool fulfilled = true;
@@ -594,6 +642,12 @@ namespace SubnauticaRandomiser.Logic
             return fulfilled;
         }
 
+        /// <summary>
+        /// Check wether any of the given TechTypes have already been randomised.
+        /// </summary>
+        /// <param name="masterDict">The master dictionary.</param>
+        /// <param name="types">The TechTypes.</param>
+        /// <returns>True if any TechType in the array has been randomised, false otherwise.</returns>
         private bool ContainsAny(EntitySerializer masterDict, TechType[] types)
         {
             foreach (TechType type in types)
@@ -604,6 +658,9 @@ namespace SubnauticaRandomiser.Logic
             return false;
         }
 
+        /// <summary>
+        /// Get a random element from a list.
+        /// </summary>
         private T GetRandom<T>(List<T> list)
         {
             if (list == null || list.Count == 0)
@@ -613,9 +670,11 @@ namespace SubnauticaRandomiser.Logic
 
             return list[_random.Next(0, list.Count)];
         }
-
-        // Grab a collection of all keys in the dictionary, then use them to
-        // apply every single one as a recipe change in the game.
+        
+        /// <summary>
+        /// Apply all recipe changes stored in the masterDict to the game.
+        /// </summary>
+        /// <param name="masterDict">The master dictionary.</param>
         internal static void ApplyMasterDict(EntitySerializer masterDict)
         {
             Dictionary<TechType, Recipe>.KeyCollection keys = masterDict.RecipeDict.Keys;
@@ -625,13 +684,15 @@ namespace SubnauticaRandomiser.Logic
                 CraftDataHandler.SetTechData(key, masterDict.RecipeDict[key]);
             }
 
-            // TODO Once scrap metal is working, un-commenting this will apply the
-            // change on every startup.
+            // TODO Once scrap metal is working, un-commenting this will apply the change on every startup.
             //ChangeScrapMetalResult(masterDict.DictionaryInstance[TechType.Titanium]);
         }
-
-        // This function handles applying a randomised recipe to the in-game
-        // craft data, and stores a copy in the master dictionary.
+        
+        /// <summary>
+        /// Apply a randomised recipe to the in-game craft data, and store a copy in the master dictionary.
+        /// </summary>
+        /// <param name="masterDict">The master dictionary.</param>
+        /// <param name="recipe">The recipe to change.</param>
         internal static void ApplyRandomisedRecipe(EntitySerializer masterDict, Recipe recipe)
         {
             CraftDataHandler.SetTechData(recipe.TechType, recipe);

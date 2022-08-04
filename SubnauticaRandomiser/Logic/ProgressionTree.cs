@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser.Logic
@@ -21,19 +22,16 @@ namespace SubnauticaRandomiser.Logic
             DepthProgressionItems = new Dictionary<TechType, bool>();
         }
 
+        /// <summary>
+        /// Set up a progression tree with all the vanilla roadblocks and checkpoints. It includes the major depth
+        /// milestones and the aurora, as well as which vehicles let you reach them. Getting to places on foot is
+        /// handled by the depth calculcation logic elsewhere.
+        /// If mod support ever becomes a thing there will likely have to be more flexible solutions than this.
+        /// </summary>
         public void SetupVanillaTree()
         {
-            // This is where the progression tree with all the vanilla roadblocks
-            // and checkpoints gets set up. It includes the major depth milestones
-            // and the aurora, as well as which vehicles let you reach them.
-            // Getting to places on foot is handled by the depth calculcation
-            // logic in ProgressionManager.
-            // If mod support ever becomes a thing there will likely have to be
-            // more flexible solutions than this.
-
-            ProgressionPath path;
             // Aurora. Radiation suit required, unless you're fast.
-            path = new ProgressionPath(EProgressionNode.Aurora);
+            var path = new ProgressionPath(EProgressionNode.Aurora);
             path.AddPath(TechType.RadiationSuit);
             SetProgressionPath(EProgressionNode.Aurora, path);
 
@@ -53,42 +51,42 @@ namespace SubnauticaRandomiser.Logic
 
             // 300m. Requires Seamoth I.
             path = new ProgressionPath(EProgressionNode.Depth300m);
-            path.AddPath(new TechType[] { TechType.Seamoth, TechType.VehicleHullModule1 });
-            path.AddPath(new TechType[] { TechType.Seamoth, TechType.VehicleHullModule2 });
-            path.AddPath(new TechType[] { TechType.Seamoth, TechType.VehicleHullModule3 });
+            path.AddPath(new [] { TechType.Seamoth, TechType.VehicleHullModule1 });
+            path.AddPath(new [] { TechType.Seamoth, TechType.VehicleHullModule2 });
+            path.AddPath(new [] { TechType.Seamoth, TechType.VehicleHullModule3 });
             path.AddPath(TechType.Exosuit);
             path.AddPath(TechType.Cyclops);
             SetProgressionPath(EProgressionNode.Depth300m, path);
 
             // 500m. Reachable with Seamoth II, Prawn, or Cyclops.
             path = new ProgressionPath(EProgressionNode.Depth500m);
-            path.AddPath(new TechType[] { TechType.Seamoth, TechType.VehicleHullModule2 });
-            path.AddPath(new TechType[] { TechType.Seamoth, TechType.VehicleHullModule3 });
+            path.AddPath(new [] { TechType.Seamoth, TechType.VehicleHullModule2 });
+            path.AddPath(new [] { TechType.Seamoth, TechType.VehicleHullModule3 });
             path.AddPath(TechType.Exosuit);
             path.AddPath(TechType.Cyclops);
             SetProgressionPath(EProgressionNode.Depth500m, path);
 
             // 900m. Reachable with Seamoth III, Prawn, or Cyclops I.
             path = new ProgressionPath(EProgressionNode.Depth900m);
-            path.AddPath(new TechType[] {TechType.Seamoth, TechType.VehicleHullModule3 });
+            path.AddPath(new [] {TechType.Seamoth, TechType.VehicleHullModule3 });
             path.AddPath(TechType.Exosuit);
-            path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule1 });
-            path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule2 });
-            path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule3 });
+            path.AddPath(new [] { TechType.Cyclops, TechType.CyclopsHullModule1 });
+            path.AddPath(new [] { TechType.Cyclops, TechType.CyclopsHullModule2 });
+            path.AddPath(new [] { TechType.Cyclops, TechType.CyclopsHullModule3 });
             SetProgressionPath(EProgressionNode.Depth900m, path);
 
             // 1300m. Reachable with Prawn I or Cyclops II.
             path = new ProgressionPath(EProgressionNode.Depth1300m);
-            path.AddPath(new TechType[] { TechType.Exosuit, TechType.ExoHullModule1 });
-            path.AddPath(new TechType[] { TechType.Exosuit, TechType.ExoHullModule2 });
-            path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule2 });
-            path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule3 });
+            path.AddPath(new [] { TechType.Exosuit, TechType.ExoHullModule1 });
+            path.AddPath(new [] { TechType.Exosuit, TechType.ExoHullModule2 });
+            path.AddPath(new [] { TechType.Cyclops, TechType.CyclopsHullModule2 });
+            path.AddPath(new [] { TechType.Cyclops, TechType.CyclopsHullModule3 });
             SetProgressionPath(EProgressionNode.Depth1300m, path);
 
             // 1700m. Only Prawn II and Cyclops III can reach here.
             path = new ProgressionPath(EProgressionNode.Depth1700m);
-            path.AddPath(new TechType[] { TechType.Exosuit, TechType.ExoHullModule2 });
-            path.AddPath(new TechType[] { TechType.Cyclops, TechType.CyclopsHullModule3 });
+            path.AddPath(new [] { TechType.Exosuit, TechType.ExoHullModule2 });
+            path.AddPath(new [] { TechType.Cyclops, TechType.CyclopsHullModule3 });
             SetProgressionPath(EProgressionNode.Depth1700m, path);
 
 
@@ -145,11 +143,11 @@ namespace SubnauticaRandomiser.Logic
 
             // From among these, at least one has to be accessible by the provided
             // depth level. Ensures e.g. at least one power source by 200m.
-            AddElectiveItems(EProgressionNode.Depth100m, new TechType[] { TechType.Battery, TechType.BatteryCharger });
+            AddElectiveItems(EProgressionNode.Depth100m, new [] { TechType.Battery, TechType.BatteryCharger });
 
-            AddElectiveItems(EProgressionNode.Depth200m, new TechType[] { TechType.BaseBioReactor, TechType.SolarPanel });
-            AddElectiveItems(EProgressionNode.Depth200m, new TechType[] { TechType.PowerCell, TechType.PowerCellCharger, TechType.SeamothSolarCharge });
-            AddElectiveItems(EProgressionNode.Depth200m, new TechType[] { TechType.BaseBulkhead, TechType.BaseFoundation, TechType.BaseReinforcement });
+            AddElectiveItems(EProgressionNode.Depth200m, new [] { TechType.BaseBioReactor, TechType.SolarPanel });
+            AddElectiveItems(EProgressionNode.Depth200m, new [] { TechType.PowerCell, TechType.PowerCellCharger, TechType.SeamothSolarCharge });
+            AddElectiveItems(EProgressionNode.Depth200m, new [] { TechType.BaseBulkhead, TechType.BaseFoundation, TechType.BaseReinforcement });
 
 
             // Assemble a vanilla upgrade chain. These are the upgrades as the
@@ -169,9 +167,12 @@ namespace SubnauticaRandomiser.Logic
             AddUpgradeChain(TechType.PlasteelTank, TechType.DoubleTank);
             AddUpgradeChain(TechType.HighCapacityTank, TechType.DoubleTank);
         }
-
-        // Make upgrade chains a part of those items' prerequisites to ensure the
-        // continuity is respected.
+        
+        /// <summary>
+        /// Add early elements of an upgrade chain as prerequisites of the later pieces to ensure that they are always
+        /// randomised in order, and no Knife can require a Heatblade as ingredient.
+        /// </summary>
+        /// <param name="materials">The list of all materials in the game.</param>
         public void ApplyUpgradeChainToPrerequisites(List<LogicEntity> materials)
         {
             if (materials == null || materials.Count == 0 || _upgradeChains == null || _upgradeChains.Count == 0)
@@ -188,6 +189,12 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
+        /// <summary>
+        /// Get all possible ways to progress past the given progression node.
+        /// </summary>
+        /// <param name="node">The node to progress past, commonly a depth.</param>
+        /// <returns>The paths to progress, or null if the node or path do not exist.</returns>
+        [CanBeNull]
         public ProgressionPath GetProgressionPath(EProgressionNode node)
         {
             if (_depthDifficulties.TryGetValue(node, out ProgressionPath path))
@@ -196,6 +203,11 @@ namespace SubnauticaRandomiser.Logic
             return null;
         }
         
+        /// <summary>
+        /// Set a pathway of progression for the given progression node.
+        /// </summary>
+        /// <param name="node">The node to set a path for.</param>
+        /// <param name="path">The path to set.</param>
         public void SetProgressionPath(EProgressionNode node, ProgressionPath path)
         {
             if (_depthDifficulties.ContainsKey(node))
@@ -205,6 +217,11 @@ namespace SubnauticaRandomiser.Logic
             _depthDifficulties.Add(node, path);
         }
 
+        /// <summary>
+        /// Add a pathway of progression to an existing one ProgressionPath.
+        /// </summary>
+        /// <param name="node">The node to add a path for.</param>
+        /// <param name="path">The TechType that allows for progression.</param>
         public void AddToProgressionPath(EProgressionNode node, TechType path)
         {
             if (_depthDifficulties.TryGetValue(node, out ProgressionPath pathways))
@@ -219,6 +236,11 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
+        /// <summary>
+        /// Add an entity that absolutely must be accessible by the time of the given progression node.
+        /// </summary>
+        /// <param name="node">The node representing the latest point at which the entity must be accessible.</param>
+        /// <param name="type">The entity which must be accessible.</param>
         public void AddEssentialItem(EProgressionNode node, TechType type)
         {
             if (_essentialItems.TryGetValue(node, out List<TechType> items))
@@ -232,6 +254,11 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
+        /// <summary>
+        /// Add a range of entities at least one of which must be accessible by the time of the given progression node.
+        /// </summary>
+        /// <param name="node">The node representing the latest point at which at least one entity must be accessible.</param>
+        /// <param name="types">The entities to choose from.</param>
         public void AddElectiveItems(EProgressionNode node, TechType[] types)
         {
             if (_electiveItems.TryGetValue(node, out List<TechType[]> existingItems))
@@ -245,19 +272,27 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
+        /// <summary>
+        /// Define one entity as a direct upgrade of another.
+        /// </summary>
+        /// <param name="upgrade">The "Tier 2", or higher order entity.</param>
+        /// <param name="ingredient">The "Tier 1", or lower order entity.</param>
+        /// <returns>True if successful, false if the upgrade is already head of an existing chain.</returns>
         public bool AddUpgradeChain(TechType upgrade, TechType ingredient)
         {
             if (_upgradeChains.ContainsKey(upgrade))
-            {
                 return false;
-            }
-            else
-            {
-                _upgradeChains.Add(upgrade, ingredient);
-                return true;
-            }
+            
+            _upgradeChains.Add(upgrade, ingredient);
+            return true;
         }
 
+        /// <summary>
+        /// Get the essential items for the given progression node.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        /// <returns>The list of essential items, or null if it doesn't exist or the node is invalid.</returns>
+        [CanBeNull]
         public List<TechType> GetEssentialItems(EProgressionNode node)
         {
             if (_essentialItems.TryGetValue(node, out List<TechType> items))
@@ -266,8 +301,16 @@ namespace SubnauticaRandomiser.Logic
             return null;
         }
 
+        /// <summary>
+        /// Get essential items for the given depth.
+        /// </summary>
+        /// <param name="depth">The maximum depth to look for.</param>
+        /// <returns>The list of essential items, or null if it doesn't exist or the given depth does not resolve to
+        /// a progression node.</returns>
+        [CanBeNull]
         public List<TechType> GetEssentialItems(int depth)
         {
+            // FIXME pretty sure this always yields the first match only.
             foreach (EProgressionNode node in _essentialItems.Keys)
             {
                 if ((int)node < depth && _essentialItems[node].Count > 0)
@@ -276,6 +319,12 @@ namespace SubnauticaRandomiser.Logic
             return null;
         }
 
+        /// <summary>
+        /// Get the list of lists of elective items for the given progression node.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        /// <returns>The list of elective items, or null if it doesn't exist or the node is invalid.</returns>
+        [CanBeNull]
         public List<TechType[]> GetElectiveItems(EProgressionNode node)
         {
             if (_electiveItems.TryGetValue(node, out List<TechType[]> items))
@@ -284,8 +333,16 @@ namespace SubnauticaRandomiser.Logic
             return null;
         }
 
+        /// <summary>
+        /// Get the list of lists of elective items for the given depth.
+        /// </summary>
+        /// <param name="depth">The maximum depth to look for.</param>
+        /// <returns>The list of elective items, or null if it doesn't exist or the given depth does not resolve to
+        /// a progression node.</returns>
+        [CanBeNull]
         public List<TechType[]> GetElectiveItems(int depth)
         {
+            // FIXME pretty sure this always yields the first match only.
             foreach (EProgressionNode node in _electiveItems.Keys)
             {
                 if ((int)node < depth && _electiveItems[node].Count > 0)
@@ -293,9 +350,13 @@ namespace SubnauticaRandomiser.Logic
             }
             return null;
         }
-
-        // Takes an advanced upgrade, and returns a required ingredient, if any.
-        // E.g. Seamoth Depth MK2 will return MK1.
+        
+        /// <summary>
+        /// Get the ingredient required for a given upgrade, if any. E.g. Seamoth Depth MK2 will return MK1.
+        /// </summary>
+        /// <param name="upgrade">The "Tier 2" entity to investigate for ingredients.</param>
+        /// <returns>The TechType of the required "Tier 1" ingredient, or TechType.None if no such requirement exists.
+        /// </returns>
         public TechType GetUpgradeChain(TechType upgrade)
         {
             if (_upgradeChains.TryGetValue(upgrade, out TechType type))  

@@ -1,8 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser.Logic
 {
+    /// <summary>
+    /// This is a legacy class, originally a revised implementation of the first Randomizer's approach to randomisation.
+    /// It is kept here for potential future repurposing.
+    /// </summary>
+    [Obsolete("This is a legacy class and no longer intended to be used.")]
     internal class ModeSubstitute
     {
         private EntitySerializer _masterDict;

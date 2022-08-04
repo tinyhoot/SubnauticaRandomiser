@@ -1,5 +1,4 @@
-﻿using System;
-namespace SubnauticaRandomiser.RandomiserObjects
+﻿namespace SubnauticaRandomiser.RandomiserObjects
 {
     public enum EBiomeType
     {
@@ -38,8 +37,11 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
     public static class BiomeTypeExtensions
     {
-        // Hardcoded, rough approximations of the depth at which the biome
-        // in general becomes broadly accessible, i.e. comfortably explorable.
+        /// <summary>
+        /// Returns a hardcoded, rough approximation of the depth at which the biome in general becomes broadly
+        /// accessible, i.e. comfortably explorable.
+        /// </summary>
+        /// <returns>The accessible depth.</returns>
         public static int GetAccessibleDepth(this EBiomeType biomeType)
         {
             switch (biomeType)

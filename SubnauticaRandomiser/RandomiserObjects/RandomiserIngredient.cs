@@ -1,6 +1,9 @@
 ﻿using System;
 namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// A wrapper for the game's Ingredient class to make it serializable.
+    /// </summary>
     [Serializable]
     public class RandomiserIngredient : IIngredient
     {

@@ -1,8 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// This class acts an abstract representation of anything that could or should be considered while randomising.
+    /// The Randomiser will pass over every one of these entities and only consider itself done once each of them has
+    /// the InLogic flag - meaning that it is considered accessible within the game.
+    /// </summary>
     public class LogicEntity
     {
         public readonly TechType TechType;
@@ -22,14 +26,6 @@ namespace SubnauticaRandomiser.RandomiserObjects
         public bool HasRecipe { get { return !(Recipe is null); } }
         public bool HasSpawnData { get { return !(SpawnData is null); } }
 
-        /* 
-         * This class acts an abstract representation of anything that could or
-         * should be considered while randomising.       
-         * The Randomiser will pass over every one of these entities and only
-         * consider itself done once each of them has the InLogic flag - meaning
-         * that it is considered accessible within the game.
-         */
-
         public LogicEntity(TechType type, ETechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null, SpawnData spawnData = null, List<TechType> prerequisites = null, bool inLogic = false, int value = 0)
         {
             TechType = type;
@@ -45,9 +41,12 @@ namespace SubnauticaRandomiser.RandomiserObjects
             MaxUsesPerGame = 0;
             _usedInRecipes = 0;
         }
-
-        // Base pieces and vehicles obviously cannot act as ingredients for
-        // recipes, so this function detects and filters them.
+        
+        /// <summary>
+        /// Check whether this entity can act as an ingredient in crafting. Base pieces and vehicles are obviously
+        /// excluded.
+        /// </summary>
+        /// <returns>True if it can act as an ingredient, false if not.</returns>
         public bool CanFunctionAsIngredient()
         {
             ETechTypeCategory[] bad = { ETechTypeCategory.BaseBasePieces,
@@ -69,8 +68,11 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
             return true;
         }
-
-        // How big is this entity in the inventory?
+        
+        /// <summary>
+        /// Get the number of slots this entity occupies in an inventory.
+        /// </summary>
+        /// <returns>The number of slots, or 0 if the entity cannot exist in the inventory.</returns>
         public int GetItemSize()
         {
             int size = 0;
@@ -79,8 +81,11 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
             return size;
         }
-
-        // Can this entity still be used in the recipe for a different entity?
+        
+        /// <summary>
+        /// Checks whether this entity can still be used in the recipe for a different entity,
+        /// </summary>
+        /// <returns>True if it can be used, false if not.</returns>
         public bool HasUsesLeft()
         {
             if (MaxUsesPerGame <= 0)

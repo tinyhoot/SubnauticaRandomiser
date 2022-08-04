@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// A class representing the knowledge required for an entity to appear in the player's PDA.
+    /// </summary>
     [Serializable]
     public class Blueprint
     {

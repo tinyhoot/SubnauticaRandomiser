@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using HarmonyLib;
 using SubnauticaRandomiser.RandomiserObjects;
 using UnityEngine;
@@ -17,7 +16,8 @@ namespace SubnauticaRandomiser
             BlueprintHandTarget blueprint = __instance.databoxPrefab.GetComponent<BlueprintHandTarget>();
             Vector3 position = __instance.transform.position;
 
-            LogHandler.Debug("[OnSpawn] Found blueprint " + blueprint.unlockTechType.AsString() + " at " + position.ToString());
+            LogHandler.Debug("[OnSpawn] Found blueprint " + blueprint.unlockTechType.AsString() + " at " 
+                             + position.ToString());
 
             ReplaceDatabox(boxDict, position, blueprint);
 
@@ -26,13 +26,14 @@ namespace SubnauticaRandomiser
 
         internal static void ReplaceDatabox(Dictionary<RandomiserVector, TechType> boxDict, Vector3 position, BlueprintHandTarget blueprint)
         {
-            // Unfortunately it has to be done like this. Building an equal vector
-            // from CSV has proven elusive, and they're not serialisable anyway.
+            // Unfortunately it has to be done like this. Building an equal vector from CSV has proven elusive, and
+            // they're not serialisable anyway.
             foreach (RandomiserVector vector in boxDict.Keys)
             {
                 if (vector.EqualsUnityVector(position))
                 {
-                    LogHandler.Debug("[!] Replacing databox " + position.ToString() + " with " + boxDict[vector].AsString());
+                    LogHandler.Debug("[!] Replacing databox " + position.ToString() + " with "
+                                     + boxDict[vector].AsString());
                     blueprint.unlockTechType = boxDict[vector];
                 }
             }
@@ -43,23 +44,20 @@ namespace SubnauticaRandomiser
     [HarmonyPatch(typeof(ProtobufSerializer), nameof(ProtobufSerializer.DeserializeIntoGameObject))]
     internal class DataboxSavePatcher
     {
-        // This intercepts loading any GameObject from disk, and swaps the blueprint
-        // of any databoxes it finds. This *needs* to be a fast, lean method or
-        // else load times and play quality will likely suffer.
+        /// <summary>
+        /// Intercept loading any GameObject from disk, and swap the blueprint if the GameObject happens to be a
+        /// databox. Very much suboptimal since this function gets called every single time something spawns in game.
+        /// </summary>
         [HarmonyPostfix]
         internal static void PatchDataboxOnLoad(ref ProtobufSerializer __instance, UniqueIdentifier uid)
         {
             BlueprintHandTarget blueprint = uid.gameObject.GetComponent<BlueprintHandTarget>();
 
             if (blueprint == null)
-            {
                 return;
-            }
 
             LogHandler.Debug("[OnLoad] Found blueprint " + blueprint.unlockTechType.AsString());
             DataboxPatcher.ReplaceDatabox(InitMod.s_masterDict.Databoxes, uid.transform.position, blueprint);
-
-            return;
         }
     }
 }

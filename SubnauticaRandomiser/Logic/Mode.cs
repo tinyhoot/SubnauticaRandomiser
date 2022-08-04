@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
@@ -30,9 +31,13 @@ namespace SubnauticaRandomiser.Logic
         }
 
         internal abstract LogicEntity RandomiseIngredients(LogicEntity entity);
-
-        // Add an ingredient to the list of ingredients used to form a recipe,
-        // but ensure its MaxUses field is respected.
+        
+        /// <summary>
+        /// Add an ingredient to the list of ingredients used to form a recipe, but ensure its MaxUses field is
+        /// respected.
+        /// </summary>
+        /// <param name="entity">The entity to add.</param>
+        /// <param name="amount">The number of uses to consume.</param>
         protected void AddIngredientWithMaxUsesCheck(LogicEntity entity, int amount)
         {
             // Ensure that limited ingredients are not overused. Particularly
@@ -47,10 +52,20 @@ namespace SubnauticaRandomiser.Logic
             if (!entity.HasUsesLeft())
             {
                 _materials.GetReachable().Remove(entity);
-                LogHandler.Debug("!   Removing " + entity.TechType.AsString() + " from materials list due to max uses reached: " + entity._usedInRecipes);
+                LogHandler.Debug("!   Removing " + entity.TechType.AsString() + " from materials list due to " +
+                                 "max uses reached: " + entity._usedInRecipes);
             }
         }
 
+        /// <summary>
+        /// Get a random entity from a list, ensuring that it is not part of a given blacklist.
+        /// TODO: Install safeguards to prevent infinite loops.
+        /// </summary>
+        /// <param name="list">The list to get a random element from.</param>
+        /// <param name="blacklist">The blacklist of forbidden elements to not ever consider.</param>
+        /// <returns>A random, non-blacklisted element from the list.</returns>
+        /// <exception cref="InvalidOperationException">Raised if the list is null or empty.</exception>
+        [NotNull]
         protected LogicEntity GetRandom(List<LogicEntity> list, List<ETechTypeCategory> blacklist = null)
         {
             if (list == null || list.Count == 0)
@@ -71,9 +86,13 @@ namespace SubnauticaRandomiser.Logic
 
             return randomEntity;
         }
-
-        // If base theming is enabled and this is a base piece, yield the base
-        // theming ingredient.
+        
+        /// <summary>
+        /// If base theming is enabled and the given entity is a base piece, return the base theming ingredient.
+        /// </summary>
+        /// <param name="entity">The entity to check.</param>
+        /// <returns>A LogicEntity if the passed entity is a base piece, null otherwise.</returns>
+        [CanBeNull]
         protected LogicEntity CheckForBaseTheming(LogicEntity entity)
         {
             if (_config.bDoBaseTheming && _baseTheme != null && entity.Category.Equals(ETechTypeCategory.BaseBasePieces))
@@ -81,9 +100,14 @@ namespace SubnauticaRandomiser.Logic
 
             return null;
         }
-
-        // If vanilla upgrade chains are enabled, yield that which this recipe
-        // upgrades from (e.g. yields Knife when given HeatBlade)
+        
+        /// <summary>
+        /// If vanilla upgrade chains are enabled, return that which this recipe upgrades from.
+        /// <example>Returns the basic Knife when given HeatBlade.</example>
+        /// </summary>
+        /// <param name="entity">The entity to check for downgrades.</param>
+        /// <returns>A LogicEntity if the given entity has a predecessor, null otherwise.</returns>
+        [CanBeNull]
         protected LogicEntity CheckForVanillaUpgrades(LogicEntity entity)
         {
             LogicEntity result = null;
@@ -92,16 +116,17 @@ namespace SubnauticaRandomiser.Logic
             {
                 TechType basicUpgrade = _tree.GetUpgradeChain(entity.TechType);
                 if (!basicUpgrade.Equals(TechType.None))
-                {
                     result = _materials.GetAll().Find(x => x.TechType.Equals(basicUpgrade));
-                }
             }
 
             return result;
         }
-
-        // Choose a theming ingredient for the base from among a range of easily
-        // available options.
+        
+        /// <summary>
+        /// Choose a theming ingredient for the base from among a range of easily available options.
+        /// </summary>
+        /// <param name="depth">The maximum depth at which the material must be available.</param>
+        /// <returns>A random LogicEntity from the Raw Materials or (if enabled) Fish categories.</returns>
         private LogicEntity ChooseBaseTheme(int depth)
         {
             List<LogicEntity> options = new List<LogicEntity>();
@@ -134,6 +159,7 @@ namespace SubnauticaRandomiser.Logic
         // This function changes the output of the metal salvage recipe by removing
         // the titanium one and replacing it with the new one.
         // As a minor caveat, the new recipe shows up at the bottom of the tree.
+        // FIXME does not function.
         internal static void ChangeScrapMetalResult(Recipe replacement)
         {
             if (replacement.TechType.Equals(TechType.Titanium))
@@ -172,6 +198,10 @@ namespace SubnauticaRandomiser.Logic
             CraftDataHandler.AddToGroup(TechGroup.Resources, TechCategory.BasicMaterials, yeet);
         }
 
+        /// <summary>
+        /// Set up the blacklist with entities that are not allowed to function as ingredients for the given entity.
+        /// </summary>
+        /// <param name="entity">The entity to build a blacklist against.</param>
         protected void UpdateBlacklist(LogicEntity entity)
         {
             _blacklist = new List<ETechTypeCategory>();

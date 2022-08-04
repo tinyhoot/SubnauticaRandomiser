@@ -7,11 +7,10 @@ namespace SubnauticaRandomiser
     public class RandomiserConfig : ConfigFile
     {
         private DateTime _timeButtonPressed = new DateTime();
-        private readonly int _confirmInterval = 5;
+        private const int _confirmInterval = 5;
 
-        // Every public variable listed here will end up in the config file
-        // Additionally, adding the relevant Attributes will also make them
-        // show up in the in-game options menu
+        // Every public variable listed here will end up in the config file.
+        // Additionally, adding the relevant Attributes will also make them show up in the in-game options menu.
         public int iSeed = 0;
 
         [Choice("Mode", "Balanced", "Chaotic")]
@@ -59,14 +58,12 @@ namespace SubnauticaRandomiser
         [Button("Randomise with new seed")]
         public void NewRandomNewSeed()
         {
-            // Re-randomising everything is a serious request, and it should not
-            // happen accidentally. This here ensures the button is pressed twice
-            // within a certain timeframe before actually randomising.
+            // Re-randomising everything is a serious request, and it should not happen accidentally. This ensures
+            // the button is pressed twice within a certain timeframe before actually randomising.
             if (EnsureButtonTime())
             {
-                Random ran = new Random();
-                iSeed = ran.Next();
-                ran = new Random(iSeed);
+                Random random = new Random();
+                iSeed = random.Next();
                 LogHandler.MainMenuMessage("Changed seed to " + iSeed);
                 LogHandler.MainMenuMessage("Randomising...");
                 InitMod.Randomise();
@@ -133,11 +130,12 @@ namespace SubnauticaRandomiser
                 fFragmentSpawnChance = ConfigDefaults.fFragmentSpawnChance;
         }
 
+        /// <summary>
+        /// Ensure the button is pressed twice within a certain timeframe before actually randomising.
+        /// </summary>
+        /// <returns>True if the button was pressed for the second time, false if not.</returns>
         private bool EnsureButtonTime()
         {
-            // Re-randomising everything is a serious request, and it should not
-            // happen accidentally. This here ensures the button is pressed twice
-            // within a certain timeframe before actually randomising.
             if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds < _confirmInterval)
             {
                 _timeButtonPressed = DateTime.MinValue;
@@ -149,31 +147,31 @@ namespace SubnauticaRandomiser
         }
     }
 
-    // Mostly used so that the spoiler log can tell which settings to include.
+    /// Mostly used so that the spoiler log can tell which settings to include.
     internal static class ConfigDefaults
     {
-        internal static readonly int iRandomiserMode = 0;
-        internal static readonly bool bUseFish = true;
-        internal static readonly bool bUseEggs = false;
-        internal static readonly bool bUseSeeds = true;
-        internal static readonly bool bRandomiseDataboxes = true;
-        internal static readonly bool bRandomiseFragments = true;
-        internal static readonly bool bVanillaUpgradeChains = false;
-        internal static readonly bool bDoBaseTheming = false;
-        internal static readonly int iEquipmentAsIngredients = 1;
-        internal static readonly int iToolsAsIngredients = 1;
-        internal static readonly int iUpgradesAsIngredients = 1;
-        internal static readonly int iMaxAmountPerIngredient = 5;
-        internal static readonly int iMaxIngredientsPerRecipe = 7;
-        internal static readonly int iMaxBiomesPerFragment = 3;
+        internal const int iRandomiserMode = 0;
+        internal const bool bUseFish = true;
+        internal const bool bUseEggs = false;
+        internal const bool bUseSeeds = true;
+        internal const bool bRandomiseDataboxes = true;
+        internal const bool bRandomiseFragments = true;
+        internal const bool bVanillaUpgradeChains = false;
+        internal const bool bDoBaseTheming = false;
+        internal const int iEquipmentAsIngredients = 1;
+        internal const int iToolsAsIngredients = 1;
+        internal const int iUpgradesAsIngredients = 1;
+        internal const int iMaxAmountPerIngredient = 5;
+        internal const int iMaxIngredientsPerRecipe = 7;
+        internal const int iMaxBiomesPerFragment = 3;
 
         // Advanced setting defaults start here.
-        internal static readonly int iDepthSearchTime = 15;
-        internal static readonly int iMaxBasicOutpostSize = 24;
-        internal static readonly int iMaxEggsAsSingleIngredient = 1;
-        internal static readonly int iMaxInventorySizePerRecipe = 24;
-        internal static readonly double dFuzziness = 0.2;
-        internal static readonly double dIngredientRatio = 0.45;
-        internal static readonly float fFragmentSpawnChance = 0.1f;
+        internal const int iDepthSearchTime = 15;
+        internal const int iMaxBasicOutpostSize = 24;
+        internal const int iMaxEggsAsSingleIngredient = 1;
+        internal const int iMaxInventorySizePerRecipe = 24;
+        internal const double dFuzziness = 0.2;
+        internal const double dIngredientRatio = 0.45;
+        internal const float fFragmentSpawnChance = 0.1f;
     }
 }

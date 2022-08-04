@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// Handles everything related to the spoiler log generated during randomisation.
+    /// </summary>
     public class SpoilerLog
     {
-        internal static readonly string s_fileName = "spoilerlog.txt";
+        internal const string _FileName = "spoilerlog.txt";
         private RandomiserConfig _config;
         internal static List<KeyValuePair<TechType, int>> s_progression = new List<KeyValuePair<TechType, int>>();
 
@@ -22,8 +25,10 @@ namespace SubnauticaRandomiser.RandomiserObjects
         {
             _config = config;
         }
-
-        // Prepare most of the fluff of the log.
+        
+        /// <summary>
+        /// Prepare the more basic aspects of the log.
+        /// </summary>
         private void PrepareStrings()
         {
             _basicOptions = new List<string>()
@@ -39,7 +44,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "iMaxIngredientsPerRecipe", "iMaxAmountPerIngredient",
                 "bMaxBiomesPerFragments"
             };
-            _contentHeader = new string[]
+            _contentHeader = new []
             {
                 "*************************************************",
                 "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
@@ -47,7 +52,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "",
                 "Generated on " + DateTime.Now + " with " + InitMod.s_versionDict[InitMod.s_expectedSaveVersion]
             };
-            _contentBasics = new string[]
+            _contentBasics = new []
             {
                 "",
                 "",
@@ -64,22 +69,24 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "Max Biomes per Fragment: " + _config.iMaxBiomesPerFragment,
                 ""
             };
-            _contentAdvanced = new string[]
+            _contentAdvanced = new []
             {
                 "",
                 "",
                 "///// Depth Progression Path /////"
             };
-            _contentDataboxes = new string[]
+            _contentDataboxes = new []
             {
                 "",
                 "",
                 "///// Databox Locations /////"
             };
         }
-
-        // Add advanced settings to the spoiler log, but only if they have been
-        // modified.
+        
+        /// <summary>
+        /// Add advanced settings to the spoiler log, but only if they have been modified.
+        /// </summary>
+        /// <returns>An array of modified settings.</returns>
         private string[] PrepareAdvancedSettings()
         {
             List<string> preparedAdvSettings = new List<string>();
@@ -101,9 +108,8 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
                     var value = field.GetValue(_config);
 
-                    // If the value of a config field does not correspond to its
-                    // default value, the user must have modified it. Add it to
-                    // the list in that case.
+                    // If the value of a config field does not correspond to its default value, the user must have
+                    // modified it. Add it to the list in that case.
                     if (!value.Equals(defaultField.GetValue(null)))
                         preparedAdvSettings.Add(field.Name + ": " + value);
 
@@ -116,12 +122,15 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
             return preparedAdvSettings.ToArray();
         }
-
-        // Grab the randomised boxes from masterDict, and sort them alphabetically.
+        
+        /// <summary>
+        /// Grab the randomised boxes from masterDict, and sort them alphabetically.
+        /// </summary>
+        /// <returns>The prepared log entries.</returns>
         private string[] PrepareDataboxes()
         {
             if (!InitMod.s_masterDict.isDataboxRandomised)
-                return new string[] { "Not randomised, all in vanilla locations." };
+                return new [] { "Not randomised, all in vanilla locations." };
 
             List<string> preparedDataboxes = new List<string>();
 
@@ -134,22 +143,24 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
             return preparedDataboxes.ToArray();
         }
-
-        // Compare the MD5 of the recipe CSV and try to see if it's still the same.
-        // Since this is done while parsing the CSV anyway, grab the value from there.
+        
+        /// <summary>
+        /// Compare the MD5 of the recipe CSV and try to see if it's still the same.
+        /// Since this is done while parsing the CSV anyway, grab the value from there.
+        /// </summary>
+        /// <returns>The prepared log entry.</returns>
         private string PrepareMD5()
         {
             if (!InitMod.s_expectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
-            {
                 return "recipeInformation.csv has been modified: " + CSVReader.s_recipeCSVMD5;
-            }
-            else
-            {
-                return "recipeInformation.csv is unmodified.";
-            }
+            
+            return "recipeInformation.csv is unmodified.";
         }
-
-        // Make the data gathered during randomising a bit nicer for human eyes.
+        
+        /// <summary>
+        /// Prepare a human readable way to tell what must be crafted to reach greater depths.
+        /// </summary>
+        /// <returns>The prepared log entries.</returns>
         private string[] PrepareProgressionPath()
         {
             List <string> preparedProgressionPath = new List<string>();
@@ -158,13 +169,9 @@ namespace SubnauticaRandomiser.RandomiserObjects
             foreach (KeyValuePair<TechType, int> pair in s_progression)
             {
                 if (pair.Value > lastDepth)
-                {
                     preparedProgressionPath.Add("Craft " + pair.Key.AsString() + " to reach " + pair.Value + "m");
-                }
                 else
-                {
                     preparedProgressionPath.Add("Unlocked " + pair.Key.AsString() + ".");
-                }
 
                 lastDepth = pair.Value;
             }
@@ -172,6 +179,9 @@ namespace SubnauticaRandomiser.RandomiserObjects
             return preparedProgressionPath.ToArray();
         }
 
+        /// <summary>
+        /// Write the log to disk.
+        /// </summary>
         internal async Task WriteLog()
         {
             List<string> lines = new List<string>();
@@ -188,17 +198,12 @@ namespace SubnauticaRandomiser.RandomiserObjects
             lines.AddRange(_contentDataboxes);
             lines.AddRange(PrepareDataboxes());
 
-            using (StreamWriter file = new StreamWriter(Path.Combine(InitMod.s_modDirectory, s_fileName)))
+            using (StreamWriter file = new StreamWriter(Path.Combine(InitMod.s_modDirectory, _FileName)))
             {
                 await WriteTextToLog(file, lines.ToArray());
             }
 
             LogHandler.Info("Wrote spoiler log to disk.");
-        }
-
-        private async Task WriteTextToLog(StreamWriter file, string text)
-        {
-            await file.WriteLineAsync(text);
         }
 
         private async Task WriteTextToLog(StreamWriter file, string[] text)

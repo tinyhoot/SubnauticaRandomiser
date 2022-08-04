@@ -1,6 +1,9 @@
-﻿using System;
-namespace SubnauticaRandomiser.RandomiserObjects
+﻿namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// A class representing a single Biome as the game handles it, along with detailed info on spawn slots.
+    /// These individual biomes can get very detailed, such as BloodKelp_Floor, BloodKelp_CaveWall, etc.
+    /// </summary>
     public class Biome
     {
         public readonly int CreatureSlots;
