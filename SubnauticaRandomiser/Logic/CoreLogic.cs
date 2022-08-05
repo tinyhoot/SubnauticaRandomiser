@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.Annotations;
-using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.RandomiserObjects;
-using UnityEngine;
-using Random = System.Random;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -35,11 +31,13 @@ namespace SubnauticaRandomiser.Logic
             _materials = new Materials(allMaterials);
             _random = random;
             _spoilerLog = new SpoilerLog(config);
-
-            // TODO: Respect config options.
-            _databoxLogic = new DataboxLogic(this);
-            _fragmentLogic = new FragmentLogic(this, biomes);
-            _recipeLogic = new RecipeLogic(this);
+            
+            if (_config.bRandomiseDataboxes)
+                _databoxLogic = new DataboxLogic(this);
+            if (_config.bRandomiseFragments)
+                _fragmentLogic = new FragmentLogic(this, biomes);
+            if (_config.bRandomiseRecipes)
+                _recipeLogic = new RecipeLogic(this);
             _tree = new ProgressionTree();
         }
 
@@ -48,18 +46,6 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void Setup(List<LogicEntity> notRandomised, Dictionary<TechType, bool> unlockedProgressionItems)
         {
-            if (_recipeLogic != null)
-            {
-                _recipeLogic.UpdateReachableMaterials(0);
-                // Queue up all craftables to be randomised.
-                notRandomised.AddRange(_materials.GetAllCraftables());
-                
-                // Init the progression tree.
-                _tree.SetupVanillaTree();
-                if (_config.bVanillaUpgradeChains)
-                    _tree.ApplyUpgradeChainToPrerequisites(_materials.GetAll());
-            }
-
             if (_databoxLogic != null)
             {
                 // Just randomise those flat out for now, instead of including them in the core loop.
@@ -72,6 +58,18 @@ namespace SubnauticaRandomiser.Logic
                 FragmentLogic.Init();
                 // Queue up all fragments to be randomised.
                 notRandomised.AddRange(_materials.GetAllFragments());
+            }
+            
+            if (_recipeLogic != null)
+            {
+                _recipeLogic.UpdateReachableMaterials(0);
+                // Queue up all craftables to be randomised.
+                notRandomised.AddRange(_materials.GetAllCraftables());
+                
+                // Init the progression tree.
+                _tree.SetupVanillaTree();
+                if (_config.bVanillaUpgradeChains)
+                    _tree.ApplyUpgradeChainToPrerequisites(_materials.GetAll());
             }
         }
         

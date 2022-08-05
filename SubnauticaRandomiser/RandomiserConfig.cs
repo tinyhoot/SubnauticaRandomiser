@@ -31,6 +31,9 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise fragments?")]
         public bool bRandomiseFragments = ConfigDefaults.bRandomiseFragments;
 
+        [Toggle("Randomise recipes?")]
+        public bool bRandomiseRecipes = ConfigDefaults.bRandomiseRecipes;
+
         [Toggle("Respect vanilla upgrade chains?")]
         public bool bVanillaUpgradeChains = ConfigDefaults.bVanillaUpgradeChains;
 
@@ -156,6 +159,7 @@ namespace SubnauticaRandomiser
         internal const bool bUseSeeds = true;
         internal const bool bRandomiseDataboxes = true;
         internal const bool bRandomiseFragments = true;
+        internal const bool bRandomiseRecipes = true;
         internal const bool bVanillaUpgradeChains = false;
         internal const bool bDoBaseTheming = false;
         internal const int iEquipmentAsIngredients = 1;
