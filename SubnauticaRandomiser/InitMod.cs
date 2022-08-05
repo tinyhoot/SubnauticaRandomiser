@@ -6,6 +6,7 @@ using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Logic;
+using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser
@@ -34,13 +35,13 @@ namespace SubnauticaRandomiser
         {
             LogHandler.Info("Randomiser starting up!");
 
-            // Register options menu
+            // Register options menu.
             s_modDirectory = GetSubnauticaRandomiserDirectory();
             s_config = OptionsPanelHandler.Main.RegisterModOptions<RandomiserConfig>();
             LogHandler.Debug("Registered options menu.");
 
-            // Ensure the user did not update into a save incompatibility, and
-            // abort if they did to preserve a prior version's state.
+            // Ensure the user did not update into a save incompatibility, and abort if they did to preserve a prior
+            // version's state.
             if (!CheckSaveCompatibility())
                 return;
 
@@ -56,22 +57,9 @@ namespace SubnauticaRandomiser
             }
 
             // Triple checking things here in case the save got corrupted somehow.
-            if (!_debug_forceRandomise && s_masterDict?.RecipeDict?.Count > 0)
+            if (!_debug_forceRandomise && s_masterDict != null)
             {
-                // Load recipe changes.
-                RandomiserLogic.ApplyMasterDict(s_masterDict);
-                
-                // Load fragment changes.
-                if (s_masterDict.SpawnDataDict?.Count > 0)
-                {
-                    FragmentLogic.ApplyMasterDict(s_masterDict);
-                    LogHandler.Info("Loaded fragment state.");
-                }
-
-                // Load databox changes.
-                if (s_masterDict.isDataboxRandomised)
-                    EnableHarmonyPatching();
-
+                ApplyAllChanges();
                 LogHandler.Info("Successfully loaded game state from disk.");
             }
             else
@@ -129,22 +117,37 @@ namespace SubnauticaRandomiser
             }
             random = new Random(s_config.iSeed);
 
-            RandomiserLogic logic = new RandomiserLogic(random, s_masterDict, s_config, completeMaterialsList, databoxes);
-            FragmentLogic fragmentLogic = null;
-            if (s_config.bRandomiseFragments)
-            {
-                fragmentLogic = new FragmentLogic(s_config, s_masterDict, completeBiomeList, random);
-                fragmentLogic.Init();
-            }
-
-            logic.RandomSmart(fragmentLogic);
+            // Randomise!
+            CoreLogic logic = new CoreLogic(random, s_masterDict, s_config, completeMaterialsList, completeBiomeList, databoxes);
+            logic.Randomise();
             LogHandler.Info("Randomisation successful!");
 
             SaveGameStateToDisk();
+        }
 
-            SpoilerLog spoiler = new SpoilerLog(s_config);
-            // This should run async, but we don't need the result here. It's a file.
-            _ = spoiler.WriteLog();
+        /// <summary>
+        /// Apply all changes contained within the serialiser.
+        /// </summary>
+        /// <exception cref="InvalidDataException">If the serialiser is null or invalid.</exception>
+        internal static void ApplyAllChanges()
+        {
+            if (s_masterDict is null)
+                throw new InvalidDataException("Cannot apply randomisation changes: MasterDict is null!");
+            
+            // Load recipe changes.
+            if (s_masterDict.RecipeDict?.Count > 0)
+                RecipeLogic.ApplyMasterDict(s_masterDict);
+                
+            // Load fragment changes.
+            if (s_masterDict.SpawnDataDict?.Count > 0)
+            {
+                FragmentLogic.ApplyMasterDict(s_masterDict);
+                LogHandler.Info("Loaded fragment state.");
+            }
+
+            // Load databox changes.
+            if (s_masterDict.isDataboxRandomised)
+                EnableHarmonyPatching();
         }
 
         /// <summary>
@@ -171,7 +174,7 @@ namespace SubnauticaRandomiser
         /// </summary>
         internal static void SaveGameStateToDisk()
         {
-            if (s_masterDict.RecipeDict != null && s_masterDict.RecipeDict.Count > 0)
+            if (s_masterDict != null)
             {
                 string base64 = s_masterDict.ToBase64String();
                 s_config.sBase64Seed = base64;
@@ -180,7 +183,7 @@ namespace SubnauticaRandomiser
             }
             else
             {
-                LogHandler.Error("Could not save game state to disk: Dictionary empty.");
+                LogHandler.Error("Could not save game state to disk: invalid data.");
             }
         }
 
@@ -199,7 +202,7 @@ namespace SubnauticaRandomiser
             LogHandler.Debug("Trying to decode base64 string...");
             EntitySerializer dictionary = EntitySerializer.FromBase64String(s_config.sBase64Seed);
 
-            if (dictionary?.RecipeDict is null || dictionary.RecipeDict.Count == 0)
+            if (dictionary?.SpawnDataDict is null || dictionary.RecipeDict is null)
             {
                 throw new InvalidDataException("base64 seed is invalid; could not deserialize Dictionary.");
             }

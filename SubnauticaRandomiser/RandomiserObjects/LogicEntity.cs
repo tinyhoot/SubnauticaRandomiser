@@ -22,9 +22,10 @@ namespace SubnauticaRandomiser.RandomiserObjects
         public int MaxUsesPerGame;              // How often can this get used in recipes?
         internal int _usedInRecipes;            // How often did this get used in recipes?
 
-        public bool HasPrerequisites { get { return !(Prerequisites is null) && Prerequisites.Count > 0; } }
-        public bool HasRecipe { get { return !(Recipe is null); } }
-        public bool HasSpawnData { get { return !(SpawnData is null); } }
+        public bool HasPrerequisites => !(Prerequisites is null) && Prerequisites.Count > 0;
+        public bool HasRecipe => !(Recipe is null);
+        public bool HasSpawnData => !(SpawnData is null);
+        public bool IsFragment => Category.Equals(ETechTypeCategory.Fragments);
 
         public LogicEntity(TechType type, ETechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null, SpawnData spawnData = null, List<TechType> prerequisites = null, bool inLogic = false, int value = 0)
         {
@@ -95,6 +96,11 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 return true;
 
             return false;
+        }
+
+        public override string ToString()
+        {
+            return TechType.AsString();
         }
     }
 }

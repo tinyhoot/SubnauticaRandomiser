@@ -4,14 +4,14 @@ using JetBrains.Annotations;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal class ModeBalanced : Mode
     {
         private int _basicOutpostSize;
         private List<LogicEntity> _reachableMaterials;
 
-        internal ModeBalanced(RandomiserConfig config, Materials materials, ProgressionTree tree, Random random) : base(config, materials, tree, random)
+        internal ModeBalanced(CoreLogic logic) : base(logic)
         {
             _basicOutpostSize = 0;
             _reachableMaterials = _materials.GetReachable();
@@ -84,12 +84,14 @@ namespace SubnauticaRandomiser.Logic
                     LogHandler.Debug("!   Recipe is getting too large, stopping.");
                     break;
                 }
+                
                 // Same thing for special case of outpost base parts.
                 if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType) && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.6)
                 {
                     LogHandler.Debug("!   Basic outpost size is getting too large, stopping.");
                     break;
                 }
+                
                 // Also, respect the maximum number of ingredients set in the config.
                 if (_config.iMaxIngredientsPerRecipe <= _ingredients.Count)
                 {

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal class ModeRandom : Mode
     {
         private List<LogicEntity> _reachableMaterials;
 
-        internal ModeRandom(RandomiserConfig config, Materials materials, ProgressionTree tree, Random random) : base(config, materials, tree, random)
+        internal ModeRandom(CoreLogic logic) : base(logic)
         {
             _reachableMaterials = _materials.GetReachable();
         }

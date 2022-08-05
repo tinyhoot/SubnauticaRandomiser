@@ -5,24 +5,23 @@ using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal abstract class Mode
     {
-        protected RandomiserConfig _config;
-        protected Materials _materials;
-        protected ProgressionTree _tree;
-        protected Random _random;
+        protected readonly CoreLogic _logic;
+        protected RandomiserConfig _config => _logic._config;
+        protected Materials _materials => _logic._materials;
+        protected ProgressionTree _tree => _logic._tree;
+        protected Random _random => _logic._random;
+        
         protected List<RandomiserIngredient> _ingredients = new List<RandomiserIngredient>();
         protected List<ETechTypeCategory> _blacklist = new List<ETechTypeCategory>();
         protected LogicEntity _baseTheme;
 
-        protected Mode(RandomiserConfig config, Materials materials, ProgressionTree tree, Random random)
+        protected Mode(CoreLogic logic)
         {
-            _config = config;
-            _materials = materials;
-            _tree = tree;
-            _random = random;
+            _logic = logic;
 
             _baseTheme = ChooseBaseTheme(100);
             LogHandler.Debug("Chosen " + _baseTheme.TechType.AsString() + " as base theme.");

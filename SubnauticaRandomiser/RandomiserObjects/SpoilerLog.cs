@@ -13,7 +13,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
     {
         internal const string _FileName = "spoilerlog.txt";
         private RandomiserConfig _config;
-        internal static List<KeyValuePair<TechType, int>> s_progression = new List<KeyValuePair<TechType, int>>();
+        private readonly List<KeyValuePair<TechType, int>> _progression = new List<KeyValuePair<TechType, int>>();
 
         private List<string> _basicOptions;
         private string[] _contentHeader;
@@ -166,7 +166,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
             List <string> preparedProgressionPath = new List<string>();
             int lastDepth = 0;
 
-            foreach (KeyValuePair<TechType, int> pair in s_progression)
+            foreach (KeyValuePair<TechType, int> pair in _progression)
             {
                 if (pair.Value > lastDepth)
                     preparedProgressionPath.Add("Craft " + pair.Key.AsString() + " to reach " + pair.Value + "m");
@@ -177,6 +177,43 @@ namespace SubnauticaRandomiser.RandomiserObjects
             }
 
             return preparedProgressionPath.ToArray();
+        }
+
+        /// <summary>
+        /// Add an entry for a progression item to the spoiler log.
+        /// </summary>
+        /// <param name="type">The progression item.</param>
+        /// <param name="depth">The depth it unlocks or was unlocked at.</param>
+        /// <returns>True if successful, false if the entry already exists.</returns>
+        internal bool AddProgressionEntry(TechType type, int depth)
+        {
+            if (_progression.Exists(x => x.Key.Equals(type)))
+            {
+                LogHandler.Warn("Tried to add duplicate progression item to spoiler log: " + type.AsString());
+                return false;
+            }
+            
+            var kvpair = new KeyValuePair<TechType, int>(type, depth);
+            _progression.Add(kvpair);
+            return true;
+        }
+        
+        /// <summary>
+        /// When a progression item first gets unlocked, its depth reflects the depth required to reach it, rather than
+        /// what it makes accessible; update that here.
+        /// Always changes the latest addition to the spoiler log.
+        /// </summary>
+        /// <param name="depth">The new depth to update the entry with.</param>
+        /// <returns>True if successful, false if the update failed, e.g. if there are no entries in the list.</returns>
+        internal bool UpdateLastProgressionEntry(int depth)
+        {
+            if (_progression.Count == 0)
+                return false;
+
+            // Since this is a list of immutable k-v pairs, it must be removed and replaced entirely.
+            TechType type = _progression[_progression.Count - 1].Key;
+            _progression.RemoveAt(_progression.Count - 1);
+            return AddProgressionEntry(type, depth);
         }
 
         /// <summary>

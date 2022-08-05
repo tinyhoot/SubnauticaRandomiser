@@ -42,6 +42,13 @@ cp $(SolutionDir)wreckInformation.csv $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomis
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="InitMod.cs" />
+    <Compile Include="Logic\DataboxLogic.cs" />
+    <Compile Include="Logic\Recipes\Materials.cs" />
+    <Compile Include="Logic\Recipes\Mode.cs" />
+    <Compile Include="Logic\Recipes\ModeBalanced.cs" />
+    <Compile Include="Logic\Recipes\ModeRandom.cs" />
+    <Compile Include="Logic\Recipes\ModeSubstitute.cs" />
+    <Compile Include="Logic\Recipes\RecipeLogic.cs" />
     <Compile Include="RandomiserConfig.cs" />
     <Compile Include="CSVReader.cs" />
     <Compile Include="LogHandler.cs" />
@@ -56,13 +63,8 @@ cp $(SolutionDir)wreckInformation.csv $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomis
     <Compile Include="RandomiserObjects\RandomiserVector.cs" />
     <Compile Include="RandomiserObjects\ProgressionPath.cs" />
     <Compile Include="RandomiserObjects\SpoilerLog.cs" />
-    <Compile Include="Logic\RandomiserLogic.cs" />
+    <Compile Include="Logic\CoreLogic.cs" />
     <Compile Include="Logic\ProgressionTree.cs" />
-    <Compile Include="Logic\ModeSubstitute.cs" />
-    <Compile Include="Logic\Materials.cs" />
-    <Compile Include="Logic\ModeBalanced.cs" />
-    <Compile Include="Logic\Mode.cs" />
-    <Compile Include="Logic\ModeRandom.cs" />
     <Compile Include="RandomiserObjects\LogicEntity.cs" />
     <Compile Include="RandomiserObjects\SpawnData.cs" />
     <Compile Include="FragmentPatcher.cs" />

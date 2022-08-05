@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SubnauticaRandomiser.RandomiserObjects;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal class Materials
     {
@@ -154,6 +154,32 @@ namespace SubnauticaRandomiser.Logic
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Get all entities that are capable of being crafted.
+        /// </summary>
+        internal List<LogicEntity> GetAllCraftables()
+        {
+            var craftables = _allMaterials.FindAll(x => 
+                !x.Category.Equals(ETechTypeCategory.RawMaterials) 
+                && !x.Category.Equals(ETechTypeCategory.Fish) 
+                && !x.Category.Equals(ETechTypeCategory.Seeds)
+                && !x.Category.Equals(ETechTypeCategory.Eggs)
+                && !x.Category.Equals(ETechTypeCategory.Fragments));
+
+            return craftables;
+        }
+
+        /// <summary>
+        /// Get all entities that are considered fragments.
+        /// </summary>
+        internal List<LogicEntity> GetAllFragments()
+        {
+            var fragments = _allMaterials.FindAll(x =>
+                x.Category.Equals(ETechTypeCategory.Fragments));
+
+            return fragments;
         }
     }
 }
