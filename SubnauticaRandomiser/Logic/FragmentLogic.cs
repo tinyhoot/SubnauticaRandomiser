@@ -14,12 +14,12 @@ namespace SubnauticaRandomiser.Logic
     {
         private readonly CoreLogic _logic;
         
-        private Dictionary<TechType, List<string>> _classIdDatabase;
+        private static Dictionary<TechType, List<string>> _classIdDatabase;
         private RandomiserConfig _config { get { return _logic._config; } }
         private EntitySerializer _masterDict { get { return _logic._masterDict; } }
         private Random _random { get { return _logic._random; } }
         private List<Biome> _availableBiomes;
-        private readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
+        private static readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
         {
             { "BaseBioReactor_Fragment", TechType.BaseBioReactorFragment },
             { "BaseNuclearReactor_Fragment", TechType.BaseNuclearReactorFragment },
@@ -124,7 +124,7 @@ namespace SubnauticaRandomiser.Logic
         /// Go through all the BiomeData in the game and reset any fragment spawn rates to 0.0f, effectively "deleting"
         /// them from the game until the randomiser has decided on a new distribution.
         /// </summary>
-        internal void ResetFragmentSpawns()
+        internal static void ResetFragmentSpawns()
         {
             LogHandler.Debug("---Resetting vanilla fragment spawn rates---");
 
@@ -184,7 +184,7 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Assemble a dictionary of all relevant prefabs with their unique classId identifier.
         /// </summary>
-        private void PrepareClassIdDatabase()
+        private static void PrepareClassIdDatabase()
         {
             _classIdDatabase = new Dictionary<TechType, List<string>>();
 
@@ -215,7 +215,7 @@ namespace SubnauticaRandomiser.Logic
         /// Reverse the classId dictionary to allow for ID to TechType matching.
         /// </summary>
         /// <returns>The inverted dictionary.</returns>
-        internal Dictionary<string, TechType> ReverseClassIdDatabase()
+        internal static Dictionary<string, TechType> ReverseClassIdDatabase()
         {
             Dictionary<string, TechType> database = new Dictionary<string, TechType>();
 
@@ -236,10 +236,13 @@ namespace SubnauticaRandomiser.Logic
         }
         
         /// <summary>
-        /// Re-apply spawnData from a saved game.
+        /// Re-apply spawnData from a saved game. This will fail to catch all existing fragment spawns if called in a
+        /// previously randomised game.
         /// </summary>
         internal static void ApplyMasterDict(EntitySerializer masterDict)
         {
+            Init();
+            
             foreach (TechType key in masterDict.SpawnDataDict.Keys)
             {
                 SpawnData spawnData = masterDict.SpawnDataDict[key];
@@ -265,7 +268,7 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Get the classId for the given TechType.
         /// </summary>
-        internal string GetClassId(TechType type)
+        private static string GetClassId(TechType type)
         {
             return CraftData.GetClassIdForTechType(type);
         }
@@ -288,7 +291,7 @@ namespace SubnauticaRandomiser.Logic
         /// Force Subnautica and SMLHelper to index and cache the classIds, setup the databases, and prepare a blank
         /// slate by removing all existing fragment spawns from the game.
         /// </summary>
-        public void Init()
+        public static void Init()
         {
             // This forces SMLHelper (and the game) to cache the classIds.
             // Without this, anything below will fail.

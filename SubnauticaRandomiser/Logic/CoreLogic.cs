@@ -60,7 +60,7 @@ namespace SubnauticaRandomiser.Logic
             if (_fragmentLogic != null)
             {
                 // Initialise the fragment cache and remove vanilla spawns.
-                _fragmentLogic.Init();
+                FragmentLogic.Init();
                 // Queue up all fragments to be randomised.
                 notRandomised.AddRange(_materials.GetAllFragments());
             }
