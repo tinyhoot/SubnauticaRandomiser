@@ -42,6 +42,7 @@ cp $(SolutionDir)wreckInformation.csv $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomis
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="InitMod.cs" />
+    <Compile Include="Logic\DataboxLogic.cs" />
     <Compile Include="Logic\Recipes\Materials.cs" />
     <Compile Include="Logic\Recipes\Mode.cs" />
     <Compile Include="Logic\Recipes\ModeBalanced.cs" />

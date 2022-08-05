@@ -311,5 +311,22 @@ namespace SubnauticaRandomiser.Logic.Recipes
             CraftDataHandler.SetTechData(recipe.TechType, recipe);
             _masterDict.AddRecipe(recipe.TechType, recipe);
         }
+
+        /// <summary>
+        /// Apply all recipe changes stored in the masterDict to the game.
+        /// </summary>
+        /// <param name="masterDict">The master dictionary.</param>
+        internal static void ApplyMasterDict(EntitySerializer masterDict)
+        {
+            Dictionary<TechType, Recipe>.KeyCollection keys = masterDict.RecipeDict.Keys;
+
+            foreach (TechType key in keys)
+            {
+                CraftDataHandler.SetTechData(key, masterDict.RecipeDict[key]);
+            }
+
+            // TODO Once scrap metal is working, un-commenting this will apply the change on every startup.
+            //ChangeScrapMetalResult(masterDict.DictionaryInstance[TechType.Titanium]);
+        }
     }
 }

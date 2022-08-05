@@ -6,6 +6,7 @@ using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Logic;
+using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser
@@ -59,7 +60,7 @@ namespace SubnauticaRandomiser
             if (!_debug_forceRandomise && s_masterDict?.RecipeDict?.Count > 0)
             {
                 // Load recipe changes.
-                CoreLogic.ApplyMasterDict(s_masterDict);
+                RecipeLogic.ApplyMasterDict(s_masterDict);
                 
                 // Load fragment changes.
                 if (s_masterDict.SpawnDataDict?.Count > 0)

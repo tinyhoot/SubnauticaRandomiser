@@ -5,6 +5,7 @@ using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.RandomiserObjects;
 using UnityEngine;
+using Random = System.Random;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -21,6 +22,7 @@ namespace SubnauticaRandomiser.Logic
         internal readonly SpoilerLog _spoilerLog;
         internal readonly ProgressionTree _tree;
 
+        private readonly DataboxLogic _databoxLogic;
         private readonly FragmentLogic _fragmentLogic;
         private readonly RecipeLogic _recipeLogic;
 
@@ -35,6 +37,7 @@ namespace SubnauticaRandomiser.Logic
             _spoilerLog = new SpoilerLog(config);
 
             // TODO: Respect config options.
+            _databoxLogic = new DataboxLogic(this);
             _fragmentLogic = new FragmentLogic(this, biomes);
             _recipeLogic = new RecipeLogic(this);
             _tree = new ProgressionTree();
@@ -55,6 +58,12 @@ namespace SubnauticaRandomiser.Logic
                 _tree.SetupVanillaTree();
                 if (_config.bVanillaUpgradeChains)
                     _tree.ApplyUpgradeChainToPrerequisites(_materials.GetAll());
+            }
+
+            if (_databoxLogic != null)
+            {
+                // Just randomise those flat out for now, instead of including them in the core loop.
+                _databoxLogic.RandomiseDataboxes();
             }
 
             if (_fragmentLogic != null)
@@ -140,41 +149,6 @@ namespace SubnauticaRandomiser.Logic
             next ??= GetRandom(notRandomised);
 
             return next;
-        }
-
-        /// <summary>
-        /// Randomise (shuffle) the blueprints found inside databoxes.
-        /// </summary>
-        /// <param name="masterDict">The master dictionary.</param>
-        /// <param name="databoxes">A list of all databoxes.</param>
-        /// <returns>The list of newly randomised databoxes.</returns>
-        [NotNull]
-        internal List<Databox> RandomiseDataboxes(EntitySerializer masterDict, List<Databox> databoxes)
-        {
-            masterDict.Databoxes = new Dictionary<RandomiserVector, TechType>();
-            List<Databox> randomDataboxes = new List<Databox>();
-            List<Vector3> toBeRandomised = new List<Vector3>();
-
-            foreach (Databox dbox in databoxes)
-            {
-                toBeRandomised.Add(dbox.Coordinates);
-            }
-
-            foreach (Databox originalBox in databoxes)
-            {
-                int next = _random.Next(0, toBeRandomised.Count);
-                Databox replacementBox = databoxes.Find(x => x.Coordinates.Equals(toBeRandomised[next]));
-
-                randomDataboxes.Add(new Databox(originalBox.TechType, toBeRandomised[next], replacementBox.Wreck, 
-                    replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
-                masterDict.Databoxes.Add(new RandomiserVector(toBeRandomised[next]), originalBox.TechType);
-                LogHandler.Debug("Databox " + toBeRandomised[next].ToString() + " with "
-                                 + replacementBox.TechType.AsString() + " now contains " + originalBox.TechType.AsString());
-                toBeRandomised.RemoveAt(next);
-            }
-            masterDict.isDataboxRandomised = true;
-
-            return randomDataboxes;
         }
 
         /// <summary>
@@ -395,23 +369,6 @@ namespace SubnauticaRandomiser.Logic
             }
 
             return list[_random.Next(0, list.Count)];
-        }
-        
-        /// <summary>
-        /// Apply all recipe changes stored in the masterDict to the game.
-        /// </summary>
-        /// <param name="masterDict">The master dictionary.</param>
-        internal static void ApplyMasterDict(EntitySerializer masterDict)
-        {
-            Dictionary<TechType, Recipe>.KeyCollection keys = masterDict.RecipeDict.Keys;
-
-            foreach (TechType key in keys)
-            {
-                CraftDataHandler.SetTechData(key, masterDict.RecipeDict[key]);
-            }
-
-            // TODO Once scrap metal is working, un-commenting this will apply the change on every startup.
-            //ChangeScrapMetalResult(masterDict.DictionaryInstance[TechType.Titanium]);
         }
     }
 }
