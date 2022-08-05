@@ -7,12 +7,17 @@ using static LootDistributionData;
 
 namespace SubnauticaRandomiser.Logic
 {
+    /// <summary>
+    /// Handles everything related to randomising fragments.
+    /// </summary>
     internal class FragmentLogic
     {
+        private readonly CoreLogic _logic;
+        
         private Dictionary<TechType, List<string>> _classIdDatabase;
-        private readonly RandomiserConfig _config;
-        private readonly EntitySerializer _entitySerializer;
-        private readonly Random _random;
+        private RandomiserConfig _config { get { return _logic._config; } }
+        private EntitySerializer _masterDict { get { return _logic._masterDict; } }
+        private Random _random { get { return _logic._random; } }
         private List<Biome> _availableBiomes;
         private readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
         {
@@ -51,12 +56,11 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Handle the logic for everything related to fragments.
         /// </summary>
-        internal FragmentLogic(RandomiserConfig config, EntitySerializer serializer, List<BiomeCollection> biomeList, Random random)
+        internal FragmentLogic(CoreLogic coreLogic, List<BiomeCollection> biomeList)
         {
-            _config = config;
-            _entitySerializer = serializer;
+            _logic = coreLogic;
+            
             _availableBiomes = GetAvailableFragmentBiomes(biomeList);
-            _random = random;
             AllSpawnData = new List<SpawnData>();
         }
         
@@ -253,7 +257,7 @@ namespace SubnauticaRandomiser.Logic
             entity.SpawnData = spawnData;
 
             AllSpawnData.Add(spawnData);
-            _entitySerializer.AddSpawnData(entity.TechType, spawnData);
+            _masterDict.AddSpawnData(entity.TechType, spawnData);
 
             LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
         }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using SubnauticaRandomiser.RandomiserObjects;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Recipes
 {
     /// <summary>
     /// This is a legacy class, originally a revised implementation of the first Randomizer's approach to randomisation.
@@ -113,7 +113,7 @@ namespace SubnauticaRandomiser.Logic
                     }
                 }
 
-                RandomiserLogic.ApplyRandomisedRecipe(masterDict, randomiseMe.Recipe);
+                //RecipeLogic.ApplyRandomisedRecipe(randomiseMe.Recipe);
             }
             LogHandler.Info("Finished randomising.");
 

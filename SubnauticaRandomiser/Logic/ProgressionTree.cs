@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.RandomiserObjects;
 
@@ -363,6 +364,21 @@ namespace SubnauticaRandomiser.Logic
                 return type;
 
             return TechType.None;
+        }
+
+        /// <summary>
+        /// Check whether the given entity is part of any essential or elective items in any node.
+        /// </summary>
+        /// <param name="entity">The entity to check.</param>
+        /// <returns>True if the entity is part of essential or elective items, false otherwise.</returns>
+        public bool IsPriorityEntity(LogicEntity entity)
+        {
+            if (_essentialItems.Values.Any(list => list.Contains(entity.TechType)))
+                return true;
+            if (_electiveItems.Values.Any(list => list.Any(arr => arr.Contains(entity.TechType))))
+                return true;
+
+            return false;
         }
     }
 }

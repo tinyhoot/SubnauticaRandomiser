@@ -34,13 +34,13 @@ namespace SubnauticaRandomiser
         {
             LogHandler.Info("Randomiser starting up!");
 
-            // Register options menu
+            // Register options menu.
             s_modDirectory = GetSubnauticaRandomiserDirectory();
             s_config = OptionsPanelHandler.Main.RegisterModOptions<RandomiserConfig>();
             LogHandler.Debug("Registered options menu.");
 
-            // Ensure the user did not update into a save incompatibility, and
-            // abort if they did to preserve a prior version's state.
+            // Ensure the user did not update into a save incompatibility, and abort if they did to preserve a prior
+            // version's state.
             if (!CheckSaveCompatibility())
                 return;
 
@@ -59,7 +59,7 @@ namespace SubnauticaRandomiser
             if (!_debug_forceRandomise && s_masterDict?.RecipeDict?.Count > 0)
             {
                 // Load recipe changes.
-                RandomiserLogic.ApplyMasterDict(s_masterDict);
+                CoreLogic.ApplyMasterDict(s_masterDict);
                 
                 // Load fragment changes.
                 if (s_masterDict.SpawnDataDict?.Count > 0)
@@ -129,22 +129,12 @@ namespace SubnauticaRandomiser
             }
             random = new Random(s_config.iSeed);
 
-            RandomiserLogic logic = new RandomiserLogic(random, s_masterDict, s_config, completeMaterialsList, databoxes);
-            FragmentLogic fragmentLogic = null;
-            if (s_config.bRandomiseFragments)
-            {
-                fragmentLogic = new FragmentLogic(s_config, s_masterDict, completeBiomeList, random);
-                fragmentLogic.Init();
-            }
-
-            logic.RandomSmart(fragmentLogic);
+            // Randomise!
+            CoreLogic logic = new CoreLogic(random, s_masterDict, s_config, completeMaterialsList, completeBiomeList, databoxes);
+            logic.Randomise();
             LogHandler.Info("Randomisation successful!");
 
             SaveGameStateToDisk();
-
-            SpoilerLog spoiler = new SpoilerLog(s_config);
-            // This should run async, but we don't need the result here. It's a file.
-            _ = spoiler.WriteLog();
         }
 
         /// <summary>
