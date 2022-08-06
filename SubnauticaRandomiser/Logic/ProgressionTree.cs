@@ -90,7 +90,6 @@ namespace SubnauticaRandomiser.Logic
             path.AddPath(new [] { TechType.Cyclops, TechType.CyclopsHullModule3 });
             SetProgressionPath(EProgressionNode.Depth1700m, path);
 
-
             // Putting every item or vehicle that can help the player achieve
             // lower depths in one dictionary.
             DepthProgressionItems.Add(TechType.Fins, true);
@@ -115,7 +114,6 @@ namespace SubnauticaRandomiser.Logic
             DepthProgressionItems.Add(TechType.CyclopsHullModule2, true);
             DepthProgressionItems.Add(TechType.CyclopsHullModule3, true);
 
-
             // Assemble a dictionary of what's considered basic outpost pieces
             // which together should not exceed the cost of config.iMaxBasicOutpostSize
             BasicOutpostPieces.Add(TechType.BaseCorridorI, 1);
@@ -124,7 +122,6 @@ namespace SubnauticaRandomiser.Logic
             BasicOutpostPieces.Add(TechType.BaseWindow, 1);
             BasicOutpostPieces.Add(TechType.Beacon, 1);
             BasicOutpostPieces.Add(TechType.SolarPanel, 2);
-
 
             // The scanner and repair tool are absolutely required to get the
             // early game going, without the others it can get tedious.
@@ -141,7 +138,6 @@ namespace SubnauticaRandomiser.Logic
 
             AddEssentialItem(EProgressionNode.Depth300m, TechType.BaseWaterPark);
 
-
             // From among these, at least one has to be accessible by the provided
             // depth level. Ensures e.g. at least one power source by 200m.
             AddElectiveItems(EProgressionNode.Depth100m, new [] { TechType.Battery, TechType.BatteryCharger });
@@ -149,7 +145,6 @@ namespace SubnauticaRandomiser.Logic
             AddElectiveItems(EProgressionNode.Depth200m, new [] { TechType.BaseBioReactor, TechType.SolarPanel });
             AddElectiveItems(EProgressionNode.Depth200m, new [] { TechType.PowerCell, TechType.PowerCellCharger, TechType.SeamothSolarCharge });
             AddElectiveItems(EProgressionNode.Depth200m, new [] { TechType.BaseBulkhead, TechType.BaseFoundation, TechType.BaseReinforcement });
-
 
             // Assemble a vanilla upgrade chain. These are the upgrades as the
             // base game intends you to progress through them.
@@ -294,7 +289,7 @@ namespace SubnauticaRandomiser.Logic
         /// <param name="node">The node.</param>
         /// <returns>The list of essential items, or null if it doesn't exist or the node is invalid.</returns>
         [CanBeNull]
-        public List<TechType> GetEssentialItems(EProgressionNode node)
+        public List<TechType> GetEssentialNodeItems(EProgressionNode node)
         {
             if (_essentialItems.TryGetValue(node, out List<TechType> items))
                 return items;
@@ -303,21 +298,25 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Get essential items for the given depth.
+        /// Get all essential items up to the given depth.
         /// </summary>
         /// <param name="depth">The maximum depth to look for.</param>
-        /// <returns>The list of essential items, or null if it doesn't exist or the given depth does not resolve to
-        /// a progression node.</returns>
-        [CanBeNull]
+        /// <returns>The list of essential items, or null if it doesn't exist.</returns>
+        [NotNull]
         public List<TechType> GetEssentialItems(int depth)
         {
-            // FIXME pretty sure this always yields the first match only.
-            foreach (EProgressionNode node in _essentialItems.Keys)
+            var essentials = new List<TechType>();
+            
+            foreach (EProgressionNode node in EProgressionNodeExtensions.AllDepthNodes)
             {
-                if ((int)node < depth && _essentialItems[node].Count > 0)
-                    return _essentialItems[node];
+                if ((int)node > depth)
+                    break;
+
+                if (_essentialItems.TryGetValue(node, out var list))
+                    essentials.AddRange(list);
             }
-            return null;
+
+            return essentials;
         }
 
         /// <summary>
@@ -326,7 +325,7 @@ namespace SubnauticaRandomiser.Logic
         /// <param name="node">The node.</param>
         /// <returns>The list of elective items, or null if it doesn't exist or the node is invalid.</returns>
         [CanBeNull]
-        public List<TechType[]> GetElectiveItems(EProgressionNode node)
+        public List<TechType[]> GetElectiveNodeItems(EProgressionNode node)
         {
             if (_electiveItems.TryGetValue(node, out List<TechType[]> items))
                 return items;
@@ -335,21 +334,25 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Get the list of lists of elective items for the given depth.
+        /// Get the list of lists of elective items up to the given depth.
         /// </summary>
         /// <param name="depth">The maximum depth to look for.</param>
-        /// <returns>The list of elective items, or null if it doesn't exist or the given depth does not resolve to
-        /// a progression node.</returns>
-        [CanBeNull]
+        /// <returns>The list of elective items, or null if it doesn't exist.</returns>
+        [NotNull]
         public List<TechType[]> GetElectiveItems(int depth)
         {
-            // FIXME pretty sure this always yields the first match only.
-            foreach (EProgressionNode node in _electiveItems.Keys)
+            var electives = new List<TechType[]>();
+            
+            foreach (EProgressionNode node in EProgressionNodeExtensions.AllDepthNodes)
             {
-                if ((int)node < depth && _electiveItems[node].Count > 0)
-                    return _electiveItems[node];
+                if ((int)node > depth)
+                    break;
+
+                if (_electiveItems.TryGetValue(node, out var list))
+                    electives.AddRange(list);
             }
-            return null;
+
+            return electives;
         }
         
         /// <summary>

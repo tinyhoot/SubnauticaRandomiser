@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
@@ -100,35 +101,26 @@ namespace SubnauticaRandomiser.Logic.Recipes
             LogicEntity entity = null;
 
             // Always get one of the essential items first, if available.
-            if (essentialItems != null && essentialItems.Count > 0)
+            if (essentialItems.Count > 0)
             {
-                entity = _materials.GetAll().Find(x => x.TechType.Equals(essentialItems[0]));
-                essentialItems.RemoveAt(0);
-                LogHandler.Debug("Prioritising essential item " + entity.TechType.AsString() + " for depth " + depth);
-
-                // If this has already been randomised, all the better.
-                if (_masterDict.RecipeDict.ContainsKey(entity.TechType))
+                TechType type = essentialItems.Find(x => !_masterDict.RecipeDict.ContainsKey(x));
+                if (!type.Equals(TechType.None))
                 {
-                    entity = null;
-                    LogHandler.Debug("Priority item was already randomised, skipping.");
+                    entity = _materials.GetAll().Find(e => e.TechType.Equals(type));
+                    LogHandler.Debug("Prioritising essential item " + entity.TechType.AsString() + " for depth " + depth);
                 }
             }
 
-            // Similarly, if all essential items are done, grab one from among
-            // the elective items and leave the rest up to chance.
-            if (entity is null && electiveItems != null && electiveItems.Count > 0)
+            // Similarly, if all essential items are done, grab one from among the elective items and leave the rest
+            // up to chance.
+            if (entity is null && electiveItems.Count > 0)
             {
-                TechType[] electiveTypes = electiveItems[0];
-                electiveItems.RemoveAt(0);
-
-                if (_logic.ContainsAny(_masterDict, electiveTypes))
+                TechType[] types = electiveItems.Find(arr => arr.All(x => !_masterDict.RecipeDict.ContainsKey(x)));
+                
+                if (types?.Length > 0)
                 {
-                    LogHandler.Debug("Priority elective containing " + electiveTypes[0].AsString() + " was already randomised, skipping.");
-                }
-                else
-                {
-                    TechType nextType = _logic.GetRandom(new List<TechType>(electiveTypes));
-                    entity = _materials.GetAll().Find(x => x.TechType.Equals(nextType));
+                    TechType nextType = _logic.GetRandom(new List<TechType>(types));
+                    entity = _materials.GetAll().Find(e => e.TechType.Equals(nextType));
                     LogHandler.Debug("Prioritising elective item " + entity.TechType.AsString() + " for depth " + depth);
                 }
             }
