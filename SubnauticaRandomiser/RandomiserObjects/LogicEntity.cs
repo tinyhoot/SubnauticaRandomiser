@@ -1,4 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using SubnauticaRandomiser.Logic;
+using SubnauticaRandomiser.Logic.Recipes;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
@@ -70,6 +75,78 @@ namespace SubnauticaRandomiser.RandomiserObjects
             return true;
         }
         
+         /// <summary>
+        /// Check if this recipe fulfills all conditions to have its blueprint be unlocked.
+        /// </summary>
+        /// <param name="logic">An instance of the core logic.</param>
+        /// <param name="depth">The maximum depth to consider.</param>
+        /// <returns>True if the recipe has no blueprint or fulfills all conditions, false otherwise.</returns>
+        public bool CheckBlueprintFulfilled(CoreLogic logic, int depth)
+        {
+            if (Blueprint is null || (Blueprint.UnlockConditions is null && Blueprint.UnlockDepth == 0))
+                return true;
+
+            // If the databox was randomised, do work to account for new locations.
+            if (logic._config.bRandomiseDataboxes && Blueprint.NeedsDatabox && !Blueprint.WasUpdated && logic._databoxes?.Count > 0)
+                Blueprint.UpdateDataboxUnlocks(logic);
+
+            foreach (TechType condition in Blueprint.UnlockConditions ?? Enumerable.Empty<TechType>())
+            {
+                LogicEntity conditionEntity = logic._materials.Find(condition);
+                if (conditionEntity is null)
+                    continue;
+
+                // Without this piece, the Air bladder will hang if fish are not enabled for the logic, as it
+                // fruitlessly searches for a bladderfish which never enters its algorithm.
+                // Eggs and seeds are never problematic in vanilla, but are covered in case users add their own
+                // modded items with those.
+                if ((!logic._config.bUseFish && conditionEntity.Category.Equals(ETechTypeCategory.Fish))
+                    || (!logic._config.bUseEggs && conditionEntity.Category.Equals(ETechTypeCategory.Eggs))
+                    || (!logic._config.bUseSeeds && conditionEntity.Category.Equals(ETechTypeCategory.Seeds)))
+                    continue;
+
+                if (logic._masterDict.RecipeDict.ContainsKey(condition)
+                    || logic._materials.GetReachable().Exists(x => x.TechType.Equals(condition)))
+                    continue;
+                
+                return false;
+            }
+
+            // Ensure that necessary fragments have already been randomised.
+            if (logic._config.bRandomiseFragments && Blueprint.Fragments?.Count > 0)
+            {
+                foreach (TechType fragment in Blueprint.Fragments)
+                {
+                    if (!logic._masterDict.SpawnDataDict.ContainsKey(fragment))
+                    {
+                        LogHandler.Debug("[B] Entity " + this + " missing fragment " + fragment.AsString());
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return depth >= Blueprint.UnlockDepth;
+        }
+         
+         /// <summary>
+         /// Check whether all prerequisites for this recipe have already been randomised.
+         /// </summary>
+         /// <param name="logic">The core logic.</param>
+         /// <returns>True if all conditions are fulfilled, false otherwise.</returns>
+         public bool CheckPrerequisitesFulfilled(CoreLogic logic)
+         {
+             // The builder tool must always be randomised before any base pieces ever become accessible.
+             if (Category.IsBasePiece() && !logic._masterDict.RecipeDict.ContainsKey(TechType.Builder))
+                 return false;
+
+             if (Prerequisites is null || Prerequisites.Count == 0)
+                 return true;
+
+             return Prerequisites.All(type => logic._masterDict.RecipeDict.ContainsKey(type));
+         }
+
         /// <summary>
         /// Get the number of slots this entity occupies in an inventory.
         /// </summary>

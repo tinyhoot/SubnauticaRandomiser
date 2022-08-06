@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.RandomiserObjects;
@@ -9,7 +10,7 @@ namespace SubnauticaRandomiser.Logic
     /// <summary>
     /// Acts as the core for handling all randomising logic in the mod, and turning modules on/off as needed.
     /// </summary>
-    internal class CoreLogic
+    public class CoreLogic
     {
         internal readonly RandomiserConfig _config;
         internal readonly List<Databox> _databoxes;
@@ -51,6 +52,7 @@ namespace SubnauticaRandomiser.Logic
             {
                 // Just randomise those flat out for now, instead of including them in the core loop.
                 _databoxLogic.RandomiseDataboxes();
+                LinkCyclopsHullModules();
             }
 
             if (_fragmentLogic != null)
@@ -277,6 +279,71 @@ namespace SubnauticaRandomiser.Logic
             _recipeLogic?.UpdateReachableMaterials(currentDepth);
 
             return currentDepth;
+        }
+        
+        /// <summary>
+        /// Cyclops hull modules are linked and unlock together once the blueprint for module1 is found. Do the work
+        /// for module1 and synchronise them.
+        /// </summary>
+        /// <exception cref="InvalidDataException">If the LogicEntity or databox for one of the hull modules cannot be
+        /// found.</exception>
+        private void LinkCyclopsHullModules()
+        {
+            if (!(_databoxes?.Count > 0))
+            {
+                LogHandler.Debug("Skipped linking Cyclops Hull Modules: Databoxes not randomised.");
+                return;
+            }
+
+            LogicEntity mod1 = _materials.Find(TechType.CyclopsHullModule1);
+            LogicEntity mod2 = _materials.Find(TechType.CyclopsHullModule2);
+            LogicEntity mod3 = _materials.Find(TechType.CyclopsHullModule3);
+
+            if (mod1 is null || mod2 is null || mod3 is null)
+                throw new InvalidDataException("Tried to link Cyclops Hull Modules, but found null.");
+            
+            int total = 0;
+            int number = 0;
+            int lasercutter = 0;
+            int propulsioncannon = 0;
+
+            foreach (Databox box in _databoxes.FindAll(x => x.TechType.Equals(mod1.TechType)))
+            {
+                total += (int)Math.Abs(box.Coordinates.y);
+                number++;
+
+                if (box.RequiresLaserCutter)
+                    lasercutter++;
+                if (box.RequiresPropulsionCannon)
+                    propulsioncannon++;
+            }
+            
+            if (number == 0)
+                throw new InvalidDataException("Entity " + this + " requires a databox, but 0 were found!");
+
+            mod1.Blueprint.UnlockDepth = total / number;
+            mod2.Blueprint.UnlockDepth = total / number;
+            mod3.Blueprint.UnlockDepth = total / number;
+
+            if (lasercutter / number >= 0.5)
+            {
+                mod1.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
+                mod2.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
+                mod3.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
+            }
+
+            if (propulsioncannon / number >= 0.5)
+            {
+                mod1.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
+                mod2.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
+                mod3.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
+            }
+
+            mod1.Blueprint.WasUpdated = true;
+            mod2.Blueprint.WasUpdated = true;
+            mod3.Blueprint.WasUpdated = true;
+            
+            LogHandler.Debug("Linked Cyclops Hull Modules.");
         }
 
         /// <summary>

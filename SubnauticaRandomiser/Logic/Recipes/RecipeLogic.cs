@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -51,7 +50,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             // Does this recipe have all of its prerequisites fulfilled? Skip this check if the recipe is a priority.
             if (!(_tree.IsPriorityEntity(entity)
-                  || (CheckRecipeForBlueprint(entity, reachableDepth) && CheckRecipeForPrerequisites(entity))))
+                  || (entity.CheckBlueprintFulfilled(_logic, reachableDepth) && entity.CheckPrerequisitesFulfilled(_logic))))
             {
                 LogHandler.Debug("--- Recipe [" + entity.TechType.AsString() + "] did not fulfill requirements, skipping.");
                 return false;
@@ -106,8 +105,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 TechType type = essentialItems.Find(x => !_masterDict.RecipeDict.ContainsKey(x));
                 if (!type.Equals(TechType.None))
                 {
-                    entity = _materials.GetAll().Find(e => e.TechType.Equals(type));
-                    LogHandler.Debug("Prioritising essential item " + entity.TechType.AsString() + " for depth " + depth);
+                    entity = _materials.Find(type);
+                    LogHandler.Debug("Prioritising essential item " + entity + " for depth " + depth);
                 }
             }
 
@@ -120,8 +119,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 if (types?.Length > 0)
                 {
                     TechType nextType = _logic.GetRandom(new List<TechType>(types));
-                    entity = _materials.GetAll().Find(e => e.TechType.Equals(nextType));
-                    LogHandler.Debug("Prioritising elective item " + entity.TechType.AsString() + " for depth " + depth);
+                    entity = _materials.Find(nextType);
+                    LogHandler.Debug("Prioritising elective item " + entity + " for depth " + depth);
                 }
             }
 
@@ -145,153 +144,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 _materials.AddReachable(ETechTypeCategory.Seeds, depth);
             if (_config.bUseEggs && _masterDict.RecipeDict.ContainsKey(TechType.BaseWaterPark))
                 _materials.AddReachable(ETechTypeCategory.Eggs, depth);
-        }
-
-        /// <summary>
-        /// Check if this recipe fulfills all conditions to have its blueprint be unlocked.
-        /// </summary>
-        /// <param name="masterDict">The master dictionary.</param>
-        /// <param name="databoxes">The list of all databoxes.</param>
-        /// <param name="entity">The recipe to check.</param>
-        /// <param name="depth">The maximum depth to consider.</param>
-        /// <returns>True if the recipe fulfills all conditions, false otherwise.</returns>
-        private bool CheckRecipeForBlueprint(LogicEntity entity, int depth)
-        {
-            bool fulfilled = true;
-
-            if (entity.Blueprint == null || (entity.Blueprint.UnlockConditions == null 
-                                             && entity.Blueprint.UnlockDepth == 0))
-                return true;
-
-            // If the databox was randomised, do work to account for new locations.
-            // Cyclops hull modules need extra special treatment.
-            if (entity.Blueprint.NeedsDatabox && _logic._databoxes?.Count > 0 
-                                              && !entity.TechType.Equals(TechType.CyclopsHullModule2) 
-                                              && !entity.TechType.Equals(TechType.CyclopsHullModule3))
-            {
-                int total = 0;
-                int number = 0;
-                int lasercutter = 0;
-                int propulsioncannon = 0;
-
-                foreach (Databox box in _logic._databoxes.FindAll(x => x.TechType.Equals(entity.TechType)))
-                {
-                    total += (int)Math.Abs(box.Coordinates.y);
-                    number++;
-
-                    if (box.RequiresLaserCutter)
-                        lasercutter++;
-                    if (box.RequiresPropulsionCannon)
-                        propulsioncannon++;
-                }
-
-                LogHandler.Debug("[B] Found " + number + " databoxes for " + entity.TechType.AsString());
-
-                entity.Blueprint.UnlockDepth = total / number;
-                if (entity.TechType.Equals(TechType.CyclopsHullModule1))
-                {
-                    _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2))
-                        .Blueprint.UnlockDepth = total / number;
-                    _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3))
-                        .Blueprint.UnlockDepth = total / number;
-                }
-
-                // If more than half of all locations of this databox require a
-                // tool to access the box, add it to the requirements for the recipe
-                if (lasercutter / number >= 0.5)
-                {
-                    entity.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
-                    if (entity.TechType.Equals(TechType.CyclopsHullModule1))
-                    {
-                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2))
-                            .Blueprint.UnlockConditions.Add(TechType.LaserCutter);
-                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3))
-                            .Blueprint.UnlockConditions.Add(TechType.LaserCutter);
-                    }
-                }
-
-                if (propulsioncannon / number >= 0.5)
-                {
-                    entity.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
-                    if (entity.TechType.Equals(TechType.CyclopsHullModule1))
-                    {
-                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule2))
-                            .Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
-                        _materials.GetAll().Find(x => x.TechType.Equals(TechType.CyclopsHullModule3))
-                            .Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
-                    }
-                }
-            }
-
-            foreach (TechType condition in entity.Blueprint.UnlockConditions)
-            {
-                LogicEntity conditionEntity = _materials.GetAll().Find(x => x.TechType.Equals(condition));
-
-                // Without this piece, the Air bladder will hang if fish are not
-                // enabled for the logic, as it fruitlessly searches for a bladderfish
-                // which never enters its algorithm.
-                // Eggs and seeds are never problematic in vanilla, but are covered
-                // in case users add their own modded items with those.
-                if (!_config.bUseFish && conditionEntity.Category.Equals(ETechTypeCategory.Fish))
-                    continue;
-                if (!_config.bUseEggs && conditionEntity.Category.Equals(ETechTypeCategory.Eggs))
-                    continue;
-                if (!_config.bUseSeeds && conditionEntity.Category.Equals(ETechTypeCategory.Seeds))
-                    continue;
-
-                fulfilled &= (_masterDict.RecipeDict.ContainsKey(condition) 
-                              || _materials.GetReachable().Exists(x => x.TechType.Equals(condition)));
-
-                if (!fulfilled)
-                    return false;
-            }
-
-            // Ensure that necessary fragments have already been randomised.
-            if (_config.bRandomiseFragments && entity.Blueprint.Fragments != null && entity.Blueprint.Fragments.Count > 0)
-            {
-                foreach (TechType fragment in entity.Blueprint.Fragments)
-                {
-                    if (!_masterDict.SpawnDataDict.ContainsKey(fragment))
-                    {
-                        LogHandler.Debug("[B] Entity " + entity.TechType.AsString() + " missing fragment " 
-                                         + fragment.AsString());
-                        return false;
-                    }
-                }
-            }
-            else if (entity.Blueprint.UnlockDepth > depth)
-            {
-                fulfilled = false;
-            }
-
-            return fulfilled;
-        }
-
-        /// <summary>
-        /// Check whether all prerequisites for this recipe have already been randomised.
-        /// </summary>
-        /// <param name="entity">The recipe to check.</param>
-        /// <returns>True if all conditions are fulfilled, false otherwise.</returns>
-        private bool CheckRecipeForPrerequisites(LogicEntity entity)
-        {
-            bool fulfilled = true;
-
-            // The builder tool must always be randomised before any base pieces
-            // ever become accessible.
-            if (entity.Category.IsBasePiece() && !_masterDict.RecipeDict.ContainsKey(TechType.Builder))
-                return false;
-
-            if (entity.Prerequisites == null)
-                return true;
-
-            foreach (TechType t in entity.Prerequisites)
-            {
-                fulfilled &= _masterDict.RecipeDict.ContainsKey(t);
-                if (!fulfilled)
-                    break;
-            }
-
-            return fulfilled;
         }
 
         /// <summary>

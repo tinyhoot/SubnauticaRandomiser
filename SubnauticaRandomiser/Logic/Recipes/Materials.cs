@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser.Logic.Recipes
@@ -132,6 +133,17 @@ namespace SubnauticaRandomiser.Logic.Recipes
         internal bool AddReachableWithPrereqs(ETechTypeCategory category, int maxDepth, TechType prerequisite, bool invert = false)
         {
             return AddReachableWithPrereqs(new[] { category }, maxDepth, prerequisite, invert);
+        }
+
+        /// <summary>
+        /// Get the corresponding LogicEntity to the given TechType.
+        /// </summary>
+        /// <param name="type">The TechType.</param>
+        /// <returns>The LogicEntity if found, null otherwise.</returns>
+        [CanBeNull]
+        internal LogicEntity Find(TechType type)
+        {
+            return _allMaterials.Find(x => x.TechType.Equals(type));
         }
 
         /// <summary>
