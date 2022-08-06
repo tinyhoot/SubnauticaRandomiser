@@ -85,28 +85,31 @@ namespace SubnauticaRandomiser
             s_masterDict = new EntitySerializer();
             s_config.SanitiseConfigValues();
             s_config.iSaveVersion = s_expectedSaveVersion;
+            var csvReader = new CSVReader();
 
             // Attempt to read and parse the CSV with all biome information.
-            var completeBiomeList = CSVReader.ParseBiomeFile(s_biomeFile);
-            if (completeBiomeList is null)
+            var biomes = csvReader.ParseBiomeFile(s_biomeFile);
+            if (biomes is null)
             {
                 LogHandler.Fatal("Failed to extract biome information from CSV, aborting.");
-                return;
+                throw new ParsingException("Failed to extract biome information: null");
             }
 
             // Attempt to read and parse the CSV with all recipe information.
-            var completeMaterialsList = CSVReader.ParseRecipeFile(s_recipeFile);
-            if (completeMaterialsList is null)
+            var materials = csvReader.ParseRecipeFile(s_recipeFile);
+            if (materials is null)
             {
                 LogHandler.Fatal("Failed to extract recipe information from CSV, aborting.");
-                return;
+                throw new ParsingException("Failed to extract recipe information: null");
             }
 
             // Attempt to read and parse the CSV with wreckages and databox info.
-            List<Databox> databoxes;
-            databoxes = CSVReader.ParseWreckageFile(s_wreckageFile);
+            var databoxes = csvReader.ParseWreckageFile(s_wreckageFile);
             if (databoxes is null || databoxes.Count == 0)
+            {
                 LogHandler.Error("Failed to extract databox information from CSV.");
+                throw new ParsingException("Failed to extract databox information: null");
+            }
 
             // Create a new seed if the current one is just a default
             Random random;
@@ -118,7 +121,7 @@ namespace SubnauticaRandomiser
             random = new Random(s_config.iSeed);
 
             // Randomise!
-            CoreLogic logic = new CoreLogic(random, s_masterDict, s_config, completeMaterialsList, completeBiomeList, databoxes);
+            CoreLogic logic = new CoreLogic(random, s_masterDict, s_config, materials, biomes, databoxes);
             logic.Randomise();
             LogHandler.Info("Randomisation successful!");
 

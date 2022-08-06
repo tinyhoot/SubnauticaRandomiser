@@ -73,6 +73,11 @@ namespace SubnauticaRandomiser.Logic
             }
         }
         
+        /// <summary>
+        /// Start the randomisation process.
+        /// </summary>
+        /// <exception cref="TimeoutException">Raised to prevent infinite loops if the core loop takes too long to find
+        /// a valid solution.</exception>
         internal void Randomise()
         {
             LogHandler.Info("Randomising using logic-based system...");
@@ -93,8 +98,7 @@ namespace SubnauticaRandomiser.Logic
                 {
                     LogHandler.MainMenuMessage("Failed to randomise items: stuck in infinite loop!");
                     LogHandler.Fatal("Encountered infinite loop, aborting!");
-                    // TODO: Throw exception.
-                    break;
+                    throw new TimeoutException("Encountered infinite loop while randomising!");
                 }
                 
                 // Update depth and reachable materials.

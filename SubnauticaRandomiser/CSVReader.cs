@@ -8,16 +8,23 @@ using UnityEngine;
 
 namespace SubnauticaRandomiser
 {
-    internal static class CSVReader
+    internal class CSVReader
     {
-        internal static List<LogicEntity> s_csvRecipeList;
-        internal static List<BiomeCollection> s_csvBiomeList;
-        internal static List<Databox> s_csvDataboxList;
+        internal List<BiomeCollection> _csvBiomeList;
+        internal List<Databox> _csvDataboxList;
+        internal List<LogicEntity> _csvRecipeList;
         internal static string s_recipeCSVMD5;
 
         private const int _ExpectedColumns = 8;
         private const int _ExpectedRows = 245;
         private const int _ExpectedWreckColumns = 6;
+
+        internal CSVReader()
+        {
+            _csvBiomeList = new List<BiomeCollection>();
+            _csvDataboxList = new List<Databox>();
+            _csvRecipeList = new List<LogicEntity>();
+        }
 
         /// <summary>
         /// Attempt to parse the given file into a list of entities representing recipes.
@@ -25,7 +32,7 @@ namespace SubnauticaRandomiser
         /// <param name="fileName">The file to parse.</param>
         /// <returns>A list of LogicEntities if successful, null otherwise.</returns>
         [CanBeNull]
-        internal static List<LogicEntity> ParseRecipeFile(string fileName)
+        internal List<LogicEntity> ParseRecipeFile(string fileName)
         {
             // First, try to find and grab the file containing recipe information.
             string[] csvLines;
@@ -57,7 +64,7 @@ namespace SubnauticaRandomiser
             }
 
             // Second, read each line and try to parse that into a list of LogicEntity objects, for later use.
-            s_csvRecipeList = new List<LogicEntity>();
+            _csvRecipeList = new List<LogicEntity>();
 
             int lineCounter = 0;
             foreach (string line in csvLines)
@@ -72,7 +79,7 @@ namespace SubnauticaRandomiser
                 // ParseRecipeFileLine fails upwards, so this ensures all errors are caught in one central location.
                 try
                 {
-                    s_csvRecipeList.Add(ParseRecipeFileLine(line));
+                    _csvRecipeList.Add(ParseRecipeFileLine(line));
                 }
                 catch (Exception ex)
                 {
@@ -81,7 +88,7 @@ namespace SubnauticaRandomiser
                 }
             }
 
-            return s_csvRecipeList;
+            return _csvRecipeList;
         }
         
         /// <summary>
@@ -91,14 +98,14 @@ namespace SubnauticaRandomiser
         /// <returns>The fully processed LogicEntity.</returns>
         /// <exception cref="InvalidDataException">If the format of the data is wrong.</exception>
         /// <exception cref="ArgumentException">If a required column is missing or invalid.</exception>
-        private static LogicEntity ParseRecipeFileLine(string line)
+        private LogicEntity ParseRecipeFileLine(string line)
         {
-            TechType type = TechType.None;
-            ETechTypeCategory category = ETechTypeCategory.None;
+            TechType type;
+            ETechTypeCategory category;
             int depth = 0;
             Recipe recipe = null;
             List<TechType> prereqList = new List<TechType>();
-            int value = 0;
+            int value;
             int maxUses = 0;
 
             Blueprint blueprint = null;
@@ -172,7 +179,9 @@ namespace SubnauticaRandomiser
                 blueprintUnlockDepth = StringToInt(cellsBPDepth, "Blueprint Unlock Depth");
 
             // Only if any of the blueprint components yielded anything, ship the entity with a blueprint.
-            if ((blueprintUnlockConditions.Count > 0) || blueprintUnlockDepth != 0 || !blueprintDatabox || blueprintFragments.Count > 0)
+            if ((blueprintUnlockConditions.Count > 0) || blueprintUnlockDepth != 0 
+                                                      || !blueprintDatabox 
+                                                      || blueprintFragments.Count > 0)
             {
                 blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragments, blueprintDatabox, 
                                     blueprintUnlockDepth);
@@ -200,7 +209,7 @@ namespace SubnauticaRandomiser
         /// <param name="fileName">The file to parse.</param>
         /// <returns>A list of BiomeCollection if successful, null otherwise.</returns>
         [CanBeNull]
-        internal static List<BiomeCollection> ParseBiomeFile(string fileName)
+        internal List<BiomeCollection> ParseBiomeFile(string fileName)
         {
             // Try and grab the file containing biome information.
             string[] csvLines;
@@ -218,7 +227,7 @@ namespace SubnauticaRandomiser
                 return null;
             }
 
-            s_csvBiomeList = new List<BiomeCollection>();
+            _csvBiomeList = new List<BiomeCollection>();
 
             int lineCounter = 0;
             foreach (string line in csvLines)
@@ -234,13 +243,13 @@ namespace SubnauticaRandomiser
                 try
                 {
                     Biome biome = ParseBiomeFileLine(line);
-                    BiomeCollection collection = s_csvBiomeList.Find(x => x.BiomeType.Equals(biome.BiomeType));
+                    BiomeCollection collection = _csvBiomeList.Find(x => x.BiomeType.Equals(biome.BiomeType));
 
                     // Initiate a BiomeCollection if it does not already exist.
                     if (collection is null)
                     {
                         collection = new BiomeCollection(biome.BiomeType);
-                        s_csvBiomeList.Add(collection);
+                        _csvBiomeList.Add(collection);
                     }
 
                     collection.Add(biome);
@@ -252,7 +261,7 @@ namespace SubnauticaRandomiser
                 }
             }
 
-            return s_csvBiomeList;
+            return _csvBiomeList;
         }
 
         /// <summary>
@@ -261,12 +270,12 @@ namespace SubnauticaRandomiser
         /// <param name="line">A string to parse.</param>
         /// <returns>The fully processed Biome.</returns>
         /// <exception cref="ArgumentException">If a required column is empty, missing or invalid.</exception>
-        private static Biome ParseBiomeFileLine(string line)
+        private Biome ParseBiomeFileLine(string line)
         {
-            Biome biome = null;
-            int smallCount = 0;
-            int mediumCount = 0;
-            int creatureCount = 0;
+            Biome biome;
+            int smallCount;
+            int mediumCount;
+            int creatureCount;
             float? fragmentRate = null;
 
             string[] cells = line.Split(',');
@@ -318,7 +327,7 @@ namespace SubnauticaRandomiser
         /// <param name="fileName">The file to parse.</param>
         /// <returns>A list of Databoxes if successful, null otherwise.</returns>
         [CanBeNull]
-        internal static List<Databox> ParseWreckageFile(string fileName)
+        internal List<Databox> ParseWreckageFile(string fileName)
         {
             string[] csvLines;
             string path = Path.Combine(InitMod.s_modDirectory, fileName);
@@ -335,7 +344,7 @@ namespace SubnauticaRandomiser
                 return null;
             }
 
-            s_csvDataboxList = new List<Databox>();
+            _csvDataboxList = new List<Databox>();
             int lineCounter = 0;
 
             foreach (string line in csvLines)
@@ -352,7 +361,7 @@ namespace SubnauticaRandomiser
                 {
                     Databox databox = ParseWreckageFileLine(line);
                     if (databox != null)
-                        s_csvDataboxList.Add(databox);
+                        _csvDataboxList.Add(databox);
                 }
                 catch (Exception ex)
                 {
@@ -361,7 +370,7 @@ namespace SubnauticaRandomiser
                 }
             }
 
-            return s_csvDataboxList;
+            return _csvDataboxList;
         }
 
         /// <summary>
@@ -370,9 +379,9 @@ namespace SubnauticaRandomiser
         /// <param name="line">A string to parse.</param>
         /// <returns>The fully processed Databox.</returns>
         /// <exception cref="ArgumentException">If a required column is empty, missing or invalid.</exception>
-        private static Databox ParseWreckageFileLine(string line)
+        private Databox ParseWreckageFileLine(string line)
         {
-            TechType type = TechType.None;
+            TechType type;
             Vector3 coordinates;
             EWreckage wreck = EWreckage.None;
             bool isDatabox;
@@ -593,5 +602,15 @@ namespace SubnauticaRandomiser
 
             return output;
         }
+    }
+
+    /// <summary>
+    /// The exception that is thrown when an input file cannot be parsed properly into the expected objects.
+    /// </summary>
+    public class ParsingException : Exception
+    {
+        public ParsingException() {}
+
+        public ParsingException(string message) : base(message) {}
     }
 }
