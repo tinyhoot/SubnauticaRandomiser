@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.RandomiserObjects;
 
@@ -44,7 +45,7 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Set up all the necessary structures for later.
         /// </summary>
-        private void Setup(List<LogicEntity> notRandomised, Dictionary<TechType, bool> unlockedProgressionItems)
+        private void Setup(List<LogicEntity> notRandomised)
         {
             if (_databoxLogic != null)
             {
@@ -86,7 +87,7 @@ namespace SubnauticaRandomiser.Logic
             Dictionary<TechType, bool> unlockedProgressionItems = new Dictionary<TechType, bool>();
 
             // Set up basic structures.
-            Setup(notRandomised, unlockedProgressionItems);
+            Setup(notRandomised);
 
             int circuitbreaker = 0;
             int currentDepth = 0;
@@ -156,7 +157,6 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// This function calculates the maximum reachable depth based on what vehicles the player has attained, as well
         /// as how much further they can go "on foot"
-        /// TODO: Simplify this.
         /// </summary>
         /// <param name="progressionItems">A list of all currently reachable items relevant for progression.</param>
         /// <param name="depthTime">The minimum time that it must be possible to spend at the reachable depth before
@@ -164,54 +164,29 @@ namespace SubnauticaRandomiser.Logic
         /// <returns>The reachable depth.</returns>
         internal int CalculateReachableDepth(Dictionary<TechType, bool> progressionItems, int depthTime = 15)
         {
-            double swimmingSpeed = 4.7; // Assuming player is holding a tool.
-            double seaglideSpeed = 11.0;
+            const double swimmingSpeed = 4.7;  // Always assume that the player is holding a tool.
+            const double seaglideSpeed = 11.0;
             bool seaglide = progressionItems.ContainsKey(TechType.Seaglide);
             double finSpeed = 0.0;
-            double tankPenalty = 0.0;
-            int breathTime = 45;
-
-            // How long should the player be able to remain at this depth and still make it back just fine?
-            int searchTime = depthTime;
-            // Never assume the player has to go deeper than this on foot.
-            int maxSoloDepth = 300;
             int vehicleDepth = 0;
-            double playerDepthRaw;
-            double totalDepth;
+            Dictionary<TechType, double[]> tanks = new Dictionary<TechType, double[]>
+            {
+                { TechType.Tank, new[] { 75, 0.4 } },  // Tank type, oxygen, weight factor.
+                { TechType.DoubleTank, new[] { 135, 0.47 } },
+                { TechType.HighCapacityTank, new[] { 225, 0.6 } },
+                { TechType.PlasteelTank, new[] { 135, 0.1 } }
+            };
 
             LogHandler.Debug("===== Recalculating reachable depth =====");
 
-            // This feels like it could be simplified.
-            // Also, this trusts that the tree is set up correctly.
-            foreach (TechType[] path in _tree.GetProgressionPath(EProgressionNode.Depth200m).Pathways)
+            // Get the deepest depth that can be reached by vehicle.
+            foreach (EProgressionNode node in EProgressionNodeExtensions.AllDepthNodes)
             {
-                if (CheckDictForAllTechTypes(progressionItems, path))
-                    vehicleDepth = 200;
-            }
-            foreach (TechType[] path in _tree.GetProgressionPath(EProgressionNode.Depth300m).Pathways)
-            {
-                if (CheckDictForAllTechTypes(progressionItems, path))
-                    vehicleDepth = 300;
-            }
-            foreach (TechType[] path in _tree.GetProgressionPath(EProgressionNode.Depth500m).Pathways)
-            {
-                if (CheckDictForAllTechTypes(progressionItems, path))
-                    vehicleDepth = 500;
-            }
-            foreach (TechType[] path in _tree.GetProgressionPath(EProgressionNode.Depth900m).Pathways)
-            {
-                if (CheckDictForAllTechTypes(progressionItems, path))
-                    vehicleDepth = 900;
-            }
-            foreach (TechType[] path in _tree.GetProgressionPath(EProgressionNode.Depth1300m).Pathways)
-            {
-                if (CheckDictForAllTechTypes(progressionItems, path))
-                    vehicleDepth = 1300;
-            }
-            foreach (TechType[] path in _tree.GetProgressionPath(EProgressionNode.Depth1700m).Pathways)
-            {
-                if (CheckDictForAllTechTypes(progressionItems, path))
-                    vehicleDepth = 1700;
+                foreach (TechType[] path in _tree?.GetProgressionPath(node)?.Pathways ?? Enumerable.Empty<TechType[]>())
+                {
+                    if (CheckDictForAllTechTypes(progressionItems, path))
+                        vehicleDepth = Math.Max(vehicleDepth, (int)node);
+                }
             }
 
             if (progressionItems.ContainsKey(TechType.Fins))
@@ -220,87 +195,67 @@ namespace SubnauticaRandomiser.Logic
                 finSpeed = 1.88;
 
             // How deep can the player go without any tanks?
-            playerDepthRaw = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed)) / 2;
+            double soloDepthRaw = (45 - depthTime) * (seaglide ? seaglideSpeed : swimmingSpeed + finSpeed) / 2;
 
-            // But can they go deeper with a tank? (Yes.)
-            if (progressionItems.ContainsKey(TechType.Tank))
+            // How deep can they go with tanks?
+            foreach (var kv in tanks)
             {
-                breathTime = 75;
-                tankPenalty = 0.4;
-                double depth = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed - tankPenalty)) / 2;
-                playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
-            }
-
-            if (progressionItems.ContainsKey(TechType.DoubleTank))
-            {
-                breathTime = 135;
-                tankPenalty = 0.47;
-                double depth = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed - tankPenalty)) / 2;
-                playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
-            }
-
-            if (progressionItems.ContainsKey(TechType.HighCapacityTank))
-            {
-                breathTime = 225;
-                tankPenalty = 0.6;
-                double depth = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed - tankPenalty)) / 2;
-                playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
-            }
-
-            if (progressionItems.ContainsKey(TechType.PlasteelTank))
-            {
-                breathTime = 135;
-                tankPenalty = 0.1;
-                double depth = (breathTime - searchTime) * (seaglide ? seaglideSpeed : (swimmingSpeed + finSpeed - tankPenalty)) / 2;
-                playerDepthRaw = depth > playerDepthRaw ? depth : playerDepthRaw;
-            }
-
-            // The vehicle depth and whether or not the player has a rebreather can modify the raw achievable diving depth.
-            if (progressionItems.ContainsKey(TechType.Rebreather))
-            {
-                totalDepth = vehicleDepth + (playerDepthRaw > maxSoloDepth ? maxSoloDepth : playerDepthRaw);
-            }
-            else
-            {
-                // Below 100 meters, air is consumed three times as fast.
-                // Below 200 meters, it is consumed five times as fast.
-                double depth = 0.0;
-
-                if (vehicleDepth == 0)
+                if (progressionItems.ContainsKey(kv.Key))
                 {
-                    if (playerDepthRaw <= 100)
-                    {
-                        depth = playerDepthRaw;
-                    }
-                    else
-                    {
-                        depth += 100;
-                        playerDepthRaw -= 100;
-
-                        // For anything between 100-200 meters, triple air consumption
-                        if (playerDepthRaw <= 100)
-                        {
-                            depth += playerDepthRaw / 3;
-                        }
-                        else
-                        {
-                            depth += 33.3;
-                            playerDepthRaw -= 100;
-                            // For anything below 200 meters, quintuple it.
-                            depth += playerDepthRaw / 5;
-                        }
-                    }
+                    // Value[0] is the oxygen granted by the tank, Value[1] its weight factor.
+                    double depth = (kv.Value[0] - depthTime)
+                        * (seaglide ? seaglideSpeed : swimmingSpeed + finSpeed - kv.Value[1]) / 2;
+                    soloDepthRaw = Math.Max(soloDepthRaw, depth);
                 }
-                else
-                {
-                    depth = playerDepthRaw / 5;
-                }
-
-                totalDepth = vehicleDepth + (depth > maxSoloDepth ? maxSoloDepth : depth);
             }
+
+            // Given everything above, calculate the total.
+            int totalDepth = CalculateTotalDepth(progressionItems, vehicleDepth, (int)soloDepthRaw);
+            
             LogHandler.Debug("===== New reachable depth: " + totalDepth + " =====");
 
-            return (int)totalDepth;
+            return totalDepth;
+        }
+
+        /// <summary>
+        /// Calculate the depth that can be comfortably reached on foot.
+        /// </summary>
+        /// <param name="vehicleDepth">The depth reachable by vehicle.</param>
+        /// <param name="soloDepthRaw">The raw depth reachable on foot given no depth restrictions.</param>
+        /// <returns>The depth that can be covered on foot in addition to the depth reachable by vehicle.</returns>
+        private int CalculateSoloDepth(int vehicleDepth, int soloDepthRaw)
+        {
+            // Ensure that a number stays between a lower and upper bound. (e.g. 0 < x < 100)
+            double limit(double x, double upperBound) => Math.Max(0, Math.Min(x, upperBound));
+            // Calculate how much of the 0-100m and 100-200m range is already covered by vehicles.
+            double[] vehicleDepths = { limit(vehicleDepth, 100), limit(vehicleDepth - 100, 100) };
+            double[] soloDepths =
+            {
+                limit(soloDepthRaw, 100 - vehicleDepths[0]),
+                limit(soloDepthRaw + vehicleDepths[0] - 100, 100 - vehicleDepths[1]),
+                limit(soloDepthRaw + vehicleDepths[1] - 200, 10000)
+            };
+            
+            // Below 100 meters, air is consumed three times as fast.
+            // Below 200 meters, it is consumed five times as fast.
+            return (int)(soloDepths[0] + soloDepths[1] / 3 + soloDepths[2] / 5);
+        }
+
+        /// <summary>
+        /// Calculate the total depth that can be reached given the available equipment.
+        /// </summary>
+        /// <param name="progressionItems">The unlocked progression items.</param>
+        /// <param name="vehicleDepth">The depth reachable by vehicle.</param>
+        /// <param name="soloDepthRaw">The raw depth reachable on foot given no oxygen restrictions.</param>
+        /// <returns>The total depth coverable by extending vehicle depth with a solo journey.</returns>
+        private int CalculateTotalDepth(Dictionary<TechType, bool> progressionItems, int vehicleDepth, int soloDepthRaw)
+        {
+            const int maxSoloDepth = 300;  // Never make the player go deeper than this on foot.
+            // If there is a rebreather, all the funky calculations are redundant.
+            if (progressionItems.ContainsKey(TechType.Rebreather))
+                return vehicleDepth + Math.Min(soloDepthRaw, maxSoloDepth);
+
+            return vehicleDepth + Math.Min(CalculateSoloDepth(vehicleDepth, soloDepthRaw), maxSoloDepth);
         }
 
         /// <summary>
