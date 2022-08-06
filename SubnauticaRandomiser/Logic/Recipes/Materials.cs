@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser.Logic.Recipes
@@ -32,7 +33,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             List<LogicEntity> additions = new List<LogicEntity>();
 
             // Use a lambda expression to find every object where the search parameters match.
-            additions.AddRange(_allMaterials.FindAll(x => ContainsCategory(categories, x.Category) && x.AccessibleDepth <= maxDepth));
+            additions.AddRange(_allMaterials.FindAll(x => categories.Contains(x.Category) && x.AccessibleDepth <= maxDepth));
 
             return AddToReachableList(additions);
         }
@@ -53,7 +54,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             if (invert)
             {
-                additions.AddRange(_allMaterials.FindAll(x => ContainsCategory(categories, x.Category)
+                additions.AddRange(_allMaterials.FindAll(x => categories.Contains(x.Category)
                                                            && x.AccessibleDepth <= maxDepth
                                                            && (!x.HasPrerequisites
                                                            || !x.Prerequisites.Contains(prerequisite))
@@ -61,7 +62,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
             else
             {
-                additions.AddRange(_allMaterials.FindAll(x => ContainsCategory(categories, x.Category)
+                additions.AddRange(_allMaterials.FindAll(x => categories.Contains(x.Category)
                                                            && x.AccessibleDepth <= maxDepth
                                                            && x.HasPrerequisites
                                                            && x.Prerequisites.Contains(prerequisite)
@@ -131,29 +132,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
         internal bool AddReachableWithPrereqs(ETechTypeCategory category, int maxDepth, TechType prerequisite, bool invert = false)
         {
             return AddReachableWithPrereqs(new[] { category }, maxDepth, prerequisite, invert);
-        }
-
-        // TODO: Generalise this.
-        private bool ContainsCategory(ETechTypeCategory[] array, ETechTypeCategory target)
-        {
-            foreach (ETechTypeCategory category in array)
-            {
-                if (category.Equals(target))
-                    return true;
-            }
-
-            return false;
-        }
-
-        private bool ContainsTechType(TechType[] array, TechType target)
-        {
-            foreach (TechType type in array)
-            {
-                if (type.Equals(target))
-                    return true;
-            }
-
-            return false;
         }
 
         /// <summary>
