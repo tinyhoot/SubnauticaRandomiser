@@ -55,7 +55,7 @@ namespace SubnauticaRandomiser
         [Slider("Max ingredients per recipe", 1, 10, DefaultValue = 7)]
         public int iMaxIngredientsPerRecipe = ConfigDefaults.iMaxIngredientsPerRecipe;
 
-        [Slider("Max biomes to spawn each fragment in", 1, 5, DefaultValue = 3)]
+        [Slider("Max biomes to spawn each fragment in", 3, 10, DefaultValue = 5)]
         public int iMaxBiomesPerFragment = ConfigDefaults.iMaxBiomesPerFragment;
 
         [Button("Randomise with new seed")]
@@ -95,7 +95,8 @@ namespace SubnauticaRandomiser
         public int iMaxInventorySizePerRecipe = ConfigDefaults.iMaxInventorySizePerRecipe;
         public double dFuzziness = ConfigDefaults.dFuzziness;
         public double dIngredientRatio = ConfigDefaults.dIngredientRatio;
-        public float fFragmentSpawnChance = ConfigDefaults.fFragmentSpawnChance;
+        public float fFragmentSpawnChanceMin = ConfigDefaults.fFragmentSpawnChanceMin;
+        public float fFragmentSpawnChanceMax = ConfigDefaults.fFragmentSpawnChanceMax;
 
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
@@ -115,7 +116,7 @@ namespace SubnauticaRandomiser
                 iMaxAmountPerIngredient = ConfigDefaults.iMaxAmountPerIngredient;
             if (iMaxIngredientsPerRecipe > 10 || iMaxIngredientsPerRecipe < 1)
                 iMaxIngredientsPerRecipe = ConfigDefaults.iMaxIngredientsPerRecipe;
-            if (iMaxBiomesPerFragment > 10 || iMaxBiomesPerFragment < 1)
+            if (iMaxBiomesPerFragment > 10 || iMaxBiomesPerFragment < 3)
                 iMaxBiomesPerFragment = ConfigDefaults.iMaxBiomesPerFragment;
 
             // Advanced settings below.
@@ -129,8 +130,10 @@ namespace SubnauticaRandomiser
                 dFuzziness = ConfigDefaults.dFuzziness;
             if (dIngredientRatio > 1 || dIngredientRatio < 0)
                 dIngredientRatio = ConfigDefaults.dIngredientRatio;
-            if (fFragmentSpawnChance > 1.0f || fFragmentSpawnChance < 0.01f)
-                fFragmentSpawnChance = ConfigDefaults.fFragmentSpawnChance;
+            if (fFragmentSpawnChanceMin > 10.0f || fFragmentSpawnChanceMin < 0.01f)
+                fFragmentSpawnChanceMin = ConfigDefaults.fFragmentSpawnChanceMin;
+            if (fFragmentSpawnChanceMax > 10.0f || fFragmentSpawnChanceMax < 0.01f)
+                fFragmentSpawnChanceMax = ConfigDefaults.fFragmentSpawnChanceMax;
         }
 
         /// <summary>
@@ -167,7 +170,7 @@ namespace SubnauticaRandomiser
         internal const int iUpgradesAsIngredients = 1;
         internal const int iMaxAmountPerIngredient = 5;
         internal const int iMaxIngredientsPerRecipe = 7;
-        internal const int iMaxBiomesPerFragment = 3;
+        internal const int iMaxBiomesPerFragment = 5;
 
         // Advanced setting defaults start here.
         internal const int iDepthSearchTime = 15;
@@ -176,6 +179,7 @@ namespace SubnauticaRandomiser
         internal const int iMaxInventorySizePerRecipe = 24;
         internal const double dFuzziness = 0.2;
         internal const double dIngredientRatio = 0.45;
-        internal const float fFragmentSpawnChance = 0.1f;
+        internal const float fFragmentSpawnChanceMin = 0.3f;
+        internal const float fFragmentSpawnChanceMax = 0.6f;
     }
 }

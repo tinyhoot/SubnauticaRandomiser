@@ -18,7 +18,8 @@ namespace SubnauticaRandomiser.Logic
         private RandomiserConfig _config { get { return _logic._config; } }
         private EntitySerializer _masterDict { get { return _logic._masterDict; } }
         private Random _random { get { return _logic._random; } }
-        private List<Biome> _availableBiomes;
+        private readonly List<Biome> _allBiomes;
+        private readonly List<Biome> _availableBiomes;
         private static readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
         {
             { "BaseBioReactor_Fragment", TechType.BaseBioReactorFragment },
@@ -60,6 +61,7 @@ namespace SubnauticaRandomiser.Logic
         {
             _logic = coreLogic;
             
+            _allBiomes = GetAvailableFragmentBiomes(biomeList);
             _availableBiomes = GetAvailableFragmentBiomes(biomeList);
             AllSpawnData = new List<SpawnData>();
         }
@@ -74,23 +76,23 @@ namespace SubnauticaRandomiser.Logic
         internal SpawnData RandomiseFragment(LogicEntity entity, int depth)
         {
             if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList))
-                throw new ArgumentException("Failed to find fragment '" + entity.TechType.AsString() + "' in classId database!");
+                throw new ArgumentException("Failed to find fragment '" + entity + "' in classId database!");
             
-            LogHandler.Debug("Randomising fragment " + entity.TechType.AsString() + " for depth " + depth);
+            LogHandler.Debug("Randomising fragment " + entity + " for depth " + depth);
 
             // HACK for now, only consider the first entry in the ID list.
             string classId = idList[0];
             SpawnData spawnData = new SpawnData(classId);
 
             // Determine how many different biomes the fragment should spawn in.
-            int biomeCount = _random.Next(1, _config.iMaxBiomesPerFragment);
+            int biomeCount = _random.Next(3, _config.iMaxBiomesPerFragment);
 
             for (int i = 0; i < biomeCount; i++)
             {
                 // Choose a suitable biome which is also accessible at this depth.
                 Biome biome = GetRandom(_availableBiomes.FindAll(x => x.AverageDepth <= depth));
-                // In case no good biome is available, just choose any.
-                biome ??= GetRandom(_availableBiomes);
+                // In case no good biome is available, ignore overpopulation restrictions and choose any.
+                biome ??= GetRandom(_allBiomes.FindAll(x => x.AverageDepth <= depth));
 
                 // Ensure the biome can actually be used for creating valid BiomeData.
                 if (!Enum.TryParse(biome.Name, out BiomeType biomeType))
@@ -109,7 +111,7 @@ namespace SubnauticaRandomiser.Logic
                 {
                     Biome = biomeType,
                     Count = 1,
-                    Probability = (float)_random.NextDouble() * _config.fFragmentSpawnChance
+                    Probability = CalcFragmentSpawnRate(biome)
                 };
 
                 spawnData.AddBiomeData(data);
@@ -179,6 +181,19 @@ namespace SubnauticaRandomiser.Logic
             }
             LogHandler.Debug("---Total biomes suitable for fragments: "+biomes.Count);
             return biomes;
+        }
+
+        /// <summary>
+        /// Calculate the spawn rate for an entity in the given biome.
+        /// </summary>
+        /// <param name="biome">The biome.</param>
+        /// <returns>The spawn rate.</returns>
+        private float CalcFragmentSpawnRate(Biome biome)
+        {
+            // Set a percentage between Min and Max% of the biome's combined original spawn rates.
+            float percentage = _config.fFragmentSpawnChanceMin + (float)_random.NextDouble()
+                * (_config.fFragmentSpawnChanceMax - _config.fFragmentSpawnChanceMax);
+            return percentage * biome.FragmentRate ?? 0.0f;
         }
         
         /// <summary>
