@@ -28,7 +28,7 @@ namespace SubnauticaRandomiser
     public class EntitySerializer
     {
         public Dictionary<TechType, Recipe> RecipeDict = new Dictionary<TechType, Recipe>();
-        public Dictionary<TechType, SpawnData> SpawnDataDict = new Dictionary<TechType, SpawnData>();
+        public Dictionary<TechType, List<SpawnData>> SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
         public Dictionary<RandomiserVector, TechType> Databoxes = new Dictionary<RandomiserVector, TechType>();
 
         public bool isDataboxRandomised = false;
@@ -85,7 +85,7 @@ namespace SubnauticaRandomiser
         /// <param name="type">The TechType to use as key.</param>
         /// <param name="data">The SpawnData to use as value.</param>
         /// <returns>True if successful, false if the key already exists in the dictionary.</returns>
-        public bool AddSpawnData(TechType type, SpawnData data)
+        public bool AddSpawnData(TechType type, List<SpawnData> data)
         {
             if (SpawnDataDict.ContainsKey(type))
             {

@@ -18,7 +18,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         public readonly ETechTypeCategory Category;
         public Blueprint Blueprint;             // For making it show up in the PDA
         public Recipe Recipe;                   // For actually crafting it
-        public SpawnData SpawnData;             // For spawning it naturally in the world
+        public List<SpawnData> SpawnData;       // For spawning it naturally in the world
         public List<TechType> Prerequisites;    // What is absolutely mandatory before getting this?
         public bool InLogic;                    // Is this available for randomising other entities?
         public int AccessibleDepth;             // How deep down must you reach to get to this?
@@ -32,7 +32,8 @@ namespace SubnauticaRandomiser.RandomiserObjects
         public bool HasSpawnData => !(SpawnData is null);
         public bool IsFragment => Category.Equals(ETechTypeCategory.Fragments);
 
-        public LogicEntity(TechType type, ETechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null, SpawnData spawnData = null, List<TechType> prerequisites = null, bool inLogic = false, int value = 0)
+        public LogicEntity(TechType type, ETechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null,
+            List<SpawnData> spawnData = null, List<TechType> prerequisites = null, bool inLogic = false, int value = 0)
         {
             TechType = type;
             Category = category;
