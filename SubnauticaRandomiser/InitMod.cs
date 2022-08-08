@@ -27,7 +27,7 @@ namespace SubnauticaRandomiser
                                                                                                        [3] = "v0.7.0"};
 
         // The master list of everything that is modified by the mod.
-        internal static EntitySerializer s_masterDict = new EntitySerializer();
+        internal static EntitySerializer s_masterDict;
         private const bool _debug_forceRandomise = false;
 
         [QModPatch]
