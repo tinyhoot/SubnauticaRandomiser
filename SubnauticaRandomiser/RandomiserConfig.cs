@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options.Attributes;
+
 namespace SubnauticaRandomiser
 {
     [Menu("Randomiser")]
@@ -14,55 +17,55 @@ namespace SubnauticaRandomiser
         public int iSeed = 0;
 
         [Choice("Mode", "Balanced", "Chaotic")]
-        public int iRandomiserMode = ConfigDefaults.iRandomiserMode;
+        public int iRandomiserMode = (int)ConfigDefaults.GetDefault("iRandomiserMode");
 
         [Toggle("Use fish in logic?")]
-        public bool bUseFish = ConfigDefaults.bUseFish;
+        public bool bUseFish = (bool)ConfigDefaults.GetDefault("bUseFish");
 
         [Toggle("Use eggs in logic?")]
-        public bool bUseEggs = ConfigDefaults.bUseEggs;
+        public bool bUseEggs = (bool)ConfigDefaults.GetDefault("bUseEggs");
 
         [Toggle("Use seeds in logic?")]
-        public bool bUseSeeds = ConfigDefaults.bUseSeeds;
+        public bool bUseSeeds = (bool)ConfigDefaults.GetDefault("bUseSeeds");
 
         [Toggle("Randomise blueprints in databoxes?")]
-        public bool bRandomiseDataboxes = ConfigDefaults.bRandomiseDataboxes;
+        public bool bRandomiseDataboxes = (bool)ConfigDefaults.GetDefault("bRandomiseDataboxes");
 
-        [Toggle("Randomise fragments?")]
-        public bool bRandomiseFragments = ConfigDefaults.bRandomiseFragments;
+        [Toggle("Randomise fragment locations?")]
+        public bool bRandomiseFragments = (bool)ConfigDefaults.GetDefault("bRandomiseFragments");
 
-        [Toggle("Randomise number of fragments to unlock something?")]
-        public bool bRandomiseNumFragments = ConfigDefaults.bRandomiseNumFragments;
+        [Toggle("Randomise number of fragments needed?")]
+        public bool bRandomiseNumFragments = (bool)ConfigDefaults.GetDefault("bRandomiseNumFragments");
 
         [Toggle("Randomise recipes?")]
-        public bool bRandomiseRecipes = ConfigDefaults.bRandomiseRecipes;
+        public bool bRandomiseRecipes = (bool)ConfigDefaults.GetDefault("bRandomiseRecipes");
 
         [Toggle("Respect vanilla upgrade chains?")]
-        public bool bVanillaUpgradeChains = ConfigDefaults.bVanillaUpgradeChains;
+        public bool bVanillaUpgradeChains = (bool)ConfigDefaults.GetDefault("bVanillaUpgradeChains");
 
         [Toggle("Theme base parts around a common ingredient?")]
-        public bool bDoBaseTheming = ConfigDefaults.bDoBaseTheming;
+        public bool bDoBaseTheming = (bool)ConfigDefaults.GetDefault("bDoBaseTheming");
 
         [Choice("Include equipment as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
-        public int iEquipmentAsIngredients = ConfigDefaults.iEquipmentAsIngredients;
+        public int iEquipmentAsIngredients = (int)ConfigDefaults.GetDefault("iEquipmentAsIngredients");
 
         [Choice("Include tools as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
-        public int iToolsAsIngredients = ConfigDefaults.iToolsAsIngredients;
+        public int iToolsAsIngredients = (int)ConfigDefaults.GetDefault("iToolsAsIngredients");
 
         [Choice("Include upgrades as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
-        public int iUpgradesAsIngredients = ConfigDefaults.iUpgradesAsIngredients;
+        public int iUpgradesAsIngredients = (int)ConfigDefaults.GetDefault("iUpgradesAsIngredients");
 
         [Slider("Max number of a single ingredient", 1, 10, DefaultValue = 5)]
-        public int iMaxAmountPerIngredient = ConfigDefaults.iMaxAmountPerIngredient;
+        public int iMaxAmountPerIngredient = (int)ConfigDefaults.GetDefault("iMaxAmountPerIngredient");
 
         [Slider("Max ingredients per recipe", 1, 10, DefaultValue = 7)]
-        public int iMaxIngredientsPerRecipe = ConfigDefaults.iMaxIngredientsPerRecipe;
+        public int iMaxIngredientsPerRecipe = (int)ConfigDefaults.GetDefault("iMaxIngredientsPerRecipe");
 
         [Slider("Max biomes to spawn each fragment in", 3, 10, DefaultValue = 5)]
-        public int iMaxBiomesPerFragment = ConfigDefaults.iMaxBiomesPerFragment;
+        public int iMaxBiomesPerFragment = (int)ConfigDefaults.GetDefault("iMaxBiomesPerFragment");
 
-        [Slider("Max number of fragments to scan to unlock something", 1, 20, DefaultValue = 5)]
-        public int iMaxFragmentsToUnlock = ConfigDefaults.iMaxFragmentsToUnlock;
+        [Slider("Max number of fragments needed", 1, 20, DefaultValue = 5)]
+        public int iMaxFragmentsToUnlock = (int)ConfigDefaults.GetDefault("iMaxFragmentsToUnlock");
 
         [Button("Randomise with new seed")]
         public void NewRandomNewSeed()
@@ -95,15 +98,15 @@ namespace SubnauticaRandomiser
         }
 
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
-        public int iMinFragmentsToUnlock = ConfigDefaults.iMinFragmentsToUnlock;
-        public int iDepthSearchTime = ConfigDefaults.iDepthSearchTime;
-        public int iMaxBasicOutpostSize = ConfigDefaults.iMaxBasicOutpostSize;
-        public int iMaxEggsAsSingleIngredient = ConfigDefaults.iMaxEggsAsSingleIngredient;
-        public int iMaxInventorySizePerRecipe = ConfigDefaults.iMaxInventorySizePerRecipe;
-        public double dFuzziness = ConfigDefaults.dFuzziness;
-        public double dIngredientRatio = ConfigDefaults.dIngredientRatio;
-        public float fFragmentSpawnChanceMin = ConfigDefaults.fFragmentSpawnChanceMin;
-        public float fFragmentSpawnChanceMax = ConfigDefaults.fFragmentSpawnChanceMax;
+        public int iMinFragmentsToUnlock = (int)ConfigDefaults.GetDefault("iMinFragmentsToUnlock");
+        public int iDepthSearchTime = (int)ConfigDefaults.GetDefault("iDepthSearchTime");
+        public int iMaxBasicOutpostSize = (int)ConfigDefaults.GetDefault("iMaxBasicOutpostSize");
+        public int iMaxEggsAsSingleIngredient = (int)ConfigDefaults.GetDefault("iMaxEgssAsSingleIngredient");
+        public int iMaxInventorySizePerRecipe = (int)ConfigDefaults.GetDefault("iMaxInventorySizePerRecipe");
+        public double dFuzziness = (double)ConfigDefaults.GetDefault("dFuzziness");
+        public double dIngredientRatio = (double)ConfigDefaults.GetDefault("dIngredientRatio");
+        public float fFragmentSpawnChanceMin = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMin");
+        public float fFragmentSpawnChanceMax = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMax");
 
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
@@ -111,40 +114,28 @@ namespace SubnauticaRandomiser
 
         public void SanitiseConfigValues()
         {
-            if (iRandomiserMode > 1 || iRandomiserMode < 0)
-                iRandomiserMode = ConfigDefaults.iRandomiserMode;
-            if (iToolsAsIngredients > 2 || iToolsAsIngredients < 0)
-                iToolsAsIngredients = ConfigDefaults.iToolsAsIngredients;
-            if (iUpgradesAsIngredients > 2 || iUpgradesAsIngredients < 0)
-                iUpgradesAsIngredients = ConfigDefaults.iUpgradesAsIngredients;
-            if (iDepthSearchTime > 45 || iDepthSearchTime < 0)
-                iDepthSearchTime = ConfigDefaults.iDepthSearchTime;
-            if (iMaxAmountPerIngredient > 10 || iMaxAmountPerIngredient < 1)
-                iMaxAmountPerIngredient = ConfigDefaults.iMaxAmountPerIngredient;
-            if (iMaxIngredientsPerRecipe > 10 || iMaxIngredientsPerRecipe < 1)
-                iMaxIngredientsPerRecipe = ConfigDefaults.iMaxIngredientsPerRecipe;
-            if (iMaxBiomesPerFragment > 10 || iMaxBiomesPerFragment < 3)
-                iMaxBiomesPerFragment = ConfigDefaults.iMaxBiomesPerFragment;
-            if (iMaxFragmentsToUnlock > 30 || iMaxFragmentsToUnlock < 1)
-                iMaxFragmentsToUnlock = ConfigDefaults.iMaxFragmentsToUnlock;
+            // Iterate through every variable of the config.
+            foreach (var field in typeof(RandomiserConfig).GetFields())
+            {
+                string name = field.Name;
+                Type type = field.FieldType;
+                // Skip clamping values for special cases, and for non-numeric options.
+                if (!ConfigDefaults.Contains(name) || type == typeof(bool))
+                {
+                    // LogHandler.Debug("Skipping config sanity check for variable " + name);
+                    continue;
+                }
 
-            // Advanced settings below.
-            if (iMinFragmentsToUnlock > iMaxFragmentsToUnlock || iMinFragmentsToUnlock < 1)
-                iMinFragmentsToUnlock = ConfigDefaults.iMinFragmentsToUnlock;
-            if (iMaxBasicOutpostSize > 48 || iMaxBasicOutpostSize < 4)
-                iMaxBasicOutpostSize = ConfigDefaults.iMaxBasicOutpostSize;
-            if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)
-                iMaxEggsAsSingleIngredient = ConfigDefaults.iMaxEggsAsSingleIngredient;
-            if (iMaxInventorySizePerRecipe > 100 || iMaxInventorySizePerRecipe < 4)
-                iMaxInventorySizePerRecipe = ConfigDefaults.iMaxInventorySizePerRecipe;
-            if (dFuzziness > 1 || dFuzziness < 0)
-                dFuzziness = ConfigDefaults.dFuzziness;
-            if (dIngredientRatio > 1 || dIngredientRatio < 0)
-                dIngredientRatio = ConfigDefaults.dIngredientRatio;
-            if (fFragmentSpawnChanceMin > 10.0f || fFragmentSpawnChanceMin < 0.01f)
-                fFragmentSpawnChanceMin = ConfigDefaults.fFragmentSpawnChanceMin;
-            if (fFragmentSpawnChanceMax > 10.0f || fFragmentSpawnChanceMax < 0.01f)
-                fFragmentSpawnChanceMax = ConfigDefaults.fFragmentSpawnChanceMax;
+                var value = (IComparable)field.GetValue(this);
+                
+                // If the variable is outside the range of acceptable values, reset it.
+                if (value.CompareTo(ConfigDefaults.GetMin(name)) < 0
+                    || value.CompareTo(ConfigDefaults.GetMax(name)) > 0)
+                {
+                    LogHandler.Debug("Resetting invalid config value for " + name);
+                    field.SetValue(this, ConfigDefaults.GetDefault(name));
+                }
+            }
         }
 
         /// <summary>
@@ -167,33 +158,57 @@ namespace SubnauticaRandomiser
     /// Mostly used so that the spoiler log can tell which settings to include.
     internal static class ConfigDefaults
     {
-        internal const int iRandomiserMode = 0;
-        internal const bool bUseFish = true;
-        internal const bool bUseEggs = false;
-        internal const bool bUseSeeds = true;
-        internal const bool bRandomiseDataboxes = true;
-        internal const bool bRandomiseFragments = true;
-        internal const bool bRandomiseNumFragments = true;
-        internal const bool bRandomiseRecipes = true;
-        internal const bool bVanillaUpgradeChains = false;
-        internal const bool bDoBaseTheming = false;
-        internal const int iEquipmentAsIngredients = 1;
-        internal const int iToolsAsIngredients = 1;
-        internal const int iUpgradesAsIngredients = 1;
-        internal const int iMaxAmountPerIngredient = 5;
-        internal const int iMaxIngredientsPerRecipe = 7;
-        internal const int iMaxBiomesPerFragment = 5;
-        internal const int iMaxFragmentsToUnlock = 5;
+        private static readonly Dictionary<string, IList> s_defaults = new Dictionary<string, IList>()
+        {
+            // Key, Default value, Minimum value, Maximum value.
+            { "iRandomiserMode", new[] { 0, 0, 1 } },
+            { "bUseFish", new[] { true, true, true } },
+            { "bUseEggs", new[] { false, false, false } },
+            { "bUseSeeds", new[] { true, true, true } },
+            { "bRandomiseDataboxes", new[] { true, true, true } },
+            { "bRandomiseFragments", new[] { true, true, true } },
+            { "bRandomiseNumFragments", new[] { true, true, true } },
+            { "bRandomiseRecipes", new[] { true, true, true } },
+            { "bVanillaUpgradeChains", new[] { false, false, false } },
+            { "bDoBaseTheming", new[] { false, false, false } },
+            { "iEquipmentAsIngredients", new[] { 1, 0, 2 } },
+            { "iToolsAsIngredients", new[] { 1, 0, 2 } },
+            { "iUpgradesAsIngredients", new[] { 1, 0, 2 } },
+            { "iMaxAmountPerIngredient", new[] { 5, 1, 10 } },
+            { "iMaxIngredientsPerRecipe", new[] { 7, 1, 10 } },
+            { "iMaxBiomesPerFragment", new[] { 5, 3, 10 } },
+            { "iMaxFragmentsToUnlock", new[] { 5, 1, 30 } },
 
-        // Advanced setting defaults start here.
-        internal const int iMinFragmentsToUnlock = 2;
-        internal const int iDepthSearchTime = 15;
-        internal const int iMaxBasicOutpostSize = 24;
-        internal const int iMaxEggsAsSingleIngredient = 1;
-        internal const int iMaxInventorySizePerRecipe = 24;
-        internal const double dFuzziness = 0.2;
-        internal const double dIngredientRatio = 0.45;
-        internal const float fFragmentSpawnChanceMin = 0.3f;
-        internal const float fFragmentSpawnChanceMax = 0.6f;
+            // Advanced settings start here.
+            { "iMinFragmentsToUnlock", new[] { 2, 1, 30 } },
+            { "iDepthSearchTime", new[] { 15, 0, 45 } },
+            { "iMaxBasicOutpostSize", new[] { 24, 4, 48 } },
+            { "iMaxEggsAsSingleIngredient", new[] { 1, 1, 10 } },
+            { "iMaxInventorySizePerRecipe", new[] { 24, 4, 100 } },
+            { "dFuzziness", new[] { 0.2, 0.0, 1.0 } },
+            { "dIngredientRatio", new[] { 0.45, 0.0, 1.0 } },
+            { "fFragmentSpawnChanceMin", new[] { 0.3f, 0.01f, 10.0f } },
+            { "fFragmentSpawnChanceMax", new[] { 0.6f, 0.01f, 10.0f } },
+        };
+
+        internal static bool Contains(string key)
+        {
+            return s_defaults.ContainsKey(key);
+        }
+        
+        internal static object GetDefault(string key)
+        {
+            return s_defaults[key][0];
+        }
+
+        internal static object GetMax(string key)
+        {
+            return s_defaults[key][2];
+        }
+
+        internal static object GetMin(string key)
+        {
+            return s_defaults[key][1];
+        }
     }
 }

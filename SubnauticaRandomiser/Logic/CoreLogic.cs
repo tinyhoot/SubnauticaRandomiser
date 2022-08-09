@@ -274,7 +274,7 @@ namespace SubnauticaRandomiser.Logic
             if (progressionItems.Count <= numItems)
                 return currentDepth;
             
-            int newDepth = CalculateReachableDepth(progressionItems);
+            int newDepth = CalculateReachableDepth(progressionItems, _config.iDepthSearchTime);
             _spoilerLog.UpdateLastProgressionEntry(newDepth);
             currentDepth = Math.Max(currentDepth, newDepth);
             _recipeLogic?.UpdateReachableMaterials(currentDepth);

@@ -211,6 +211,9 @@ namespace SubnauticaRandomiser.Logic
         /// <param name="entity">The entity that is unlocked on scan completion.</param>
         private void ChangeNumFragmentsToUnlock(LogicEntity entity)
         {
+            if (!_config.bRandomiseNumFragments)
+                return;
+            
             int numFragments = _random.Next(_config.iMinFragmentsToUnlock, _config.iMaxFragmentsToUnlock + 1);
             // Exosuit fragments are worth a lot more and the vanilla blueprint has the highest cost of all, at 20.
             if (entity.TechType.Equals(TechType.ExosuitFragment))
