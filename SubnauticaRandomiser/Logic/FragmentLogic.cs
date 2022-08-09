@@ -78,14 +78,11 @@ namespace SubnauticaRandomiser.Logic
                 throw new ArgumentException("Failed to find fragment '" + entity + "' in classId database!");
             
             LogHandler.Debug("Randomising fragment " + entity + " for depth " + depth);
-
-            // HACK for now, only consider the first entry in the ID list.
-            //string classId = idList[0];
-            //SpawnData spawnList = new SpawnData(classId);
+            
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
-            int biomeCount = _random.Next(3, _config.iMaxBiomesPerFragment);
+            int biomeCount = _random.Next(3, _config.iMaxBiomesPerFragment + 1);
 
             for (int i = 0; i < biomeCount; i++)
             {
@@ -124,10 +121,12 @@ namespace SubnauticaRandomiser.Logic
                     spawnData.AddBiomeData(data);
                     spawnList.Add(spawnData);
                 }
-                
+
                 LogHandler.Debug("  Adding fragment to biome: " + biomeType.AsString() + ", " + spawnRate);
             }
 
+            // Change the number of fragments required to unlock the blueprint.
+            ChangeNumFragmentsToUnlock(entity);
             ApplyRandomisedFragment(entity, spawnList);
             return spawnList;
         }
@@ -204,6 +203,22 @@ namespace SubnauticaRandomiser.Logic
             float percentage = _config.fFragmentSpawnChanceMin + (float)_random.NextDouble()
                 * (_config.fFragmentSpawnChanceMax - _config.fFragmentSpawnChanceMax);
             return percentage * biome.FragmentRate ?? 0.0f;
+        }
+
+        /// <summary>
+        /// Change the number of fragments needed to unlock the blueprint to the given entity.
+        /// </summary>
+        /// <param name="entity">The entity that is unlocked on scan completion.</param>
+        private void ChangeNumFragmentsToUnlock(LogicEntity entity)
+        {
+            int numFragments = _random.Next(_config.iMinFragmentsToUnlock, _config.iMaxFragmentsToUnlock + 1);
+            // Exosuit fragments are worth a lot more and the vanilla blueprint has the highest cost of all, at 20.
+            if (entity.TechType.Equals(TechType.ExosuitFragment))
+                numFragments *= 6;
+            
+            LogHandler.Debug("  New number of fragments required: " + numFragments);
+            _masterDict.AddFragmentUnlockNum(entity.TechType, numFragments);
+            PDAHandler.EditFragmentsToScan(entity.TechType, numFragments);
         }
         
         /// <summary>
@@ -305,6 +320,11 @@ namespace SubnauticaRandomiser.Logic
                 {
                     LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
                 }
+            }
+
+            foreach (TechType key in masterDict.NumFragmentsToUnlock.Keys)
+            {
+                PDAHandler.EditFragmentsToScan(key, masterDict.NumFragmentsToUnlock[key]);
             }
         }
         

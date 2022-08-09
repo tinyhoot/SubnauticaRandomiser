@@ -31,6 +31,9 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise fragments?")]
         public bool bRandomiseFragments = ConfigDefaults.bRandomiseFragments;
 
+        [Toggle("Randomise number of fragments to unlock something?")]
+        public bool bRandomiseNumFragments = ConfigDefaults.bRandomiseNumFragments;
+
         [Toggle("Randomise recipes?")]
         public bool bRandomiseRecipes = ConfigDefaults.bRandomiseRecipes;
 
@@ -57,6 +60,9 @@ namespace SubnauticaRandomiser
 
         [Slider("Max biomes to spawn each fragment in", 3, 10, DefaultValue = 5)]
         public int iMaxBiomesPerFragment = ConfigDefaults.iMaxBiomesPerFragment;
+
+        [Slider("Max number of fragments to scan to unlock something", 1, 20, DefaultValue = 5)]
+        public int iMaxFragmentsToUnlock = ConfigDefaults.iMaxFragmentsToUnlock;
 
         [Button("Randomise with new seed")]
         public void NewRandomNewSeed()
@@ -89,6 +95,7 @@ namespace SubnauticaRandomiser
         }
 
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
+        public int iMinFragmentsToUnlock = ConfigDefaults.iMinFragmentsToUnlock;
         public int iDepthSearchTime = ConfigDefaults.iDepthSearchTime;
         public int iMaxBasicOutpostSize = ConfigDefaults.iMaxBasicOutpostSize;
         public int iMaxEggsAsSingleIngredient = ConfigDefaults.iMaxEggsAsSingleIngredient;
@@ -118,8 +125,12 @@ namespace SubnauticaRandomiser
                 iMaxIngredientsPerRecipe = ConfigDefaults.iMaxIngredientsPerRecipe;
             if (iMaxBiomesPerFragment > 10 || iMaxBiomesPerFragment < 3)
                 iMaxBiomesPerFragment = ConfigDefaults.iMaxBiomesPerFragment;
+            if (iMaxFragmentsToUnlock > 30 || iMaxFragmentsToUnlock < 1)
+                iMaxFragmentsToUnlock = ConfigDefaults.iMaxFragmentsToUnlock;
 
             // Advanced settings below.
+            if (iMinFragmentsToUnlock > iMaxFragmentsToUnlock || iMinFragmentsToUnlock < 1)
+                iMinFragmentsToUnlock = ConfigDefaults.iMinFragmentsToUnlock;
             if (iMaxBasicOutpostSize > 48 || iMaxBasicOutpostSize < 4)
                 iMaxBasicOutpostSize = ConfigDefaults.iMaxBasicOutpostSize;
             if (iMaxEggsAsSingleIngredient > 10 || iMaxEggsAsSingleIngredient < 1)
@@ -162,6 +173,7 @@ namespace SubnauticaRandomiser
         internal const bool bUseSeeds = true;
         internal const bool bRandomiseDataboxes = true;
         internal const bool bRandomiseFragments = true;
+        internal const bool bRandomiseNumFragments = true;
         internal const bool bRandomiseRecipes = true;
         internal const bool bVanillaUpgradeChains = false;
         internal const bool bDoBaseTheming = false;
@@ -171,8 +183,10 @@ namespace SubnauticaRandomiser
         internal const int iMaxAmountPerIngredient = 5;
         internal const int iMaxIngredientsPerRecipe = 7;
         internal const int iMaxBiomesPerFragment = 5;
+        internal const int iMaxFragmentsToUnlock = 5;
 
         // Advanced setting defaults start here.
+        internal const int iMinFragmentsToUnlock = 2;
         internal const int iDepthSearchTime = 15;
         internal const int iMaxBasicOutpostSize = 24;
         internal const int iMaxEggsAsSingleIngredient = 1;

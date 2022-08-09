@@ -30,9 +30,10 @@ namespace SubnauticaRandomiser
         public Dictionary<TechType, Recipe> RecipeDict = new Dictionary<TechType, Recipe>();
         public Dictionary<TechType, List<SpawnData>> SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
         public Dictionary<RandomiserVector, TechType> Databoxes = new Dictionary<RandomiserVector, TechType>();
+        public Dictionary<TechType, int> NumFragmentsToUnlock = new Dictionary<TechType, int>();
 
         public bool isDataboxRandomised = false;
-        public static readonly int s_SaveVersion = InitMod.s_expectedSaveVersion;
+        public const int SaveVersion = InitMod.s_expectedSaveVersion;
 
         /// <summary>
         /// Convert this class to a string for saving.
@@ -60,6 +61,23 @@ namespace SubnauticaRandomiser
                 ms.Position = 0;
                 return (EntitySerializer)(new BinaryFormatter().Deserialize(ms));
             }
+        }
+
+        /// <summary>
+        /// Try to add an entry to the FragmentUnlockNumber dictionary.
+        /// </summary>
+        /// <param name="type">The TechType to use as key.</param>
+        /// <param name="number">The number to use as value.</param>
+        /// <returns>True if successful, false if the key already exists in the dictionary.</returns>
+        public bool AddFragmentUnlockNum(TechType type, int number)
+        {
+            if (NumFragmentsToUnlock.ContainsKey(type))
+            {
+                LogHandler.Warn("Tried to add duplicate key " + type.AsString() + " to FragmentNum master dictionary!");
+                return false;
+            }
+            NumFragmentsToUnlock.Add(type, number);
+            return true;
         }
         
         /// <summary>

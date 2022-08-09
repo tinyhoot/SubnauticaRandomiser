@@ -14,17 +14,20 @@ namespace SubnauticaRandomiser.RandomiserObjects
         public TechType TechType;
         public List<TechType> UnlockConditions;
         public List<TechType> Fragments;
+        public int NumFragments;
         public bool NeedsDatabox;
         public int UnlockDepth;
         public bool WasUpdated;  // Was this one updated to account for changes in databox locations?
 
-        public Blueprint(TechType techType, List<TechType> unlockConditions = null, TechType fragment = TechType.None, bool databox = false, int unlockDepth = 0)
+        public Blueprint(TechType techType, List<TechType> unlockConditions = null, TechType fragment = TechType.None,
+            int numFragments = 3, bool databox = false, int unlockDepth = 0)
         {
             Fragments = new List<TechType>();
 
             TechType = techType;
             UnlockConditions = unlockConditions;
             Fragments.Add(fragment);
+            NumFragments = numFragments;
             NeedsDatabox = databox;
             UnlockDepth = unlockDepth;
         }
