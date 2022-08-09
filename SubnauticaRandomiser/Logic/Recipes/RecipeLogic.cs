@@ -152,7 +152,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="recipe">The recipe to change.</param>
         internal void ApplyRandomisedRecipe(Recipe recipe)
         {
-            CraftDataHandler.SetTechData(recipe.TechType, recipe);
             _masterDict.AddRecipe(recipe.TechType, recipe);
         }
 

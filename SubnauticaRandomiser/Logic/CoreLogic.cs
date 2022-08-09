@@ -138,6 +138,7 @@ namespace SubnauticaRandomiser.Logic
             }
 
             _spoilerLog.WriteLog();
+            InitMod.ApplyAllChanges();
             LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
         }
 

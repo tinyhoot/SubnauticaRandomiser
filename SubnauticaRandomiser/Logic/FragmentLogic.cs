@@ -218,7 +218,6 @@ namespace SubnauticaRandomiser.Logic
             
             LogHandler.Debug("  New number of fragments required: " + numFragments);
             _masterDict.AddFragmentUnlockNum(entity.TechType, numFragments);
-            PDAHandler.EditFragmentsToScan(entity.TechType, numFragments);
         }
         
         /// <summary>
@@ -321,7 +320,7 @@ namespace SubnauticaRandomiser.Logic
                     LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
                 }
             }
-
+            
             foreach (TechType key in masterDict.NumFragmentsToUnlock.Keys)
             {
                 PDAHandler.EditFragmentsToScan(key, masterDict.NumFragmentsToUnlock[key]);
@@ -337,11 +336,6 @@ namespace SubnauticaRandomiser.Logic
         {
             entity.SpawnData = spawnList;
             _masterDict.AddSpawnData(entity.TechType, spawnList);
-
-            foreach (SpawnData data in spawnList)
-            {
-                LootDistributionHandler.EditLootDistributionData(data.ClassId, data.GetBaseBiomeData());
-            }
         }
 
         /// <summary>
