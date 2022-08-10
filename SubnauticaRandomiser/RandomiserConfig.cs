@@ -98,11 +98,12 @@ namespace SubnauticaRandomiser
         }
 
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
-        public int iMinFragmentsToUnlock = (int)ConfigDefaults.GetDefault("iMinFragmentsToUnlock");
         public int iDepthSearchTime = (int)ConfigDefaults.GetDefault("iDepthSearchTime");
         public int iMaxBasicOutpostSize = (int)ConfigDefaults.GetDefault("iMaxBasicOutpostSize");
-        public int iMaxEggsAsSingleIngredient = (int)ConfigDefaults.GetDefault("iMaxEgssAsSingleIngredient");
+        public int iMaxDuplicateScanYield = (int)ConfigDefaults.GetDefault("iMaxDuplicateScanYield");
+        public int iMaxEggsAsSingleIngredient = (int)ConfigDefaults.GetDefault("iMaxEggsAsSingleIngredient");
         public int iMaxInventorySizePerRecipe = (int)ConfigDefaults.GetDefault("iMaxInventorySizePerRecipe");
+        public int iMinFragmentsToUnlock = (int)ConfigDefaults.GetDefault("iMinFragmentsToUnlock");
         public double dFuzziness = (double)ConfigDefaults.GetDefault("dFuzziness");
         public double dIngredientRatio = (double)ConfigDefaults.GetDefault("dIngredientRatio");
         public float fFragmentSpawnChanceMin = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMin");
@@ -180,11 +181,12 @@ namespace SubnauticaRandomiser
             { "iMaxFragmentsToUnlock", new[] { 5, 1, 30 } },
 
             // Advanced settings start here.
-            { "iMinFragmentsToUnlock", new[] { 2, 1, 30 } },
             { "iDepthSearchTime", new[] { 15, 0, 45 } },
             { "iMaxBasicOutpostSize", new[] { 24, 4, 48 } },
+            { "iMaxDuplicateScanYield", new[] { 3, 1, 10 } },
             { "iMaxEggsAsSingleIngredient", new[] { 1, 1, 10 } },
             { "iMaxInventorySizePerRecipe", new[] { 24, 4, 100 } },
+            { "iMinFragmentsToUnlock", new[] { 2, 1, 30 } },
             { "dFuzziness", new[] { 0.2, 0.0, 1.0 } },
             { "dIngredientRatio", new[] { 0.45, 0.0, 1.0 } },
             { "fFragmentSpawnChanceMin", new[] { 0.3f, 0.01f, 10.0f } },
@@ -198,6 +200,11 @@ namespace SubnauticaRandomiser
         
         internal static object GetDefault(string key)
         {
+            if (!s_defaults.ContainsKey(key))
+            {
+                LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                return null;
+            }
             return s_defaults[key][0];
         }
 

@@ -27,10 +27,16 @@ namespace SubnauticaRandomiser
     [Serializable]
     public class EntitySerializer
     {
-        public Dictionary<TechType, Recipe> RecipeDict = new Dictionary<TechType, Recipe>();
-        public Dictionary<TechType, List<SpawnData>> SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
+        // All databoxes and their new locations.
         public Dictionary<RandomiserVector, TechType> Databoxes = new Dictionary<RandomiserVector, TechType>();
+        // The options to choose from for spawning materials when scanning a fragment which is already unlocked.
+        public Dictionary<TechType, float> FragmentMaterialYield;
+        // The number of scans required to unlock the fragment item.
         public Dictionary<TechType, int> NumFragmentsToUnlock = new Dictionary<TechType, int>();
+        // All modified recipes.
+        public Dictionary<TechType, Recipe> RecipeDict = new Dictionary<TechType, Recipe>();
+        // All modified fragment spawn rates.
+        public Dictionary<TechType, List<SpawnData>> SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
 
         public bool isDataboxRandomised = false;
         public const int SaveVersion = InitMod.s_expectedSaveVersion;
@@ -61,6 +67,22 @@ namespace SubnauticaRandomiser
                 ms.Position = 0;
                 return (EntitySerializer)(new BinaryFormatter().Deserialize(ms));
             }
+        }
+
+        /// <summary>
+        /// Try to add an entry to the duplicate fragment scan material dictionary.
+        /// </summary>
+        /// <param name="type">The TechType to spawn.</param>
+        /// <param name="weight">The weighting for the spawn rate.</param>
+        /// <returns>True if successful, false if the key already exists in the dictionary.</returns>
+        public bool AddDuplicateFragmentMaterial(TechType type, float weight)
+        {
+            FragmentMaterialYield ??= new Dictionary<TechType, float>();
+            if (FragmentMaterialYield.ContainsKey(type))
+                return false;
+            
+            FragmentMaterialYield.Add(type, weight);
+            return true;
         }
 
         /// <summary>

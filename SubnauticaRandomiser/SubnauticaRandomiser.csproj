@@ -41,6 +41,7 @@ cp $(SolutionDir)recipeInformation.csv $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomi
 cp $(SolutionDir)wreckInformation.csv $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Patches\FragmentPatcher.cs" />
     <Compile Include="InitMod.cs" />
     <Compile Include="Logic\DataboxLogic.cs" />
     <Compile Include="Logic\Recipes\Materials.cs" />
@@ -67,7 +68,6 @@ cp $(SolutionDir)wreckInformation.csv $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomis
     <Compile Include="Logic\ProgressionTree.cs" />
     <Compile Include="RandomiserObjects\LogicEntity.cs" />
     <Compile Include="RandomiserObjects\SpawnData.cs" />
-    <Compile Include="FragmentPatcher.cs" />
     <Compile Include="Logic\FragmentLogic.cs" />
     <Compile Include="EntitySerializer.cs" />
     <Compile Include="RandomiserObjects\Biome.cs" />

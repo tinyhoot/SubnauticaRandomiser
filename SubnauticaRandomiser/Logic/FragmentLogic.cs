@@ -222,6 +222,22 @@ namespace SubnauticaRandomiser.Logic
             LogHandler.Debug("  New number of fragments required: " + numFragments);
             _masterDict.AddFragmentUnlockNum(entity.TechType, numFragments);
         }
+
+        /// <summary>
+        /// Set up the dictionary of possible rewards for scanning an already unlocked fragment.
+        /// </summary>
+        internal void CreateDuplicateScanYieldDict()
+        {
+            _masterDict.FragmentMaterialYield = new Dictionary<TechType, float>();
+            var materials = _logic._materials.GetAllRawMaterials(50);
+
+            foreach (LogicEntity entity in materials)
+            {
+                // Two random calls will tend to produce less extreme and more evenly distributed values.
+                double weight = _random.NextDouble() + _random.NextDouble();
+                _masterDict.AddDuplicateFragmentMaterial(entity.TechType, (float)weight);
+            }
+        }
         
         /// <summary>
         /// Assemble a dictionary of all relevant prefabs with their unique classId identifier.
