@@ -82,7 +82,7 @@ namespace SubnauticaRandomiser
         /// </summary>
         internal static void Randomise()
         {
-            s_masterDict = new EntitySerializer();
+            s_masterDict = null;
             s_config.SanitiseConfigValues();
             s_config.iSaveVersion = s_expectedSaveVersion;
             var csvReader = new CSVReader();
@@ -121,8 +121,9 @@ namespace SubnauticaRandomiser
             random = new Random(s_config.iSeed);
 
             // Randomise!
-            CoreLogic logic = new CoreLogic(random, s_masterDict, s_config, materials, biomes, databoxes);
-            logic.Randomise();
+            CoreLogic logic = new CoreLogic(random, s_config, materials, biomes, databoxes);
+            s_masterDict = logic.Randomise();
+            ApplyAllChanges();
             LogHandler.Info("Randomisation successful!");
 
             SaveGameStateToDisk();

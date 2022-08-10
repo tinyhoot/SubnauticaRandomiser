@@ -24,12 +24,12 @@ namespace SubnauticaRandomiser.Logic
         private readonly FragmentLogic _fragmentLogic;
         private readonly RecipeLogic _recipeLogic;
 
-        public CoreLogic(System.Random random, EntitySerializer masterDict, RandomiserConfig config,
+        public CoreLogic(System.Random random, RandomiserConfig config,
             List<LogicEntity> allMaterials, List<BiomeCollection> biomes = null, List<Databox> databoxes = null)
         {
             _config = config;
             _databoxes = databoxes;
-            _masterDict = masterDict;
+            _masterDict = new EntitySerializer();
             _materials = new Materials(allMaterials);
             _random = random;
             _spoilerLog = new SpoilerLog(config);
@@ -61,6 +61,8 @@ namespace SubnauticaRandomiser.Logic
                 FragmentLogic.Init();
                 // Queue up all fragments to be randomised.
                 notRandomised.AddRange(_materials.GetAllFragments());
+                // Randomise duplicate scan rewards.
+                _fragmentLogic.CreateDuplicateScanYieldDict();
             }
             
             if (_recipeLogic != null)
@@ -79,9 +81,10 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Start the randomisation process.
         /// </summary>
+        /// <returns>A serialisation instance containing all changes made.</returns>
         /// <exception cref="TimeoutException">Raised to prevent infinite loops if the core loop takes too long to find
         /// a valid solution.</exception>
-        internal void Randomise()
+        internal EntitySerializer Randomise()
         {
             LogHandler.Info("Randomising using logic-based system...");
             
@@ -138,8 +141,9 @@ namespace SubnauticaRandomiser.Logic
             }
 
             _spoilerLog.WriteLog();
-            InitMod.ApplyAllChanges();
             LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
+
+            return _masterDict;
         }
 
         /// <summary>
