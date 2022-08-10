@@ -124,11 +124,21 @@ namespace SubnauticaRandomiser.Logic
 
                 LogHandler.Debug("  Adding fragment to biome: " + biomeType.AsString() + ", " + spawnRate);
             }
-
-            // Change the number of fragments required to unlock the blueprint.
-            ChangeNumFragmentsToUnlock(entity);
+            
             ApplyRandomisedFragment(entity, spawnList);
             return spawnList;
+        }
+
+        /// <summary>
+        /// Change the number of scans required to unlock the blueprint for all fragments.
+        /// </summary>
+        /// <param name="fragments">The list of fragments to change scan numbers for.</param>
+        internal void RandomiseNumFragments(List<LogicEntity> fragments)
+        {
+            foreach (LogicEntity entity in fragments)
+            {
+                ChangeNumFragmentsToUnlock(entity);
+            }
         }
 
         /// <summary>
@@ -330,13 +340,16 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         internal static void ApplyMasterDict(EntitySerializer masterDict)
         {
-            Init();
-            
-            foreach (TechType key in masterDict.SpawnDataDict.Keys)
+            if (masterDict.SpawnDataDict?.Count > 0)
             {
-                foreach (SpawnData spawnData in masterDict.SpawnDataDict[key])
+                Init();
+                            
+                foreach (TechType key in masterDict.SpawnDataDict.Keys)
                 {
-                    LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
+                    foreach (SpawnData spawnData in masterDict.SpawnDataDict[key])
+                    {
+                        LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
+                    }
                 }
             }
             

@@ -143,7 +143,7 @@ namespace SubnauticaRandomiser
                 RecipeLogic.ApplyMasterDict(s_masterDict);
                 
             // Load fragment changes.
-            if (s_masterDict.SpawnDataDict?.Count > 0)
+            if (s_masterDict.SpawnDataDict?.Count > 0 || s_masterDict.NumFragmentsToUnlock?.Count > 0)
             {
                 FragmentLogic.ApplyMasterDict(s_masterDict);
                 LogHandler.Info("Loaded fragment state.");

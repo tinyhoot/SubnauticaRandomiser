@@ -36,7 +36,7 @@ namespace SubnauticaRandomiser.Logic
             
             if (_config.bRandomiseDataboxes)
                 _databoxLogic = new DataboxLogic(this);
-            if (_config.bRandomiseFragments)
+            if (_config.bRandomiseFragments || _config.bRandomiseNumFragments || _config.bRandomiseDuplicateScans)
                 _fragmentLogic = new FragmentLogic(this, biomes);
             if (_config.bRandomiseRecipes)
                 _recipeLogic = new RecipeLogic(this);
@@ -57,12 +57,21 @@ namespace SubnauticaRandomiser.Logic
 
             if (_fragmentLogic != null)
             {
-                // Initialise the fragment cache and remove vanilla spawns.
-                FragmentLogic.Init();
-                // Queue up all fragments to be randomised.
-                notRandomised.AddRange(_materials.GetAllFragments());
+                if (_config.bRandomiseFragments)
+                {
+                    // Initialise the fragment cache and remove vanilla spawns.
+                    FragmentLogic.Init();
+                    // Queue up all fragments to be randomised.
+                    notRandomised.AddRange(_materials.GetAllFragments());
+                }
+                
+                // Randomise the number of fragment scans required per blueprint.
+                if (_config.bRandomiseNumFragments)
+                    _fragmentLogic.RandomiseNumFragments(_materials.GetAllFragments());
+                
                 // Randomise duplicate scan rewards.
-                _fragmentLogic.CreateDuplicateScanYieldDict();
+                if (_config.bRandomiseDuplicateScans)
+                    _fragmentLogic.CreateDuplicateScanYieldDict();
             }
             
             if (_recipeLogic != null)

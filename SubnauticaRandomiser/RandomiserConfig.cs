@@ -37,6 +37,9 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise number of fragments needed?")]
         public bool bRandomiseNumFragments = (bool)ConfigDefaults.GetDefault("bRandomiseNumFragments");
 
+        [Toggle("Randomise duplicate scan rewards?")]
+        public bool bRandomiseDuplicateScans = (bool)ConfigDefaults.GetDefault("bRandomiseDuplicateScans");
+
         [Toggle("Randomise recipes?")]
         public bool bRandomiseRecipes = (bool)ConfigDefaults.GetDefault("bRandomiseRecipes");
 
@@ -169,6 +172,7 @@ namespace SubnauticaRandomiser
             { "bRandomiseDataboxes", new[] { true, true, true } },
             { "bRandomiseFragments", new[] { true, true, true } },
             { "bRandomiseNumFragments", new[] { true, true, true } },
+            { "bRandomiseDuplicateScans", new[] { true, true ,true } },
             { "bRandomiseRecipes", new[] { true, true, true } },
             { "bVanillaUpgradeChains", new[] { false, false, false } },
             { "bDoBaseTheming", new[] { false, false, false } },
