@@ -7,6 +7,7 @@ using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
+using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser
@@ -70,8 +71,6 @@ namespace SubnauticaRandomiser
                     LogHandler.Warn("Failed to load game state from disk: dictionary empty.");
 
                 Randomise();
-                if (s_masterDict?.isDataboxRandomised == true)
-                    EnableHarmonyPatching();
             }
 
             LogHandler.Info("Finished loading.");
@@ -149,8 +148,8 @@ namespace SubnauticaRandomiser
                 LogHandler.Info("Loaded fragment state.");
             }
 
-            // Load databox changes.
-            if (s_masterDict.isDataboxRandomised)
+            // Load any changes that rely on harmony patches.
+            if (s_masterDict.NeedsHarmony)
                 EnableHarmonyPatching();
         }
 
@@ -223,14 +222,32 @@ namespace SubnauticaRandomiser
         }
 
         /// <summary>
-        /// Enables all necessary harmony patches based on the randomisation state in s_masterDict.
+        /// Enables all necessary harmony patches based on the randomisation state in the serialiser.
+        /// Must use manual patching since PatchAll() will not respect any config settings.
         /// </summary>
         private static void EnableHarmonyPatching()
         {
+            Harmony harmony = new Harmony("SubnauticaRandomiser");
+            
+            // Swapping databoxes.
             if (s_masterDict?.Databoxes?.Count > 0)
             {
-                Harmony harmony = new Harmony("SubnauticaRandomiser");
-                harmony.PatchAll();
+                var original = AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start));
+                var prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnSpawn));
+                harmony.Patch(original, new HarmonyMethod(prefix));
+                
+                original = AccessTools.Method(typeof(ProtobufSerializer),
+                    nameof(ProtobufSerializer.DeserializeIntoGameObject));
+                var postfix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnLoad));
+                harmony.Patch(original, postfix: new HarmonyMethod(postfix));
+            }
+
+            // Changing duplicate scan rewards.
+            if (s_masterDict?.FragmentMaterialYield?.Count > 0)
+            {
+                var original = AccessTools.Method(typeof(PDAScanner), nameof(PDAScanner.Scan));
+                var transpiler = AccessTools.Method(typeof(FragmentPatcher), nameof(FragmentPatcher.Transpiler));
+                harmony.Patch(original, transpiler: new HarmonyMethod(transpiler));
             }
         }
     }

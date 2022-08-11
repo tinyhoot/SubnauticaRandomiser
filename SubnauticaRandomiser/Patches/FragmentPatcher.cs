@@ -6,7 +6,7 @@ using HarmonyLib;
 
 namespace SubnauticaRandomiser.Patches
 {
-    [HarmonyPatch]
+    // [HarmonyPatch]
     public class FragmentPatcher
     {
         /// <summary>

@@ -129,7 +129,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         /// <returns>The prepared log entries.</returns>
         private string[] PrepareDataboxes()
         {
-            if (!InitMod.s_masterDict.isDataboxRandomised)
+            if (InitMod.s_masterDict.Databoxes is null)
                 return new [] { "Not randomised, all in vanilla locations." };
 
             List<string> preparedDataboxes = new List<string>();

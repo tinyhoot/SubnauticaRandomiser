@@ -46,7 +46,7 @@ namespace SubnauticaRandomiser.Logic
                                  + replacementBox.TechType.AsString() + " now contains " + originalBox.TechType.AsString());
                 toBeRandomised.RemoveAt(next);
             }
-            _masterDict.isDataboxRandomised = true;
+            _masterDict.NeedsHarmony = true;
 
             return randomDataboxes;
         }
