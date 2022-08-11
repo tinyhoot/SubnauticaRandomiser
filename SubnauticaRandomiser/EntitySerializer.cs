@@ -38,7 +38,6 @@ namespace SubnauticaRandomiser
         // All modified fragment spawn rates.
         public Dictionary<TechType, List<SpawnData>> SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
         
-        public bool NeedsHarmony = false;
         public const int SaveVersion = InitMod.s_expectedSaveVersion;
 
         /// <summary>

@@ -149,8 +149,7 @@ namespace SubnauticaRandomiser
             }
 
             // Load any changes that rely on harmony patches.
-            if (s_masterDict.NeedsHarmony)
-                EnableHarmonyPatching();
+            EnableHarmonyPatching();
         }
 
         /// <summary>
