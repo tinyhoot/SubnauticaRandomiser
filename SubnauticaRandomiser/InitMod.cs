@@ -229,11 +229,16 @@ namespace SubnauticaRandomiser
         {
             Harmony harmony = new Harmony("SubnauticaRandomiser");
             
+            // Make corridors return the correct building materials.
+            var original = AccessTools.Method(typeof(BaseDeconstructable), nameof(BaseDeconstructable.Deconstruct));
+            var prefix = AccessTools.Method(typeof(DeconstructionFix), nameof(DeconstructionFix.FixCorridors));
+            harmony.Patch(original, prefix: new HarmonyMethod(prefix));
+            
             // Swapping databoxes.
             if (s_masterDict?.Databoxes?.Count > 0)
             {
-                var original = AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start));
-                var prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnSpawn));
+                original = AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start));
+                prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnSpawn));
                 harmony.Patch(original, new HarmonyMethod(prefix));
                 
                 original = AccessTools.Method(typeof(ProtobufSerializer),
@@ -245,7 +250,7 @@ namespace SubnauticaRandomiser
             // Changing duplicate scan rewards.
             if (s_masterDict?.FragmentMaterialYield?.Count > 0)
             {
-                var original = AccessTools.Method(typeof(PDAScanner), nameof(PDAScanner.Scan));
+                original = AccessTools.Method(typeof(PDAScanner), nameof(PDAScanner.Scan));
                 var transpiler = AccessTools.Method(typeof(FragmentPatcher), nameof(FragmentPatcher.Transpiler));
                 harmony.Patch(original, transpiler: new HarmonyMethod(transpiler));
             }
