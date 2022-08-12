@@ -240,6 +240,8 @@ namespace SubnauticaRandomiser.Logic
         {
             _masterDict.FragmentMaterialYield = new Dictionary<TechType, float>();
             var materials = _logic._materials.GetAllRawMaterials(50);
+            // Gaining seeds from fragments is not great for balance. Remove that.
+            materials.Remove(_logic._materials.Find(TechType.CreepvineSeedCluster));
 
             foreach (LogicEntity entity in materials)
             {

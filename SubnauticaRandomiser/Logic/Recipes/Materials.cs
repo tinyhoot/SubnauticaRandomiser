@@ -173,13 +173,14 @@ namespace SubnauticaRandomiser.Logic.Recipes
         }
 
         /// <summary>
-        /// Get all entities that are considered raw materials and accessible by the given depth.
+        /// Get all entities that are considered raw materials without prerequisites and accessible by the given depth.
         /// </summary>
         /// <param name="maxDepth">The maximum depth at which the raw materials must be available.</param>
         internal List<LogicEntity> GetAllRawMaterials(int maxDepth = 2000)
         {
             var rawMaterials = _allMaterials.FindAll(x =>
-                x.Category.Equals(ETechTypeCategory.RawMaterials) && x.AccessibleDepth <= maxDepth);
+                x.Category.Equals(ETechTypeCategory.RawMaterials) && x.AccessibleDepth <= maxDepth
+                                                                  && !x.HasPrerequisites);
 
             return rawMaterials;
         }
