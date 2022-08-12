@@ -6,12 +6,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{14E05614-1903-437D-AD80-25E6EE173917}"
 	ProjectSection(SolutionItems) = preProject
 		mod.json = mod.json
-		recipeInformation.csv = recipeInformation.csv
 		DevNotes.txt = DevNotes.txt
-		wreckInformation.csv = wreckInformation.csv
 		ReadMe-Documentation.txt = ReadMe-Documentation.txt
-		biomeSlots.csv = biomeSlots.csv
-		alternateStarts.csv = alternateStarts.csv
+		DataFiles\biomeSlots.csv = DataFiles\biomeSlots.csv
+		DataFiles\alternateStarts.csv = DataFiles\alternateStarts.csv
+		DataFiles\recipeInformation.csv = DataFiles\recipeInformation.csv
+		DataFiles\wreckInformation.csv = DataFiles\wreckInformation.csv
 	EndProjectSection
 EndProject
 Global

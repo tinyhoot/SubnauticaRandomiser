@@ -37,7 +37,7 @@ namespace SubnauticaRandomiser
         {
             // First, try to find and grab the file containing recipe information.
             string[] csvLines;
-            string path = Path.Combine(InitMod.s_modDirectory, fileName);
+            string path = GetDataPath(fileName);
             LogHandler.Debug("Looking for alternate start CSV as " + path);
 
             try
@@ -121,7 +121,7 @@ namespace SubnauticaRandomiser
         {
             // First, try to find and grab the file containing recipe information.
             string[] csvLines;
-            string path = Path.Combine(InitMod.s_modDirectory, fileName);
+            string path = GetDataPath(fileName);
             LogHandler.Debug("Looking for recipe CSV as " + path);
 
             try
@@ -298,7 +298,7 @@ namespace SubnauticaRandomiser
         {
             // Try and grab the file containing biome information.
             string[] csvLines;
-            string path = Path.Combine(InitMod.s_modDirectory, fileName);
+            string path = GetDataPath(fileName);
             LogHandler.Debug("Looking for biome CSV as " + path);
 
             try
@@ -415,7 +415,7 @@ namespace SubnauticaRandomiser
         internal List<Databox> ParseWreckageFile(string fileName)
         {
             string[] csvLines;
-            string path = Path.Combine(InitMod.s_modDirectory, fileName);
+            string path = GetDataPath(fileName);
             LogHandler.Debug("Looking for wreckage CSV as " + path);
 
             try
@@ -545,6 +545,17 @@ namespace SubnauticaRandomiser
             using FileStream fileStream = File.OpenRead(path);
             var hash = md5.ComputeHash(fileStream);
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// Get the absolute path to a file in the mod's DataFiles folder.
+        /// </summary>
+        /// <param name="fileName">The file.</param>
+        /// <returns>The absolute path.</returns>
+        private static string GetDataPath(string fileName)
+        {
+            string dataFolder = Path.Combine(InitMod.s_modDirectory, "DataFiles");
+            return Path.Combine(dataFolder, fileName);
         }
 
         /// <summary>

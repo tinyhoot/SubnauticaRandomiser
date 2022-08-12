@@ -34,11 +34,10 @@
   <PropertyGroup>
     <PostBuildEvent>mkdir $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
 cp $(OutDir)SubnauticaRandomiser.dll $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-cp $(SolutionDir)biomeSlots.csv $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
 cp $(SolutionDir)mod.json $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
 cp $(SolutionDir)ReadMe-Documentation.txt $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-cp $(SolutionDir)recipeInformation.csv $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-cp $(SolutionDir)wreckInformation.csv $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser</PostBuildEvent>
+mkdir $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFiles
+cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFiles</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Logic\AlternateStartLogic.cs" />
