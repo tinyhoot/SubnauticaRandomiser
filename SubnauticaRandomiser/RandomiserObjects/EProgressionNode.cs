@@ -1,5 +1,4 @@
-﻿using System;
-namespace SubnauticaRandomiser.RandomiserObjects
+﻿namespace SubnauticaRandomiser.RandomiserObjects
 {
     public enum EProgressionNode
     {
@@ -12,6 +11,21 @@ namespace SubnauticaRandomiser.RandomiserObjects
         Depth500m = 500,
         Depth900m = 900,
         Depth1300m = 1300,
-        Depth1700m = 1700,
+        Depth1700m = 1700
+    }
+
+    public static class EProgressionNodeExtensions
+    {
+        public static EProgressionNode[] AllDepthNodes => new[]
+        {
+            EProgressionNode.Depth0m,
+            EProgressionNode.Depth100m,
+            EProgressionNode.Depth200m,
+            EProgressionNode.Depth300m,
+            EProgressionNode.Depth500m,
+            EProgressionNode.Depth900m,
+            EProgressionNode.Depth1300m,
+            EProgressionNode.Depth1700m
+        };
     }
 }

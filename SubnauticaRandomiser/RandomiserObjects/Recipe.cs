@@ -5,6 +5,9 @@ using SMLHelper.V2.Handlers;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// A wrapper for the game's TechData class to make it serializable.
+    /// </summary>
     [Serializable]
     public class Recipe : ITechData
     {

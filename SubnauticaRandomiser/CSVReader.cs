@@ -1,29 +1,127 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
-using SMLHelper.V2.Crafting;
+using JetBrains.Annotations;
 using SubnauticaRandomiser.RandomiserObjects;
 using UnityEngine;
 
 namespace SubnauticaRandomiser
 {
-    internal static class CSVReader
+    internal class CSVReader
     {
-        internal static List<LogicEntity> s_csvRecipeList;
-        internal static List<BiomeCollection> s_csvBiomeList;
-        internal static List<Databox> s_csvDataboxList;
+        internal Dictionary<EBiomeType, List<float[]>> _csvAlternateStarts;
+        internal List<BiomeCollection> _csvBiomeList;
+        internal List<Databox> _csvDataboxList;
+        internal List<LogicEntity> _csvRecipeList;
         internal static string s_recipeCSVMD5;
 
-        private static readonly int s_expectedColumns = 8;
-        private static readonly int s_expectedRows = 245;
-        private static readonly int s_expectedWreckColumns = 6;
+        private const int _ExpectedColumns = 8;
+        private const int _ExpectedRows = 245;
+        private const int _ExpectedWreckColumns = 6;
 
-        internal static List<LogicEntity> ParseRecipeFile(string fileName)
+        internal CSVReader()
+        {
+            _csvBiomeList = new List<BiomeCollection>();
+            _csvDataboxList = new List<Databox>();
+            _csvRecipeList = new List<LogicEntity>();
+        }
+
+        /// <summary>
+        /// Attempt to parse a csv file containing information on alternate starts.
+        /// </summary>
+        /// <param name="fileName">The .csv file to parse.</param>
+        /// <returns>The parsed Dictionary if successful, or null otherwise.</returns>
+        internal Dictionary<EBiomeType, List<float[]>> ParseAlternateStartFile(string fileName)
         {
             // First, try to find and grab the file containing recipe information.
             string[] csvLines;
-            string path = Path.Combine(InitMod.s_modDirectory, fileName);
+            string path = GetDataPath(fileName);
+            LogHandler.Debug("Looking for alternate start CSV as " + path);
+
+            try
+            {
+                csvLines = File.ReadAllLines(path);
+            }
+            catch (Exception ex)
+            {
+                LogHandler.MainMenuMessage("Failed to read alternate start CSV!");
+                LogHandler.Error(ex.Message);
+                return null;
+            }
+
+            _csvAlternateStarts = new Dictionary<EBiomeType, List<float[]>>();
+
+            int lineCounter = 0;
+            foreach (string line in csvLines)
+            {
+                lineCounter++;
+                if (line.StartsWith("Biome", StringComparison.InvariantCulture))
+                {
+                    // This is the header line. Skip.
+                    continue;
+                }
+
+                // ParseRecipeFileLine fails upwards, so this ensures all errors are caught in one central location.
+                try
+                {
+                    ParseAlternateStartLine(line);
+                }
+                catch (Exception ex)
+                {
+                    LogHandler.Error("Failed to parse information from alternate start CSV on line "+lineCounter);
+                    LogHandler.Error(ex.Message);
+                }
+            }
+
+            return _csvAlternateStarts;
+        }
+
+        /// <summary>
+        /// Attempt to parse one content line of the alternate starts csv.
+        /// </summary>
+        /// <param name="line">The line to parse.</param>
+        private void ParseAlternateStartLine(string line)
+        {
+            string[] cells = line.Split(',');
+            if (cells.Length < 2)
+                throw new FormatException("Unexpected number of columns: " + cells.Length);
+
+            EBiomeType biome = StringToEBiomeType(cells[0]);
+            List<float[]> starts = new List<float[]>();
+            foreach (string cell in cells.Skip(1))
+            {
+                if (String.IsNullOrEmpty(cell))
+                    continue;
+                
+                string[] rawCoords = cell.Split('/');
+                if (rawCoords.Length != 4)
+                    throw new FormatException("Invalid number of coordinates: " + rawCoords.Length);
+                
+                float[] parsedCoords = new float[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    parsedCoords[i] = float.Parse(rawCoords[i]);
+                }
+                starts.Add(parsedCoords);
+            }
+            
+            LogHandler.Debug("Registering alternate starts for biome " + biome);
+            _csvAlternateStarts.Add(biome, starts);
+        }
+
+        /// <summary>
+        /// Attempt to parse the given file into a list of entities representing recipes.
+        /// </summary>
+        /// <param name="fileName">The file to parse.</param>
+        /// <returns>A list of LogicEntities if successful, null otherwise.</returns>
+        [CanBeNull]
+        internal List<LogicEntity> ParseRecipeFile(string fileName)
+        {
+            // First, try to find and grab the file containing recipe information.
+            string[] csvLines;
+            string path = GetDataPath(fileName);
             LogHandler.Debug("Looking for recipe CSV as " + path);
 
             try
@@ -37,12 +135,11 @@ namespace SubnauticaRandomiser
                 return null;
             }
 
-            // If the CSV does not contain the expected amount of rows, it is
-            // likely that the user added custom items to it.
-            // If the lines are the same, but the MD5 is not, some values of
-            // existing entries must have been modified.
+            // If the CSV does not contain the expected amount of rows, it is likely that the user added custom items
+            // to it. If the lines are the same, but the MD5 is not, some values of existing entries must have been
+            // modified.
             s_recipeCSVMD5 = CalculateMD5(path);
-            if (csvLines.Length != s_expectedRows)
+            if (csvLines.Length != _ExpectedRows)
             {
                 LogHandler.Info("Recipe CSV seems to contain custom entries.");
             }
@@ -51,9 +148,8 @@ namespace SubnauticaRandomiser
                 LogHandler.Info("Recipe CSV seems to have been modified.");
             }
 
-            // Second, read each line and try to parse that into a list of
-            // LogicEntity objects, for later use.
-            s_csvRecipeList = new List<LogicEntity>();
+            // Second, read each line and try to parse that into a list of LogicEntity objects, for later use.
+            _csvRecipeList = new List<LogicEntity>();
 
             int lineCounter = 0;
             foreach (string line in csvLines)
@@ -65,11 +161,10 @@ namespace SubnauticaRandomiser
                     continue;
                 }
 
-                // ParseRecipeFileLine fails upwards, so this ensures all errors
-                // are caught in one central location.
+                // ParseRecipeFileLine fails upwards, so this ensures all errors are caught in one central location.
                 try
                 {
-                    s_csvRecipeList.Add(ParseRecipeFileLine(line));
+                    _csvRecipeList.Add(ParseRecipeFileLine(line));
                 }
                 catch (Exception ex)
                 {
@@ -78,20 +173,24 @@ namespace SubnauticaRandomiser
                 }
             }
 
-            return s_csvRecipeList;
+            return _csvRecipeList;
         }
-
-        // Parse one line of a CSV file and attempt to create a LogicEntity.
-        private static LogicEntity ParseRecipeFileLine(string line)
+        
+        /// <summary>
+        /// Parse one line of a CSV file and attempt to create a LogicEntity.
+        /// </summary>
+        /// <param name="line">A string to parse.</param>
+        /// <returns>The fully processed LogicEntity.</returns>
+        /// <exception cref="InvalidDataException">If the format of the data is wrong.</exception>
+        /// <exception cref="ArgumentException">If a required column is missing or invalid.</exception>
+        private LogicEntity ParseRecipeFileLine(string line)
         {
-            LogicEntity entity = null;
-
-            TechType type = TechType.None;
-            ETechTypeCategory category = ETechTypeCategory.None;
+            TechType type;
+            ETechTypeCategory category;
             int depth = 0;
             Recipe recipe = null;
             List<TechType> prereqList = new List<TechType>();
-            int value = 0;
+            int value;
             int maxUses = 0;
 
             Blueprint blueprint = null;
@@ -102,10 +201,9 @@ namespace SubnauticaRandomiser
 
             string[] cells = line.Split(',');
 
-            if (cells.Length != s_expectedColumns)
-            {
-                throw new InvalidDataException("Unexpected number of columns: " + cells.Length + " instead of " + s_expectedColumns);
-            }
+            if (cells.Length != _ExpectedColumns)
+                throw new InvalidDataException("Unexpected number of columns: " + cells.Length + " instead of "
+                                               + _ExpectedColumns);
             // While ugly, this makes it much easier to react to changes in the
             // structure of the CSV. Also less prone to accidental oversights.
             string cellsTechType = cells[0];
@@ -120,42 +218,30 @@ namespace SubnauticaRandomiser
             // Now to convert the data in each cell to an object we can use.
             // Column 1: TechType
             if (string.IsNullOrEmpty(cellsTechType))
-            {
                 throw new ArgumentException("TechType is null or empty, but is a required field.");
-            }
             type = StringToEnum<TechType>(cellsTechType);
 
             // Column 2: Category
             if (string.IsNullOrEmpty(cellsCategory))
-            {
                 throw new ArgumentException("Category is null or empty, but is a required field.");
-            }
             category = StringToEnum<ETechTypeCategory>(cellsCategory);
 
             // Column 3: Depth Difficulty
             if (!string.IsNullOrEmpty(cellsDepth))
-            {
                 depth = StringToInt(cellsDepth, "Depth");
-            }
 
             // Column 4: Prerequisites
             if (!string.IsNullOrEmpty(cellsPrereqs))
-            {
                 prereqList = ProcessMultipleTechTypes(cellsPrereqs.Split(';'));
-            }
 
             // Column 5: Value
             if (string.IsNullOrEmpty(cellsValue))
-            {
                 throw new ArgumentException("Value is null or empty, but is a required field.");
-            }
             value = StringToInt(cellsValue, "Value");
 
             // Column 6: Max Uses Per Game
             if (!string.IsNullOrEmpty(cellsMaxUses))
-            {
                 maxUses = StringToInt(cellsMaxUses, "Max Uses");
-            }
 
             // Column 7: Blueprint Unlock Conditions
             if (!string.IsNullOrEmpty(cellsBPUnlock))
@@ -165,54 +251,54 @@ namespace SubnauticaRandomiser
                 foreach (string str in conditions)
                 {
                     if (str.ToLower().Contains("fragment"))
-                    {
                         blueprintFragments.Add(StringToEnum<TechType>(str));
-                    } 
                     else if (str.ToLower().Contains("databox"))
-                    {
                         blueprintDatabox = true;
-                    }
                     else
-                    {
                         blueprintUnlockConditions.Add(StringToEnum<TechType>(str));
-                    }
                 }
             }
 
             // Column 8: Blueprint Unlock Depth
             if (!string.IsNullOrEmpty(cellsBPDepth))
-            {
                 blueprintUnlockDepth = StringToInt(cellsBPDepth, "Blueprint Unlock Depth");
-            }
-            
-            // Only if any of the blueprint components yielded anything,
-            // ship the entity with a blueprint.
-            if ((blueprintUnlockConditions != null && blueprintUnlockConditions.Count > 0) || blueprintUnlockDepth != 0 || !blueprintDatabox || blueprintFragments.Count > 0)
+
+            // Only if any of the blueprint components yielded anything, ship the entity with a blueprint.
+            if ((blueprintUnlockConditions.Count > 0) || blueprintUnlockDepth != 0 
+                                                      || !blueprintDatabox 
+                                                      || blueprintFragments.Count > 0)
             {
-                blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragments, blueprintDatabox, blueprintUnlockDepth);
+                blueprint = new Blueprint(type, blueprintUnlockConditions, blueprintFragments, blueprintDatabox, 
+                                    blueprintUnlockDepth);
             }
 
-            // Only if the category corresponds to a techtype commonly associated
-            // with a craftable thing, ship the entity with a recipe.
+            // Only if the category corresponds to a techtype commonly associated with a craftable thing, ship the
+            // entity with a recipe.
             if (category.CanHaveRecipe())
-            {
                 recipe = new Recipe(type);
-            }
 
-            LogHandler.Debug("Registering entity: " + type.AsString() + ", " + category.ToString() + ", " + depth + ", "+ prereqList.Count + " prerequisites, " + value + ", " + maxUses + ", ...");
+            LogHandler.Debug("Registering entity: " + type.AsString() + ", " + category.ToString() + ", "
+                             + depth + ", "+ prereqList.Count + " prerequisites, " + value + ", " + maxUses + ", ...");
 
-            entity = new LogicEntity(type, category, blueprint, recipe, null, prereqList, false, value);
-            entity.AccessibleDepth = depth;
-            entity.MaxUsesPerGame = maxUses;
+            var entity = new LogicEntity(type, category, blueprint, recipe, null, prereqList, false, value)
+                {
+                    AccessibleDepth = depth,
+                    MaxUsesPerGame = maxUses
+                };
             return entity;
         }
 
-        // This handles everything related to the biome CSV.
-        internal static List<BiomeCollection> ParseBiomeFile(string fileName)
+        /// <summary>
+        /// Attempt to parse the given file into a list of biomes and their stats.
+        /// </summary>
+        /// <param name="fileName">The file to parse.</param>
+        /// <returns>A list of BiomeCollection if successful, null otherwise.</returns>
+        [CanBeNull]
+        internal List<BiomeCollection> ParseBiomeFile(string fileName)
         {
             // Try and grab the file containing biome information.
             string[] csvLines;
-            string path = Path.Combine(InitMod.s_modDirectory, fileName);
+            string path = GetDataPath(fileName);
             LogHandler.Debug("Looking for biome CSV as " + path);
 
             try
@@ -226,7 +312,7 @@ namespace SubnauticaRandomiser
                 return null;
             }
 
-            s_csvBiomeList = new List<BiomeCollection>();
+            _csvBiomeList = new List<BiomeCollection>();
 
             int lineCounter = 0;
             foreach (string line in csvLines)
@@ -238,18 +324,17 @@ namespace SubnauticaRandomiser
                     continue;
                 }
 
-                // ParseBiomeFileLine fails upwards, so this ensures all errors
-                // are caught in one central location.
+                // ParseBiomeFileLine fails upwards, so this ensures all errors are caught in one central location.
                 try
                 {
                     Biome biome = ParseBiomeFileLine(line);
-                    BiomeCollection collection = s_csvBiomeList.Find(x => x.BiomeType.Equals(biome.BiomeType));
+                    BiomeCollection collection = _csvBiomeList.Find(x => x.BiomeType.Equals(biome.BiomeType));
 
-                    // Initiate a BiomeCollection if it does not alread exist.
+                    // Initiate a BiomeCollection if it does not already exist.
                     if (collection is null)
                     {
                         collection = new BiomeCollection(biome.BiomeType);
-                        s_csvBiomeList.Add(collection);
+                        _csvBiomeList.Add(collection);
                     }
 
                     collection.Add(biome);
@@ -261,15 +346,21 @@ namespace SubnauticaRandomiser
                 }
             }
 
-            return s_csvBiomeList;
+            return _csvBiomeList;
         }
 
-        private static Biome ParseBiomeFileLine(string line)
+        /// <summary>
+        /// Parse one line of a CSV file and attempt to create a single Biome.
+        /// </summary>
+        /// <param name="line">A string to parse.</param>
+        /// <returns>The fully processed Biome.</returns>
+        /// <exception cref="ArgumentException">If a required column is empty, missing or invalid.</exception>
+        private Biome ParseBiomeFileLine(string line)
         {
-            Biome biome = null;
-            int smallCount = 0;
-            int mediumCount = 0;
-            int creatureCount = 0;
+            Biome biome;
+            int smallCount;
+            int mediumCount;
+            int creatureCount;
             float? fragmentRate = null;
 
             string[] cells = line.Split(',');
@@ -309,17 +400,22 @@ namespace SubnauticaRandomiser
                 fragmentRate = StringToFloat(cellsFragmentRate, "fragmentRate");
 
             biome = new Biome(name, biomeType, creatureCount, mediumCount, smallCount, fragmentRate);
-            LogHandler.Debug("Registering biome: " + name + ", " + biomeType.ToString() + ", " + creatureCount + ", " + mediumCount + ", " + smallCount);
+            LogHandler.Debug("Registering biome: " + name + ", " + biomeType.ToString() + ", " + creatureCount
+                             + ", " + mediumCount + ", " + smallCount);
 
             return biome;
         }
-
-        // This handles everything related to the wreckage CSV and databoxes.
-        // Similar in structure to the recipe CSV parser above.
-        internal static List<Databox> ParseWreckageFile(string fileName)
+        
+        /// <summary>
+        /// Attempt to parse the given CSV file for wreckage information and extract stats on Databoxes.
+        /// </summary>
+        /// <param name="fileName">The file to parse.</param>
+        /// <returns>A list of Databoxes if successful, null otherwise.</returns>
+        [CanBeNull]
+        internal List<Databox> ParseWreckageFile(string fileName)
         {
             string[] csvLines;
-            string path = Path.Combine(InitMod.s_modDirectory, fileName);
+            string path = GetDataPath(fileName);
             LogHandler.Debug("Looking for wreckage CSV as " + path);
 
             try
@@ -333,7 +429,7 @@ namespace SubnauticaRandomiser
                 return null;
             }
 
-            s_csvDataboxList = new List<Databox>();
+            _csvDataboxList = new List<Databox>();
             int lineCounter = 0;
 
             foreach (string line in csvLines)
@@ -350,7 +446,7 @@ namespace SubnauticaRandomiser
                 {
                     Databox databox = ParseWreckageFileLine(line);
                     if (databox != null)
-                        s_csvDataboxList.Add(databox);
+                        _csvDataboxList.Add(databox);
                 }
                 catch (Exception ex)
                 {
@@ -359,26 +455,29 @@ namespace SubnauticaRandomiser
                 }
             }
 
-            return s_csvDataboxList;
+            return _csvDataboxList;
         }
 
-        private static Databox ParseWreckageFileLine(string line)
+        /// <summary>
+        /// Parse one line of a CSV file and attempt to create a single Databox.
+        /// </summary>
+        /// <param name="line">A string to parse.</param>
+        /// <returns>The fully processed Databox.</returns>
+        /// <exception cref="ArgumentException">If a required column is empty, missing or invalid.</exception>
+        private Databox ParseWreckageFileLine(string line)
         {
-            Databox databox = null;
-
-            TechType type = TechType.None;
-            Vector3 coordinates = Vector3.zero;
+            TechType type;
+            Vector3 coordinates;
             EWreckage wreck = EWreckage.None;
-            bool isDatabox = false;
+            bool isDatabox;
             bool laserCutter = false;
             bool propulsionCannon = false;
 
             string[] cells = line.Split(',');
 
-            if (cells.Length != s_expectedWreckColumns)
-            {
-                throw new InvalidDataException("Unexpected number of columns: " + cells.Length + " instead of " + s_expectedWreckColumns);
-            }
+            if (cells.Length != _ExpectedWreckColumns)
+                throw new InvalidDataException("Unexpected number of columns: " + cells.Length + " instead of "
+                                               + _ExpectedWreckColumns);
             // As above, it's not the prettiest, but it's flexible.
             string cellsTechType = cells[0];
             string cellsCoordinates = cells[1];
@@ -389,9 +488,7 @@ namespace SubnauticaRandomiser
 
             // Column 1: TechType
             if (string.IsNullOrEmpty(cellsTechType))
-            {
                 throw new ArgumentException("TechType is null or empty, but is a required field.");
-            }
             type = StringToEnum<TechType>(cellsTechType);
 
             // Column 2: Coordinates
@@ -399,9 +496,7 @@ namespace SubnauticaRandomiser
             {
                 string[] str = cellsCoordinates.Split(';');
                 if (str.Length != 3)
-                {
                     throw new ArgumentException("Coordinates are not in a valid format: " + cellsCoordinates);
-                }
 
                 float x = StringToFloat(str[0], "Coordinates");
                 float y = StringToFloat(str[1], "Coordinates");
@@ -417,47 +512,58 @@ namespace SubnauticaRandomiser
 
             // Column 3: General location
             if (!string.IsNullOrEmpty(cellsEWreckage))
-            {
                 wreck = StringToEnum<EWreckage>(cellsEWreckage);
-            }
 
             // Column 4: Is it a databox?
             // Redundant until fragments are implemented, so this does nothing.
             if (!string.IsNullOrEmpty(cellsIsDatabox))
-            {
                 isDatabox = StringToBool(cellsIsDatabox, "IsDatabox");
-            }
 
             // Column 5: Does it need a laser cutter?
             if (!string.IsNullOrEmpty(cellsLaserCutter))
-            {
                 laserCutter = StringToBool(cellsLaserCutter, "NeedsLaserCutter");
-            }
 
             // Column 6: Does it need a propulsion cannon?
             if (!string.IsNullOrEmpty(cellsPropulsionCannon))
-            {
                 propulsionCannon = StringToBool(cellsPropulsionCannon, "NeedsPropulsionCannon");
-            }
 
-            LogHandler.Debug("Registering databox: " + type + ", " + coordinates.ToString() + ", " + wreck.ToString() + ", " + laserCutter + ", " + propulsionCannon);
-            databox = new Databox(type, coordinates, wreck, laserCutter, propulsionCannon);
+            LogHandler.Debug("Registering databox: " + type + ", " + coordinates.ToString() + ", "
+                             + wreck.ToString() + ", " + laserCutter + ", " + propulsionCannon);
+            Databox databox = new Databox(type, coordinates, wreck, laserCutter, propulsionCannon);
 
             return databox;
         }
 
+        /// <summary>
+        /// Calculate the MD5 hash for a given file.
+        /// </summary>
+        /// <param name="path">The path to the file to hash.</param>
+        /// <returns>The MD5 hash.</returns>
         internal static string CalculateMD5(string path)
         {
-            using (MD5 md5 = MD5.Create())
-            {
-                using (FileStream fileStream = File.OpenRead(path))
-                {
-                    var hash = md5.ComputeHash(fileStream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                }
-            }
+            using MD5 md5 = MD5.Create();
+            using FileStream fileStream = File.OpenRead(path);
+            var hash = md5.ComputeHash(fileStream);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
+        /// <summary>
+        /// Get the absolute path to a file in the mod's DataFiles folder.
+        /// </summary>
+        /// <param name="fileName">The file.</param>
+        /// <returns>The absolute path.</returns>
+        private static string GetDataPath(string fileName)
+        {
+            string dataFolder = Path.Combine(InitMod.s_modDirectory, "DataFiles");
+            return Path.Combine(dataFolder, fileName);
+        }
+
+        /// <summary>
+        /// Turn multiple strings into their TechType equivalents.
+        /// </summary>
+        /// <returns>A list containing all successfully parsed TechTypes.</returns>
+        /// <exception cref="ArgumentException">Raised if the parsing fails.</exception>
+        [NotNull]
         private static List<TechType> ProcessMultipleTechTypes(string[] str)
         {
             List<TechType> output = new List<TechType>();
@@ -474,6 +580,11 @@ namespace SubnauticaRandomiser
             return output;
         }
 
+        /// <summary>
+        /// Attempt to parse a given string into an Enum.
+        /// </summary>
+        /// <returns>The parsed Enum.</returns>
+        /// <exception cref="ArgumentException">Raised if the parsing fails.</exception>
         private static TEnum StringToEnum<TEnum>(string str)
             where TEnum : struct
         {
@@ -505,6 +616,13 @@ namespace SubnauticaRandomiser
             return EBiomeType.None;
         }
 
+        /// <summary>
+        /// Attempt to parse a string into a boolean value.
+        /// </summary>
+        /// <param name="input">The value.</param>
+        /// <param name="column">The name of the column the value was in.</param>
+        /// <returns>The parsed boolean value as appropriate.</returns>
+        /// <exception cref="FormatException">Raised if the input value is unparseable.</exception>
         private static bool StringToBool(string input, string column)
         {
             // If the string is "true" or "false", this just works.
@@ -535,6 +653,13 @@ namespace SubnauticaRandomiser
             throw new FormatException(column + " is not a valid boolean value: " + input);
         }
 
+        /// <summary>
+        /// Attempt to parse a string into a floating point value.
+        /// </summary>
+        /// <param name="input">The value.</param>
+        /// <param name="column">The name of the column the value was in.</param>
+        /// <returns>The parsed float.</returns>
+        /// <exception cref="FormatException">Raised if the input value is unparseable.</exception>
         private static float StringToFloat(string input, string column)
         {
             float output;
@@ -551,6 +676,13 @@ namespace SubnauticaRandomiser
             return output;
         }
 
+        /// <summary>
+        /// Attempt to parse a string into an integer.
+        /// </summary>
+        /// <param name="input">The value.</param>
+        /// <param name="column">The name of the column the value was in.</param>
+        /// <returns>The parsed integer.</returns>
+        /// <exception cref="FormatException">Raised if the input value is unparseable.</exception>
         private static int StringToInt(string input, string column)
         {
             int output;

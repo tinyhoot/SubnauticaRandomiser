@@ -1,5 +1,4 @@
-﻿using System;
-namespace SubnauticaRandomiser.RandomiserObjects
+﻿namespace SubnauticaRandomiser.RandomiserObjects
 {
     public enum ETechTypeCategory
     {
@@ -31,6 +30,10 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
     public static class TTCategoryExtensions
     {
+        /// <summary>
+        /// Checks whether this category is made up of base pieces.
+        /// </summary>
+        /// <returns>True if the category belongs to base pieces, falls otherwise.</returns>
         public static bool IsBasePiece(this ETechTypeCategory category)
         {
             switch (category)
@@ -46,6 +49,10 @@ namespace SubnauticaRandomiser.RandomiserObjects
             }
         }
 
+        /// <summary>
+        /// Checks whether this category is capable of showing up in the PDA as a craftable item.
+        /// </summary>
+        /// <returns>True if the category can be craftable, false otherwise.</returns>
         public static bool CanHaveRecipe(this ETechTypeCategory category)
         {
             switch (category)

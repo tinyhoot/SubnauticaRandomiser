@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal class ModeRandom : Mode
     {
         private List<LogicEntity> _reachableMaterials;
 
-        internal ModeRandom(RandomiserConfig config, Materials materials, ProgressionTree tree, Random random) : base(config, materials, tree, random)
+        internal ModeRandom(CoreLogic logic) : base(logic)
         {
             _reachableMaterials = _materials.GetReachable();
         }
-
-        // Fill a given recipe with ingredients. This algorithm mostly uses random
-        // number generation to fill in the gaps.
+        
+        /// <summary>
+        /// Fill a given recipe with ingredients in-place. This algorithm mostly uses pure RNG to fill in the gaps.
+        /// </summary>
+        /// <param name="entity">The recipe to randomise ingredients for.</param>
+        /// <returns>The modified entity.</returns>
         internal override LogicEntity RandomiseIngredients(LogicEntity entity)
         {
             int number = _random.Next(1, _config.iMaxIngredientsPerRecipe + 1);
@@ -62,14 +65,20 @@ namespace SubnauticaRandomiser.Logic
             return entity;
         }
 
+        /// <summary>
+        /// Find the highest number allowed for the given ingredient.
+        /// </summary>
+        /// <param name="entity">The ingredient to consider.</param>
+        /// <returns>A positive integer.</returns>
         private int FindMaximum(LogicEntity entity)
         {
             int max = _config.iMaxAmountPerIngredient;
 
-            // Tools and upgrades do not stack, but if the recipe would
-            // require several and you have more than one in inventory,
-            // it will consume all of them.
-            if (entity.Category.Equals(ETechTypeCategory.Tools) || entity.Category.Equals(ETechTypeCategory.VehicleUpgrades) || entity.Category.Equals(ETechTypeCategory.WorkBenchUpgrades))
+            // Tools and upgrades do not stack, but if the recipe would require several and you have more than one in
+            // inventory, it will consume all of them.
+            if (entity.Category.Equals(ETechTypeCategory.Tools) 
+                || entity.Category.Equals(ETechTypeCategory.VehicleUpgrades) 
+                || entity.Category.Equals(ETechTypeCategory.WorkBenchUpgrades))
                 max = 1;
 
             // Never require more than one (default) egg. That's tedious.

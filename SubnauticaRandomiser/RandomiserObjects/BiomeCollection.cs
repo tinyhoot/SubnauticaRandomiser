@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// A class representing a biome as the average player might know it. E.g. BloodKelp being made up of 14 smaller,
+    /// more detailed biomes.
+    /// </summary>
     public class BiomeCollection
     {
         public List<Biome> BiomeList = new List<Biome>();
@@ -16,10 +19,12 @@ namespace SubnauticaRandomiser.RandomiserObjects
             BiomeType = biomeType;
             AverageDepth = biomeType.GetAccessibleDepth();
         }
-
-        // Calculate the average depth of the biomes contained in this collection.
-        // Intended as a more fine-tuneable way of depth control, but largely
-        // unused due to the hardcoded depths of EBiomeType.
+        
+        /// <summary>
+        /// Calculate the average depth of the biomes contained in this collection. Intended as a more fine-tuneable
+        /// way of depth control, but largely unused due to the hardcoded depths of EBiomeType.
+        /// </summary>
+        /// <returns>The average depth.</returns>
         public int CalculateAverageDepth()
         {
             if (BiomeList is null || BiomeList.Count == 0)
@@ -37,8 +42,12 @@ namespace SubnauticaRandomiser.RandomiserObjects
             AverageDepth = total / BiomeList.Count;
             return AverageDepth;
         }
-
-        // Ensure that no duplicates can be added to the collection.
+        
+        /// <summary>
+        /// Add a biome to the collection if it does not already exist.
+        /// </summary>
+        /// <param name="biome">The biome to add.</param>
+        /// <returns>True if successful, false if the collection already contained the biome.</returns>
         public bool Add(Biome biome)
         {
             if (BiomeList.Contains(biome))

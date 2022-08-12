@@ -57,6 +57,13 @@ is the recommended way to play the randomiser. Should you wish for a completely
 off-the-rails experience, Chaotic has you covered. Chaotic will not softlock
 you, but it provides very little protection from the ups and downs of random chance.
 
+| Spawnpoint | Vanilla / Random / <Biome> / Void |
+--Default: Vanilla
+Change where the lifepod spawns. Random simply chooses one among all available options.
+You can constrain the general area of where the lifepod will end up by choosing one
+of the given surface biomes. It is also possible to spawn in the little lake of the
+floating island by choosing Floating Island.
+
 | Use fish in logic | Yes / No |
 --Default: Yes
 Enabling this setting will include all fish you can grab in the wild in the logic,
@@ -81,6 +88,23 @@ When enabled, this setting will shuffle the blueprints found in databoxes. It do
 not add any recipes to the boxes that are not already contained in them in vanilla,
 and the boxes themselves will still be found in the same locations. However, the
 blueprints you get from them will no longer be in the same boxes as they used to be.
+
+| Randomise fragment locations | Yes / No |
+--Default: Yes
+When enabled, all fragments will be distributed throughout the game. Logic is in place
+to prevent any softlocks from not being able to access a specific fragment. However,
+note that this will not (yet) put fragments into biomes where the vanilla game didn't
+spawn any.
+
+| Randomise number of fragments needed | Yes / No |
+--Default: Yes
+When enabled, all fragments will require a random number of scans to unlock. Ties into
+the setting "Max number of fragments needed" below.
+
+| Randomise duplicate scan rewards | Yes / No |
+--Default: Yes
+Scanning a fragment you've already unlocked will yield a random raw material instead
+of the normal two titanium.
 
 | Respect vanilla upgrade chains | Yes / No |
 --Default: No
@@ -118,16 +142,23 @@ the same recipe. Thus, setting this to 5 will never allow e.g. a knife to be mad
 from 6 titanium and 3 copper. The titanium would be capped at 5, and other ingredients
 would be used in the 6th piece's stead.
 Reducing this number leads to "flatter" recipes which require more diverse ingredients,
-but only a few of them each. This setting is very strongly tied with the one below.
+but only a few of them each. This setting is very strongly tied to the one below.
 
 | Max ingredients per recipe | 1 - 10 |
-This number determines how many different ingredient types a recipe can hold. Assuming
+This number determines how many different ingredient types a recipe can hold. Assume
 you set this setting to 3, and you're trying to craft a knife. The recipe you get is
 2 copper, 4 gold and 1 stalker tooth. The setting then prevents the randomiser from
 adding e.g. 2 titanium to the list of necessary materials, which would bring the
 total of diverse types up to 4. However, it does NOT influence how many of each
 of these ingredients can be required at once.
-This setting is very strongly tied with the one above.
+This setting is very strongly tied to the one above.
+
+| Max biomes to spawn each fragment in | 3 - 10 |
+This number regulates within how many biomes any given fragment can show up in. Note
+that these biomes do NOT refer to biomes in player terms, but rather in game terms,
+which treats e.g. walls, ceilings, caves, wreckages, rooms behind locked doors inside
+wreckages, etc. each as a different biome. Setting this too low will make it difficult
+to find enough fragments.
 
 | Randomise with new seed |
 | Randomise with same seed |
@@ -155,17 +186,16 @@ the randomiser will stop at a depth where you can remain for this many seconds
 before having to return for air without dying. This number is capped at 45 seconds
 since that is your maximum at the beginning of the game, without any tanks.
 
-| iMaxAmountPerIngredient | 1 - 20 |
---Default: 5
-Most ingredients in a recipe may show up as multiples. For example, a Seamoth might
-require you to collect four Titanium, five Gold and three Holefish. This setting
-controls the maximum amount any single ingredient of a recipe can require.
-
 | iMaxBasicOutpostSize | 4 - 48 |
 --Default: 24
 The absolute essentials to establish a small scanning outpost all taken together
 will not require ingredients which exceed this much space in your inventory. This
 affects I-corridors, hatches, scanner rooms, windows, solar panels, and beacons.
+
+| iMaxDuplicateScanYield | 1 - 10 |
+--Default: 2
+The maximum number of items you will be given upon scanning a fragment that is
+already known. Setting this number too high will quickly clutter your inventory.
 
 | iMaxEggsAsSingleIngredient | 1 - 10 |
 --Default: 1
@@ -187,7 +217,7 @@ it at your own risk.
 
 | dFuzziness | 0.0 - 1.0 |
 --Default: 0.2
-Every item in the game is assigned a value before randomising. This setting controls
+Every recipe in the game is assigned a value before randomising. This setting controls
 how closely the randomiser tries to stick to that value before it declares a
 recipe done.
 The setting represents a percentage. Assume that Titanium Ingots had a value of 100.
@@ -206,10 +236,22 @@ With the default value, this means that the randomiser will first try to find an
 ingredient with 35%-55% of the total value before moving on to entirely random ones.
 Set to 0.0 to disable this behaviour.
 
+| fFragmentSpawnChanceMin | 0.01f - 10.0f |
+--Default: 0.3f
+This setting, tethered with the one below, provides a global modifier for the 
+randomiser to decide how likely a fragment spawn should be within a biome. The value
+it ultimately decides on is multiplied with the vanilla average fragment spawn rate
+within that biome. Small adjustments can have large effects, particularly if combined
+with the maximum number of fragments allowed to spawn in a single biome.
+
+| fFragmentSpawnChanceMax | 0.01f - 10.0f |
+--Default: 0.6f
+See above.
+
 | sBase64Seed |
 This extremely long string represents your savegame. All recipes, databoxes,
 everything that this mod changes is saved here. You should never change this
-manually, unless you're using it share seeds with someone else. In that case,
+manually, unless you're using it to share seeds with someone else. In that case,
 copying someone else's base seed to your own file allows you to skip synchronising
 your settings with them and pressing the randomise button. The game will simply
 load their game state next time you boot it up.
@@ -337,6 +379,12 @@ of information. These are the categories the randomiser will accept:
   - Note that fish bred from eggs are also listed in this category.
   - Additionally, this category requires an alien containment and a multipurpose
     room to be unlocked in logic.
+- Fragments
+  - Provides a base TechType for the randomiser to latch on to while looking through
+    prefabs in the spawn registry.
+  - Removing an entry here will cause it to no longer be randomised in a new location.
+  - Adding an entry will likely do nothing, as the randomiser will probably fail to
+    find any associated custom prefabs.
     
     
  [3.3] Depth

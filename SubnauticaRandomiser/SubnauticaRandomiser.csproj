@@ -9,6 +9,8 @@
     <AssemblyName>SubnauticaRandomiser</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <LangVersion>8</LangVersion>
+    <Nullable>warnings</Nullable>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -19,16 +21,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>../../CopyToSubnauticaDir.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-          <externalConsole>True</externalConsole>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -38,43 +30,48 @@
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>../../CopyToSubnauticaDir.sh</command>
-          <workingdir>${ProjectDir}</workingdir>
-          <externalConsole>True</externalConsole>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>mkdir $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
+cp $(OutDir)SubnauticaRandomiser.dll $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
+cp $(SolutionDir)mod.json $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
+cp $(SolutionDir)ReadMe-Documentation.txt $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
+mkdir $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFiles
+cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFiles</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ConfigDefaults.cs" />
+    <Compile Include="Logic\AlternateStartLogic.cs" />
+    <Compile Include="Patches\DataboxPatcher.cs" />
+    <Compile Include="Patches\DeconstructionFix.cs" />
+    <Compile Include="Patches\FragmentPatcher.cs" />
     <Compile Include="InitMod.cs" />
+    <Compile Include="Logic\DataboxLogic.cs" />
+    <Compile Include="Logic\Recipes\Materials.cs" />
+    <Compile Include="Logic\Recipes\Mode.cs" />
+    <Compile Include="Logic\Recipes\ModeBalanced.cs" />
+    <Compile Include="Logic\Recipes\ModeRandom.cs" />
+    <Compile Include="Logic\Recipes\ModeSubstitute.cs" />
+    <Compile Include="Logic\Recipes\RecipeLogic.cs" />
+    <Compile Include="Patches\AlternateStart.cs" />
     <Compile Include="RandomiserConfig.cs" />
     <Compile Include="CSVReader.cs" />
     <Compile Include="LogHandler.cs" />
     <Compile Include="RandomiserObjects\Blueprint.cs" />
+    <Compile Include="RandomiserObjects\ParsingException.cs" />
     <Compile Include="RandomiserObjects\RandomiserIngredient.cs" />
     <Compile Include="RandomiserObjects\EProgressionNode.cs" />
     <Compile Include="RandomiserObjects\ETechTypeCategory.cs" />
     <Compile Include="RandomiserObjects\Recipe.cs" />
-    <Compile Include="DataboxPatcher.cs" />
     <Compile Include="RandomiserObjects\Databox.cs" />
     <Compile Include="RandomiserObjects\EWreckage.cs" />
     <Compile Include="RandomiserObjects\RandomiserVector.cs" />
     <Compile Include="RandomiserObjects\ProgressionPath.cs" />
     <Compile Include="RandomiserObjects\SpoilerLog.cs" />
-    <Compile Include="Logic\RandomiserLogic.cs" />
+    <Compile Include="Logic\CoreLogic.cs" />
     <Compile Include="Logic\ProgressionTree.cs" />
-    <Compile Include="Logic\ModeSubstitute.cs" />
-    <Compile Include="Logic\Materials.cs" />
-    <Compile Include="Logic\ModeBalanced.cs" />
-    <Compile Include="Logic\Mode.cs" />
-    <Compile Include="Logic\ModeRandom.cs" />
     <Compile Include="RandomiserObjects\LogicEntity.cs" />
     <Compile Include="RandomiserObjects\SpawnData.cs" />
-    <Compile Include="FragmentPatcher.cs" />
     <Compile Include="Logic\FragmentLogic.cs" />
     <Compile Include="EntitySerializer.cs" />
     <Compile Include="RandomiserObjects\Biome.cs" />
@@ -86,28 +83,36 @@
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="0Harmony">
-      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\BepInEx\core\0Harmony.dll</HintPath>
+      <HintPath>Subnautica\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp_publicized">
-      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+      <HintPath>Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass_publicized">
-      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
+      <HintPath>Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="QModInstaller">
-      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\BepInEx\plugins\QModManager\QModInstaller.dll</HintPath>
+      <HintPath>Subnautica\BepInEx\plugins\QModManager\QModInstaller.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SMLHelper">
-      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
+      <HintPath>Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\..\.steam\steamapps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using SMLHelper.V2.Handlers;
+using JetBrains.Annotations;
 using static LootDistributionData;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// A wrapper for the game's SpawnData class to make it serializable.
+    /// </summary>
     [Serializable]
     public class SpawnData
     {
@@ -19,6 +22,10 @@ namespace SubnauticaRandomiser.RandomiserObjects
             BiomeDataList = new List<RandomiserBiomeData>();
         }
 
+        /// <summary>
+        /// Add BiomeData to the SpawnData. Will throw out any duplicates.
+        /// </summary>
+        /// <param name="bd">The data to add.</param>
         public void AddBiomeData(RandomiserBiomeData bd)
         {
             if (BiomeDataList.Find(x => x.Biome.Equals(bd.Biome)) != null)
@@ -29,6 +36,11 @@ namespace SubnauticaRandomiser.RandomiserObjects
             BiomeDataList.Add(bd);
         }
 
+        /// <summary>
+        /// Get a list of this object's BiomeData converted to the game's base form.
+        /// </summary>
+        /// <returns>A list of BiomeData.</returns>
+        [NotNull]
         public List<BiomeData> GetBaseBiomeData()
         {
             List<BiomeData> list = new List<BiomeData>();

@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// This class represents all the ways a progression roadblock (node) can be surpassed.
+    /// </summary>
     public class ProgressionPath
     {
         public EProgressionNode Node;

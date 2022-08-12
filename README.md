@@ -1,29 +1,35 @@
 # Subnautica Randomiser
-A Subnautica Mod that randomises recipes for replayability, originally based on [the work of stephenengland](https://github.com/stephenengland/SubnauticaRandomizer).
 
-This can make the game considerably more difficult, and the varying availability of ingredients may also make it harder to collect enough of what you need. Since ingredients can vary so wildly, use of a blueprint tracker mod like [this one on nexus](https://www.nexusmods.com/subnautica/mods/22) is recommended.
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/tinyhoot/SubnauticaRandomiser)
+![GitHub](https://img.shields.io/github/license/tinyhoot/SubnauticaRandomiser)
+[![CodeFactor](https://www.codefactor.io/repository/github/tinyhoot/subnauticarandomiser/badge/dev)](https://www.codefactor.io/repository/github/tinyhoot/subnauticarandomiser/overview/master)
+[![wakatime](https://wakatime.com/badge/user/d7c60741-27ca-486e-a1d0-e23b93d91114/project/acdd8cb2-0e10-422a-990f-d717dc24ae45.svg)](https://wakatime.com/badge/user/d7c60741-27ca-486e-a1d0-e23b93d91114/project/acdd8cb2-0e10-422a-990f-d717dc24ae45)
 
-The randomisation persists between play sessions and save games. If you decide to stop playing for the day, everything will remain randomised as it was. In case you need it, there is a mod menu option for randomising everything from scratch again.
+A Subnautica Mod that randomises many aspects of the game for replayability, originally based on [the first Subnautica randomizer](https://github.com/stephenengland/SubnauticaRandomizer).
+
+This mod can make the game considerably more difficult, and the varying availability of fragments and ingredients may also make it harder to collect enough of what you need. Since ingredients can vary so wildly, use of a blueprint tracker mod like [this one on nexus](https://www.nexusmods.com/subnautica/mods/22) is recommended.
+
+The randomisation persists between play sessions and save games. If you decide to stop playing for the day, everything will remain randomised as it was. 
+
+On first startup, the mod will randomise using recommended settings. You can either start playing immediately, or customise your experience in the mod options menu. Note that, should you choose to re-randomise from the mod options menu, you must **restart your game** for all changes to properly take effect.
 
 #### This mod randomises:
-* All recipes for basic and advanced materials
-* All recipes for tools, equipment, vehicles and upgrades
-* Most ingredients required for base building
-  * Decorative pieces like chairs or beds are unaffected
-* The blueprints found in databoxes
+* Recipes for most craftable things in the game, excluding decorative base pieces.
+* Blueprints found in databoxes
 * Fragment spawn rates and locations
+* Lifepod spawn location
 
 ## Features
-- ✔️ Randomise most items in the game
-- ✔️ Include fish, eggs and seeds in recipes (customisable in in-game menu)
-- ✔️ Randomise blueprints from databoxes
-- ✔️ Randomise fragments
-- ✔️ No softlocks 
-- ✔️ Upgrades can be made independent from their basic variants, so you might acquire e.g. a Seamoth Depth Module 3 long before you ever manage to get Module 1 or 2
-- ✔️ Most things you can make may also show up as an ingredient in other recipes. Do you really need that laser cutter, or do you craft it into Polyaniline?
+- ✔️ No softlocks
+- ✔️ Detailed mod options menu
+- ✔️ (Probably) Don't spawn in the void
+- ✔️ Randomise rewards from scanning a fragment you already know
+- ✔️ Include fish, eggs and seeds in recipes
+- ✔️ Out-of-order upgrades, so you might acquire e.g. a Seamoth Depth Module 3 long before you ever manage to get Module 1 or 2
+- ✔️ Long recipe chains. Do you really need that laser cutter, or do you craft it into Polyaniline for a Rebreather?
 - ✔️ Items are balanced on an underlying value logic
    - If you prefer pure chaos, simply turn on Chaotic mode!
-- ✔️ Easily share your seed with friends
+- ✔️ Share your seed with friends
 
 ## How to Use
 1. Install [QModManager](https://www.nexusmods.com/subnautica/mods/201)
@@ -36,9 +42,10 @@ The randomisation persists between play sessions and save games. If you decide t
 4. Enjoy!
 
 ## How to Build
-* Install QModManager and SMLHelper
 * git clone
+* Add a SUBNAUTICA_DIR variable to your PATH pointing to your install directory of Subnautica
+* Install QModManager and SMLHelper
 * In Visual Studio, update the project's assembly references to point to the correct locations on your computer.
   * For more information, see [QMod Wiki](https://github.com/SubnauticaModding/QModManager/wiki/Libraries)
-  * In addition, you'll likely need a publicised version of Subnautica's `Assembly-CSharp.dll`. I used [the BepinEx plugin](https://github.com/MrPurple6411/Bepinex-Tools/releases/tag/1.0.1-Publicizer) for that.
+  * In addition, you'll need a publicised version of Subnautica's `Assembly-CSharp.dll`. Start the game once using [the BepinEx plugin](https://github.com/MrPurple6411/Bepinex-Tools/releases/) for this.
 * Building in the Release configuration should leave you with a `SubnauticaRandomiser.dll` in `SubnauticaRandomiser/bin/Release/`

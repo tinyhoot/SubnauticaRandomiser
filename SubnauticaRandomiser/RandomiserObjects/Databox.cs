@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// A databox containing a blueprint it unlocks.
+    /// </summary>
     [Serializable]
     public class Databox
     {

@@ -3,8 +3,9 @@ using static LootDistributionData;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
-    // This is a wrapper class around the original BiomeData to make it serializable.
-
+    /// <summary>
+    /// A wrapper for the game's BiomeData class to make it serializable.
+    /// </summary>
     [Serializable]
     public class RandomiserBiomeData
     {
@@ -18,8 +19,11 @@ namespace SubnauticaRandomiser.RandomiserObjects
             Count = 0;
             Probability = 0f;
         }
-
-        // Get the non-serializable equivalent.
+        
+        /// <summary>
+        /// Get the non-serializable in-game equivalent of this class.
+        /// </summary>
+        /// <returns>This class, converted to the game's equivalent.</returns>
         public BiomeData GetBaseBiomeData()
         {
             BiomeData data = new BiomeData

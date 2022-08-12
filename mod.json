@@ -1,8 +1,8 @@
 ﻿{
     "Id": "SubnauticaRandomiser",
     "DisplayName": "SubnauticaRandomiser",
-    "Author": "Raqzas",
-    "Version": "0.7.0",
+    "Author": "tinyhoot",
+    "Version": "0.8.0",
     "Dependencies": [ "SMLHelper" ],
     "Enable": true,
     "Game": "Subnautica",

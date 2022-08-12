@@ -6,24 +6,32 @@ using System.Threading.Tasks;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
+    /// <summary>
+    /// Handles everything related to the spoiler log generated during randomisation.
+    /// </summary>
     public class SpoilerLog
     {
-        internal static readonly string s_fileName = "spoilerlog.txt";
-        private RandomiserConfig _config;
-        internal static List<KeyValuePair<TechType, int>> s_progression = new List<KeyValuePair<TechType, int>>();
+        internal const string _FileName = "spoilerlog.txt";
+        private readonly RandomiserConfig _config;
+        private readonly EntitySerializer _serializer;
+        private readonly List<KeyValuePair<TechType, int>> _progression = new List<KeyValuePair<TechType, int>>();
 
         private List<string> _basicOptions;
         private string[] _contentHeader;
         private string[] _contentBasics;
         private string[] _contentAdvanced;
         private string[] _contentDataboxes;
+        private string[] _contentFragments;
 
-        internal SpoilerLog(RandomiserConfig config)
+        internal SpoilerLog(RandomiserConfig config, EntitySerializer serializer)
         {
             _config = config;
+            _serializer = serializer;
         }
-
-        // Prepare most of the fluff of the log.
+        
+        /// <summary>
+        /// Prepare the more basic aspects of the log.
+        /// </summary>
         private void PrepareStrings()
         {
             _basicOptions = new List<string>()
@@ -39,7 +47,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "iMaxIngredientsPerRecipe", "iMaxAmountPerIngredient",
                 "bMaxBiomesPerFragments"
             };
-            _contentHeader = new string[]
+            _contentHeader = new[]
             {
                 "*************************************************",
                 "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
@@ -47,16 +55,20 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "",
                 "Generated on " + DateTime.Now + " with " + InitMod.s_versionDict[InitMod.s_expectedSaveVersion]
             };
-            _contentBasics = new string[]
+            _contentBasics = new[]
             {
                 "",
                 "",
                 "///// Basic Information /////",
                 "Seed: " + _config.iSeed,
                 "Mode: " + _config.iRandomiserMode,
+                "Spawnpoint: " + _config.sSpawnPoint,
                 "Fish, Eggs, Seeds: " + _config.bUseFish + ", " + _config.bUseEggs + ", " + _config.bUseSeeds,
                 "Random Databoxes: " + _config.bRandomiseDataboxes,
                 "Random Fragments: " + _config.bRandomiseFragments,
+                "Random Fragment numbers: " + _config.bRandomiseNumFragments + ", " + _config.iMaxFragmentsToUnlock,
+                "Random Duplicate Scan Rewards: " + _config.bRandomiseDuplicateScans,
+                "Random Recipes: " + _config.bRandomiseRecipes,
                 "Vanilla Upgrade Chains: " + _config.bVanillaUpgradeChains,
                 "Base Theming: " + _config.bDoBaseTheming,
                 "Equipment, Tools, Upgrades: " + _config.iEquipmentAsIngredients + ", " + _config.iToolsAsIngredients + ", " + _config.iUpgradesAsIngredients,
@@ -64,107 +76,132 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "Max Biomes per Fragment: " + _config.iMaxBiomesPerFragment,
                 ""
             };
-            _contentAdvanced = new string[]
+            _contentAdvanced = new[]
             {
                 "",
                 "",
                 "///// Depth Progression Path /////"
             };
-            _contentDataboxes = new string[]
+            _contentDataboxes = new[]
             {
                 "",
                 "",
                 "///// Databox Locations /////"
             };
+            _contentFragments = new[]
+            {
+                "",
+                "",
+                "///// Fragment Locations /////"
+            };
         }
-
-        // Add advanced settings to the spoiler log, but only if they have been
-        // modified.
+        
+        /// <summary>
+        /// Add advanced settings to the spoiler log, but only if they have been modified.
+        /// </summary>
+        /// <returns>An array of modified settings.</returns>
         private string[] PrepareAdvancedSettings()
         {
             List<string> preparedAdvSettings = new List<string>();
-            FieldInfo[] defaultFieldInfoArray = typeof(ConfigDefaults).GetFields(BindingFlags.NonPublic | BindingFlags.Static);
             FieldInfo[] fieldInfoArray = typeof(RandomiserConfig).GetFields(BindingFlags.Public | BindingFlags.Instance);
-
-            LogHandler.Debug("Number of fields in default, instance: " + defaultFieldInfoArray.Length + ", " + fieldInfoArray.Length);
-
-            foreach (FieldInfo defaultField in defaultFieldInfoArray)
+            
+            foreach (FieldInfo field in fieldInfoArray)
             {
                 // Check whether this field is an advanced config option or not.
-                if (_basicOptions.Contains(defaultField.Name))
+                if (_basicOptions.Contains(field.Name))
                     continue;
-
-                foreach (FieldInfo field in fieldInfoArray)
-                {
-                    if (!field.Name.Equals(defaultField.Name))
-                        continue;
-
-                    var value = field.GetValue(_config);
-
-                    // If the value of a config field does not correspond to its
-                    // default value, the user must have modified it. Add it to
-                    // the list in that case.
-                    if (!value.Equals(defaultField.GetValue(null)))
-                        preparedAdvSettings.Add(field.Name + ": " + value);
-
-                    break;
-                }
+                if (!ConfigDefaults.Contains(field.Name))
+                    continue;
+                
+                var userValue = field.GetValue(_config);
+                var defaultValue = ConfigDefaults.GetDefault(field.Name);
+                // If the value of a config field does not correspond to its default value, the user must have
+                // modified it. Add it to the list in that case.
+                if (!userValue.Equals(defaultValue))
+                    preparedAdvSettings.Add(field.Name + ": " + userValue);
             }
+            LogHandler.Debug("Added anomalies: " + preparedAdvSettings.Count);
 
             if (preparedAdvSettings.Count == 0)
                 preparedAdvSettings.Add("No advanced settings were modified.");
 
             return preparedAdvSettings.ToArray();
         }
-
-        // Grab the randomised boxes from masterDict, and sort them alphabetically.
+        
+        /// <summary>
+        /// Grab the randomised boxes from masterDict, and sort them alphabetically.
+        /// </summary>
+        /// <returns>The prepared log entries.</returns>
         private string[] PrepareDataboxes()
         {
-            if (!InitMod.s_masterDict.isDataboxRandomised)
-                return new string[] { "Not randomised, all in vanilla locations." };
+            if (_serializer.Databoxes is null)
+                return new [] { "Not randomised, all in vanilla locations." };
 
             List<string> preparedDataboxes = new List<string>();
-
-            foreach (KeyValuePair<RandomiserVector, TechType> entry in InitMod.s_masterDict.Databoxes) 
+            foreach (KeyValuePair<RandomiserVector, TechType> entry in _serializer.Databoxes) 
             {
                 preparedDataboxes.Add(entry.Value.AsString() + " can be found at " + entry.Key);
             }
-
             preparedDataboxes.Sort();
 
             return preparedDataboxes.ToArray();
         }
 
-        // Compare the MD5 of the recipe CSV and try to see if it's still the same.
-        // Since this is done while parsing the CSV anyway, grab the value from there.
+        /// <summary>
+        /// Grab the randomise fragments from masterDict, and sort them alphabetically.
+        /// </summary>
+        /// <returns>The prepared log entries.</returns>
+        private string[] PrepareFragments()
+        {
+            if (_serializer.SpawnDataDict is null || _serializer.SpawnDataDict.Count == 0)
+                return new[] { "Not randomised, all in vanilla locations." };
+
+            List<string> preparedFragments = new List<string>();
+            // Iterate through every TechType representing each fragment.
+            foreach (var kv in _serializer.SpawnDataDict)
+            {
+                string line = kv.Key.AsString() + ": ";
+                foreach (var spawnData in kv.Value)
+                {
+                    // Fragments are split up into their respective prefabs, but those all have the same spawn biomes
+                    // and can be neglected. Just take the first prefab's biome spawns directly.
+                    line += spawnData.BiomeDataList[0].Biome.AsString() + ", ";
+                }
+                preparedFragments.Add(line);
+            }
+            preparedFragments.Sort();
+            
+            return preparedFragments.ToArray();
+        }
+        
+        /// <summary>
+        /// Compare the MD5 of the recipe CSV and try to see if it's still the same.
+        /// Since this is done while parsing the CSV anyway, grab the value from there.
+        /// </summary>
+        /// <returns>The prepared log entry.</returns>
         private string PrepareMD5()
         {
             if (!InitMod.s_expectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
-            {
                 return "recipeInformation.csv has been modified: " + CSVReader.s_recipeCSVMD5;
-            }
-            else
-            {
-                return "recipeInformation.csv is unmodified.";
-            }
+            
+            return "recipeInformation.csv is unmodified.";
         }
-
-        // Make the data gathered during randomising a bit nicer for human eyes.
+        
+        /// <summary>
+        /// Prepare a human readable way to tell what must be crafted to reach greater depths.
+        /// </summary>
+        /// <returns>The prepared log entries.</returns>
         private string[] PrepareProgressionPath()
         {
             List <string> preparedProgressionPath = new List<string>();
             int lastDepth = 0;
 
-            foreach (KeyValuePair<TechType, int> pair in s_progression)
+            foreach (KeyValuePair<TechType, int> pair in _progression)
             {
                 if (pair.Value > lastDepth)
-                {
                     preparedProgressionPath.Add("Craft " + pair.Key.AsString() + " to reach " + pair.Value + "m");
-                }
                 else
-                {
                     preparedProgressionPath.Add("Unlocked " + pair.Key.AsString() + ".");
-                }
 
                 lastDepth = pair.Value;
             }
@@ -172,6 +209,46 @@ namespace SubnauticaRandomiser.RandomiserObjects
             return preparedProgressionPath.ToArray();
         }
 
+        /// <summary>
+        /// Add an entry for a progression item to the spoiler log.
+        /// </summary>
+        /// <param name="type">The progression item.</param>
+        /// <param name="depth">The depth it unlocks or was unlocked at.</param>
+        /// <returns>True if successful, false if the entry already exists.</returns>
+        internal bool AddProgressionEntry(TechType type, int depth)
+        {
+            if (_progression.Exists(x => x.Key.Equals(type)))
+            {
+                LogHandler.Warn("Tried to add duplicate progression item to spoiler log: " + type.AsString());
+                return false;
+            }
+            
+            var kvpair = new KeyValuePair<TechType, int>(type, depth);
+            _progression.Add(kvpair);
+            return true;
+        }
+        
+        /// <summary>
+        /// When a progression item first gets unlocked, its depth reflects the depth required to reach it, rather than
+        /// what it makes accessible; update that here.
+        /// Always changes the latest addition to the spoiler log.
+        /// </summary>
+        /// <param name="depth">The new depth to update the entry with.</param>
+        /// <returns>True if successful, false if the update failed, e.g. if there are no entries in the list.</returns>
+        internal bool UpdateLastProgressionEntry(int depth)
+        {
+            if (_progression.Count == 0)
+                return false;
+
+            // Since this is a list of immutable k-v pairs, it must be removed and replaced entirely.
+            TechType type = _progression[_progression.Count - 1].Key;
+            _progression.RemoveAt(_progression.Count - 1);
+            return AddProgressionEntry(type, depth);
+        }
+
+        /// <summary>
+        /// Write the log to disk.
+        /// </summary>
         internal async Task WriteLog()
         {
             List<string> lines = new List<string>();
@@ -179,26 +256,24 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
             lines.AddRange(_contentHeader);
             lines.Add(PrepareMD5());
-
+            
             lines.AddRange(_contentBasics);
             lines.AddRange(PrepareAdvancedSettings());
             lines.AddRange(_contentAdvanced);
-
+            
             lines.AddRange(PrepareProgressionPath());
             lines.AddRange(_contentDataboxes);
             lines.AddRange(PrepareDataboxes());
+            
+            lines.AddRange(_contentFragments);
+            lines.AddRange(PrepareFragments());
 
-            using (StreamWriter file = new StreamWriter(Path.Combine(InitMod.s_modDirectory, s_fileName)))
+            using (StreamWriter file = new StreamWriter(Path.Combine(InitMod.s_modDirectory, _FileName)))
             {
                 await WriteTextToLog(file, lines.ToArray());
             }
 
             LogHandler.Info("Wrote spoiler log to disk.");
-        }
-
-        private async Task WriteTextToLog(StreamWriter file, string text)
-        {
-            await file.WriteLineAsync(text);
         }
 
         private async Task WriteTextToLog(StreamWriter file, string[] text)
