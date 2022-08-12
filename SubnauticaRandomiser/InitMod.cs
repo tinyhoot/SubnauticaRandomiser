@@ -22,11 +22,14 @@ namespace SubnauticaRandomiser
         internal const string s_recipeFile = "recipeInformation.csv";
         internal const string s_wreckageFile = "wreckInformation.csv";
         internal const string s_expectedRecipeMD5 = "4ab1b7a019037f76c0d508f1c2aee5f8";
-        internal const int s_expectedSaveVersion = 3;
-
-        internal static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string> { [1] = "v0.5.1", 
-                                                                                                       [2] = "v0.6.1",
-                                                                                                       [3] = "v0.7.0"};
+        internal const int s_expectedSaveVersion = 4;
+        internal static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
+        {
+            [1] = "v0.5.1",
+            [2] = "v0.6.1",
+            [3] = "v0.7.0",
+            [4] = "v0.8.0"
+        };
 
         // The master list of everything that is modified by the mod.
         internal static EntitySerializer s_masterDict;
