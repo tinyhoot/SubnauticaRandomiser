@@ -43,5 +43,10 @@ namespace SubnauticaRandomiser.RandomiserObjects
         {
             return x + ", " + y + ", " + z;
         }
+
+        public Vector3 ToUnityVector()
+        {
+            return new Vector3(x, y, z);
+        }
     }
 }

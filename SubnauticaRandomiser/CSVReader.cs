@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.RandomiserObjects;
@@ -10,6 +11,7 @@ namespace SubnauticaRandomiser
 {
     internal class CSVReader
     {
+        internal Dictionary<EBiomeType, List<float[]>> _csvAlternateStarts;
         internal List<BiomeCollection> _csvBiomeList;
         internal List<Databox> _csvDataboxList;
         internal List<LogicEntity> _csvRecipeList;
@@ -24,6 +26,89 @@ namespace SubnauticaRandomiser
             _csvBiomeList = new List<BiomeCollection>();
             _csvDataboxList = new List<Databox>();
             _csvRecipeList = new List<LogicEntity>();
+        }
+
+        /// <summary>
+        /// Attempt to parse a csv file containing information on alternate starts.
+        /// </summary>
+        /// <param name="fileName">The .csv file to parse.</param>
+        /// <returns>The parsed Dictionary if successful, or null otherwise.</returns>
+        internal Dictionary<EBiomeType, List<float[]>> ParseAlternateStartFile(string fileName)
+        {
+            // First, try to find and grab the file containing recipe information.
+            string[] csvLines;
+            string path = Path.Combine(InitMod.s_modDirectory, fileName);
+            LogHandler.Debug("Looking for alternate start CSV as " + path);
+
+            try
+            {
+                csvLines = File.ReadAllLines(path);
+            }
+            catch (Exception ex)
+            {
+                LogHandler.MainMenuMessage("Failed to read alternate start CSV!");
+                LogHandler.Error(ex.Message);
+                return null;
+            }
+
+            _csvAlternateStarts = new Dictionary<EBiomeType, List<float[]>>();
+
+            int lineCounter = 0;
+            foreach (string line in csvLines)
+            {
+                lineCounter++;
+                if (line.StartsWith("Biome", StringComparison.InvariantCulture))
+                {
+                    // This is the header line. Skip.
+                    continue;
+                }
+
+                // ParseRecipeFileLine fails upwards, so this ensures all errors are caught in one central location.
+                try
+                {
+                    ParseAlternateStartLine(line);
+                }
+                catch (Exception ex)
+                {
+                    LogHandler.Error("Failed to parse information from alternate start CSV on line "+lineCounter);
+                    LogHandler.Error(ex.Message);
+                }
+            }
+
+            return _csvAlternateStarts;
+        }
+
+        /// <summary>
+        /// Attempt to parse one content line of the alternate starts csv.
+        /// </summary>
+        /// <param name="line">The line to parse.</param>
+        private void ParseAlternateStartLine(string line)
+        {
+            string[] cells = line.Split(',');
+            if (cells.Length < 2)
+                throw new FormatException("Unexpected number of columns: " + cells.Length);
+
+            EBiomeType biome = StringToEBiomeType(cells[0]);
+            List<float[]> starts = new List<float[]>();
+            foreach (string cell in cells.Skip(1))
+            {
+                if (String.IsNullOrEmpty(cell))
+                    continue;
+                
+                string[] rawCoords = cell.Split('/');
+                if (rawCoords.Length != 4)
+                    throw new FormatException("Invalid number of coordinates: " + rawCoords.Length);
+                
+                float[] parsedCoords = new float[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    parsedCoords[i] = float.Parse(rawCoords[i]);
+                }
+                starts.Add(parsedCoords);
+            }
+            
+            LogHandler.Debug("Registering alternate starts for biome " + biome);
+            _csvAlternateStarts.Add(biome, starts);
         }
 
         /// <summary>

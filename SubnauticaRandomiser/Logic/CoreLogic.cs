@@ -20,12 +20,14 @@ namespace SubnauticaRandomiser.Logic
         internal readonly SpoilerLog _spoilerLog;
         internal readonly ProgressionTree _tree;
 
+        private readonly AlternateStartLogic _altStartLogic;
         private readonly DataboxLogic _databoxLogic;
         private readonly FragmentLogic _fragmentLogic;
         private readonly RecipeLogic _recipeLogic;
 
-        public CoreLogic(System.Random random, RandomiserConfig config,
-            List<LogicEntity> allMaterials, List<BiomeCollection> biomes = null, List<Databox> databoxes = null)
+        public CoreLogic(System.Random random, RandomiserConfig config, List<LogicEntity> allMaterials,
+            Dictionary<EBiomeType, List<float[]>> alternateStarts, List<BiomeCollection> biomes = null,
+            List<Databox> databoxes = null)
         {
             _config = config;
             _databoxes = databoxes;
@@ -34,6 +36,8 @@ namespace SubnauticaRandomiser.Logic
             _random = random;
             _spoilerLog = new SpoilerLog(config);
             
+            // TODO Config
+            _altStartLogic = new AlternateStartLogic(this, alternateStarts);
             if (_config.bRandomiseDataboxes)
                 _databoxLogic = new DataboxLogic(this);
             if (_config.bRandomiseFragments || _config.bRandomiseNumFragments || _config.bRandomiseDuplicateScans)
@@ -48,6 +52,9 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void Setup(List<LogicEntity> notRandomised)
         {
+            if (_altStartLogic != null)
+                _altStartLogic.Randomise();
+            
             if (_databoxLogic != null)
             {
                 // Just randomise those flat out for now, instead of including them in the core loop.

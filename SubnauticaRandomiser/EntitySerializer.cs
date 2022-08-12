@@ -27,6 +27,7 @@ namespace SubnauticaRandomiser
     [Serializable]
     public class EntitySerializer
     {
+        public RandomiserVector StartPoint;
         // All databoxes and their new locations.
         public Dictionary<RandomiserVector, TechType> Databoxes;
         // The options to choose from for spawning materials when scanning a fragment which is already unlocked.

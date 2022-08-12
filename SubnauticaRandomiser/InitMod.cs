@@ -17,6 +17,7 @@ namespace SubnauticaRandomiser
     {
         internal static string s_modDirectory;
         internal static RandomiserConfig s_config;
+        internal const string s_alternateStartFile = "alternateStarts.csv";
         internal const string s_biomeFile = "biomeSlots.csv";
         internal const string s_recipeFile = "recipeInformation.csv";
         internal const string s_wreckageFile = "wreckInformation.csv";
@@ -84,31 +85,9 @@ namespace SubnauticaRandomiser
             s_masterDict = null;
             s_config.SanitiseConfigValues();
             s_config.iSaveVersion = s_expectedSaveVersion;
-            var csvReader = new CSVReader();
 
-            // Attempt to read and parse the CSV with all biome information.
-            var biomes = csvReader.ParseBiomeFile(s_biomeFile);
-            if (biomes is null)
-            {
-                LogHandler.Fatal("Failed to extract biome information from CSV, aborting.");
-                throw new ParsingException("Failed to extract biome information: null");
-            }
-
-            // Attempt to read and parse the CSV with all recipe information.
-            var materials = csvReader.ParseRecipeFile(s_recipeFile);
-            if (materials is null)
-            {
-                LogHandler.Fatal("Failed to extract recipe information from CSV, aborting.");
-                throw new ParsingException("Failed to extract recipe information: null");
-            }
-
-            // Attempt to read and parse the CSV with wreckages and databox info.
-            var databoxes = csvReader.ParseWreckageFile(s_wreckageFile);
-            if (databoxes is null || databoxes.Count == 0)
-            {
-                LogHandler.Error("Failed to extract databox information from CSV.");
-                throw new ParsingException("Failed to extract databox information: null");
-            }
+            // Parse all the necessary input files.
+            var (alternateStarts, biomes, databoxes, materials) = ParseInputFiles();
 
             // Create a new seed if the current one is just a default
             Random random;
@@ -120,7 +99,7 @@ namespace SubnauticaRandomiser
             random = new Random(s_config.iSeed);
 
             // Randomise!
-            CoreLogic logic = new CoreLogic(random, s_config, materials, biomes, databoxes);
+            CoreLogic logic = new CoreLogic(random, s_config, materials, alternateStarts, biomes, databoxes);
             s_masterDict = logic.Randomise();
             ApplyAllChanges();
             LogHandler.Info("Randomisation successful!");
@@ -169,6 +148,51 @@ namespace SubnauticaRandomiser
             LogHandler.MainMenuMessage("To protect your previous savegame, no changes to the game have been made.");
             LogHandler.MainMenuMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json");
             return false;
+        }
+
+        /// <summary>
+        /// Parse all CSV files needed for randomisation.
+        /// </summary>
+        /// <returns>The parsed objects.</returns>
+        /// <exception cref="ParsingException">Raised if a file could not be parsed.</exception>
+        private static (Dictionary<EBiomeType, List<float[]>> starts, List<BiomeCollection> biomes, List<Databox>
+            databoxes, List<LogicEntity> materials) ParseInputFiles()
+        {
+            var csvReader = new CSVReader();
+
+            // Attempt to read and parse the CSV with all alternate starts.
+            var alternateStarts = csvReader.ParseAlternateStartFile(s_alternateStartFile);
+            if (alternateStarts is null)
+            {
+                LogHandler.Error("Failed to extract alternate start information from CSV.");
+                throw new ParsingException("Failed to extract alternate start information: null.");
+            }
+            
+            // Attempt to read and parse the CSV with all biome information.
+            var biomes = csvReader.ParseBiomeFile(s_biomeFile);
+            if (biomes is null)
+            {
+                LogHandler.Error("Failed to extract biome information from CSV.");
+                throw new ParsingException("Failed to extract biome information: null");
+            }
+
+            // Attempt to read and parse the CSV with all recipe information.
+            var materials = csvReader.ParseRecipeFile(s_recipeFile);
+            if (materials is null)
+            {
+                LogHandler.Error("Failed to extract recipe information from CSV.");
+                throw new ParsingException("Failed to extract recipe information: null");
+            }
+
+            // Attempt to read and parse the CSV with wreckages and databox info.
+            var databoxes = csvReader.ParseWreckageFile(s_wreckageFile);
+            if (databoxes is null || databoxes.Count == 0)
+            {
+                LogHandler.Error("Failed to extract databox information from CSV.");
+                throw new ParsingException("Failed to extract databox information: null");
+            }
+
+            return (alternateStarts, biomes, databoxes, materials);
         }
 
         /// <summary>
@@ -228,8 +252,13 @@ namespace SubnauticaRandomiser
         {
             Harmony harmony = new Harmony("SubnauticaRandomiser");
             
+            // Alternate starting location.
+            var original = AccessTools.Method(typeof(RandomStart), nameof(RandomStart.GetRandomStartPoint));
+            var postfix = AccessTools.Method(typeof(AlternateStart), nameof(AlternateStart.OverrideStart));
+            harmony.Patch(original, postfix: new HarmonyMethod(postfix));
+            
             // Make corridors return the correct building materials.
-            var original = AccessTools.Method(typeof(BaseDeconstructable), nameof(BaseDeconstructable.Deconstruct));
+            original = AccessTools.Method(typeof(BaseDeconstructable), nameof(BaseDeconstructable.Deconstruct));
             var prefix = AccessTools.Method(typeof(DeconstructionFix), nameof(DeconstructionFix.FixCorridors));
             harmony.Patch(original, prefix: new HarmonyMethod(prefix));
             
@@ -242,7 +271,7 @@ namespace SubnauticaRandomiser
                 
                 original = AccessTools.Method(typeof(ProtobufSerializer),
                     nameof(ProtobufSerializer.DeserializeIntoGameObject));
-                var postfix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnLoad));
+                postfix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnLoad));
                 harmony.Patch(original, postfix: new HarmonyMethod(postfix));
             }
 
