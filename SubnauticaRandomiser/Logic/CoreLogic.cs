@@ -34,7 +34,7 @@ namespace SubnauticaRandomiser.Logic
             _masterDict = new EntitySerializer();
             _materials = new Materials(allMaterials);
             _random = random;
-            _spoilerLog = new SpoilerLog(config);
+            _spoilerLog = new SpoilerLog(config, _masterDict);
             
             if (!_config.sSpawnPoint.StartsWith("Vanilla"))
                 _altStartLogic = new AlternateStartLogic(this, alternateStarts);
@@ -154,8 +154,8 @@ namespace SubnauticaRandomiser.Logic
                 LogHandler.Warn("Unsupported entity in loop: " + nextEntity);
             }
 
-            _spoilerLog.WriteLog();
             LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
+            _spoilerLog.WriteLog();
 
             return _masterDict;
         }

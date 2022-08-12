@@ -12,7 +12,8 @@ namespace SubnauticaRandomiser.RandomiserObjects
     public class SpoilerLog
     {
         internal const string _FileName = "spoilerlog.txt";
-        private RandomiserConfig _config;
+        private readonly RandomiserConfig _config;
+        private readonly EntitySerializer _serializer;
         private readonly List<KeyValuePair<TechType, int>> _progression = new List<KeyValuePair<TechType, int>>();
 
         private List<string> _basicOptions;
@@ -20,10 +21,12 @@ namespace SubnauticaRandomiser.RandomiserObjects
         private string[] _contentBasics;
         private string[] _contentAdvanced;
         private string[] _contentDataboxes;
+        private string[] _contentFragments;
 
-        internal SpoilerLog(RandomiserConfig config)
+        internal SpoilerLog(RandomiserConfig config, EntitySerializer serializer)
         {
             _config = config;
+            _serializer = serializer;
         }
         
         /// <summary>
@@ -44,7 +47,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "iMaxIngredientsPerRecipe", "iMaxAmountPerIngredient",
                 "bMaxBiomesPerFragments"
             };
-            _contentHeader = new []
+            _contentHeader = new[]
             {
                 "*************************************************",
                 "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
@@ -52,16 +55,20 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "",
                 "Generated on " + DateTime.Now + " with " + InitMod.s_versionDict[InitMod.s_expectedSaveVersion]
             };
-            _contentBasics = new []
+            _contentBasics = new[]
             {
                 "",
                 "",
                 "///// Basic Information /////",
                 "Seed: " + _config.iSeed,
                 "Mode: " + _config.iRandomiserMode,
+                "Spawnpoint: " + _config.sSpawnPoint,
                 "Fish, Eggs, Seeds: " + _config.bUseFish + ", " + _config.bUseEggs + ", " + _config.bUseSeeds,
                 "Random Databoxes: " + _config.bRandomiseDataboxes,
                 "Random Fragments: " + _config.bRandomiseFragments,
+                "Random Fragment numbers: " + _config.bRandomiseNumFragments + ", " + _config.iMaxFragmentsToUnlock,
+                "Random Duplicate Scan Rewards: " + _config.bRandomiseDuplicateScans,
+                "Random Recipes: " + _config.bRandomiseRecipes,
                 "Vanilla Upgrade Chains: " + _config.bVanillaUpgradeChains,
                 "Base Theming: " + _config.bDoBaseTheming,
                 "Equipment, Tools, Upgrades: " + _config.iEquipmentAsIngredients + ", " + _config.iToolsAsIngredients + ", " + _config.iUpgradesAsIngredients,
@@ -69,17 +76,23 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "Max Biomes per Fragment: " + _config.iMaxBiomesPerFragment,
                 ""
             };
-            _contentAdvanced = new []
+            _contentAdvanced = new[]
             {
                 "",
                 "",
                 "///// Depth Progression Path /////"
             };
-            _contentDataboxes = new []
+            _contentDataboxes = new[]
             {
                 "",
                 "",
                 "///// Databox Locations /////"
+            };
+            _contentFragments = new[]
+            {
+                "",
+                "",
+                "///// Fragment Locations /////"
             };
         }
         
@@ -90,32 +103,24 @@ namespace SubnauticaRandomiser.RandomiserObjects
         private string[] PrepareAdvancedSettings()
         {
             List<string> preparedAdvSettings = new List<string>();
-            FieldInfo[] defaultFieldInfoArray = typeof(ConfigDefaults).GetFields(BindingFlags.NonPublic | BindingFlags.Static);
             FieldInfo[] fieldInfoArray = typeof(RandomiserConfig).GetFields(BindingFlags.Public | BindingFlags.Instance);
-
-            LogHandler.Debug("Number of fields in default, instance: " + defaultFieldInfoArray.Length + ", " + fieldInfoArray.Length);
-
-            foreach (FieldInfo defaultField in defaultFieldInfoArray)
+            
+            foreach (FieldInfo field in fieldInfoArray)
             {
                 // Check whether this field is an advanced config option or not.
-                if (_basicOptions.Contains(defaultField.Name))
+                if (_basicOptions.Contains(field.Name))
                     continue;
-
-                foreach (FieldInfo field in fieldInfoArray)
-                {
-                    if (!field.Name.Equals(defaultField.Name))
-                        continue;
-
-                    var value = field.GetValue(_config);
-
-                    // If the value of a config field does not correspond to its default value, the user must have
-                    // modified it. Add it to the list in that case.
-                    if (!value.Equals(defaultField.GetValue(null)))
-                        preparedAdvSettings.Add(field.Name + ": " + value);
-
-                    break;
-                }
+                if (!ConfigDefaults.Contains(field.Name))
+                    continue;
+                
+                var userValue = field.GetValue(_config);
+                var defaultValue = ConfigDefaults.GetDefault(field.Name);
+                // If the value of a config field does not correspond to its default value, the user must have
+                // modified it. Add it to the list in that case.
+                if (!userValue.Equals(defaultValue))
+                    preparedAdvSettings.Add(field.Name + ": " + userValue);
             }
+            LogHandler.Debug("Added anomalies: " + preparedAdvSettings.Count);
 
             if (preparedAdvSettings.Count == 0)
                 preparedAdvSettings.Add("No advanced settings were modified.");
@@ -129,19 +134,44 @@ namespace SubnauticaRandomiser.RandomiserObjects
         /// <returns>The prepared log entries.</returns>
         private string[] PrepareDataboxes()
         {
-            if (InitMod.s_masterDict.Databoxes is null)
+            if (_serializer.Databoxes is null)
                 return new [] { "Not randomised, all in vanilla locations." };
 
             List<string> preparedDataboxes = new List<string>();
-
-            foreach (KeyValuePair<RandomiserVector, TechType> entry in InitMod.s_masterDict.Databoxes) 
+            foreach (KeyValuePair<RandomiserVector, TechType> entry in _serializer.Databoxes) 
             {
                 preparedDataboxes.Add(entry.Value.AsString() + " can be found at " + entry.Key);
             }
-
             preparedDataboxes.Sort();
 
             return preparedDataboxes.ToArray();
+        }
+
+        /// <summary>
+        /// Grab the randomise fragments from masterDict, and sort them alphabetically.
+        /// </summary>
+        /// <returns>The prepared log entries.</returns>
+        private string[] PrepareFragments()
+        {
+            if (_serializer.SpawnDataDict is null || _serializer.SpawnDataDict.Count == 0)
+                return new[] { "Not randomised, all in vanilla locations." };
+
+            List<string> preparedFragments = new List<string>();
+            // Iterate through every TechType representing each fragment.
+            foreach (var kv in _serializer.SpawnDataDict)
+            {
+                string line = kv.Key.AsString() + ": ";
+                foreach (var spawnData in kv.Value)
+                {
+                    // Fragments are split up into their respective prefabs, but those all have the same spawn biomes
+                    // and can be neglected. Just take the first prefab's biome spawns directly.
+                    line += spawnData.BiomeDataList[0].Biome.AsString() + ", ";
+                }
+                preparedFragments.Add(line);
+            }
+            preparedFragments.Sort();
+            
+            return preparedFragments.ToArray();
         }
         
         /// <summary>
@@ -226,14 +256,17 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
             lines.AddRange(_contentHeader);
             lines.Add(PrepareMD5());
-
+            
             lines.AddRange(_contentBasics);
             lines.AddRange(PrepareAdvancedSettings());
             lines.AddRange(_contentAdvanced);
-
+            
             lines.AddRange(PrepareProgressionPath());
             lines.AddRange(_contentDataboxes);
             lines.AddRange(PrepareDataboxes());
+            
+            lines.AddRange(_contentFragments);
+            lines.AddRange(PrepareFragments());
 
             using (StreamWriter file = new StreamWriter(Path.Combine(InitMod.s_modDirectory, _FileName)))
             {
