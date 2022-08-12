@@ -36,8 +36,8 @@ namespace SubnauticaRandomiser.Logic
             _random = random;
             _spoilerLog = new SpoilerLog(config);
             
-            // TODO Config
-            _altStartLogic = new AlternateStartLogic(this, alternateStarts);
+            if (!_config.sSpawnPoint.StartsWith("Vanilla"))
+                _altStartLogic = new AlternateStartLogic(this, alternateStarts);
             if (_config.bRandomiseDataboxes)
                 _databoxLogic = new DataboxLogic(this);
             if (_config.bRandomiseFragments || _config.bRandomiseNumFragments || _config.bRandomiseDuplicateScans)
@@ -52,9 +52,8 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void Setup(List<LogicEntity> notRandomised)
         {
-            if (_altStartLogic != null)
-                _altStartLogic.Randomise();
-            
+            _altStartLogic?.Randomise();
+
             if (_databoxLogic != null)
             {
                 // Just randomise those flat out for now, instead of including them in the core loop.
@@ -132,7 +131,6 @@ namespace SubnauticaRandomiser.Logic
                 // Choose a logic appropriate to the entity.
                 if (nextEntity.IsFragment)
                 {
-                    // TODO implement proper depth restrictions and config options.
                     if (_config.bRandomiseFragments && _fragmentLogic != null)
                         _fragmentLogic.RandomiseFragment(nextEntity, currentDepth);
 
