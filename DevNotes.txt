@@ -1,17 +1,9 @@
-﻿
 ﻿Thoughts and notes on features and issues.
   
 - Randomise more things.
   - Fish spawn points.
   - Fish size and aggression.
   - Raw material spawn points.
-  
-- Expand on fragments.
-  - Make it possible to randomise the amount of fragments
-    needed for each blueprint.
-  - Is it possible to swap fragments around?
-  - Change what resources you get upon scanning duplicate fragments
-    - Maybe you'd get one or two resources needed to build what you scanned?
     
 - Add a casual mode.
   - Casual mode would respect vanilla upgrade chains and be more lenient with its
@@ -21,8 +13,7 @@
 - Add a fiendish mode.
   - Many more recipes are locked behind databoxes scattered throughout the ocean.
   - Databoxes can be many more places, including the cave systems in many biomes.
-  - Raw materials are no longer found in their original biomes. Look into using
-    LootDistributionHandler for this?
+  - Raw materials are no longer found in their original biomes.
     
 - Add support for glitches.
   - Several glitches in the game can let you get items or blueprints much earlier.
@@ -30,6 +21,8 @@
     - Since this would make the logic run on a timer, better not implement this.
   - Large wrecks can be made to despawn with the building tool, skipping the need
     for e.g. a laser cutter.
+  - Table coral can be acquired with a Crashfish, or bumping into it with a vehicle.
+    No knife required!
     
 - Mod support.
   - Even if autodetecting mods and their items seems impossible with how the
@@ -62,10 +55,6 @@ Thoughts from a playthrough:
   - Water filter (covers water, get food from surrounding fish)
 - What about land seeds? If those get added, indoor growbeds are a necessity.
 - Add Aurora interior to logic. What parts need repair tool, laser cutter, cannon?
-
-
-Thoughts from users:
-- Add console commands to reroll a specific recipe only.
 
 Other:
 - Sea treaders are a potential anti softlock mechanism. You could change their
