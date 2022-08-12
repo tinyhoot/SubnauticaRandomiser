@@ -6,7 +6,6 @@ using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser
 {
-    
     /// <summary>
     /// This class does three things.
     /// <list type="bullet">

@@ -259,7 +259,7 @@ namespace SubnauticaRandomiser.Logic
             
             // Below 100 meters, air is consumed three times as fast.
             // Below 200 meters, it is consumed five times as fast.
-            return (int)(soloDepths[0] + soloDepths[1] / 3 + soloDepths[2] / 5);
+            return (int)(soloDepths[0] + (soloDepths[1] / 3) + (soloDepths[2] / 5));
         }
 
         /// <summary>

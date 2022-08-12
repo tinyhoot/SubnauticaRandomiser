@@ -8,7 +8,6 @@ namespace SubnauticaRandomiser.Patches
     // [HarmonyPatch]
     internal class DataboxPatcher
     {
-
         [HarmonyPrefix]
         [HarmonyPatch(typeof(DataboxSpawner), nameof(DataboxSpawner.Start))]
         internal static bool PatchDataboxOnSpawn(ref DataboxSpawner __instance)

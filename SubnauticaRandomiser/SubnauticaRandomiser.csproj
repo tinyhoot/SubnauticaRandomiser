@@ -40,6 +40,7 @@ mkdir $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFiles
 cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFiles</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ConfigDefaults.cs" />
     <Compile Include="Logic\AlternateStartLogic.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
     <Compile Include="Patches\DeconstructionFix.cs" />
@@ -57,6 +58,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Compile Include="CSVReader.cs" />
     <Compile Include="LogHandler.cs" />
     <Compile Include="RandomiserObjects\Blueprint.cs" />
+    <Compile Include="RandomiserObjects\ParsingException.cs" />
     <Compile Include="RandomiserObjects\RandomiserIngredient.cs" />
     <Compile Include="RandomiserObjects\EProgressionNode.cs" />
     <Compile Include="RandomiserObjects\ETechTypeCategory.cs" />

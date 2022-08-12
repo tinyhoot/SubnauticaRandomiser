@@ -6,7 +6,6 @@ namespace SubnauticaRandomiser
     /// Also includes main menu messages for relaying information to the user directly.
     public static class LogHandler
     {
-
         internal static void Info(string message)
         {
             Logger.Log(Logger.Level.Info, message);

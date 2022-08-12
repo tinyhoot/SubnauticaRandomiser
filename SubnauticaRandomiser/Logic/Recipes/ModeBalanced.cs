@@ -154,7 +154,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>A positive integer.</returns>
         private int FindMaximum(LogicEntity ingredient, double targetValue, double currentValue)
         {
-            int max = (int)((targetValue + targetValue * _config.dFuzziness / 2) - currentValue) / ingredient.Value;
+            int max = (int)((targetValue + ((targetValue * _config.dFuzziness) / 2)) - currentValue) / ingredient.Value;
             max = max > 0 ? max : 1;
             max = max > _config.iMaxAmountPerIngredient ? _config.iMaxAmountPerIngredient : max;
 
@@ -193,8 +193,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
             {
                 // Add all items of the same category with value +- range%
                 betterOptions.AddRange(_reachableMaterials.FindAll(x => x.Category.Equals(undesirable.Category)
-                                                                     && x.Value < undesirable.Value + undesirable.Value * range
-                                                                     && x.Value > undesirable.Value - undesirable.Value * range
+                                                                     && x.Value < undesirable.Value + (undesirable.Value * range)
+                                                                     && x.Value > undesirable.Value - (undesirable.Value * range)
                                                                      ));
                 range += 0.2;
             }
