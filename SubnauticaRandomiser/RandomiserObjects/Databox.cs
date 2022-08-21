@@ -23,5 +23,10 @@ namespace SubnauticaRandomiser.RandomiserObjects
             RequiresLaserCutter = laserCutter;
             RequiresPropulsionCannon = propulsionCannon;
         }
+
+        public override string ToString()
+        {
+            return TechType.AsString();
+        }
     }
 }

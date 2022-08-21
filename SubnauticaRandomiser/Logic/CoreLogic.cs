@@ -154,7 +154,7 @@ namespace SubnauticaRandomiser.Logic
                 LogHandler.Warn("Unsupported entity in loop: " + nextEntity);
             }
 
-            LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
+            LogHandler.Info($"Finished randomising within {circuitbreaker} cycles!");
             _spoilerLog.WriteLog();
 
             return _masterDict;

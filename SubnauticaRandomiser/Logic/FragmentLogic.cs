@@ -75,10 +75,9 @@ namespace SubnauticaRandomiser.Logic
         internal List<SpawnData> RandomiseFragment(LogicEntity entity, int depth)
         {
             if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList))
-                throw new ArgumentException("Failed to find fragment '" + entity + "' in classId database!");
+                throw new ArgumentException($"Failed to find fragment '{entity}' in classId database!");
             
-            LogHandler.Debug("Randomising fragment " + entity + " for depth " + depth);
-            
+            LogHandler.Debug($"[F] Randomising fragment {entity} for depth {depth}");
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
@@ -89,12 +88,16 @@ namespace SubnauticaRandomiser.Logic
                 // Choose a suitable biome which is also accessible at this depth.
                 Biome biome = GetRandom(_availableBiomes.FindAll(x => x.AverageDepth <= depth));
                 // In case no good biome is available, ignore overpopulation restrictions and choose any.
-                biome ??= GetRandom(_allBiomes.FindAll(x => x.AverageDepth <= depth));
+                if (biome is null)
+                {
+                    biome ??= GetRandom(_allBiomes.FindAll(x => x.AverageDepth <= depth));
+                    LogHandler.Debug($"[F] ! Using fallback biome for {entity}: {biome.Name}");
+                }
 
                 // Ensure the biome can actually be used for creating valid BiomeData.
                 if (!Enum.TryParse(biome.Name, out BiomeType biomeType))
                 {
-                    LogHandler.Warn("  Failed to parse biome to enum: " + biome.Name);
+                    LogHandler.Warn("[F] ! Failed to parse biome to enum: " + biome.Name);
                     // i--;
                     continue;
                 }
@@ -122,7 +125,7 @@ namespace SubnauticaRandomiser.Logic
                     spawnList.Add(spawnData);
                 }
 
-                LogHandler.Debug("  Adding fragment to biome: " + biomeType.AsString() + ", " + spawnRate);
+                LogHandler.Debug($"[F] + Adding fragment to biome: {biomeType.AsString()}, {spawnRate}");
             }
             
             ApplyRandomisedFragment(entity, spawnList);
@@ -225,7 +228,7 @@ namespace SubnauticaRandomiser.Logic
                 return;
             
             int numFragments = _random.Next(_config.iMinFragmentsToUnlock, _config.iMaxFragmentsToUnlock + 1);
-            LogHandler.Debug("  New number of fragments required: " + numFragments);
+            LogHandler.Debug($"[F] New number of fragments required for {entity}: {numFragments}");
             _masterDict.AddFragmentUnlockNum(entity.TechType, numFragments);
         }
 

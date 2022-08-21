@@ -94,7 +94,7 @@ namespace SubnauticaRandomiser
         {
             if (NumFragmentsToUnlock.ContainsKey(type))
             {
-                LogHandler.Warn("Tried to add duplicate key " + type.AsString() + " to FragmentNum master dictionary!");
+                LogHandler.Warn($"[ES] Tried to add duplicate key {type.AsString()} to FragmentNum master dictionary!");
                 return false;
             }
             NumFragmentsToUnlock.Add(type, number);
@@ -111,7 +111,7 @@ namespace SubnauticaRandomiser
         {
             if (RecipeDict.ContainsKey(type))
             {
-                LogHandler.Warn("Tried to add duplicate key " + type.AsString() + " to Recipe master dictionary!");
+                LogHandler.Warn($"[ES] Tried to add duplicate key {type.AsString()} to Recipe master dictionary!");
                 return false;
             }
             RecipeDict.Add(type, r);
@@ -128,7 +128,7 @@ namespace SubnauticaRandomiser
         {
             if (SpawnDataDict.ContainsKey(type))
             {
-                LogHandler.Warn("Tried to add duplicate key " + type.AsString() + "to SpawnData master dictionary!");
+                LogHandler.Warn($"Tried to add duplicate key {type.AsString()} to SpawnData master dictionary!");
                 return false;
             }
             SpawnDataDict.Add(type, data);

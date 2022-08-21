@@ -33,7 +33,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             entity.Value = 0;
             int totalSize = 0;
 
-            LogHandler.Debug("Figuring out ingredients for " + entity.TechType.AsString());
+            LogHandler.Debug("[R] Figuring out ingredients for " + entity);
 
             LogicEntity primaryIngredient = ChoosePrimaryIngredient(entity, targetValue);
 
@@ -44,7 +44,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             AddIngredientWithMaxUsesCheck(primaryIngredient, 1);
             currentValue += primaryIngredient.Value;
 
-            LogHandler.Debug("    Adding primary ingredient " + primaryIngredient.TechType.AsString());
+            LogHandler.Debug("[R] > Adding primary ingredient " + primaryIngredient);
 
             // Now fill up with random materials until the value threshold is more or less met, as defined by fuzziness.
             // Using a do-while since we want this to happen at least once.
@@ -76,26 +76,26 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 currentValue += ingredient.Value * number;
                 totalSize += ingredient.GetItemSize() * number;
 
-                LogHandler.Debug("    Adding ingredient: " + ingredient.TechType.AsString() + ", " + number);
+                LogHandler.Debug($"[R] > Adding ingredient: {ingredient}, {number}");
 
                 // If a recipe starts getting out of hand, shut it down early.
                 if (totalSize >= _config.iMaxInventorySizePerRecipe)
                 {
-                    LogHandler.Debug("!   Recipe is getting too large, stopping.");
+                    LogHandler.Debug("[R] ! Recipe is getting too large, stopping.");
                     break;
                 }
                 
                 // Same thing for special case of outpost base parts.
                 if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType) && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.6)
                 {
-                    LogHandler.Debug("!   Basic outpost size is getting too large, stopping.");
+                    LogHandler.Debug("[R] ! Basic outpost size is getting too large, stopping.");
                     break;
                 }
                 
                 // Also, respect the maximum number of ingredients set in the config.
                 if (_config.iMaxIngredientsPerRecipe <= _ingredients.Count)
                 {
-                    LogHandler.Debug("!   Recipe has reached maximum allowed number of ingredients, stopping.");
+                    LogHandler.Debug("[R] ! Recipe has reached maximum allowed number of ingredients, stopping.");
                     break;
                 }
             } while ((targetValue - currentValue) > (targetValue * _config.dRecipeValueVariance / 2));
@@ -105,7 +105,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 _basicOutpostSize += (totalSize * _tree.BasicOutpostPieces[entity.TechType]);
 
             entity.Value = currentValue;
-            LogHandler.Debug("    Recipe is now valued " + currentValue + " out of " + targetValue);
+            LogHandler.Debug($"[R] > Recipe is now valued {currentValue} out of {targetValue}");
 
             entity.Recipe.Ingredients = _ingredients;
             entity.Recipe.CraftAmount = CraftDataHandler.GetTechData(entity.TechType).craftAmount;
@@ -185,7 +185,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             double range = 0.1;
 
             List<LogicEntity> betterOptions = new List<LogicEntity>();
-            LogHandler.Debug("Replacing undesirable ingredient " + undesirable.TechType.AsString());
+            LogHandler.Debug("[R] Replacing undesirable ingredient " + undesirable);
 
             // Progressively increase the search radius if no replacement is found,
             // but stop before it gets out of hand.

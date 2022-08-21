@@ -277,8 +277,8 @@ namespace SubnauticaRandomiser
             if (category.CanHaveRecipe())
                 recipe = new Recipe(type);
 
-            LogHandler.Debug("Registering entity: " + type.AsString() + ", " + category.ToString() + ", "
-                             + depth + ", "+ prereqList.Count + " prerequisites, " + value + ", " + maxUses + ", ...");
+            LogHandler.Debug($"Registering entity: {type.AsString()}, {category}, {depth}, {prereqList.Count}"
+                             + $" prerequisites, {value}, {maxUses}, ...");
 
             var entity = new LogicEntity(type, category, blueprint, recipe, null, prereqList, false, value)
                 {
@@ -400,8 +400,7 @@ namespace SubnauticaRandomiser
                 fragmentRate = StringToFloat(cellsFragmentRate, "fragmentRate");
 
             biome = new Biome(name, biomeType, creatureCount, mediumCount, smallCount, fragmentRate);
-            LogHandler.Debug("Registering biome: " + name + ", " + biomeType.ToString() + ", " + creatureCount
-                             + ", " + mediumCount + ", " + smallCount);
+            LogHandler.Debug($"Registering biome: {name}, {biomeType}, {creatureCount}, {mediumCount}, {smallCount}");
 
             return biome;
         }
@@ -527,8 +526,8 @@ namespace SubnauticaRandomiser
             if (!string.IsNullOrEmpty(cellsPropulsionCannon))
                 propulsionCannon = StringToBool(cellsPropulsionCannon, "NeedsPropulsionCannon");
 
-            LogHandler.Debug("Registering databox: " + type + ", " + coordinates.ToString() + ", "
-                             + wreck.ToString() + ", " + laserCutter + ", " + propulsionCannon);
+            LogHandler.Debug($"Registering databox: {type.AsString()}, {coordinates}, {wreck}, {laserCutter}, "
+                             + propulsionCannon);
             Databox databox = new Databox(type, coordinates, wreck, laserCutter, propulsionCannon);
 
             return databox;

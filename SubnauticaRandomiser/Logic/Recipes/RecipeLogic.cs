@@ -52,7 +52,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (!(_tree.IsPriorityEntity(entity)
                   || (entity.CheckBlueprintFulfilled(_logic, reachableDepth) && entity.CheckPrerequisitesFulfilled(_logic))))
             {
-                LogHandler.Debug("--- Recipe [" + entity.TechType.AsString() + "] did not fulfill requirements, skipping.");
+                LogHandler.Debug($"[R] --- Recipe [{entity}] did not fulfill requirements, skipping.");
                 return false;
             }
             
@@ -78,11 +78,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 unlockedProgressionItems.Add(entity.TechType, true);
                 _logic._spoilerLog.AddProgressionEntry(entity.TechType, 0);
 
-                LogHandler.Debug("[+] Added " + entity.TechType.AsString() + " to progression items.");
+                LogHandler.Debug($"[R][+] Added {entity} to progression items.");
             }
 
             entity.InLogic = true;
-            LogHandler.Debug("[+] Randomised recipe for [" + entity.TechType.AsString() + "].");
+            LogHandler.Debug($"[R][+] Randomised recipe for [{entity}].");
 
             return true;
         }
@@ -106,7 +106,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 if (!type.Equals(TechType.None))
                 {
                     entity = _materials.Find(type);
-                    LogHandler.Debug("Prioritising essential item " + entity + " for depth " + depth);
+                    LogHandler.Debug($"[R] Prioritising essential item {entity} for depth {depth}");
                 }
             }
 
@@ -120,7 +120,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 {
                     TechType nextType = _logic.GetRandom(new List<TechType>(types));
                     entity = _materials.Find(nextType);
-                    LogHandler.Debug("Prioritising elective item " + entity + " for depth " + depth);
+                    LogHandler.Debug($"[R] Prioritising elective item {entity} for depth {depth}");
                 }
             }
 

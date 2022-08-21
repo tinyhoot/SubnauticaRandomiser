@@ -59,7 +59,7 @@ namespace SubnauticaRandomiser.Logic
             EBiomeType biome = GetBiome();
             if (!_alternateStarts.ContainsKey(biome))
             {
-                LogHandler.Error("No information found on chosen starting biome " + biome);
+                LogHandler.Error("[AS] No information found on chosen starting biome " + biome);
                 return new RandomiserVector(0, 0, 0);
             }
 
@@ -70,7 +70,7 @@ namespace SubnauticaRandomiser.Logic
             int x = _random.Next((int)box[0], (int)box[2] + 1);
             int z = _random.Next((int)box[3], (int)box[1] + 1);
 
-            LogHandler.Debug("Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
+            LogHandler.Debug("[AS] Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
             return new RandomiserVector(x, 0, z);
         }
     }
