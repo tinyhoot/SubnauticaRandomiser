@@ -89,46 +89,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
         }
 
         /// <summary>
-        /// Get an essential or elective entity for the currently reachable depth, prioritising essential ones.
-        /// </summary>
-        /// <param name="depth">The maximum depth to consider.</param>
-        /// <returns>A LogicEntity, or null if all have been processed already.</returns>
-        [CanBeNull]
-        internal LogicEntity GetPriorityEntity(int depth)
-        {
-            List<TechType> essentialItems = _tree.GetEssentialItems(depth);
-            List<TechType[]> electiveItems = _tree.GetElectiveItems(depth);
-            LogicEntity entity = null;
-
-            // Always get one of the essential items first, if available.
-            if (essentialItems.Count > 0)
-            {
-                TechType type = essentialItems.Find(x => !_masterDict.RecipeDict.ContainsKey(x));
-                if (!type.Equals(TechType.None))
-                {
-                    entity = _materials.Find(type);
-                    LogHandler.Debug($"[R] Prioritising essential item {entity} for depth {depth}");
-                }
-            }
-
-            // Similarly, if all essential items are done, grab one from among the elective items and leave the rest
-            // up to chance.
-            if (entity is null && electiveItems.Count > 0)
-            {
-                TechType[] types = electiveItems.Find(arr => arr.All(x => !_masterDict.RecipeDict.ContainsKey(x)));
-                
-                if (types?.Length > 0)
-                {
-                    TechType nextType = _logic.GetRandom(new List<TechType>(types));
-                    entity = _materials.Find(nextType);
-                    LogHandler.Debug($"[R] Prioritising elective item {entity} for depth {depth}");
-                }
-            }
-
-            return entity;
-        }
-        
-        /// <summary>
         /// Add all reachable materials to the list, taking into account depth and any config options.
         /// </summary>
         /// <param name="depth">The maximum depth to consider.</param>

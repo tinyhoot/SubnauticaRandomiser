@@ -114,7 +114,30 @@ namespace SubnauticaRandomiser.Logic
             DepthProgressionItems.Add(TechType.CyclopsHullModule1, true);
             DepthProgressionItems.Add(TechType.CyclopsHullModule2, true);
             DepthProgressionItems.Add(TechType.CyclopsHullModule3, true);
+        }
 
+        /// <summary>
+        /// Set up everything needed for randomising fragments.
+        /// </summary>
+        public void SetupFragments()
+        {
+            if (_depthDifficulties.Count == 0)
+                SetupVanillaTree();
+            
+            // Ensure certain fragments are available by the given depth.
+            AddEssentialItem(EProgressionNode.Depth0m, TechType.SeaglideFragment);
+            
+            AddEssentialItem(EProgressionNode.Depth100m, TechType.LaserCutterFragment);
+        }
+
+        /// <summary>
+        /// Set up everything needed for randomising recipes.
+        /// </summary>
+        public void SetupRecipes()
+        {
+            if (_depthDifficulties.Count == 0)
+                SetupVanillaTree();
+            
             // Assemble a dictionary of what's considered basic outpost pieces
             // which together should not exceed the cost of config.iMaxBasicOutpostSize
             BasicOutpostPieces.Add(TechType.BaseCorridorI, 1);
