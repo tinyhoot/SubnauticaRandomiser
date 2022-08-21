@@ -18,9 +18,9 @@ namespace SubnauticaRandomiser
         [Choice("Mode", "Balanced", "Chaotic")]
         public int iRandomiserMode = (int)ConfigDefaults.GetDefault("iRandomiserMode");
 
-        [Choice("Spawnpoint", "Vanilla", "Random", "BloodKelp", "BulbZone", "CragField", "CrashZone", 
-            "Dunes", "Floating Island", "GrandReef", "GrassyPlateaus", "Kelp", "Mountains", "MushroomForest", 
-            "SeaTreaderPath", "SparseReef", "UnderwaterIslands", "Void")]
+        [Choice("Spawnpoint", "Vanilla", "Random", "Chaotic Random", "BloodKelp", "BulbZone", "CragField",
+            "CrashZone", "Dunes", "Floating Island", "GrandReef", "GrassyPlateaus", "Kelp", "Mountains",
+            "MushroomForest", "SeaTreaderPath", "SparseReef", "UnderwaterIslands", "Void")]
         public string sSpawnPoint = "Vanilla";
 
         [Toggle("Use fish in logic?")]

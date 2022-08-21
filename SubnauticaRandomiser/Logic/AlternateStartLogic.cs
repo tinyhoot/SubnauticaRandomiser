@@ -35,6 +35,10 @@ namespace SubnauticaRandomiser.Logic
             switch (_config.sSpawnPoint)
             {
                 case "Random":
+                    // Only use starts where you can actually reach the ground.
+                    return _logic.GetRandom(_alternateStarts.Keys.ToList()
+                        .FindAll(biome => !biome.Equals(EBiomeType.None) && biome.GetAccessibleDepth() <= 100));
+                case "Chaotic Random":
                     return _logic.GetRandom(_alternateStarts.Keys.ToList());
                 case "BulbZone":
                     return EBiomeType.KooshZone;
