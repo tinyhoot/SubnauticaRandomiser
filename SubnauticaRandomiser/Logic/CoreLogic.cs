@@ -271,12 +271,11 @@ namespace SubnauticaRandomiser.Logic
         /// <returns>The total depth coverable by extending vehicle depth with a solo journey.</returns>
         private int CalculateTotalDepth(Dictionary<TechType, bool> progressionItems, int vehicleDepth, int soloDepthRaw)
         {
-            const int maxSoloDepth = 300;  // Never make the player go deeper than this on foot.
             // If there is a rebreather, all the funky calculations are redundant.
             if (progressionItems.ContainsKey(TechType.Rebreather))
-                return vehicleDepth + Math.Min(soloDepthRaw, maxSoloDepth);
+                return vehicleDepth + Math.Min(soloDepthRaw, _config.iMaxDepthWithoutVehicle);
 
-            return vehicleDepth + Math.Min(CalculateSoloDepth(vehicleDepth, soloDepthRaw), maxSoloDepth);
+            return vehicleDepth + Math.Min(CalculateSoloDepth(vehicleDepth, soloDepthRaw), _config.iMaxDepthWithoutVehicle);
         }
 
         /// <summary>

@@ -107,6 +107,7 @@ namespace SubnauticaRandomiser
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
         public int iDepthSearchTime = (int)ConfigDefaults.GetDefault("iDepthSearchTime");
         public int iMaxBasicOutpostSize = (int)ConfigDefaults.GetDefault("iMaxBasicOutpostSize");
+        public int iMaxDepthWithoutVehicle = (int)ConfigDefaults.GetDefault("iMaxDepthWithoutVehicle");
         public int iMaxDuplicateScanYield = (int)ConfigDefaults.GetDefault("iMaxDuplicateScanYield");
         public int iMaxEggsAsSingleIngredient = (int)ConfigDefaults.GetDefault("iMaxEggsAsSingleIngredient");
         public int iMaxInventorySizePerRecipe = (int)ConfigDefaults.GetDefault("iMaxInventorySizePerRecipe");
