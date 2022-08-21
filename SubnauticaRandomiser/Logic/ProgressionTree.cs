@@ -2,6 +2,7 @@
 using System.Linq;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.Logic
 {

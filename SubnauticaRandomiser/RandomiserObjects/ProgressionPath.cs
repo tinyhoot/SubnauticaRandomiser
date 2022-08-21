@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {

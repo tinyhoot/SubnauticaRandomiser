@@ -58,14 +58,15 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Compile Include="CSVReader.cs" />
     <Compile Include="LogHandler.cs" />
     <Compile Include="RandomiserObjects\Blueprint.cs" />
-    <Compile Include="RandomiserObjects\ParsingException.cs" />
-    <Compile Include="RandomiserObjects\RandomisationException.cs" />
+    <Compile Include="RandomiserObjects\Enums\EBiomeType.cs" />
+    <Compile Include="RandomiserObjects\Enums\EProgressionNode.cs" />
+    <Compile Include="RandomiserObjects\Enums\ETechTypeCategory.cs" />
+    <Compile Include="RandomiserObjects\Enums\EWreckage.cs" />
+    <Compile Include="RandomiserObjects\Exceptions\ParsingException.cs" />
+    <Compile Include="RandomiserObjects\Exceptions\RandomisationException.cs" />
     <Compile Include="RandomiserObjects\RandomiserIngredient.cs" />
-    <Compile Include="RandomiserObjects\EProgressionNode.cs" />
-    <Compile Include="RandomiserObjects\ETechTypeCategory.cs" />
     <Compile Include="RandomiserObjects\Recipe.cs" />
     <Compile Include="RandomiserObjects\Databox.cs" />
-    <Compile Include="RandomiserObjects\EWreckage.cs" />
     <Compile Include="RandomiserObjects\RandomiserVector.cs" />
     <Compile Include="RandomiserObjects\ProgressionPath.cs" />
     <Compile Include="RandomiserObjects\SpoilerLog.cs" />
@@ -77,7 +78,6 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Compile Include="EntitySerializer.cs" />
     <Compile Include="RandomiserObjects\Biome.cs" />
     <Compile Include="RandomiserObjects\BiomeCollection.cs" />
-    <Compile Include="RandomiserObjects\EBiomeType.cs" />
     <Compile Include="RandomiserObjects\RandomiserBiomeData.cs" />
   </ItemGroup>
   <ItemGroup>

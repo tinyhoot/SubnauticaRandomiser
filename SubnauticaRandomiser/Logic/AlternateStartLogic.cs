@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 using Random = System.Random;
 
 namespace SubnauticaRandomiser.Logic

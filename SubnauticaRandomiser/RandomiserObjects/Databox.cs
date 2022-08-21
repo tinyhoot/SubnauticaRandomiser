@@ -1,4 +1,5 @@
 ﻿using System;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 using UnityEngine;
 
 namespace SubnauticaRandomiser.RandomiserObjects

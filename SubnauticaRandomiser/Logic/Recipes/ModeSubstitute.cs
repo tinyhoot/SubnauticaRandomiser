@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {

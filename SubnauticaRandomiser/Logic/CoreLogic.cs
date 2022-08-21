@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.Logic
 {

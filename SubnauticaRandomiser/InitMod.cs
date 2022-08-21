@@ -9,6 +9,8 @@ using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.RandomiserObjects.Exceptions;
 
 namespace SubnauticaRandomiser
 {

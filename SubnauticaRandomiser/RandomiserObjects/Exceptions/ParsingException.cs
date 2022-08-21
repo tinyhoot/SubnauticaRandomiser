@@ -1,6 +1,6 @@
 using System;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.RandomiserObjects.Exceptions
 {
     /// <summary>
     /// The exception that is thrown when an input file cannot be parsed properly into the expected objects.
