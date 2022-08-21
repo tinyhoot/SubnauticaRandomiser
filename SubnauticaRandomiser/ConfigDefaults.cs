@@ -39,8 +39,8 @@ namespace SubnauticaRandomiser
             { "iMaxEggsAsSingleIngredient", new[] { 1, 1, 10 } },
             { "iMaxInventorySizePerRecipe", new[] { 24, 4, 100 } },
             { "iMinFragmentsToUnlock", new[] { 2, 1, 30 } },
-            { "dFuzziness", new[] { 0.2, 0.0, 1.0 } },
-            { "dIngredientRatio", new[] { 0.45, 0.0, 1.0 } },
+            { "dPrimaryIngredientValue", new[] { 0.45, 0.0, 1.0 } },
+            { "dRecipeValueVariance", new[] { 0.2, 0.0, 1.0 } },
             { "fFragmentSpawnChanceMin", new[] { 0.3f, 0.01f, 10.0f } },
             { "fFragmentSpawnChanceMax", new[] { 0.6f, 0.01f, 10.0f } },
         };
@@ -62,11 +62,21 @@ namespace SubnauticaRandomiser
 
         internal static object GetMax(string key)
         {
+            if (!s_defaults.ContainsKey(key))
+            {
+                LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                return null;
+            }
             return s_defaults[key][2];
         }
 
         internal static object GetMin(string key)
         {
+            if (!s_defaults.ContainsKey(key))
+            {
+                LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                return null;
+            }
             return s_defaults[key][1];
         }
     }

@@ -98,7 +98,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                     LogHandler.Debug("!   Recipe has reached maximum allowed number of ingredients, stopping.");
                     break;
                 }
-            } while ((targetValue - currentValue) > (targetValue * _config.dFuzziness / 2));
+            } while ((targetValue - currentValue) > (targetValue * _config.dRecipeValueVariance / 2));
 
             // Update the total size of everything needed to build a basic outpost.
             if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType))
@@ -123,8 +123,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private LogicEntity ChoosePrimaryIngredient(LogicEntity entity, double targetValue)
         {
             List<LogicEntity> pIngredientCandidates = _reachableMaterials.FindAll(
-                                                                     x => (targetValue * (_config.dIngredientRatio + 0.1)) > x.Value
-                                                                       && (targetValue * (_config.dIngredientRatio - 0.1)) < x.Value
+                                                                     x => (targetValue * (_config.dPrimaryIngredientValue + 0.1)) > x.Value
+                                                                       && (targetValue * (_config.dPrimaryIngredientValue - 0.1)) < x.Value
                                                                        && !_blacklist.Contains(x.Category)
                                                                        );
 
@@ -154,7 +154,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>A positive integer.</returns>
         private int FindMaximum(LogicEntity ingredient, double targetValue, double currentValue)
         {
-            int max = (int)((targetValue + ((targetValue * _config.dFuzziness) / 2)) - currentValue) / ingredient.Value;
+            int max = (int)((targetValue + ((targetValue * _config.dRecipeValueVariance) / 2)) - currentValue) / ingredient.Value;
             max = max > 0 ? max : 1;
             max = max > _config.iMaxAmountPerIngredient ? _config.iMaxAmountPerIngredient : max;
 

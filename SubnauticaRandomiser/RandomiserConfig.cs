@@ -112,8 +112,8 @@ namespace SubnauticaRandomiser
         public int iMaxEggsAsSingleIngredient = (int)ConfigDefaults.GetDefault("iMaxEggsAsSingleIngredient");
         public int iMaxInventorySizePerRecipe = (int)ConfigDefaults.GetDefault("iMaxInventorySizePerRecipe");
         public int iMinFragmentsToUnlock = (int)ConfigDefaults.GetDefault("iMinFragmentsToUnlock");
-        public double dFuzziness = (double)ConfigDefaults.GetDefault("dFuzziness");
-        public double dIngredientRatio = (double)ConfigDefaults.GetDefault("dIngredientRatio");
+        public double dPrimaryIngredientValue = (double)ConfigDefaults.GetDefault("dPrimaryIngredientValue");
+        public double dRecipeValueVariance = (double)ConfigDefaults.GetDefault("dRecipeValueVariance");
         public float fFragmentSpawnChanceMin = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMin");
         public float fFragmentSpawnChanceMax = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMax");
 
