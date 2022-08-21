@@ -225,10 +225,6 @@ namespace SubnauticaRandomiser.Logic
                 return;
             
             int numFragments = _random.Next(_config.iMinFragmentsToUnlock, _config.iMaxFragmentsToUnlock + 1);
-            // Exosuit fragments are worth a lot more and the vanilla blueprint has the highest cost of all, at 20.
-            if (entity.TechType.Equals(TechType.ExosuitFragment))
-                numFragments *= 6;
-            
             LogHandler.Debug("  New number of fragments required: " + numFragments);
             _masterDict.AddFragmentUnlockNum(entity.TechType, numFragments);
         }
