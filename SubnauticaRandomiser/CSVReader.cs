@@ -328,12 +328,12 @@ namespace SubnauticaRandomiser
                 try
                 {
                     Biome biome = ParseBiomeFileLine(line);
-                    BiomeCollection collection = _csvBiomeList.Find(x => x.BiomeType.Equals(biome.BiomeType));
+                    BiomeCollection collection = _csvBiomeList.Find(x => x.BiomeType.Equals(biome.Region));
 
                     // Initiate a BiomeCollection if it does not already exist.
                     if (collection is null)
                     {
-                        collection = new BiomeCollection(biome.BiomeType);
+                        collection = new BiomeCollection(biome.Region);
                         _csvBiomeList.Add(collection);
                     }
 

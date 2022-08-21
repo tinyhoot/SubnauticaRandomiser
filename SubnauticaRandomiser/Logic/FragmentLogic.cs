@@ -85,21 +85,15 @@ namespace SubnauticaRandomiser.Logic
 
             for (int i = 0; i < biomeCount; i++)
             {
-                // Choose a suitable biome which is also accessible at this depth.
-                Biome biome = GetRandom(_availableBiomes.FindAll(x => x.AverageDepth <= depth));
+                // Choose a suitable biome which is also accessible at this depth, and has not been chosen before.
+                Biome biome = GetRandom(_availableBiomes.FindAll(bio =>
+                    bio.AverageDepth <= depth
+                    && !spawnList.Any(sd => sd.ContainsBiome(bio.Variant))));
                 // In case no good biome is available, ignore overpopulation restrictions and choose any.
                 if (biome is null)
                 {
-                    biome ??= GetRandom(_allBiomes.FindAll(x => x.AverageDepth <= depth));
+                    biome = GetRandom(_allBiomes.FindAll(x => x.AverageDepth <= depth));
                     LogHandler.Debug($"[F] ! Using fallback biome for {entity}: {biome.Name}");
-                }
-
-                // Ensure the biome can actually be used for creating valid BiomeData.
-                if (!Enum.TryParse(biome.Name, out BiomeType biomeType))
-                {
-                    LogHandler.Warn("[F] ! Failed to parse biome to enum: " + biome.Name);
-                    // i--;
-                    continue;
                 }
                 biome.Used++;
 
@@ -117,7 +111,7 @@ namespace SubnauticaRandomiser.Logic
                     SpawnData spawnData = new SpawnData(idList[j]);
                     RandomiserBiomeData data = new RandomiserBiomeData
                     {
-                        Biome = biomeType,
+                        Biome = biome.Variant,
                         Count = 1,
                         Probability = splitRates[j]
                     };
@@ -125,7 +119,7 @@ namespace SubnauticaRandomiser.Logic
                     spawnList.Add(spawnData);
                 }
 
-                LogHandler.Debug($"[F] + Adding fragment to biome: {biomeType.AsString()}, {spawnRate}");
+                LogHandler.Debug($"[F] + Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
             }
             
             ApplyRandomisedFragment(entity, spawnList);
@@ -214,7 +208,7 @@ namespace SubnauticaRandomiser.Logic
         {
             // Set a percentage between Min and Max% of the biome's combined original spawn rates.
             float percentage = _config.fFragmentSpawnChanceMin + (float)_random.NextDouble()
-                * (_config.fFragmentSpawnChanceMax - _config.fFragmentSpawnChanceMax);
+                * (_config.fFragmentSpawnChanceMax - _config.fFragmentSpawnChanceMin);
             return percentage * biome.FragmentRate ?? 0.0f;
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using static LootDistributionData;
 
@@ -34,6 +35,16 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 return;
             }
             BiomeDataList.Add(bd);
+        }
+
+        /// <summary>
+        /// Check whether any of the BiomeData associated with this SpawnData are of the given biome type.
+        /// </summary>
+        /// <param name="biome">The biome to check for.</param>
+        /// <returns>True if any BiomeData modifies the given biome, false if not.</returns>
+        public bool ContainsBiome(BiomeType biome)
+        {
+            return BiomeDataList.Any(b => b.Biome.Equals(biome));
         }
 
         /// <summary>
