@@ -16,9 +16,9 @@ namespace SubnauticaRandomiser.Logic
         private readonly CoreLogic _logic;
         
         private static Dictionary<TechType, List<string>> _classIdDatabase;
-        private RandomiserConfig _config { get { return _logic._config; } }
-        private EntitySerializer _masterDict { get { return _logic._masterDict; } }
-        private Random _random { get { return _logic._random; } }
+        private RandomiserConfig _config => _logic._config;
+        private EntitySerializer _masterDict => _logic._masterDict;
+        private Random _random => _logic._random;
         private readonly List<Biome> _allBiomes;
         private readonly List<Biome> _availableBiomes;
         private static readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
@@ -85,27 +85,14 @@ namespace SubnauticaRandomiser.Logic
 
             for (int i = 0; i < biomeCount; i++)
             {
-                // Choose a suitable biome which is also accessible at this depth, and has not been chosen before.
-                Biome biome = GetRandom(_availableBiomes.FindAll(bio =>
-                    bio.AverageDepth <= depth
-                    && !spawnList.Any(sd => sd.ContainsBiome(bio.Variant))));
-                // In case no good biome is available, ignore overpopulation restrictions and choose any.
-                if (biome is null)
-                {
-                    biome = GetRandom(_allBiomes.FindAll(x => x.AverageDepth <= depth));
-                    LogHandler.Debug($"[F] ! Using fallback biome for {entity}: {biome.Name}");
-                }
-                biome.Used++;
-
-                // Remove the biome from the pool if it gets too populated.
-                if (biome.Used >= 5)
-                    _availableBiomes.Remove(biome);
+                // Choose a random biome.
+                Biome biome = ChooseBiome(spawnList, depth);
                 
                 // Calculate spawn rate.
                 float spawnRate = CalcFragmentSpawnRate(biome);
                 float[] splitRates = SplitFragmentSpawnRate(spawnRate, idList.Count);
 
-                // Split the spawn rate among each variation of the fragment.
+                // Split the spawn rate among each variation (prefab) of the fragment.
                 for (int j = 0; j < idList.Count; j++)
                 {
                     SpawnData spawnData = new SpawnData(idList[j]);
@@ -224,6 +211,36 @@ namespace SubnauticaRandomiser.Logic
             int numFragments = _random.Next(_config.iMinFragmentsToUnlock, _config.iMaxFragmentsToUnlock + 1);
             LogHandler.Debug($"[F] New number of fragments required for {entity}: {numFragments}");
             _masterDict.AddFragmentUnlockNum(entity.TechType, numFragments);
+        }
+
+        /// <summary>
+        /// Choose a suitable biome which is also accessible at this depth, and has not been chosen before.
+        /// </summary>
+        /// <param name="previousChoices">The list of SpawnData resulting from previously chosen biomes.</param>
+        /// <param name="depth">The maximum depth to consider.</param>
+        /// <returns>The chosen biome.</returns>
+        private Biome ChooseBiome(List<SpawnData> previousChoices, int depth)
+        {
+            List<Biome> choices = _availableBiomes.FindAll(bio =>
+                bio.AverageDepth <= depth && !previousChoices.Any(sd => sd.ContainsBiome(bio.Variant)));
+            
+            // In case no good biome is available, ignore overpopulation restrictions and choose any.
+            if (choices.Count == 0)
+            {
+                LogHandler.Debug("[F] ! No valid biome choices, using fallback");
+                choices = _allBiomes.FindAll(x => x.AverageDepth <= depth);
+                if (choices.Count == 0)
+                    throw new RandomisationException("No valid biome options for depth " + depth);
+            }
+
+            Biome biome = GetRandom(choices);
+            biome.Used++;
+
+            // Remove the biome from the pool if it gets too populated.
+            if (biome.Used == 5)
+                _availableBiomes.Remove(biome);
+
+            return biome;
         }
 
         /// <summary>
@@ -461,41 +478,6 @@ namespace SubnauticaRandomiser.Logic
                     LogHandler.Debug(string.Format("{0}\tNONE\t\t", biome.AsString()));
                 }
             }
-        }
-        
-        // This is kinda redundant and a leftover from early testing.
-        internal void EditBiomeData(string classId, List<LootDistributionData.BiomeData> distribution)
-        {
-            LootDistributionHandler.EditLootDistributionData(classId, distribution);
-        }
-
-        internal void Test()
-        {
-            LogHandler.Debug("titanium " + GetClassId(TechType.Titanium));
-            LogHandler.Debug("peeper " + GetClassId(TechType.Peeper));
-            LogHandler.Debug("reaper " + GetClassId(TechType.ReaperLeviathan));
-            LogHandler.Debug("acid " + GetClassId(TechType.AcidMushroom));
-            LogHandler.Debug("seamothfragment " + GetClassId(TechType.SeamothFragment));
-            LogHandler.Debug("cyclopshullfragment " + GetClassId(TechType.CyclopsHullFragment));
-
-            PrepareClassIdDatabase();
-
-            BiomeData b = new BiomeData();
-            b.biome = BiomeType.SafeShallows_Grass;
-            b.count = 1;
-            b.probability = 0.8f;
-
-            BiomeData b2 = new BiomeData();
-            b2.biome = BiomeType.GrassyPlateaus_TechSite_Scattered;
-            b2.count = 1;
-            b2.probability = 0.9f;
-
-            List<BiomeData> list = new List<BiomeData>();
-            list.Add(b);
-            list.Add(b2);
-
-            EditBiomeData(_classIdDatabase[TechType.BaseNuclearReactorFragment][0], list);
-            //DumpBiomeDataEntities();
         }
     }
 }

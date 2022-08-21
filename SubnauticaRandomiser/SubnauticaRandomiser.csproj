@@ -59,6 +59,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Compile Include="LogHandler.cs" />
     <Compile Include="RandomiserObjects\Blueprint.cs" />
     <Compile Include="RandomiserObjects\ParsingException.cs" />
+    <Compile Include="RandomiserObjects\RandomisationException.cs" />
     <Compile Include="RandomiserObjects\RandomiserIngredient.cs" />
     <Compile Include="RandomiserObjects\EProgressionNode.cs" />
     <Compile Include="RandomiserObjects\ETechTypeCategory.cs" />
