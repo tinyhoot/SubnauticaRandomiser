@@ -63,7 +63,7 @@ namespace SubnauticaRandomiser.Logic
             _logic = coreLogic;
             
             _allBiomes = GetAvailableFragmentBiomes(biomeList);
-            _availableBiomes = GetAvailableFragmentBiomes(biomeList);
+            _availableBiomes = GetAvailableFragmentBiomes(biomeList).Where(x => !x.Name.ToLower().Contains("barrier")).ToList();
         }
         
         /// <summary>
@@ -185,6 +185,15 @@ namespace SubnauticaRandomiser.Logic
             }
             LogHandler.Debug("---Total biomes suitable for fragments: "+biomes.Count);
             return biomes;
+        }
+
+        /// <summary>
+        /// Add all biomes that are locked behind needing a laser cutter to the list of available biomes.
+        /// </summary>
+        internal void AddLaserCutterBiomes()
+        {
+            var additions = _allBiomes.Where(x => x.Name.ToLower().Contains("barrier"));
+            _availableBiomes.AddRange(additions);
         }
 
         /// <summary>

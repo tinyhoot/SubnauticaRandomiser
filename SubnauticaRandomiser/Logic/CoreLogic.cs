@@ -24,7 +24,7 @@ namespace SubnauticaRandomiser.Logic
 
         private readonly AlternateStartLogic _altStartLogic;
         private readonly DataboxLogic _databoxLogic;
-        private readonly FragmentLogic _fragmentLogic;
+        internal readonly FragmentLogic _fragmentLogic;
         private readonly RecipeLogic _recipeLogic;
 
         public CoreLogic(System.Random random, RandomiserConfig config, List<LogicEntity> allMaterials,
@@ -115,8 +115,8 @@ namespace SubnauticaRandomiser.Logic
             Setup(notRandomised);
 
             int circuitbreaker = 0;
-            int currentDepth = UpdateReachableDepth(0, unlockedProgressionItems, unlockedProgressionItems.Count - 1);
-            int numProgressionItems = unlockedProgressionItems.Count;
+            int currentDepth = 0;
+            int numProgressionItems = -1; // This forces a depth calculation on the first loop.
             while (notRandomised.Count > 0)
             {
                 circuitbreaker++;
@@ -301,6 +301,10 @@ namespace SubnauticaRandomiser.Logic
             _spoilerLog.UpdateLastProgressionEntry(newDepth);
             currentDepth = Math.Max(currentDepth, newDepth);
             _recipeLogic?.UpdateReachableMaterials(currentDepth);
+            
+            // If recipes are not enabled, ensure barrier biomes are added after a certain time.
+            if (_recipeLogic is null && currentDepth < 100 && newDepth >= 100)
+                _fragmentLogic?.AddLaserCutterBiomes();
 
             return currentDepth;
         }

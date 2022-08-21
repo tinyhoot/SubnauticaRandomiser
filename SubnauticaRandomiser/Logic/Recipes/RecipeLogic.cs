@@ -72,6 +72,10 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // Similarly, Alien Containment is a special case for eggs.
             if (entity.TechType.Equals(TechType.BaseWaterPark) && _config.bUseEggs)
                 unlockedProgressionItems.Add(TechType.BaseWaterPark, true);
+            
+            // If fragment randomisation is enabled, laser cutters open up new options there.
+            if (entity.TechType.Equals(TechType.LaserCutter))
+                _logic._fragmentLogic?.AddLaserCutterBiomes();
 
             // If it is a central depth progression item, consider it unlocked.
             if (_tree.DepthProgressionItems.ContainsKey(entity.TechType) && !unlockedProgressionItems.ContainsKey(entity.TechType))
