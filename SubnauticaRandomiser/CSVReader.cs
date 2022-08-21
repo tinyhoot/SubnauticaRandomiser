@@ -599,7 +599,7 @@ namespace SubnauticaRandomiser
         {
             foreach (string type in Enum.GetNames(typeof(EBiomeType)))
             {
-                if (str.Contains(type))
+                if (str.ToLower().Contains(type.ToLower()))
                 {
                     try
                     {
