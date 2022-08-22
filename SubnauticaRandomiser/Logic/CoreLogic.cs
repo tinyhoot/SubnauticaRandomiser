@@ -137,7 +137,7 @@ namespace SubnauticaRandomiser.Logic
                 if (nextEntity.IsFragment)
                 {
                     if (_config.bRandomiseFragments && _fragmentLogic != null)
-                        _fragmentLogic.RandomiseFragment(nextEntity, currentDepth);
+                        _fragmentLogic.RandomiseFragment(nextEntity, unlockedProgressionItems, currentDepth);
 
                     notRandomised.Remove(nextEntity);
                     nextEntity.InLogic = true;

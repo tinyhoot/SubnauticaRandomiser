@@ -73,7 +73,7 @@ namespace SubnauticaRandomiser.Logic
         /// <param name="depth">The maximum depth to consider.</param>
         /// <returns>The SpawnData that was newly added to the EntitySerializer.</returns>
         /// <exception cref="ArgumentException">Raised if the fragment name is invalid.</exception>
-        internal List<SpawnData> RandomiseFragment(LogicEntity entity, int depth)
+        internal List<SpawnData> RandomiseFragment(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems, int depth)
         {
             if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList))
                 throw new ArgumentException($"Failed to find fragment '{entity}' in classId database!");
@@ -110,6 +110,10 @@ namespace SubnauticaRandomiser.Logic
                 LogHandler.Debug($"[F] + Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
             }
             
+            // If recipes are not randomised, handle unlocking depth progression items.
+            if (!_config.bRandomiseRecipes)
+                UpdateProgressionItems(entity, unlockedProgressionItems);
+
             ApplyRandomisedFragment(entity, spawnList);
             return spawnList;
         }
@@ -354,6 +358,58 @@ namespace SubnauticaRandomiser.Logic
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// When randomising a fragment while recipe randomisation is disabled, ensure that the item previously locked
+        /// by the fragment is added to the collection of progression items, if necessary.
+        /// </summary>
+        /// <param name="entity">The fragment being randomised.</param>
+        /// <param name="unlockedProgressionItems">The progression items.</param>
+        /// <returns>True if a new entry was added to the progression items, false if not.</returns>
+        private bool UpdateProgressionItems(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems)
+        {
+            // Find the recipe that needs the given fragment as a prerequisite, i.e. the recipe that is unlocked
+            // by the fragment.
+            LogicEntity recipe = _logic._materials.GetAll()
+                .Find(e => e.Blueprint?.Fragments?.Contains(entity.TechType) ?? false);
+            if (recipe is null || unlockedProgressionItems.ContainsKey(recipe.TechType))
+                return false;
+
+            // If the recipe is a vehicle, also immediately add its upgrades.
+            if (recipe.TechType.Equals(TechType.Seamoth))
+            {
+                unlockedProgressionItems.Add(TechType.VehicleHullModule1, true);
+                unlockedProgressionItems.Add(TechType.VehicleHullModule2, true);
+                unlockedProgressionItems.Add(TechType.VehicleHullModule3, true);
+            }
+
+            if (recipe.TechType.Equals(TechType.Exosuit))
+            {
+                unlockedProgressionItems.Add(TechType.ExoHullModule1, true);
+                unlockedProgressionItems.Add(TechType.ExoHullModule2, true);
+            }
+            
+            // The cyclops is a special case, since it needs three different fragments to unlock. Associate each
+            // fragment with one upgrade, and only add the cyclops once all three upgrades are unlocked.
+            if (recipe.TechType.Equals(TechType.Cyclops))
+            {
+                if (entity.TechType.Equals(TechType.CyclopsBridgeFragment))
+                    unlockedProgressionItems.Add(TechType.CyclopsHullModule1, true);
+                if (entity.TechType.Equals(TechType.CyclopsEngineFragment))
+                    unlockedProgressionItems.Add(TechType.CyclopsHullModule2, true);
+                if (entity.TechType.Equals(TechType.CyclopsHullFragment))
+                    unlockedProgressionItems.Add(TechType.CyclopsHullModule3, true);
+                
+                if (!unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule1)
+                    || !unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule2)
+                    || !unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule3))
+                    return false;
+            }
+            
+            unlockedProgressionItems.Add(recipe.TechType, true);
+            LogHandler.Debug($"[F][+] Added {recipe} to progression items.");
+            return true;
         }
         
         /// <summary>
