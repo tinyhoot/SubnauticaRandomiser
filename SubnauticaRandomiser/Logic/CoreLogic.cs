@@ -301,10 +301,6 @@ namespace SubnauticaRandomiser.Logic
             _spoilerLog.UpdateLastProgressionEntry(newDepth);
             currentDepth = Math.Max(currentDepth, newDepth);
             _recipeLogic?.UpdateReachableMaterials(currentDepth);
-            
-            // If recipes are not enabled, ensure barrier biomes are added after a certain time.
-            if (_recipeLogic is null && currentDepth < 100 && newDepth >= 100)
-                _fragmentLogic?.AddLaserCutterBiomes();
 
             return currentDepth;
         }

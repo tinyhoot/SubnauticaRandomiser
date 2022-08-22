@@ -373,40 +373,45 @@ namespace SubnauticaRandomiser.Logic
             // by the fragment.
             LogicEntity recipe = _logic._materials.GetAll()
                 .Find(e => e.Blueprint?.Fragments?.Contains(entity.TechType) ?? false);
-            if (recipe is null || unlockedProgressionItems.ContainsKey(recipe.TechType))
+            if (recipe is null || !_logic._tree.IsProgressionItem(recipe)
+                               || unlockedProgressionItems.ContainsKey(recipe.TechType))
                 return false;
 
-            // If the recipe is a vehicle, also immediately add its upgrades.
-            if (recipe.TechType.Equals(TechType.Seamoth))
+            switch (recipe.TechType)
             {
-                unlockedProgressionItems.Add(TechType.VehicleHullModule1, true);
-                unlockedProgressionItems.Add(TechType.VehicleHullModule2, true);
-                unlockedProgressionItems.Add(TechType.VehicleHullModule3, true);
+                // On a laser cutter, add all the biomes behind barriers.
+                case TechType.LaserCutter:
+                    AddLaserCutterBiomes();
+                    break;
+                // If the recipe is a vehicle, also immediately add its upgrades.
+                case TechType.Seamoth:
+                    unlockedProgressionItems.Add(TechType.VehicleHullModule1, true);
+                    unlockedProgressionItems.Add(TechType.VehicleHullModule2, true);
+                    unlockedProgressionItems.Add(TechType.VehicleHullModule3, true);
+                    break;
+                case TechType.Exosuit:
+                    unlockedProgressionItems.Add(TechType.ExoHullModule1, true);
+                    unlockedProgressionItems.Add(TechType.ExoHullModule2, true);
+                    break;
+                // The cyclops is a special case, since it needs three different fragments to unlock. Associate each
+                // fragment with one upgrade, and only add the cyclops once all three upgrades are unlocked.
+                case TechType.Cyclops:
+                {
+                    if (entity.TechType.Equals(TechType.CyclopsBridgeFragment))
+                        unlockedProgressionItems.Add(TechType.CyclopsHullModule1, true);
+                    if (entity.TechType.Equals(TechType.CyclopsEngineFragment))
+                        unlockedProgressionItems.Add(TechType.CyclopsHullModule2, true);
+                    if (entity.TechType.Equals(TechType.CyclopsHullFragment))
+                        unlockedProgressionItems.Add(TechType.CyclopsHullModule3, true);
+                
+                    if (!unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule1)
+                        || !unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule2)
+                        || !unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule3))
+                        return false;
+                    break;
+                }
             }
 
-            if (recipe.TechType.Equals(TechType.Exosuit))
-            {
-                unlockedProgressionItems.Add(TechType.ExoHullModule1, true);
-                unlockedProgressionItems.Add(TechType.ExoHullModule2, true);
-            }
-            
-            // The cyclops is a special case, since it needs three different fragments to unlock. Associate each
-            // fragment with one upgrade, and only add the cyclops once all three upgrades are unlocked.
-            if (recipe.TechType.Equals(TechType.Cyclops))
-            {
-                if (entity.TechType.Equals(TechType.CyclopsBridgeFragment))
-                    unlockedProgressionItems.Add(TechType.CyclopsHullModule1, true);
-                if (entity.TechType.Equals(TechType.CyclopsEngineFragment))
-                    unlockedProgressionItems.Add(TechType.CyclopsHullModule2, true);
-                if (entity.TechType.Equals(TechType.CyclopsHullFragment))
-                    unlockedProgressionItems.Add(TechType.CyclopsHullModule3, true);
-                
-                if (!unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule1)
-                    || !unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule2)
-                    || !unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule3))
-                    return false;
-            }
-            
             unlockedProgressionItems.Add(recipe.TechType, true);
             LogHandler.Debug($"[F][+] Added {recipe} to progression items.");
             return true;
