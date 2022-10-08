@@ -134,29 +134,20 @@ namespace SubnauticaRandomiser.Logic
                 LogicEntity nextEntity = ChooseNextEntity(notRandomised, currentDepth);
 
                 // Choose a logic appropriate to the entity.
+                bool? success = null;
                 if (nextEntity.IsFragment)
+                    success = _fragmentLogic.RandomiseFragment(nextEntity, unlockedProgressionItems, currentDepth);
+                else if (nextEntity.HasRecipe)
+                    success = _recipeLogic.RandomiseRecipe(nextEntity, unlockedProgressionItems, currentDepth);
+                
+                if (success == true)
                 {
-                    if (_config.bRandomiseFragments && _fragmentLogic != null)
-                        _fragmentLogic.RandomiseFragment(nextEntity, unlockedProgressionItems, currentDepth);
-
                     notRandomised.Remove(nextEntity);
                     nextEntity.InLogic = true;
-                    continue;
                 }
 
-                if (nextEntity.HasRecipe)
-                {
-                    bool success = _recipeLogic.RandomiseRecipe(nextEntity, unlockedProgressionItems, currentDepth);
-                    if (success)
-                    {
-                        notRandomised.Remove(nextEntity);
-                        nextEntity.InLogic = true;
-                    }
-
-                    continue;
-                }
-                
-                LogHandler.Warn("Unsupported entity in loop: " + nextEntity);
+                if (success is null)
+                    LogHandler.Warn("Unsupported entity in loop: " + nextEntity);
             }
 
             LogHandler.Info($"Finished randomising within {circuitbreaker} cycles!");

@@ -70,15 +70,23 @@ namespace SubnauticaRandomiser.Logic
         /// Randomise the spawn points for a given fragment.
         /// </summary>
         /// <param name="entity">The fragment entity to randomise.</param>
-        /// <param name="depth">The maximum depth to consider.</param>
-        /// <returns>The SpawnData that was newly added to the EntitySerializer.</returns>
+        /// <param name="unlockedProgressionItems">The dictionary of already unlocked progression items.</param>
+        /// <param name="reachableDepth">The maximum depth to consider.</param>
+        /// <returns>True if the fragment was successfully randomised, false otherwise.</returns>
         /// <exception cref="ArgumentException">Raised if the fragment name is invalid.</exception>
-        internal List<SpawnData> RandomiseFragment(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems, int depth)
+        internal bool RandomiseFragment(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems, int reachableDepth)
         {
             if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList))
                 throw new ArgumentException($"Failed to find fragment '{entity}' in classId database!");
             
-            LogHandler.Debug($"[F] Randomising fragment {entity} for depth {depth}");
+            // Check whether the fragment fulfills its prerequisites.
+            if (entity.AccessibleDepth >= reachableDepth)
+            {
+                LogHandler.Debug($"[F] --- Fragment [{entity}] did not fulfill requirements, skipping.");
+                return false;
+            }
+            
+            LogHandler.Debug($"[F] Randomising fragment {entity} for depth {reachableDepth}");
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
@@ -87,7 +95,7 @@ namespace SubnauticaRandomiser.Logic
             for (int i = 0; i < biomeCount; i++)
             {
                 // Choose a random biome.
-                Biome biome = ChooseBiome(spawnList, depth);
+                Biome biome = ChooseBiome(spawnList, reachableDepth);
                 
                 // Calculate spawn rate.
                 float spawnRate = CalcFragmentSpawnRate(biome);
@@ -115,7 +123,7 @@ namespace SubnauticaRandomiser.Logic
                 UpdateProgressionItems(entity, unlockedProgressionItems);
 
             ApplyRandomisedFragment(entity, spawnList);
-            return spawnList;
+            return true;
         }
 
         /// <summary>
