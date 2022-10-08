@@ -37,6 +37,7 @@ namespace SubnauticaRandomiser
             { "iMaxDepthWithoutVehicle", new[] { 300, 100, 500 } },
             { "iMaxDuplicateScanYield", new[] { 2, 1, 10 } },
             { "iMaxEggsAsSingleIngredient", new[] { 1, 1, 10 } },
+            { "iMaxFragmentsPerBiome", new[] { 4, 1, 10 } },
             { "iMaxInventorySizePerRecipe", new[] { 24, 4, 100 } },
             { "iMinFragmentsToUnlock", new[] { 2, 1, 30 } },
             { "dPrimaryIngredientValue", new[] { 0.45, 0.0, 1.0 } },

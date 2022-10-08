@@ -256,7 +256,7 @@ namespace SubnauticaRandomiser.Logic
             biome.Used++;
 
             // Remove the biome from the pool if it gets too populated.
-            if (biome.Used == 5)
+            if (biome.Used == _config.iMaxFragmentsPerBiome)
                 _availableBiomes.Remove(biome);
 
             return biome;
