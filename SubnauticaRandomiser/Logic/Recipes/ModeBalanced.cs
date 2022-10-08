@@ -99,7 +99,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
                     LogHandler.Debug("[R] ! Basic outpost size is getting too large, stopping.");
                     break;
                 }
-                
             } while ((targetValue - currentValue) > (targetValue * _config.dRecipeValueVariance / 2));
 
             // Update the total size of everything needed to build a basic outpost.
