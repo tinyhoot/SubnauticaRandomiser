@@ -58,7 +58,7 @@ CrashZone_EscapePod,2,0,0,
 CrashZone_OpenDeep_CreatureOnly,0,0,762,
 CrashZone_OpenShallow_CreatureOnly,0,0,1255,
 CrashZone_Rock,804,804,682,
-CrashZone_Sand,927,927,797,0.05
+CrashZone_Sand,927,927,797,0.08
 CrashZone_TrenchSand,179,179,185,0.2
 DeepGrandReef_AbandonedBase_Exterior,28,0,0,0.1
 DeepGrandReef_AbandonedBase_Interior,44,13,0,
@@ -85,7 +85,7 @@ Dunes_ThermalVent_Grass,9,9,9,
 Dunes_ThermalVent_Rock,23,23,25,
 Dunes_ThermalVent_Sand,30,30,33,
 FloatingIslands_AbandonedBase_Inside,27,0,0,
-FloatingIslands_AbandonedBase_Outside,60,8,0,
+FloatingIslands_AbandonedBase_Outside,60,8,0,0.12
 FloatingIslands_Birds,0,0,37,
 GhostTree_Ceiling,51,51,25,
 GhostTree_Ground,37,37,0,
@@ -115,11 +115,11 @@ GrassyPlateaus_CaveEntrance,1,1,2,
 GrassyPlateaus_CaveFloor,1,1,3,
 GrassyPlateaus_CaveWall,36,36,25,
 GrassyPlateaus_EscapePod,11,7,0,
-GrassyPlateaus_Grass,126,126,115,0.03
+GrassyPlateaus_Grass,126,126,115,0.05
 GrassyPlateaus_OpenDeep_CreatureOnly,0,0,753,
 GrassyPlateaus_OpenShallow_CreatureOnly,0,0,960,
 GrassyPlateaus_PlateauTop_Obsolete,7,7,26,
-GrassyPlateaus_Sand,375,375,180,0.045
+GrassyPlateaus_Sand,375,375,180,0.08
 GrassyPlateaus_TechSite,110,31,0,0.17
 GrassyPlateaus_TechSite_Barrier,78,19,0,0.5700001
 GrassyPlateaus_TechSite_Scattered,345,235,0,0.16
@@ -163,8 +163,8 @@ Kelp_CaveSpecial,1,1,0,
 Kelp_CaveWall,40,40,23,
 Kelp_DenseVine,0,0,133,
 Kelp_EscapePod,13,10,0,
-Kelp_GrassDense,34,34,33,
-Kelp_GrassSparse,44,44,77,
+Kelp_GrassDense,34,34,33,0.15
+Kelp_GrassSparse,44,44,77,0.1
 Kelp_Outcropping_Obsolete,0,0,9,
 Kelp_Sand,143,143,139,
 Kelp_SandRocky_Obsolete,0,0,3,
@@ -210,7 +210,7 @@ Mountains_Birds,0,0,34,
 Mountains_CaveCeiling,9,9,3,
 Mountains_CaveFloor,27,27,19,
 Mountains_CaveWall,42,42,20,
-Mountains_Grass,96,96,79,0.07
+Mountains_Grass,96,96,79,0.1
 Mountains_IslandCaveCeiling,8,8,1,
 Mountains_IslandCaveFloor,24,24,6,
 Mountains_IslandCaveWall,54,54,17,
@@ -220,7 +220,7 @@ Mountains_IslandSand,17,17,0,
 Mountains_OpenDeep_CreatureOnly,0,0,3078,
 Mountains_OpenShallow_CreatureOnly,0,0,5183,
 Mountains_Rock,886,886,701,
-Mountains_Sand,480,480,392,0.03
+Mountains_Sand,480,480,392,0.05
 Mountains_TechSite,35,14,0,0.24
 Mountains_TechSite_Barrier,31,18,0,0.43
 Mountains_TechSite_Scatter,79,79,0,0.27
@@ -261,7 +261,7 @@ SafeShallows_PlateauTop_Obsolete,0,0,2,
 SafeShallows_SandFlat,75,75,56,
 SafeShallows_ShellTunnel,5,5,31,
 SafeShallows_ShellTunnelHuge,2,2,2,
-SafeShallows_TechSite,12,2,0,0.12
+SafeShallows_TechSite,12,2,0,0.16
 SafeShallows_TechSite_Barrier,9,0,0,0.2
 SafeShallows_TechSite_Hidden_Obsolete,2,0,0,
 SafeShallows_TechSite_Scattered,101,59,0,0.08
@@ -277,7 +277,7 @@ SeaTreaderPath_OpenDeep_CreatureOnly,0,0,1038,
 SeaTreaderPath_OpenShallow_CreatureOnly,0,0,2194,
 SeaTreaderPath_Path,47,47,43,
 SeaTreaderPath_Rock,180,180,215,
-SeaTreaderPath_Sand,139,139,131,0.09999999
+SeaTreaderPath_Sand,139,139,131,0.12
 SeaTreaderPath_TechSite,15,10,0,0.7
 SeaTreaderPath_TechSite_Barrier,8,3,0,1.5
 SeaTreaderPath_TechSite_Scatter,34,34,0,0.26
