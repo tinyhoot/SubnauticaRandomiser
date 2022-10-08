@@ -130,6 +130,8 @@ namespace SubnauticaRandomiser.Logic
             AddEssentialItem(EProgressionNode.Depth0m, TechType.SeaglideFragment);
             
             AddEssentialItem(EProgressionNode.Depth100m, TechType.LaserCutterFragment);
+            
+            AddEssentialItem(EProgressionNode.Depth200m, TechType.BaseBioReactorFragment);
         }
 
         /// <summary>
