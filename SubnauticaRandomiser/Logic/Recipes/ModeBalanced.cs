@@ -51,6 +51,20 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // Using a do-while since we want this to happen at least once.
             do
             {
+                // Respect the maximum number of ingredients set in the config.
+                if (_config.iMaxIngredientsPerRecipe <= _ingredients.Count)
+                {
+                    LogHandler.Debug("[R] ! Recipe has reached maximum allowed number of ingredients, stopping.");
+                    break;
+                }
+                
+                // If a recipe starts requiring too much space, shut it down early.
+                if (totalSize >= _config.iMaxInventorySizePerRecipe)
+                {
+                    LogHandler.Debug("[R] ! Recipe is getting too large, stopping.");
+                    break;
+                }
+
                 LogicEntity ingredient = GetRandom(_reachableMaterials, _blacklist);
 
                 // Prevent duplicates.
@@ -78,27 +92,14 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 totalSize += ingredient.GetItemSize() * number;
 
                 LogHandler.Debug($"[R] > Adding ingredient: {ingredient}, {number}");
-
-                // If a recipe starts getting out of hand, shut it down early.
-                if (totalSize >= _config.iMaxInventorySizePerRecipe)
-                {
-                    LogHandler.Debug("[R] ! Recipe is getting too large, stopping.");
-                    break;
-                }
                 
-                // Same thing for special case of outpost base parts.
+                // For special case of outpost base parts, be conservative with ingredients.
                 if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType) && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.6)
                 {
                     LogHandler.Debug("[R] ! Basic outpost size is getting too large, stopping.");
                     break;
                 }
                 
-                // Also, respect the maximum number of ingredients set in the config.
-                if (_config.iMaxIngredientsPerRecipe <= _ingredients.Count)
-                {
-                    LogHandler.Debug("[R] ! Recipe has reached maximum allowed number of ingredients, stopping.");
-                    break;
-                }
             } while ((targetValue - currentValue) > (targetValue * _config.dRecipeValueVariance / 2));
 
             // Update the total size of everything needed to build a basic outpost.
