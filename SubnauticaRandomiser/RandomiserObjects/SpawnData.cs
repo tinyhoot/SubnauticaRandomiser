@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using static LootDistributionData;
 
@@ -30,10 +31,20 @@ namespace SubnauticaRandomiser.RandomiserObjects
         {
             if (BiomeDataList.Find(x => x.Biome.Equals(bd.Biome)) != null)
             {
-                LogHandler.Warn("Tried to add duplicate biome " + bd.Biome.AsString() + " to SpawnData ID " + ClassId);
+                LogHandler.Warn($"[SD] Tried to add duplicate biome {bd.Biome.AsString()} to SpawnData ID {ClassId}");
                 return;
             }
             BiomeDataList.Add(bd);
+        }
+
+        /// <summary>
+        /// Check whether any of the BiomeData associated with this SpawnData are of the given biome type.
+        /// </summary>
+        /// <param name="biome">The biome to check for.</param>
+        /// <returns>True if any BiomeData modifies the given biome, false if not.</returns>
+        public bool ContainsBiome(BiomeType biome)
+        {
+            return BiomeDataList.Any(b => b.Biome.Equals(biome));
         }
 
         /// <summary>

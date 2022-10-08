@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -22,7 +24,7 @@ namespace SubnauticaRandomiser.Logic
 
         private readonly AlternateStartLogic _altStartLogic;
         private readonly DataboxLogic _databoxLogic;
-        private readonly FragmentLogic _fragmentLogic;
+        internal readonly FragmentLogic _fragmentLogic;
         private readonly RecipeLogic _recipeLogic;
 
         public CoreLogic(System.Random random, RandomiserConfig config, List<LogicEntity> allMaterials,
@@ -52,6 +54,8 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void Setup(List<LogicEntity> notRandomised)
         {
+            // Init the progression tree.
+            _tree.SetupVanillaTree();
             _altStartLogic?.Randomise();
 
             if (_databoxLogic != null)
@@ -65,6 +69,7 @@ namespace SubnauticaRandomiser.Logic
             {
                 if (_config.bRandomiseFragments)
                 {
+                    _tree.SetupFragments();
                     // Initialise the fragment cache and remove vanilla spawns.
                     FragmentLogic.Init();
                     // Queue up all fragments to be randomised.
@@ -86,8 +91,8 @@ namespace SubnauticaRandomiser.Logic
                 // Queue up all craftables to be randomised.
                 notRandomised.AddRange(_materials.GetAllCraftables());
                 
-                // Init the progression tree.
-                _tree.SetupVanillaTree();
+                // Update the progression tree with recipes.
+                _tree.SetupRecipes();
                 if (_config.bVanillaUpgradeChains)
                     _tree.ApplyUpgradeChainToPrerequisites(_materials.GetAll());
             }
@@ -111,7 +116,7 @@ namespace SubnauticaRandomiser.Logic
 
             int circuitbreaker = 0;
             int currentDepth = 0;
-            int numProgressionItems = unlockedProgressionItems.Count;
+            int numProgressionItems = -1; // This forces a depth calculation on the first loop.
             while (notRandomised.Count > 0)
             {
                 circuitbreaker++;
@@ -129,32 +134,23 @@ namespace SubnauticaRandomiser.Logic
                 LogicEntity nextEntity = ChooseNextEntity(notRandomised, currentDepth);
 
                 // Choose a logic appropriate to the entity.
+                bool? success = null;
                 if (nextEntity.IsFragment)
+                    success = _fragmentLogic.RandomiseFragment(nextEntity, unlockedProgressionItems, currentDepth);
+                else if (nextEntity.HasRecipe)
+                    success = _recipeLogic.RandomiseRecipe(nextEntity, unlockedProgressionItems, currentDepth);
+                
+                if (success == true)
                 {
-                    if (_config.bRandomiseFragments && _fragmentLogic != null)
-                        _fragmentLogic.RandomiseFragment(nextEntity, currentDepth);
-
                     notRandomised.Remove(nextEntity);
                     nextEntity.InLogic = true;
-                    continue;
                 }
 
-                if (nextEntity.HasRecipe)
-                {
-                    bool success = _recipeLogic.RandomiseRecipe(nextEntity, unlockedProgressionItems, currentDepth);
-                    if (success)
-                    {
-                        notRandomised.Remove(nextEntity);
-                        nextEntity.InLogic = true;
-                    }
-
-                    continue;
-                }
-                
-                LogHandler.Warn("Unsupported entity in loop: " + nextEntity);
+                if (success is null)
+                    LogHandler.Warn("Unsupported entity in loop: " + nextEntity);
             }
 
-            LogHandler.Info("Finished randomising within " + circuitbreaker + " cycles!");
+            LogHandler.Info($"Finished randomising within {circuitbreaker} cycles!");
             _spoilerLog.WriteLog();
 
             return _masterDict;
@@ -164,12 +160,13 @@ namespace SubnauticaRandomiser.Logic
         /// Get the next entity to be randomised, prioritising essential or elective ones.
         /// </summary>
         /// <returns>The next entity.</returns>
+        [NotNull]
         private LogicEntity ChooseNextEntity(List<LogicEntity> notRandomised, int depth)
         {
             // Make sure the list of absolutely essential items is done first, for each depth level. This guarantees
             // certain recipes are done by a certain depth, e.g. waterparks by 500m.
             // Automatically fails if recipes do not get randomised.
-            LogicEntity next = _recipeLogic?.GetPriorityEntity(depth);
+            LogicEntity next = GetPriorityEntity(depth);
             next ??= GetRandom(notRandomised);
 
             return next;
@@ -271,12 +268,11 @@ namespace SubnauticaRandomiser.Logic
         /// <returns>The total depth coverable by extending vehicle depth with a solo journey.</returns>
         private int CalculateTotalDepth(Dictionary<TechType, bool> progressionItems, int vehicleDepth, int soloDepthRaw)
         {
-            const int maxSoloDepth = 300;  // Never make the player go deeper than this on foot.
             // If there is a rebreather, all the funky calculations are redundant.
             if (progressionItems.ContainsKey(TechType.Rebreather))
-                return vehicleDepth + Math.Min(soloDepthRaw, maxSoloDepth);
+                return vehicleDepth + Math.Min(soloDepthRaw, _config.iMaxDepthWithoutVehicle);
 
-            return vehicleDepth + Math.Min(CalculateSoloDepth(vehicleDepth, soloDepthRaw), maxSoloDepth);
+            return vehicleDepth + Math.Min(CalculateSoloDepth(vehicleDepth, soloDepthRaw), _config.iMaxDepthWithoutVehicle);
         }
 
         /// <summary>
@@ -298,6 +294,49 @@ namespace SubnauticaRandomiser.Logic
             _recipeLogic?.UpdateReachableMaterials(currentDepth);
 
             return currentDepth;
+        }
+
+        /// <summary>
+        /// Get an essential or elective entity for the currently reachable depth, prioritising essential ones.
+        /// </summary>
+        /// <param name="depth">The maximum depth to consider.</param>
+        /// <returns>A LogicEntity, or null if all have been processed already.</returns>
+        [CanBeNull]
+        private LogicEntity GetPriorityEntity(int depth)
+        {
+            List<TechType> essentialItems = _tree.GetEssentialItems(depth);
+            List<TechType[]> electiveItems = _tree.GetElectiveItems(depth);
+            LogicEntity entity = null;
+
+            // Always get one of the essential items first, if available.
+            if (essentialItems.Count > 0)
+            {
+                TechType type = essentialItems.Find(x =>
+                    !_masterDict.RecipeDict.ContainsKey(x) && !_masterDict.SpawnDataDict.ContainsKey(x));
+                
+                if (!type.Equals(TechType.None))
+                {
+                    entity = _materials.Find(type);
+                    LogHandler.Debug($"Prioritising essential entity {entity} for depth {depth}");
+                }
+            }
+
+            // Similarly, if all essential items are done, grab one from among the elective items and leave the rest
+            // up to chance.
+            if (entity is null && electiveItems.Count > 0)
+            {
+                TechType[] types = electiveItems.Find(arr => arr.All(x =>
+                    !_masterDict.RecipeDict.ContainsKey(x) && !_masterDict.SpawnDataDict.ContainsKey(x)));
+                
+                if (types?.Length > 0)
+                {
+                    TechType nextType = GetRandom(new List<TechType>(types));
+                    entity = _materials.Find(nextType);
+                    LogHandler.Debug($"Prioritising elective entity {entity} for depth {depth}");
+                }
+            }
+
+            return entity;
         }
         
         /// <summary>

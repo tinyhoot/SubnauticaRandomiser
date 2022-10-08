@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
@@ -24,7 +25,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _logic = logic;
 
             _baseTheme = ChooseBaseTheme(100);
-            LogHandler.Debug("Chosen " + _baseTheme.TechType.AsString() + " as base theme.");
+            LogHandler.Debug($"[R] Chosen {_baseTheme.TechType.AsString()} as base theme.");
             //InitMod.s_masterDict.DictionaryInstance.Add(TechType.Titanium, _baseTheme.GetSerializableRecipe());
             //ChangeScrapMetalResult(_baseTheme);
         }
@@ -51,8 +52,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (!entity.HasUsesLeft())
             {
                 _materials.GetReachable().Remove(entity);
-                LogHandler.Debug("!   Removing " + entity.TechType.AsString() + " from materials list due to " +
-                                 "max uses reached: " + entity._usedInRecipes);
+                LogHandler.Debug($"[R] ! Removing {entity} from materials list due to " +
+                                 $"max uses reached: {entity._usedInRecipes}");
             }
         }
 

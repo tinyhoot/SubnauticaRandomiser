@@ -9,6 +9,8 @@ using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.RandomiserObjects.Exceptions;
 
 namespace SubnauticaRandomiser
 {
@@ -21,14 +23,14 @@ namespace SubnauticaRandomiser
         internal const string s_biomeFile = "biomeSlots.csv";
         internal const string s_recipeFile = "recipeInformation.csv";
         internal const string s_wreckageFile = "wreckInformation.csv";
-        internal const string s_expectedRecipeMD5 = "4ab1b7a019037f76c0d508f1c2aee5f8";
+        internal const string s_expectedRecipeMD5 = "fb1f4990a52976c72ec957f82bf15bf4";
         internal const int s_expectedSaveVersion = 4;
         internal static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
         {
             [1] = "v0.5.1",
             [2] = "v0.6.1",
             [3] = "v0.7.0",
-            [4] = "v0.8.0"
+            [4] = "v0.8.1"
         };
 
         // The master list of everything that is modified by the mod.
@@ -103,7 +105,20 @@ namespace SubnauticaRandomiser
 
             // Randomise!
             CoreLogic logic = new CoreLogic(random, s_config, materials, alternateStarts, biomes, databoxes);
-            s_masterDict = logic.Randomise();
+            try
+            {
+                s_masterDict = logic.Randomise();
+            }
+            catch (Exception ex)
+            {
+                LogHandler.MainMenuMessage("ERROR: Something went wrong. Please report this error with the config.json"
+                                           + " from your mod folder on NexusMods.");
+                LogHandler.Fatal($"{ex.GetType()}: {ex.Message}");
+                
+                // Ensure that the randomiser crashes completely if things go wrong this badly.
+                throw;
+            }
+            
             ApplyAllChanges();
             LogHandler.Info("Randomisation successful!");
 

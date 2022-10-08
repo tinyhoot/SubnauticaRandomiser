@@ -23,8 +23,8 @@ namespace SubnauticaRandomiser
             { "bRandomiseRecipes", new[] { true, true, true } },
             { "bVanillaUpgradeChains", new[] { false, false, false } },
             { "bDoBaseTheming", new[] { false, false, false } },
-            { "iEquipmentAsIngredients", new[] { 1, 0, 2 } },
-            { "iToolsAsIngredients", new[] { 1, 0, 2 } },
+            { "iEquipmentAsIngredients", new[] { 0, 0, 2 } },
+            { "iToolsAsIngredients", new[] { 0, 0, 2 } },
             { "iUpgradesAsIngredients", new[] { 1, 0, 2 } },
             { "iMaxAmountPerIngredient", new[] { 5, 1, 10 } },
             { "iMaxIngredientsPerRecipe", new[] { 7, 1, 10 } },
@@ -34,12 +34,14 @@ namespace SubnauticaRandomiser
             // Advanced settings start here.
             { "iDepthSearchTime", new[] { 15, 0, 45 } },
             { "iMaxBasicOutpostSize", new[] { 24, 4, 48 } },
+            { "iMaxDepthWithoutVehicle", new[] { 200, 100, 500 } },
             { "iMaxDuplicateScanYield", new[] { 2, 1, 10 } },
             { "iMaxEggsAsSingleIngredient", new[] { 1, 1, 10 } },
+            { "iMaxFragmentsPerBiome", new[] { 4, 1, 10 } },
             { "iMaxInventorySizePerRecipe", new[] { 24, 4, 100 } },
             { "iMinFragmentsToUnlock", new[] { 2, 1, 30 } },
-            { "dFuzziness", new[] { 0.2, 0.0, 1.0 } },
-            { "dIngredientRatio", new[] { 0.45, 0.0, 1.0 } },
+            { "dPrimaryIngredientValue", new[] { 0.45, 0.0, 1.0 } },
+            { "dRecipeValueVariance", new[] { 0.2, 0.0, 1.0 } },
             { "fFragmentSpawnChanceMin", new[] { 0.3f, 0.01f, 10.0f } },
             { "fFragmentSpawnChanceMax", new[] { 0.6f, 0.01f, 10.0f } },
         };
@@ -61,11 +63,21 @@ namespace SubnauticaRandomiser
 
         internal static object GetMax(string key)
         {
+            if (!s_defaults.ContainsKey(key))
+            {
+                LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                return null;
+            }
             return s_defaults[key][2];
         }
 
         internal static object GetMin(string key)
         {
+            if (!s_defaults.ContainsKey(key))
+            {
+                LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                return null;
+            }
             return s_defaults[key][1];
         }
     }

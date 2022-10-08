@@ -2,6 +2,7 @@
 using System.Linq;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
@@ -93,7 +94,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             foreach(LogicEntity ent in additions)
             {
-                LogHandler.Debug("Adding to reachable materials: " + ent.TechType.AsString());
+                LogHandler.Debug("[R] Adding to reachable materials: " + ent.TechType.AsString());
             }
             _reachableMaterials.AddRange(additions);
             return true;

@@ -9,7 +9,7 @@ namespace SubnauticaRandomiser
     public class RandomiserConfig : ConfigFile
     {
         private DateTime _timeButtonPressed = new DateTime();
-        private const int _confirmInterval = 5;
+        private const double _buttonMinInterval = 0.5;
 
         // Every public variable listed here will end up in the config file.
         // Additionally, adding the relevant Attributes will also make them show up in the in-game options menu.
@@ -18,19 +18,16 @@ namespace SubnauticaRandomiser
         [Choice("Mode", "Balanced", "Chaotic")]
         public int iRandomiserMode = (int)ConfigDefaults.GetDefault("iRandomiserMode");
 
-        [Choice("Spawnpoint", "Vanilla", "Random", "BloodKelp", "BulbZone", "CragField", "CrashZone", 
-            "Dunes", "Floating Island", "GrandReef", "GrassyPlateaus", "Kelp", "Mountains", "MushroomForest", 
-            "SeaTreaderPath", "SparseReef", "UnderwaterIslands", "Void")]
+        [Choice("Spawnpoint", "Vanilla", "Random", "Chaotic Random", "BloodKelp", "BulbZone", "CragField",
+            "CrashZone", "Dunes", "Floating Island", "GrandReef", "GrassyPlateaus", "Kelp", "Mountains",
+            "MushroomForest", "SeaTreaderPath", "SparseReef", "UnderwaterIslands", "Void")]
         public string sSpawnPoint = "Vanilla";
 
-        [Toggle("Use fish in logic?")]
-        public bool bUseFish = (bool)ConfigDefaults.GetDefault("bUseFish");
+        [Toggle("Use fish in logic?")] public bool bUseFish = (bool)ConfigDefaults.GetDefault("bUseFish");
 
-        [Toggle("Use eggs in logic?")]
-        public bool bUseEggs = (bool)ConfigDefaults.GetDefault("bUseEggs");
+        [Toggle("Use eggs in logic?")] public bool bUseEggs = (bool)ConfigDefaults.GetDefault("bUseEggs");
 
-        [Toggle("Use seeds in logic?")]
-        public bool bUseSeeds = (bool)ConfigDefaults.GetDefault("bUseSeeds");
+        [Toggle("Use seeds in logic?")] public bool bUseSeeds = (bool)ConfigDefaults.GetDefault("bUseSeeds");
 
         [Toggle("Randomise blueprints in databoxes?")]
         public bool bRandomiseDataboxes = (bool)ConfigDefaults.GetDefault("bRandomiseDataboxes");
@@ -77,28 +74,27 @@ namespace SubnauticaRandomiser
         [Button("Randomise with new seed")]
         public void NewRandomNewSeed()
         {
-            // Re-randomising everything is a serious request, and it should not happen accidentally. This ensures
-            // the button is pressed twice within a certain timeframe before actually randomising.
-            if (EnsureButtonTime())
-            {
-                Random random = new Random();
-                iSeed = random.Next();
-                LogHandler.MainMenuMessage("Changed seed to " + iSeed);
-                LogHandler.MainMenuMessage("Randomising...");
-                InitMod.Randomise();
-                LogHandler.MainMenuMessage("Finished randomising! Please restart the game for changes to take effect.");
-            }
-            else
-            {
-                LogHandler.MainMenuMessage("Are you sure you wish to re-randomise all recipes?");
-                LogHandler.MainMenuMessage("Press the button again to proceed.");
-            }
+            // Due to how the randomiser locks up when pressing the button, it is possible for the click to be
+            // registered twice and randomisation to happen twice in a row. Prevent this here.
+            if (WasButtonRecentlyPressed())
+                return;
+
+            Random random = new Random();
+            iSeed = random.Next();
+            LogHandler.MainMenuMessage("Changed seed to " + iSeed);
+            LogHandler.MainMenuMessage("Randomising...");
+            InitMod.Randomise();
+            LogHandler.MainMenuMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
         [Button("Randomise with same seed")]
         public void NewRandomOldSeed()
         {
+            if (WasButtonRecentlyPressed())
+                return;
+            
             LogHandler.MainMenuMessage("Randomising...");
+            // Ensure all manual changes to the config file are loaded.
             Load();
             InitMod.Randomise();
             LogHandler.MainMenuMessage("Finished randomising! Please restart the game for changes to take effect.");
@@ -107,12 +103,14 @@ namespace SubnauticaRandomiser
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
         public int iDepthSearchTime = (int)ConfigDefaults.GetDefault("iDepthSearchTime");
         public int iMaxBasicOutpostSize = (int)ConfigDefaults.GetDefault("iMaxBasicOutpostSize");
+        public int iMaxDepthWithoutVehicle = (int)ConfigDefaults.GetDefault("iMaxDepthWithoutVehicle");
         public int iMaxDuplicateScanYield = (int)ConfigDefaults.GetDefault("iMaxDuplicateScanYield");
         public int iMaxEggsAsSingleIngredient = (int)ConfigDefaults.GetDefault("iMaxEggsAsSingleIngredient");
+        public int iMaxFragmentsPerBiome = (int)ConfigDefaults.GetDefault("iMaxFragmentsPerBiome");
         public int iMaxInventorySizePerRecipe = (int)ConfigDefaults.GetDefault("iMaxInventorySizePerRecipe");
         public int iMinFragmentsToUnlock = (int)ConfigDefaults.GetDefault("iMinFragmentsToUnlock");
-        public double dFuzziness = (double)ConfigDefaults.GetDefault("dFuzziness");
-        public double dIngredientRatio = (double)ConfigDefaults.GetDefault("dIngredientRatio");
+        public double dPrimaryIngredientValue = (double)ConfigDefaults.GetDefault("dPrimaryIngredientValue");
+        public double dRecipeValueVariance = (double)ConfigDefaults.GetDefault("dRecipeValueVariance");
         public float fFragmentSpawnChanceMin = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMin");
         public float fFragmentSpawnChanceMax = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMax");
 
@@ -147,19 +145,17 @@ namespace SubnauticaRandomiser
         }
 
         /// <summary>
-        /// Ensure the button is pressed twice within a certain timeframe before actually randomising.
+        /// Ensure the button is not accidentally pressed twice within a certain timeframe by checking against the
+        /// system clock.
         /// </summary>
-        /// <returns>True if the button was pressed for the second time, false if not.</returns>
-        private bool EnsureButtonTime()
+        /// <returns>True if the button was recently pressed, false if it was not.</returns>
+        private bool WasButtonRecentlyPressed()
         {
-            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds < _confirmInterval)
-            {
-                _timeButtonPressed = DateTime.MinValue;
-                return true;
-            }
+            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds< _buttonMinInterval)
+                return false;
 
             _timeButtonPressed = DateTime.UtcNow;
-            return false;
+            return true;
         }
     }
 }

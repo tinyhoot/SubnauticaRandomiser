@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
@@ -51,11 +52,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 AddIngredientWithMaxUsesCheck(ingredientEntity, ingredient.amount);
                 totalInvSize += ingredientEntity.GetItemSize() * ingredient.amount;
 
-                LogHandler.Debug("    Adding ingredient: " + ingredient.techType.AsString() + ", " + ingredient.amount);
+                LogHandler.Debug($"[R] > Adding ingredient: {ingredient.techType.AsString()}, {ingredient.amount}");
 
                 if (totalInvSize > _config.iMaxInventorySizePerRecipe)
                 {
-                    LogHandler.Debug("!   Recipe is getting too large, stopping.");
+                    LogHandler.Debug("[R] ! Recipe is getting too large, stopping.");
                     break;
                 }
             }

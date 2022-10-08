@@ -1,4 +1,4 @@
-﻿namespace SubnauticaRandomiser.RandomiserObjects
+﻿namespace SubnauticaRandomiser.RandomiserObjects.Enums
 {
     public enum ETechTypeCategory
     {

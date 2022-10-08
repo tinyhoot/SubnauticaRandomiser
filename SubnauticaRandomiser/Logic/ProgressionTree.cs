@@ -2,6 +2,7 @@
 using System.Linq;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -99,6 +100,8 @@ namespace SubnauticaRandomiser.Logic
             DepthProgressionItems.Add(TechType.HighCapacityTank, true);
             DepthProgressionItems.Add(TechType.PlasteelTank, true);
             DepthProgressionItems.Add(TechType.Rebreather, true);
+            // While not technically an item for depth progression, the laser cutter still unlocks a lot of things.
+            DepthProgressionItems.Add(TechType.LaserCutter, true);
 
             DepthProgressionItems.Add(TechType.Seaglide, true);
             DepthProgressionItems.Add(TechType.Seamoth, true);
@@ -113,7 +116,32 @@ namespace SubnauticaRandomiser.Logic
             DepthProgressionItems.Add(TechType.CyclopsHullModule1, true);
             DepthProgressionItems.Add(TechType.CyclopsHullModule2, true);
             DepthProgressionItems.Add(TechType.CyclopsHullModule3, true);
+        }
 
+        /// <summary>
+        /// Set up everything needed for randomising fragments.
+        /// </summary>
+        public void SetupFragments()
+        {
+            if (_depthDifficulties.Count == 0)
+                SetupVanillaTree();
+            
+            // Ensure certain fragments are available by the given depth.
+            AddEssentialItem(EProgressionNode.Depth0m, TechType.SeaglideFragment);
+            
+            AddEssentialItem(EProgressionNode.Depth100m, TechType.LaserCutterFragment);
+            
+            AddEssentialItem(EProgressionNode.Depth200m, TechType.BaseBioReactorFragment);
+        }
+
+        /// <summary>
+        /// Set up everything needed for randomising recipes.
+        /// </summary>
+        public void SetupRecipes()
+        {
+            if (_depthDifficulties.Count == 0)
+                SetupVanillaTree();
+            
             // Assemble a dictionary of what's considered basic outpost pieces
             // which together should not exceed the cost of config.iMaxBasicOutpostSize
             BasicOutpostPieces.Add(TechType.BaseCorridorI, 1);
@@ -132,6 +160,7 @@ namespace SubnauticaRandomiser.Logic
             AddEssentialItem(EProgressionNode.Depth0m, TechType.Fabricator);
 
             AddEssentialItem(EProgressionNode.Depth100m, TechType.BaseRoom);
+            AddEssentialItem(EProgressionNode.Depth100m, TechType.Seaglide);
             AddEssentialItem(EProgressionNode.Depth100m, TechType.Tank);
 
             AddEssentialItem(EProgressionNode.Depth200m, TechType.Builder);
@@ -382,6 +411,16 @@ namespace SubnauticaRandomiser.Logic
                 return true;
 
             return false;
+        }
+
+        /// <summary>
+        /// Check whether the given entity is a depth progression item.
+        /// </summary>
+        /// <param name="entity">The entity to check.</param>
+        /// <returns>True if the entity is a depth progression item, false otherwise.</returns>
+        public bool IsProgressionItem(LogicEntity entity)
+        {
+            return DepthProgressionItems.ContainsKey(entity.TechType);
         }
     }
 }

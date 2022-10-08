@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 using Random = System.Random;
 
 namespace SubnauticaRandomiser.Logic
@@ -35,6 +36,10 @@ namespace SubnauticaRandomiser.Logic
             switch (_config.sSpawnPoint)
             {
                 case "Random":
+                    // Only use starts where you can actually reach the ground.
+                    return _logic.GetRandom(_alternateStarts.Keys.ToList()
+                        .FindAll(biome => !biome.Equals(EBiomeType.None) && biome.GetAccessibleDepth() <= 100));
+                case "Chaotic Random":
                     return _logic.GetRandom(_alternateStarts.Keys.ToList());
                 case "BulbZone":
                     return EBiomeType.KooshZone;
@@ -59,7 +64,7 @@ namespace SubnauticaRandomiser.Logic
             EBiomeType biome = GetBiome();
             if (!_alternateStarts.ContainsKey(biome))
             {
-                LogHandler.Error("No information found on chosen starting biome " + biome);
+                LogHandler.Error("[AS] No information found on chosen starting biome " + biome);
                 return new RandomiserVector(0, 0, 0);
             }
 
@@ -70,7 +75,7 @@ namespace SubnauticaRandomiser.Logic
             int x = _random.Next((int)box[0], (int)box[2] + 1);
             int z = _random.Next((int)box[3], (int)box[1] + 1);
 
-            LogHandler.Debug("Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
+            LogHandler.Debug("[AS] Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
             return new RandomiserVector(x, 0, z);
         }
     }

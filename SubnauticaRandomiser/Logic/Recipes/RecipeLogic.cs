@@ -3,6 +3,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
@@ -52,7 +53,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (!(_tree.IsPriorityEntity(entity)
                   || (entity.CheckBlueprintFulfilled(_logic, reachableDepth) && entity.CheckPrerequisitesFulfilled(_logic))))
             {
-                LogHandler.Debug("--- Recipe [" + entity.TechType.AsString() + "] did not fulfill requirements, skipping.");
+                LogHandler.Debug($"[R] --- Recipe [{entity}] did not fulfill requirements, skipping.");
                 return false;
             }
             
@@ -71,6 +72,10 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // Similarly, Alien Containment is a special case for eggs.
             if (entity.TechType.Equals(TechType.BaseWaterPark) && _config.bUseEggs)
                 unlockedProgressionItems.Add(TechType.BaseWaterPark, true);
+            
+            // If fragment randomisation is enabled, laser cutters open up new options there.
+            if (entity.TechType.Equals(TechType.LaserCutter))
+                _logic._fragmentLogic?.AddLaserCutterBiomes();
 
             // If it is a central depth progression item, consider it unlocked.
             if (_tree.DepthProgressionItems.ContainsKey(entity.TechType) && !unlockedProgressionItems.ContainsKey(entity.TechType))
@@ -78,55 +83,15 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 unlockedProgressionItems.Add(entity.TechType, true);
                 _logic._spoilerLog.AddProgressionEntry(entity.TechType, 0);
 
-                LogHandler.Debug("[+] Added " + entity.TechType.AsString() + " to progression items.");
+                LogHandler.Debug($"[R][+] Added {entity} to progression items.");
             }
 
             entity.InLogic = true;
-            LogHandler.Debug("[+] Randomised recipe for [" + entity.TechType.AsString() + "].");
+            LogHandler.Debug($"[R][+] Randomised recipe for [{entity}].");
 
             return true;
         }
 
-        /// <summary>
-        /// Get an essential or elective entity for the currently reachable depth, prioritising essential ones.
-        /// </summary>
-        /// <param name="depth">The maximum depth to consider.</param>
-        /// <returns>A LogicEntity, or null if all have been processed already.</returns>
-        [CanBeNull]
-        internal LogicEntity GetPriorityEntity(int depth)
-        {
-            List<TechType> essentialItems = _tree.GetEssentialItems(depth);
-            List<TechType[]> electiveItems = _tree.GetElectiveItems(depth);
-            LogicEntity entity = null;
-
-            // Always get one of the essential items first, if available.
-            if (essentialItems.Count > 0)
-            {
-                TechType type = essentialItems.Find(x => !_masterDict.RecipeDict.ContainsKey(x));
-                if (!type.Equals(TechType.None))
-                {
-                    entity = _materials.Find(type);
-                    LogHandler.Debug("Prioritising essential item " + entity + " for depth " + depth);
-                }
-            }
-
-            // Similarly, if all essential items are done, grab one from among the elective items and leave the rest
-            // up to chance.
-            if (entity is null && electiveItems.Count > 0)
-            {
-                TechType[] types = electiveItems.Find(arr => arr.All(x => !_masterDict.RecipeDict.ContainsKey(x)));
-                
-                if (types?.Length > 0)
-                {
-                    TechType nextType = _logic.GetRandom(new List<TechType>(types));
-                    entity = _materials.Find(nextType);
-                    LogHandler.Debug("Prioritising elective item " + entity + " for depth " + depth);
-                }
-            }
-
-            return entity;
-        }
-        
         /// <summary>
         /// Add all reachable materials to the list, taking into account depth and any config options.
         /// </summary>

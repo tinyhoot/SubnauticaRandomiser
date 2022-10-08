@@ -49,7 +49,7 @@ namespace SubnauticaRandomiser.Patches
             {
                 if (vector.EqualsUnityVector(position))
                 {
-                    LogHandler.Debug("[!] Replacing databox " + position.ToString() + " with "
+                    LogHandler.Debug("[D] Replacing databox " + position.ToString() + " with "
                                      + boxDict[vector].AsString());
                     blueprint.unlockTechType = boxDict[vector];
                 }

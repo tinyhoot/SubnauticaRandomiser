@@ -1,4 +1,7 @@
-﻿namespace SubnauticaRandomiser.RandomiserObjects
+﻿using System;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
+
+namespace SubnauticaRandomiser.RandomiserObjects
 {
     /// <summary>
     /// A class representing a single Biome as the game handles it, along with detailed info on spawn slots.
@@ -11,20 +14,33 @@
         public readonly int SmallSlots;
         public readonly float? FragmentRate;
         public readonly string Name;
-        public readonly EBiomeType BiomeType;
+        public readonly EBiomeType Region;
+        public readonly BiomeType Variant;
 
-        public int AverageDepth { get { return BiomeType.GetAccessibleDepth(); } }
+        public int AverageDepth => Region.GetAccessibleDepth();
         public int Used = 0;
 
         public Biome(string name, EBiomeType biomeType, int creatureSlots, int mediumSlots, int smallSlots = -1, float? fragmentRate = null)
         {
             Name = name;
-            BiomeType = biomeType;
+            Region = biomeType;
+            Variant = ParseName(name);
 
             CreatureSlots = creatureSlots;
             MediumSlots = mediumSlots;
             SmallSlots = smallSlots >= 0 ? smallSlots : mediumSlots;
             FragmentRate = fragmentRate;
+        }
+
+        public static BiomeType ParseName(string name)
+        {
+            if (!Enum.TryParse(name, out BiomeType biomeType))
+            {
+                LogHandler.Warn("! Failed to parse biome to enum: " + name);
+                return BiomeType.Unassigned;
+            }
+
+            return biomeType;
         }
     }
 }

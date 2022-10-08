@@ -1,4 +1,5 @@
 ﻿using System;
+using SubnauticaRandomiser.RandomiserObjects.Enums;
 using UnityEngine;
 
 namespace SubnauticaRandomiser.RandomiserObjects
@@ -22,6 +23,11 @@ namespace SubnauticaRandomiser.RandomiserObjects
             Wreck = wreck;
             RequiresLaserCutter = laserCutter;
             RequiresPropulsionCannon = propulsionCannon;
+        }
+
+        public override string ToString()
+        {
+            return TechType.AsString();
         }
     }
 }

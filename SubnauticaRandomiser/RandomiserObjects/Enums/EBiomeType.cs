@@ -1,4 +1,4 @@
-﻿namespace SubnauticaRandomiser.RandomiserObjects
+﻿namespace SubnauticaRandomiser.RandomiserObjects.Enums
 {
     public enum EBiomeType
     {
@@ -91,7 +91,7 @@
                 case (EBiomeType.PrisonAquarium):
                     return 1700;
                 case (EBiomeType.SafeShallows):
-                    return 25;
+                    return 0;
                 case (EBiomeType.SeaTreaderPath):
                     return 200;
                 case (EBiomeType.SkeletonCave):

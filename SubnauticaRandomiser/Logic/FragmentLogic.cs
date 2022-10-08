@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.RandomiserObjects.Exceptions;
 using static LootDistributionData;
 
 namespace SubnauticaRandomiser.Logic
@@ -16,9 +17,9 @@ namespace SubnauticaRandomiser.Logic
         private readonly CoreLogic _logic;
         
         private static Dictionary<TechType, List<string>> _classIdDatabase;
-        private RandomiserConfig _config { get { return _logic._config; } }
-        private EntitySerializer _masterDict { get { return _logic._masterDict; } }
-        private Random _random { get { return _logic._random; } }
+        private RandomiserConfig _config => _logic._config;
+        private EntitySerializer _masterDict => _logic._masterDict;
+        private Random _random => _logic._random;
         private readonly List<Biome> _allBiomes;
         private readonly List<Biome> _availableBiomes;
         private static readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
@@ -33,7 +34,10 @@ namespace SubnauticaRandomiser.Logic
             { "CyclopsEngine_Fragment", TechType.CyclopsEngineFragment },
             { "CyclopsHull_Fragment_Large", TechType.CyclopsHullFragment },
             { "CyclopsHull_Fragment_Medium", TechType.CyclopsHullFragment },
-            { "Exosuit_Fragment", TechType.ExosuitFragment },
+            { "exosuit_damaged_01", TechType.ExosuitFragment },
+            { "exosuit_damaged_02", TechType.ExosuitFragment },
+            { "exosuit_damaged_03", TechType.ExosuitFragment },
+            { "exosuit_damaged_06", TechType.ExosuitFragment },
             { "ExosuitDrillArmfragment", TechType.ExosuitDrillArmFragment },
             { "ExosuitGrapplingArmfragment", TechType.ExosuitGrapplingArmFragment },
             { "ExosuitPropulsionArmfragment", TechType.ExosuitPropulsionArmFragment },
@@ -62,23 +66,30 @@ namespace SubnauticaRandomiser.Logic
             _logic = coreLogic;
             
             _allBiomes = GetAvailableFragmentBiomes(biomeList);
-            _availableBiomes = GetAvailableFragmentBiomes(biomeList);
+            _availableBiomes = GetAvailableFragmentBiomes(biomeList).Where(x => !x.Name.ToLower().Contains("barrier")).ToList();
         }
         
         /// <summary>
         /// Randomise the spawn points for a given fragment.
         /// </summary>
         /// <param name="entity">The fragment entity to randomise.</param>
-        /// <param name="depth">The maximum depth to consider.</param>
-        /// <returns>The SpawnData that was newly added to the EntitySerializer.</returns>
+        /// <param name="unlockedProgressionItems">The dictionary of already unlocked progression items.</param>
+        /// <param name="reachableDepth">The maximum depth to consider.</param>
+        /// <returns>True if the fragment was successfully randomised, false otherwise.</returns>
         /// <exception cref="ArgumentException">Raised if the fragment name is invalid.</exception>
-        internal List<SpawnData> RandomiseFragment(LogicEntity entity, int depth)
+        internal bool RandomiseFragment(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems, int reachableDepth)
         {
             if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList))
-                throw new ArgumentException("Failed to find fragment '" + entity + "' in classId database!");
+                throw new ArgumentException($"Failed to find fragment '{entity}' in classId database!");
             
-            LogHandler.Debug("Randomising fragment " + entity + " for depth " + depth);
+            // Check whether the fragment fulfills its prerequisites.
+            if (entity.AccessibleDepth >= reachableDepth)
+            {
+                LogHandler.Debug($"[F] --- Fragment [{entity}] did not fulfill requirements, skipping.");
+                return false;
+            }
             
+            LogHandler.Debug($"[F] Randomising fragment {entity} for depth {reachableDepth}");
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
@@ -86,35 +97,23 @@ namespace SubnauticaRandomiser.Logic
 
             for (int i = 0; i < biomeCount; i++)
             {
-                // Choose a suitable biome which is also accessible at this depth.
-                Biome biome = GetRandom(_availableBiomes.FindAll(x => x.AverageDepth <= depth));
-                // In case no good biome is available, ignore overpopulation restrictions and choose any.
-                biome ??= GetRandom(_allBiomes.FindAll(x => x.AverageDepth <= depth));
-
-                // Ensure the biome can actually be used for creating valid BiomeData.
-                if (!Enum.TryParse(biome.Name, out BiomeType biomeType))
-                {
-                    LogHandler.Warn("  Failed to parse biome to enum: " + biome.Name);
-                    // i--;
-                    continue;
-                }
-                biome.Used++;
-
-                // Remove the biome from the pool if it gets too populated.
-                if (biome.Used >= 5)
-                    _availableBiomes.Remove(biome);
+                // Choose a random biome.
+                Biome biome = ChooseBiome(spawnList, reachableDepth);
                 
                 // Calculate spawn rate.
                 float spawnRate = CalcFragmentSpawnRate(biome);
                 float[] splitRates = SplitFragmentSpawnRate(spawnRate, idList.Count);
 
-                // Split the spawn rate among each variation of the fragment.
+                // Split the spawn rate among each variation (prefab) of the fragment.
                 for (int j = 0; j < idList.Count; j++)
                 {
-                    SpawnData spawnData = new SpawnData(idList[j]);
+                    // Add to an existing entry if it already exists from a previous loop.
+                    SpawnData spawnData = spawnList.Find(x => x.ClassId.Equals(idList[j]));
+                    spawnData ??= new SpawnData(idList[j]);
+                    
                     RandomiserBiomeData data = new RandomiserBiomeData
                     {
-                        Biome = biomeType,
+                        Biome = biome.Variant,
                         Count = 1,
                         Probability = splitRates[j]
                     };
@@ -122,11 +121,15 @@ namespace SubnauticaRandomiser.Logic
                     spawnList.Add(spawnData);
                 }
 
-                LogHandler.Debug("  Adding fragment to biome: " + biomeType.AsString() + ", " + spawnRate);
+                LogHandler.Debug($"[F] + Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
             }
             
+            // If recipes are not randomised, handle unlocking depth progression items.
+            if (!_config.bRandomiseRecipes)
+                UpdateProgressionItems(entity, unlockedProgressionItems);
+
             ApplyRandomisedFragment(entity, spawnList);
-            return spawnList;
+            return true;
         }
 
         /// <summary>
@@ -203,6 +206,15 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
+        /// Add all biomes that are locked behind needing a laser cutter to the list of available biomes.
+        /// </summary>
+        internal void AddLaserCutterBiomes()
+        {
+            var additions = _allBiomes.Where(x => x.Name.ToLower().Contains("barrier"));
+            _availableBiomes.AddRange(additions);
+        }
+
+        /// <summary>
         /// Calculate the spawn rate for an entity in the given biome.
         /// </summary>
         /// <param name="biome">The biome.</param>
@@ -211,7 +223,12 @@ namespace SubnauticaRandomiser.Logic
         {
             // Set a percentage between Min and Max% of the biome's combined original spawn rates.
             float percentage = _config.fFragmentSpawnChanceMin + (float)_random.NextDouble()
-                * (_config.fFragmentSpawnChanceMax - _config.fFragmentSpawnChanceMax);
+                * (_config.fFragmentSpawnChanceMax - _config.fFragmentSpawnChanceMin);
+            // If the number of scans needed per fragment is very high, increase the spawn rate proportionally.
+            int maxFragments = (int)ConfigDefaults.GetDefault("iMaxFragmentsToUnlock");
+            if (_config.iMaxFragmentsToUnlock > maxFragments)
+                percentage += 0.04f * (_config.iMaxFragmentsToUnlock - maxFragments);
+            
             return percentage * biome.FragmentRate ?? 0.0f;
         }
 
@@ -225,12 +242,38 @@ namespace SubnauticaRandomiser.Logic
                 return;
             
             int numFragments = _random.Next(_config.iMinFragmentsToUnlock, _config.iMaxFragmentsToUnlock + 1);
-            // Exosuit fragments are worth a lot more and the vanilla blueprint has the highest cost of all, at 20.
-            if (entity.TechType.Equals(TechType.ExosuitFragment))
-                numFragments *= 6;
-            
-            LogHandler.Debug("  New number of fragments required: " + numFragments);
+            LogHandler.Debug($"[F] New number of fragments required for {entity}: {numFragments}");
             _masterDict.AddFragmentUnlockNum(entity.TechType, numFragments);
+        }
+
+        /// <summary>
+        /// Choose a suitable biome which is also accessible at this depth, and has not been chosen before.
+        /// </summary>
+        /// <param name="previousChoices">The list of SpawnData resulting from previously chosen biomes.</param>
+        /// <param name="depth">The maximum depth to consider.</param>
+        /// <returns>The chosen biome.</returns>
+        private Biome ChooseBiome(List<SpawnData> previousChoices, int depth)
+        {
+            List<Biome> choices = _availableBiomes.FindAll(bio =>
+                bio.AverageDepth <= depth && !previousChoices.Any(sd => sd.ContainsBiome(bio.Variant)));
+            
+            // In case no good biome is available, ignore overpopulation restrictions and choose any.
+            if (choices.Count == 0)
+            {
+                LogHandler.Debug("[F] ! No valid biome choices, using fallback");
+                choices = _allBiomes.FindAll(x => x.AverageDepth <= depth);
+                if (choices.Count == 0)
+                    throw new RandomisationException("No valid biome options for depth " + depth);
+            }
+
+            Biome biome = GetRandom(choices);
+            biome.Used++;
+
+            // Remove the biome from the pool if it gets too populated.
+            if (biome.Used == _config.iMaxFragmentsPerBiome)
+                _availableBiomes.Remove(biome);
+
+            return biome;
         }
 
         /// <summary>
@@ -265,6 +308,7 @@ namespace SubnauticaRandomiser.Logic
             foreach (string classId in keys)
             {
                 string dataPath = UWE.PrefabDatabase.prefabFiles[classId];
+                //LogHandler.Debug($"KEY: {classId}, VALUE: {UWE.PrefabDatabase.prefabFiles[classId]}");
 
                 // If the prefab is not part of the predefined dictionary of fragments,
                 // discard it and continue. Acts as a filter for only those fragments
@@ -276,8 +320,6 @@ namespace SubnauticaRandomiser.Logic
                     _classIdDatabase.Add(type, new List<string> { classId });
                 else
                     _classIdDatabase[type].Add(classId);
-
-                //LogHandler.Debug("KEY: " + classId + ", VALUE: " + UWE.PrefabDatabase.prefabFiles[classId] + ", TECHTYPE: " + type.AsString());
             }
         }
         
@@ -334,6 +376,63 @@ namespace SubnauticaRandomiser.Logic
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// When randomising a fragment while recipe randomisation is disabled, ensure that the item previously locked
+        /// by the fragment is added to the collection of progression items, if necessary.
+        /// </summary>
+        /// <param name="entity">The fragment being randomised.</param>
+        /// <param name="unlockedProgressionItems">The progression items.</param>
+        /// <returns>True if a new entry was added to the progression items, false if not.</returns>
+        private bool UpdateProgressionItems(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems)
+        {
+            // Find the recipe that needs the given fragment as a prerequisite, i.e. the recipe that is unlocked
+            // by the fragment.
+            LogicEntity recipe = _logic._materials.GetAll()
+                .Find(e => e.Blueprint?.Fragments?.Contains(entity.TechType) ?? false);
+            if (recipe is null || !_logic._tree.IsProgressionItem(recipe)
+                               || unlockedProgressionItems.ContainsKey(recipe.TechType))
+                return false;
+
+            switch (recipe.TechType)
+            {
+                // On a laser cutter, add all the biomes behind barriers.
+                case TechType.LaserCutter:
+                    AddLaserCutterBiomes();
+                    break;
+                // If the recipe is a vehicle, also immediately add its upgrades.
+                case TechType.Seamoth:
+                    unlockedProgressionItems.Add(TechType.VehicleHullModule1, true);
+                    unlockedProgressionItems.Add(TechType.VehicleHullModule2, true);
+                    unlockedProgressionItems.Add(TechType.VehicleHullModule3, true);
+                    break;
+                case TechType.Exosuit:
+                    unlockedProgressionItems.Add(TechType.ExoHullModule1, true);
+                    unlockedProgressionItems.Add(TechType.ExoHullModule2, true);
+                    break;
+                // The cyclops is a special case, since it needs three different fragments to unlock. Associate each
+                // fragment with one upgrade, and only add the cyclops once all three upgrades are unlocked.
+                case TechType.Cyclops:
+                {
+                    if (entity.TechType.Equals(TechType.CyclopsBridgeFragment))
+                        unlockedProgressionItems.Add(TechType.CyclopsHullModule1, true);
+                    if (entity.TechType.Equals(TechType.CyclopsEngineFragment))
+                        unlockedProgressionItems.Add(TechType.CyclopsHullModule2, true);
+                    if (entity.TechType.Equals(TechType.CyclopsHullFragment))
+                        unlockedProgressionItems.Add(TechType.CyclopsHullModule3, true);
+                
+                    if (!unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule1)
+                        || !unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule2)
+                        || !unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule3))
+                        return false;
+                    break;
+                }
+            }
+
+            unlockedProgressionItems.Add(recipe.TechType, true);
+            LogHandler.Debug($"[F][+] Added {recipe} to progression items.");
+            return true;
         }
         
         /// <summary>
@@ -468,41 +567,6 @@ namespace SubnauticaRandomiser.Logic
                     LogHandler.Debug(string.Format("{0}\tNONE\t\t", biome.AsString()));
                 }
             }
-        }
-        
-        // This is kinda redundant and a leftover from early testing.
-        internal void EditBiomeData(string classId, List<LootDistributionData.BiomeData> distribution)
-        {
-            LootDistributionHandler.EditLootDistributionData(classId, distribution);
-        }
-
-        internal void Test()
-        {
-            LogHandler.Debug("titanium " + GetClassId(TechType.Titanium));
-            LogHandler.Debug("peeper " + GetClassId(TechType.Peeper));
-            LogHandler.Debug("reaper " + GetClassId(TechType.ReaperLeviathan));
-            LogHandler.Debug("acid " + GetClassId(TechType.AcidMushroom));
-            LogHandler.Debug("seamothfragment " + GetClassId(TechType.SeamothFragment));
-            LogHandler.Debug("cyclopshullfragment " + GetClassId(TechType.CyclopsHullFragment));
-
-            PrepareClassIdDatabase();
-
-            BiomeData b = new BiomeData();
-            b.biome = BiomeType.SafeShallows_Grass;
-            b.count = 1;
-            b.probability = 0.8f;
-
-            BiomeData b2 = new BiomeData();
-            b2.biome = BiomeType.GrassyPlateaus_TechSite_Scattered;
-            b2.count = 1;
-            b2.probability = 0.9f;
-
-            List<BiomeData> list = new List<BiomeData>();
-            list.Add(b);
-            list.Add(b2);
-
-            EditBiomeData(_classIdDatabase[TechType.BaseNuclearReactorFragment][0], list);
-            //DumpBiomeDataEntities();
         }
     }
 }

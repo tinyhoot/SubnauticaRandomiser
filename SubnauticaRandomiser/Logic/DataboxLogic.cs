@@ -42,8 +42,8 @@ namespace SubnauticaRandomiser.Logic
                 randomDataboxes.Add(new Databox(originalBox.TechType, toBeRandomised[next], replacementBox.Wreck, 
                     replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
                 _masterDict.Databoxes.Add(new RandomiserVector(toBeRandomised[next]), originalBox.TechType);
-                LogHandler.Debug("Databox " + toBeRandomised[next].ToString() + " with "
-                                 + replacementBox.TechType.AsString() + " now contains " + originalBox.TechType.AsString());
+                LogHandler.Debug($"[D] Databox {toBeRandomised[next].ToString()} with {replacementBox}"
+                                 + " now contains " + originalBox);
                 toBeRandomised.RemoveAt(next);
             }
 
