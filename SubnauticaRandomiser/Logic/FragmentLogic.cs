@@ -107,7 +107,10 @@ namespace SubnauticaRandomiser.Logic
                 // Split the spawn rate among each variation (prefab) of the fragment.
                 for (int j = 0; j < idList.Count; j++)
                 {
-                    SpawnData spawnData = new SpawnData(idList[j]);
+                    // Add to an existing entry if it already exists from a previous loop.
+                    SpawnData spawnData = spawnList.Find(x => x.ClassId.Equals(idList[j]));
+                    spawnData ??= new SpawnData(idList[j]);
+                    
                     RandomiserBiomeData data = new RandomiserBiomeData
                     {
                         Biome = biome.Variant,
@@ -305,7 +308,7 @@ namespace SubnauticaRandomiser.Logic
             foreach (string classId in keys)
             {
                 string dataPath = UWE.PrefabDatabase.prefabFiles[classId];
-                LogHandler.Debug($"KEY: {classId}, VALUE: {UWE.PrefabDatabase.prefabFiles[classId]}");
+                //LogHandler.Debug($"KEY: {classId}, VALUE: {UWE.PrefabDatabase.prefabFiles[classId]}");
 
                 // If the prefab is not part of the predefined dictionary of fragments,
                 // discard it and continue. Acts as a filter for only those fragments
@@ -317,8 +320,6 @@ namespace SubnauticaRandomiser.Logic
                     _classIdDatabase.Add(type, new List<string> { classId });
                 else
                     _classIdDatabase[type].Add(classId);
-
-                //LogHandler.Debug("KEY: " + classId + ", VALUE: " + UWE.PrefabDatabase.prefabFiles[classId] + ", TECHTYPE: " + type.AsString());
             }
         }
         

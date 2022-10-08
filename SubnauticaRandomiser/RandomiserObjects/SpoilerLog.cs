@@ -41,6 +41,9 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "bUseFish", "bUseEggs", "bUseSeeds",
                 "bRandomiseDataboxes",
                 "bRandomiseFragments",
+                "bRandomiseNumFragments", "iMaxFragmentsToUnlock",
+                "bRandomiseDuplicateScans",
+                "bRandomiseRecipes",
                 "bVanillaUpgradeChains",
                 "bDoBaseTheming",
                 "iEquipmentAsIngredients", "iToolsAsIngredients", "iUpgradesAsIngredients",
@@ -161,11 +164,11 @@ namespace SubnauticaRandomiser.RandomiserObjects
             foreach (var kv in _serializer.SpawnDataDict)
             {
                 string line = kv.Key.AsString() + ": ";
-                foreach (var spawnData in kv.Value)
+                // Fragments are split up into their respective prefabs, but those all have the same spawn biomes
+                // and can be neglected. Just take the first prefab's biome spawns directly.
+                foreach (var biomeData in kv.Value[0].BiomeDataList)
                 {
-                    // Fragments are split up into their respective prefabs, but those all have the same spawn biomes
-                    // and can be neglected. Just take the first prefab's biome spawns directly.
-                    line += spawnData.BiomeDataList[0].Biome.AsString() + ", ";
+                    line += biomeData.Biome.AsString() + ", ";
                 }
                 preparedFragments.Add(line);
             }
@@ -193,6 +196,10 @@ namespace SubnauticaRandomiser.RandomiserObjects
         /// <returns>The prepared log entries.</returns>
         private string[] PrepareProgressionPath()
         {
+            // When recipes are not randomised, this spoiler hint does more or less nothing; go with default value.
+            if (_progression.Count == 0)
+                return new[] { "Vanilla" };
+            
             List <string> preparedProgressionPath = new List<string>();
             int lastDepth = 0;
 
