@@ -34,7 +34,10 @@ namespace SubnauticaRandomiser.Logic
             { "CyclopsEngine_Fragment", TechType.CyclopsEngineFragment },
             { "CyclopsHull_Fragment_Large", TechType.CyclopsHullFragment },
             { "CyclopsHull_Fragment_Medium", TechType.CyclopsHullFragment },
-            { "Exosuit_Fragment", TechType.ExosuitFragment },
+            { "exosuit_damaged_01", TechType.ExosuitFragment },
+            { "exosuit_damaged_02", TechType.ExosuitFragment },
+            { "exosuit_damaged_03", TechType.ExosuitFragment },
+            { "exosuit_damaged_06", TechType.ExosuitFragment },
             { "ExosuitDrillArmfragment", TechType.ExosuitDrillArmFragment },
             { "ExosuitGrapplingArmfragment", TechType.ExosuitGrapplingArmFragment },
             { "ExosuitPropulsionArmfragment", TechType.ExosuitPropulsionArmFragment },
@@ -302,6 +305,7 @@ namespace SubnauticaRandomiser.Logic
             foreach (string classId in keys)
             {
                 string dataPath = UWE.PrefabDatabase.prefabFiles[classId];
+                LogHandler.Debug($"KEY: {classId}, VALUE: {UWE.PrefabDatabase.prefabFiles[classId]}");
 
                 // If the prefab is not part of the predefined dictionary of fragments,
                 // discard it and continue. Acts as a filter for only those fragments
