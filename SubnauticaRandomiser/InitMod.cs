@@ -105,7 +105,20 @@ namespace SubnauticaRandomiser
 
             // Randomise!
             CoreLogic logic = new CoreLogic(random, s_config, materials, alternateStarts, biomes, databoxes);
-            s_masterDict = logic.Randomise();
+            try
+            {
+                s_masterDict = logic.Randomise();
+            }
+            catch (Exception ex)
+            {
+                LogHandler.MainMenuMessage("ERROR: Something went wrong. Please report this error with the config.json"
+                                           + " from your mod folder on NexusMods.");
+                LogHandler.Fatal($"{ex.GetType()}: {ex.Message}");
+                
+                // Ensure that the randomiser crashes completely if things go wrong this badly.
+                throw;
+            }
+            
             ApplyAllChanges();
             LogHandler.Info("Randomisation successful!");
 
