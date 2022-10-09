@@ -52,7 +52,6 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Compile Include="Logic\Recipes\Mode.cs" />
     <Compile Include="Logic\Recipes\ModeBalanced.cs" />
     <Compile Include="Logic\Recipes\ModeRandom.cs" />
-    <Compile Include="Logic\Recipes\ModeSubstitute.cs" />
     <Compile Include="Logic\Recipes\RecipeLogic.cs" />
     <Compile Include="Patches\AlternateStart.cs" />
     <Compile Include="RandomiserConfig.cs" />
