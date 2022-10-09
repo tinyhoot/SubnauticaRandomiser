@@ -25,14 +25,12 @@
     No knife required!
     
 - Mod support.
-  - Even if autodetecting mods and their items seems impossible with how the
-    randomiser works right now, giving users the ability to do it themselves
-    should be a priority.
+  - Out-of-the-box support is not happening.
   - Perhaps expose the progression tree? This would allow for more customisation,
-    and enable modded items to act as gateways and road blocks.
+    and enable modded items to act as progression items and road blocks.
     
 - Internal improvements.
-  - Make reading the CSV an async function.
+  - Look into why the game locks up while the mod is busy randomising.
   
 - Scrap metal!
   - For some reason, the existing logic works on some recipes but not for others.
@@ -46,8 +44,8 @@
     - Abuse this and file the new recipe for whatever scrap metal can be turned
       *into* under scrap metal.
 
-   
-  
+
+
 Thoughts from a playthrough:
 - Ensure access to food and water using one of the following:
   - Indoor growbed (covers both)
@@ -60,4 +58,9 @@ Other:
 - Sea treaders are a potential anti softlock mechanism. You could change their
   poop and shale into something useful on the fly, or make shale always contain
   something useful in the first place.
-  
+
+- display some kind of warning at the beginning if you're inside the explosion radius?
+- ensure easy radiation suit
+- for priority items, first force their prerequisites.
+- aurora: randomise door codes
+- randomise supply box contents
