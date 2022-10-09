@@ -74,7 +74,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
             if (number == 0)
                 throw new InvalidDataException($"Entity {TechType.AsString()} requires a databox, but 0 were found!");
 
-            LogHandler.Debug($"[B] Found {number} databoxes for {TechType.AsString()}");
+            logic._log.Debug($"[B] Found {number} databoxes for {TechType.AsString()}");
 
             UnlockDepth = total / number;
             UnlockConditions ??= new List<TechType>();

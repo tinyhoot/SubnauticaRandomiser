@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using SubnauticaRandomiser.RandomiserObjects;
 using SubnauticaRandomiser.RandomiserObjects.Enums;
 using UnityEngine;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser
 {
@@ -16,17 +17,19 @@ namespace SubnauticaRandomiser
         internal List<BiomeCollection> _csvBiomeList;
         internal List<Databox> _csvDataboxList;
         internal List<LogicEntity> _csvRecipeList;
+        private readonly ILogHandler _log;
         internal static string s_recipeCSVMD5;
 
         private const int _ExpectedColumns = 8;
         private const int _ExpectedRows = 245;
         private const int _ExpectedWreckColumns = 6;
 
-        internal CSVReader()
+        public CSVReader(ILogHandler logger)
         {
             _csvBiomeList = new List<BiomeCollection>();
             _csvDataboxList = new List<Databox>();
             _csvRecipeList = new List<LogicEntity>();
+            _log = logger;
         }
 
         /// <summary>
@@ -39,7 +42,7 @@ namespace SubnauticaRandomiser
             // First, try to find and grab the file containing recipe information.
             string[] csvLines;
             string path = GetDataPath(fileName);
-            LogHandler.Debug("Looking for alternate start CSV as " + path);
+            _log.Debug("Looking for alternate start CSV as " + path);
 
             try
             {
@@ -47,8 +50,8 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                LogHandler.MainMenuMessage("Failed to read alternate start CSV!");
-                LogHandler.Error(ex.Message);
+                _log.MainMenuMessage("Failed to read alternate start CSV!");
+                _log.Error(ex.Message);
                 return null;
             }
 
@@ -71,8 +74,8 @@ namespace SubnauticaRandomiser
                 }
                 catch (Exception ex)
                 {
-                    LogHandler.Error("Failed to parse information from alternate start CSV on line "+lineCounter);
-                    LogHandler.Error(ex.Message);
+                    _log.Error("Failed to parse information from alternate start CSV on line "+lineCounter);
+                    _log.Error(ex.Message);
                 }
             }
 
@@ -108,7 +111,7 @@ namespace SubnauticaRandomiser
                 starts.Add(parsedCoords);
             }
             
-            LogHandler.Debug("Registering alternate starts for biome " + biome);
+            _log.Debug("Registering alternate starts for biome " + biome);
             _csvAlternateStarts.Add(biome, starts);
         }
 
@@ -123,7 +126,7 @@ namespace SubnauticaRandomiser
             // First, try to find and grab the file containing recipe information.
             string[] csvLines;
             string path = GetDataPath(fileName);
-            LogHandler.Debug("Looking for recipe CSV as " + path);
+            _log.Debug("Looking for recipe CSV as " + path);
 
             try
             {
@@ -131,8 +134,8 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                LogHandler.MainMenuMessage("Failed to read recipe CSV! Aborting.");
-                LogHandler.Error(ex.Message);
+                _log.MainMenuMessage("Failed to read recipe CSV! Aborting.");
+                _log.Error(ex.Message);
                 return null;
             }
 
@@ -142,11 +145,11 @@ namespace SubnauticaRandomiser
             s_recipeCSVMD5 = CalculateMD5(path);
             if (csvLines.Length != _ExpectedRows)
             {
-                LogHandler.Info("Recipe CSV seems to contain custom entries.");
+                _log.Info("Recipe CSV seems to contain custom entries.");
             }
             else if (!s_recipeCSVMD5.Equals(InitMod._ExpectedRecipeMD5))
             {
-                LogHandler.Info("Recipe CSV seems to have been modified.");
+                _log.Info("Recipe CSV seems to have been modified.");
             }
 
             // Second, read each line and try to parse that into a list of LogicEntity objects, for later use.
@@ -169,8 +172,8 @@ namespace SubnauticaRandomiser
                 }
                 catch (Exception ex)
                 {
-                    LogHandler.Error("Failed to parse information from recipe CSV on line "+lineCounter);
-                    LogHandler.Error(ex.Message);
+                    _log.Error("Failed to parse information from recipe CSV on line "+lineCounter);
+                    _log.Error(ex.Message);
                 }
             }
 
@@ -278,8 +281,8 @@ namespace SubnauticaRandomiser
             if (category.CanHaveRecipe())
                 recipe = new Recipe(type);
 
-            LogHandler.Debug($"Registering entity: {type.AsString()}, {category}, {depth}, {prereqList.Count}"
-                             + $" prerequisites, {value}, {maxUses}, ...");
+            _log.Debug($"Registering entity: {type.AsString()}, {category}, {depth}, {prereqList.Count}"
+                       + $" prerequisites, {value}, {maxUses}, ...");
 
             var entity = new LogicEntity(type, category, blueprint, recipe, null, prereqList, false, value)
                 {
@@ -300,7 +303,7 @@ namespace SubnauticaRandomiser
             // Try and grab the file containing biome information.
             string[] csvLines;
             string path = GetDataPath(fileName);
-            LogHandler.Debug("Looking for biome CSV as " + path);
+            _log.Debug("Looking for biome CSV as " + path);
 
             try
             {
@@ -308,8 +311,8 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                LogHandler.MainMenuMessage("Failed to read biome CSV! Aborting.");
-                LogHandler.Error(ex.Message);
+                _log.MainMenuMessage("Failed to read biome CSV! Aborting.");
+                _log.Error(ex.Message);
                 return null;
             }
 
@@ -342,8 +345,8 @@ namespace SubnauticaRandomiser
                 }
                 catch (Exception ex)
                 {
-                    LogHandler.Error("Failed to parse information from biome CSV on line " + lineCounter);
-                    LogHandler.Error(ex.Message);
+                    _log.Error("Failed to parse information from biome CSV on line " + lineCounter);
+                    _log.Error(ex.Message);
                 }
             }
 
@@ -401,7 +404,7 @@ namespace SubnauticaRandomiser
                 fragmentRate = StringToFloat(cellsFragmentRate, "fragmentRate");
 
             biome = new Biome(name, biomeType, creatureCount, mediumCount, smallCount, fragmentRate);
-            LogHandler.Debug($"Registering biome: {name}, {biomeType}, {creatureCount}, {mediumCount}, {smallCount}");
+            _log.Debug($"Registering biome: {name}, {biomeType}, {creatureCount}, {mediumCount}, {smallCount}");
 
             return biome;
         }
@@ -416,7 +419,7 @@ namespace SubnauticaRandomiser
         {
             string[] csvLines;
             string path = GetDataPath(fileName);
-            LogHandler.Debug("Looking for wreckage CSV as " + path);
+            _log.Debug("Looking for wreckage CSV as " + path);
 
             try
             {
@@ -424,8 +427,8 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                LogHandler.MainMenuMessage("Failed to read wreckage CSV!");
-                LogHandler.Error(ex.Message);
+                _log.MainMenuMessage("Failed to read wreckage CSV!");
+                _log.Error(ex.Message);
                 return null;
             }
 
@@ -450,8 +453,8 @@ namespace SubnauticaRandomiser
                 }
                 catch (Exception ex)
                 {
-                    LogHandler.Error("Failed to parse information from wreckage CSV on line " + lineCounter);
-                    LogHandler.Error(ex.Message);
+                    _log.Error("Failed to parse information from wreckage CSV on line " + lineCounter);
+                    _log.Error(ex.Message);
                 }
             }
 
@@ -527,8 +530,8 @@ namespace SubnauticaRandomiser
             if (!string.IsNullOrEmpty(cellsPropulsionCannon))
                 propulsionCannon = StringToBool(cellsPropulsionCannon, "NeedsPropulsionCannon");
 
-            LogHandler.Debug($"Registering databox: {type.AsString()}, {coordinates}, {wreck}, {laserCutter}, "
-                             + propulsionCannon);
+            _log.Debug($"Registering databox: {type.AsString()}, {coordinates}, {wreck}, {laserCutter}, "
+                       + propulsionCannon);
             Databox databox = new Databox(type, coordinates, wreck, laserCutter, propulsionCannon);
 
             return databox;

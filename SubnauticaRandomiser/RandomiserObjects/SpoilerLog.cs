@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using SubnauticaRandomiser.Interfaces;
 
 namespace SubnauticaRandomiser.RandomiserObjects
 {
@@ -13,6 +14,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
     {
         internal const string _FileName = "spoilerlog.txt";
         private readonly RandomiserConfig _config;
+        private readonly ILogHandler _log;
         private readonly EntitySerializer _serializer;
         private readonly List<KeyValuePair<TechType, int>> _progression = new List<KeyValuePair<TechType, int>>();
 
@@ -23,9 +25,10 @@ namespace SubnauticaRandomiser.RandomiserObjects
         private string[] _contentDataboxes;
         private string[] _contentFragments;
 
-        internal SpoilerLog(RandomiserConfig config, EntitySerializer serializer)
+        internal SpoilerLog(RandomiserConfig config, ILogHandler logger, EntitySerializer serializer)
         {
             _config = config;
+            _log = logger;
             _serializer = serializer;
         }
         
@@ -123,7 +126,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 if (!userValue.Equals(defaultValue))
                     preparedAdvSettings.Add(field.Name + ": " + userValue);
             }
-            LogHandler.Debug("Added anomalies: " + preparedAdvSettings.Count);
+            _log.Debug("Added anomalies: " + preparedAdvSettings.Count);
 
             if (preparedAdvSettings.Count == 0)
                 preparedAdvSettings.Add("No advanced settings were modified.");
@@ -226,7 +229,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         {
             if (_progression.Exists(x => x.Key.Equals(type)))
             {
-                LogHandler.Warn("Tried to add duplicate progression item to spoiler log: " + type.AsString());
+                _log.Warn("Tried to add duplicate progression item to spoiler log: " + type.AsString());
                 return false;
             }
             
@@ -280,7 +283,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 await WriteTextToLog(file, lines.ToArray());
             }
 
-            LogHandler.Info("Wrote spoiler log to disk.");
+            _log.Info("Wrote spoiler log to disk.");
         }
 
         private async Task WriteTextToLog(StreamWriter file, string[] text)

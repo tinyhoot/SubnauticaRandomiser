@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.RandomiserObjects;
 using SubnauticaRandomiser.RandomiserObjects.Enums;
 
@@ -15,17 +16,19 @@ namespace SubnauticaRandomiser.Logic.Recipes
         protected Materials _materials => _logic._materials;
         protected ProgressionTree _tree => _logic._tree;
         protected Random _random => _logic._random;
+        protected ILogHandler _log;
         
         protected List<RandomiserIngredient> _ingredients = new List<RandomiserIngredient>();
         protected List<ETechTypeCategory> _blacklist = new List<ETechTypeCategory>();
         protected LogicEntity _baseTheme;
 
-        protected Mode(CoreLogic logic)
+        protected Mode(CoreLogic logic, ILogHandler logger)
         {
             _logic = logic;
+            _log = logger;
 
             _baseTheme = ChooseBaseTheme(100);
-            LogHandler.Debug($"[R] Chosen {_baseTheme.TechType.AsString()} as base theme.");
+            _log.Debug($"[R] Chosen {_baseTheme.TechType.AsString()} as base theme.");
             //InitMod.s_masterDict.DictionaryInstance.Add(TechType.Titanium, _baseTheme.GetSerializableRecipe());
             //ChangeScrapMetalResult(_baseTheme);
         }
@@ -52,7 +55,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (!entity.HasUsesLeft())
             {
                 _materials.GetReachable().Remove(entity);
-                LogHandler.Debug($"[R] ! Removing {entity} from materials list due to " +
+                _log.Debug($"[R] ! Removing {entity} from materials list due to " +
                                  $"max uses reached: {entity._usedInRecipes}");
             }
         }
@@ -146,12 +149,12 @@ namespace SubnauticaRandomiser.Logic.Recipes
                                                          && x.GetItemSize() == 1));
             }
 
-            LogHandler.Debug("LIST OF BASE THEME OPTIONS:");
+            _log.Debug("LIST OF BASE THEME OPTIONS:");
             foreach (LogicEntity ent in options)
             {
-                LogHandler.Debug(ent.TechType.AsString());
+                _log.Debug(ent.TechType.AsString());
             }
-            LogHandler.Debug("END LIST");
+            _log.Debug("END LIST");
 
             return GetRandom(options);
         }
@@ -160,7 +163,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         // the titanium one and replacing it with the new one.
         // As a minor caveat, the new recipe shows up at the bottom of the tree.
         // FIXME does not function.
-        internal static void ChangeScrapMetalResult(Recipe replacement)
+        internal void ChangeScrapMetalResult(Recipe replacement)
         {
             if (replacement.TechType.Equals(TechType.Titanium))
                 return;
@@ -180,10 +183,10 @@ namespace SubnauticaRandomiser.Logic.Recipes
             //CraftDataHandler.SetTechData(replacement.TechType, replacement);
             CraftDataHandler.SetTechData(yeet, td);
 
-            LogHandler.Debug("!!! TechType contained in replacement: " + replacement.TechType.AsString());
+            _log.Debug("!!! TechType contained in replacement: " + replacement.TechType.AsString());
             foreach (RandomiserIngredient i in replacement.Ingredients)
             {
-                LogHandler.Debug("!!! Ingredient: " + i.techType.AsString() + ", " + i.amount);
+                _log.Debug("!!! Ingredient: " + i.techType.AsString() + ", " + i.amount);
             }
 
             // FIXME for whatever reason, this code works for some items, but not for others????

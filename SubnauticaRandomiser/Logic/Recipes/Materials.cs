@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.RandomiserObjects;
 using SubnauticaRandomiser.RandomiserObjects.Enums;
 
@@ -12,16 +13,18 @@ namespace SubnauticaRandomiser.Logic.Recipes
         // this into a list since the searchability of _all is important,
         // and _reachable often gets iterated over anyway. Plus, lists have the
         // advantage of making it very easy to call up a random element.
-        private List<LogicEntity> _allMaterials;
-        private List<LogicEntity> _reachableMaterials;
+        private readonly List<LogicEntity> _allMaterials;
+        private readonly List<LogicEntity> _reachableMaterials;
+        private readonly ILogHandler _log;
 
         internal List<LogicEntity> GetAll() => _allMaterials;
         internal List<LogicEntity> GetReachable() => _reachableMaterials;
 
-        internal Materials(List<LogicEntity> allMaterials)
+        internal Materials(List<LogicEntity> allMaterials, ILogHandler logger)
         {
             _allMaterials = allMaterials;
             _reachableMaterials = new List<LogicEntity>();
+            _log = logger;
         }
         
         /// <summary>
@@ -94,7 +97,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             foreach(LogicEntity ent in additions)
             {
-                LogHandler.Debug("[R] Adding to reachable materials: " + ent.TechType.AsString());
+                _log.Debug("[R] Adding to reachable materials: " + ent.TechType.AsString());
             }
             _reachableMaterials.AddRange(additions);
             return true;

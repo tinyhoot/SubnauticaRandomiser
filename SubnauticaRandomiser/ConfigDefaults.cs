@@ -55,7 +55,7 @@ namespace SubnauticaRandomiser
         {
             if (!s_defaults.ContainsKey(key))
             {
-                LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                //LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
                 return null;
             }
             return s_defaults[key][0];
@@ -65,7 +65,7 @@ namespace SubnauticaRandomiser
         {
             if (!s_defaults.ContainsKey(key))
             {
-                LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                //LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
                 return null;
             }
             return s_defaults[key][2];
@@ -75,7 +75,7 @@ namespace SubnauticaRandomiser
         {
             if (!s_defaults.ContainsKey(key))
             {
-                LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                //LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
                 return null;
             }
             return s_defaults[key][1];

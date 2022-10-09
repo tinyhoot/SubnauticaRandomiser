@@ -36,7 +36,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         {
             if (!Enum.TryParse(name, out BiomeType biomeType))
             {
-                LogHandler.Warn("! Failed to parse biome to enum: " + name);
+                //LogHandler.Warn("! Failed to parse biome to enum: " + name);
                 return BiomeType.Unassigned;
             }
 

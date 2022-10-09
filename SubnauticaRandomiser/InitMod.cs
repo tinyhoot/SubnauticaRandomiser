@@ -37,17 +37,19 @@ namespace SubnauticaRandomiser
 
         // The master list of everything that is modified by the mod.
         internal static EntitySerializer s_masterDict;
+        private static LogHandler _log;
         private const bool _Debug_forceRandomise = false;
 
         [QModPatch]
         public static void Initialise()
         {
-            LogHandler.Info("Randomiser starting up!");
+            _log = new LogHandler();
+            _log.Info("Randomiser starting up!");
 
             // Register options menu.
             s_modDirectory = GetSubnauticaRandomiserDirectory();
             s_config = OptionsPanelHandler.Main.RegisterModOptions<RandomiserConfig>();
-            LogHandler.Debug("Registered options menu.");
+            _log.Debug("Registered options menu.");
 
             // Ensure the user did not update into a save incompatibility, and abort if they did to preserve a prior
             // version's state.
@@ -61,27 +63,27 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                LogHandler.Warn("Could not load game state from disk.");
-                LogHandler.Warn(ex.Message);
+                _log.Warn("Could not load game state from disk.");
+                _log.Warn(ex.Message);
             }
 
             // Triple checking things here in case the save got corrupted somehow.
             if (!_Debug_forceRandomise && s_masterDict != null)
             {
                 ApplyAllChanges();
-                LogHandler.Info("Successfully loaded game state from disk.");
+                _log.Info("Successfully loaded game state from disk.");
             }
             else
             {
                 if (_Debug_forceRandomise)
-                    LogHandler.Warn("Set to forcibly re-randomise recipes.");
+                    _log.Warn("Set to forcibly re-randomise recipes.");
                 else
-                    LogHandler.Warn("Failed to load game state from disk: dictionary empty.");
+                    _log.Warn("Failed to load game state from disk: dictionary empty.");
 
                 Randomise();
             }
 
-            LogHandler.Info("Finished loading.");
+            _log.Info("Finished loading.");
         }
 
         /// <summary>
@@ -106,23 +108,23 @@ namespace SubnauticaRandomiser
             random = new Random(s_config.iSeed);
 
             // Randomise!
-            CoreLogic logic = new CoreLogic(random, s_config, materials, alternateStarts, biomes, databoxes);
+            CoreLogic logic = new CoreLogic(random, s_config, _log, materials, alternateStarts, biomes, databoxes);
             try
             {
                 s_masterDict = logic.Randomise();
             }
             catch (Exception ex)
             {
-                LogHandler.MainMenuMessage("ERROR: Something went wrong. Please report this error with the config.json"
+                _log.MainMenuMessage("ERROR: Something went wrong. Please report this error with the config.json"
                                            + " from your mod folder on NexusMods.");
-                LogHandler.Fatal($"{ex.GetType()}: {ex.Message}");
+                _log.Fatal($"{ex.GetType()}: {ex.Message}");
                 
                 // Ensure that the randomiser crashes completely if things go wrong this badly.
                 throw;
             }
             
             ApplyAllChanges();
-            LogHandler.Info("Randomisation successful!");
+            _log.Info("Randomisation successful!");
 
             SaveGameStateToDisk();
         }
@@ -144,7 +146,7 @@ namespace SubnauticaRandomiser
             if (s_masterDict.SpawnDataDict?.Count > 0 || s_masterDict.NumFragmentsToUnlock?.Count > 0)
             {
                 FragmentLogic.ApplyMasterDict(s_masterDict);
-                LogHandler.Info("Loaded fragment state.");
+                _log.Info("Loaded fragment state.");
             }
 
             // Load any changes that rely on harmony patches.
@@ -163,10 +165,10 @@ namespace SubnauticaRandomiser
             if (string.IsNullOrEmpty(version))
                 version = "unknown or corrupted.";
 
-            LogHandler.MainMenuMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.");
-            LogHandler.MainMenuMessage("The last supported version for your savegame is " + version);
-            LogHandler.MainMenuMessage("To protect your previous savegame, no changes to the game have been made.");
-            LogHandler.MainMenuMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json");
+            _log.MainMenuMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.");
+            _log.MainMenuMessage("The last supported version for your savegame is " + version);
+            _log.MainMenuMessage("To protect your previous savegame, no changes to the game have been made.");
+            _log.MainMenuMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json");
             return false;
         }
 
@@ -178,13 +180,13 @@ namespace SubnauticaRandomiser
         private static (Dictionary<EBiomeType, List<float[]>> starts, List<BiomeCollection> biomes, List<Databox>
             databoxes, List<LogicEntity> materials) ParseInputFiles()
         {
-            var csvReader = new CSVReader();
+            var csvReader = new CSVReader(_log);
 
             // Attempt to read and parse the CSV with all alternate starts.
             var alternateStarts = csvReader.ParseAlternateStartFile(_AlternateStartFile);
             if (alternateStarts is null)
             {
-                LogHandler.Error("Failed to extract alternate start information from CSV.");
+                _log.Error("Failed to extract alternate start information from CSV.");
                 throw new ParsingException("Failed to extract alternate start information: null.");
             }
             
@@ -192,7 +194,7 @@ namespace SubnauticaRandomiser
             var biomes = csvReader.ParseBiomeFile(_BiomeFile);
             if (biomes is null)
             {
-                LogHandler.Error("Failed to extract biome information from CSV.");
+                _log.Error("Failed to extract biome information from CSV.");
                 throw new ParsingException("Failed to extract biome information: null");
             }
 
@@ -200,7 +202,7 @@ namespace SubnauticaRandomiser
             var materials = csvReader.ParseRecipeFile(_RecipeFile);
             if (materials is null)
             {
-                LogHandler.Error("Failed to extract recipe information from CSV.");
+                _log.Error("Failed to extract recipe information from CSV.");
                 throw new ParsingException("Failed to extract recipe information: null");
             }
 
@@ -208,7 +210,7 @@ namespace SubnauticaRandomiser
             var databoxes = csvReader.ParseWreckageFile(_WreckageFile);
             if (databoxes is null || databoxes.Count == 0)
             {
-                LogHandler.Error("Failed to extract databox information from CSV.");
+                _log.Error("Failed to extract databox information from CSV.");
                 throw new ParsingException("Failed to extract databox information: null");
             }
 
@@ -225,11 +227,11 @@ namespace SubnauticaRandomiser
                 string base64 = s_masterDict.ToBase64String();
                 s_config.sBase64Seed = base64;
                 s_config.Save();
-                LogHandler.Debug("Saved game state to disk!");
+                _log.Debug("Saved game state to disk!");
             }
             else
             {
-                LogHandler.Error("Could not save game state to disk: invalid data.");
+                _log.Error("Could not save game state to disk: invalid data.");
             }
         }
 
@@ -245,7 +247,7 @@ namespace SubnauticaRandomiser
                 throw new InvalidDataException("base64 seed is empty.");
             }
 
-            LogHandler.Debug("Trying to decode base64 string...");
+            _log.Debug("Trying to decode base64 string...");
             EntitySerializer dictionary = EntitySerializer.FromBase64String(s_config.sBase64Seed);
 
             if (dictionary?.SpawnDataDict is null || dictionary.RecipeDict is null)

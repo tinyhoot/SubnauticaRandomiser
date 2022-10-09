@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.RandomiserObjects;
 using SubnauticaRandomiser.RandomiserObjects.Enums;
@@ -16,6 +17,7 @@ namespace SubnauticaRandomiser.Logic
     {
         internal readonly RandomiserConfig _config;
         internal readonly List<Databox> _databoxes;
+        internal readonly ILogHandler _log;
         internal readonly EntitySerializer _masterDict;
         internal readonly Materials _materials;
         internal readonly System.Random _random;
@@ -27,16 +29,17 @@ namespace SubnauticaRandomiser.Logic
         internal readonly FragmentLogic _fragmentLogic;
         private readonly RecipeLogic _recipeLogic;
 
-        public CoreLogic(System.Random random, RandomiserConfig config, List<LogicEntity> allMaterials,
+        public CoreLogic(System.Random random, RandomiserConfig config, ILogHandler logger, List<LogicEntity> allMaterials,
             Dictionary<EBiomeType, List<float[]>> alternateStarts, List<BiomeCollection> biomes = null,
             List<Databox> databoxes = null)
         {
             _config = config;
             _databoxes = databoxes;
-            _masterDict = new EntitySerializer();
-            _materials = new Materials(allMaterials);
+            _log = logger;
+            _masterDict = new EntitySerializer(logger);
+            _materials = new Materials(allMaterials, logger);
             _random = random;
-            _spoilerLog = new SpoilerLog(config, _masterDict);
+            _spoilerLog = new SpoilerLog(config, logger, _masterDict);
             
             if (!_config.sSpawnPoint.StartsWith("Vanilla"))
                 _altStartLogic = new AlternateStartLogic(this, alternateStarts);
@@ -106,7 +109,7 @@ namespace SubnauticaRandomiser.Logic
         /// a valid solution.</exception>
         internal EntitySerializer Randomise()
         {
-            LogHandler.Info("Randomising using logic-based system...");
+            _log.Info("Randomising using logic-based system...");
             
             List<LogicEntity> notRandomised = new List<LogicEntity>();
             Dictionary<TechType, bool> unlockedProgressionItems = new Dictionary<TechType, bool>();
@@ -122,8 +125,8 @@ namespace SubnauticaRandomiser.Logic
                 circuitbreaker++;
                 if (circuitbreaker > 3000)
                 {
-                    LogHandler.MainMenuMessage("Failed to randomise items: stuck in infinite loop!");
-                    LogHandler.Fatal("Encountered infinite loop, aborting!");
+                    _log.MainMenuMessage("Failed to randomise items: stuck in infinite loop!");
+                    _log.Fatal("Encountered infinite loop, aborting!");
                     throw new TimeoutException("Encountered infinite loop while randomising!");
                 }
                 
@@ -147,10 +150,10 @@ namespace SubnauticaRandomiser.Logic
                 }
 
                 if (success is null)
-                    LogHandler.Warn("Unsupported entity in loop: " + nextEntity);
+                    _log.Warn("Unsupported entity in loop: " + nextEntity);
             }
 
-            LogHandler.Info($"Finished randomising within {circuitbreaker} cycles!");
+            _log.Info($"Finished randomising within {circuitbreaker} cycles!");
             _spoilerLog.WriteLog();
 
             return _masterDict;
@@ -195,7 +198,7 @@ namespace SubnauticaRandomiser.Logic
                 { TechType.PlasteelTank, new[] { 135, 0.1 } }
             };
 
-            LogHandler.Debug("===== Recalculating reachable depth =====");
+            _log.Debug("===== Recalculating reachable depth =====");
 
             // Get the deepest depth that can be reached by vehicle.
             foreach (EProgressionNode node in EProgressionNodeExtensions.AllDepthNodes)
@@ -230,7 +233,7 @@ namespace SubnauticaRandomiser.Logic
             // Given everything above, calculate the total.
             int totalDepth = CalculateTotalDepth(progressionItems, vehicleDepth, (int)soloDepthRaw);
             
-            LogHandler.Debug("===== New reachable depth: " + totalDepth + " =====");
+            _log.Debug("===== New reachable depth: " + totalDepth + " =====");
 
             return totalDepth;
         }
@@ -317,7 +320,7 @@ namespace SubnauticaRandomiser.Logic
                 if (!type.Equals(TechType.None))
                 {
                     entity = _materials.Find(type);
-                    LogHandler.Debug($"Prioritising essential entity {entity} for depth {depth}");
+                    _log.Debug($"Prioritising essential entity {entity} for depth {depth}");
                 }
             }
 
@@ -332,7 +335,7 @@ namespace SubnauticaRandomiser.Logic
                 {
                     TechType nextType = GetRandom(new List<TechType>(types));
                     entity = _materials.Find(nextType);
-                    LogHandler.Debug($"Prioritising elective entity {entity} for depth {depth}");
+                    _log.Debug($"Prioritising elective entity {entity} for depth {depth}");
                 }
             }
 
@@ -349,7 +352,7 @@ namespace SubnauticaRandomiser.Logic
         {
             if (!(_databoxes?.Count > 0))
             {
-                LogHandler.Debug("Skipped linking Cyclops Hull Modules: Databoxes not randomised.");
+                _log.Debug("Skipped linking Cyclops Hull Modules: Databoxes not randomised.");
                 return;
             }
 
@@ -401,7 +404,7 @@ namespace SubnauticaRandomiser.Logic
             mod2.Blueprint.WasUpdated = true;
             mod3.Blueprint.WasUpdated = true;
             
-            LogHandler.Debug("Linked Cyclops Hull Modules.");
+            _log.Debug("Linked Cyclops Hull Modules.");
         }
 
         /// <summary>

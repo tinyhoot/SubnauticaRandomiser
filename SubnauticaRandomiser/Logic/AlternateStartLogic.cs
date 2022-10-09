@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.RandomiserObjects;
 using SubnauticaRandomiser.RandomiserObjects.Enums;
 using Random = System.Random;
@@ -13,6 +14,7 @@ namespace SubnauticaRandomiser.Logic
         private readonly CoreLogic _logic;
 
         private RandomiserConfig _config => _logic._config;
+        private ILogHandler _log => _logic._log;
         private EntitySerializer _masterDict => _logic._masterDict;
         private Random _random => _logic._random;
 
@@ -64,7 +66,7 @@ namespace SubnauticaRandomiser.Logic
             EBiomeType biome = GetBiome();
             if (!_alternateStarts.ContainsKey(biome))
             {
-                LogHandler.Error("[AS] No information found on chosen starting biome " + biome);
+                _log.Error("[AS] No information found on chosen starting biome " + biome);
                 return new RandomiserVector(0, 0, 0);
             }
 
@@ -75,7 +77,7 @@ namespace SubnauticaRandomiser.Logic
             int x = _random.Next((int)box[0], (int)box[2] + 1);
             int z = _random.Next((int)box[3], (int)box[1] + 1);
 
-            LogHandler.Debug("[AS] Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
+            _log.Debug("[AS] Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
             return new RandomiserVector(x, 0, z);
         }
     }

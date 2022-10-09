@@ -121,7 +121,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 {
                     if (!logic._masterDict.SpawnDataDict.ContainsKey(fragment))
                     {
-                        LogHandler.Debug($"[B] Entity {this} missing fragment {fragment.AsString()}");
+                        //LogHandler.Debug($"[B] Entity {this} missing fragment {fragment.AsString()}");
                         return false;
                     }
                 }

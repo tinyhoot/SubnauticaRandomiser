@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.RandomiserObjects;
 using SubnauticaRandomiser.RandomiserObjects.Enums;
 
@@ -16,6 +15,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private readonly Mode _mode;
 
         private RandomiserConfig _config => _logic._config;
+        private ILogHandler _log => _logic._log;
         private EntitySerializer _masterDict => _logic._masterDict;
         private Materials _materials => _logic._materials;
         private ProgressionTree _tree => _logic._tree;
@@ -29,13 +29,13 @@ namespace SubnauticaRandomiser.Logic.Recipes
             switch (_config.iRandomiserMode)
             {
                 case (0):
-                    _mode = new ModeBalanced(_logic);
+                    _mode = new ModeBalanced(_logic, _log);
                     break;
                 case (1):
-                    _mode = new ModeRandom(_logic);
+                    _mode = new ModeRandom(_logic, _log);
                     break;
                 default:
-                    LogHandler.Error("Invalid recipe mode: " + _config.iRandomiserMode);
+                    _log.Error("Invalid recipe mode: " + _config.iRandomiserMode);
                     break;
             }
         }
@@ -53,7 +53,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (!(_tree.IsPriorityEntity(entity)
                   || (entity.CheckBlueprintFulfilled(_logic, reachableDepth) && entity.CheckPrerequisitesFulfilled(_logic))))
             {
-                LogHandler.Debug($"[R] --- Recipe [{entity}] did not fulfill requirements, skipping.");
+                _log.Debug($"[R] --- Recipe [{entity}] did not fulfill requirements, skipping.");
                 return false;
             }
             
@@ -83,11 +83,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 unlockedProgressionItems.Add(entity.TechType, true);
                 _logic._spoilerLog.AddProgressionEntry(entity.TechType, 0);
 
-                LogHandler.Debug($"[R][+] Added {entity} to progression items.");
+                _log.Debug($"[R][+] Added {entity} to progression items.");
             }
 
             entity.InLogic = true;
-            LogHandler.Debug($"[R][+] Randomised recipe for [{entity}].");
+            _log.Debug($"[R][+] Randomised recipe for [{entity}].");
 
             return true;
         }

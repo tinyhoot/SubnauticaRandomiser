@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.RandomiserObjects;
 using UnityEngine;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -10,6 +11,7 @@ namespace SubnauticaRandomiser.Logic
         private readonly CoreLogic _logic;
 
         private List<Databox> _databoxes => _logic._databoxes;
+        private ILogHandler _log => _logic._log;
         private EntitySerializer _masterDict => _logic._masterDict;
         private System.Random _random => _logic._random;
 
@@ -42,8 +44,8 @@ namespace SubnauticaRandomiser.Logic
                 randomDataboxes.Add(new Databox(originalBox.TechType, toBeRandomised[next], replacementBox.Wreck, 
                     replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
                 _masterDict.Databoxes.Add(new RandomiserVector(toBeRandomised[next]), originalBox.TechType);
-                LogHandler.Debug($"[D] Databox {toBeRandomised[next].ToString()} with {replacementBox}"
-                                 + " now contains " + originalBox);
+                _log.Debug($"[D] Databox {toBeRandomised[next].ToString()} with {replacementBox}"
+                           + " now contains " + originalBox);
                 toBeRandomised.RemoveAt(next);
             }
 

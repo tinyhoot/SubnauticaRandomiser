@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.RandomiserObjects;
 
 namespace SubnauticaRandomiser
@@ -32,13 +33,22 @@ namespace SubnauticaRandomiser
         // The options to choose from for spawning materials when scanning a fragment which is already unlocked.
         public Dictionary<TechType, float> FragmentMaterialYield;
         // The number of scans required to unlock the fragment item.
-        public Dictionary<TechType, int> NumFragmentsToUnlock = new Dictionary<TechType, int>();
+        public Dictionary<TechType, int> NumFragmentsToUnlock;
         // All modified recipes.
-        public Dictionary<TechType, Recipe> RecipeDict = new Dictionary<TechType, Recipe>();
+        public Dictionary<TechType, Recipe> RecipeDict;
         // All modified fragment spawn rates.
-        public Dictionary<TechType, List<SpawnData>> SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
+        public Dictionary<TechType, List<SpawnData>> SpawnDataDict;
+        private readonly ILogHandler _log;
         
         public const int SaveVersion = InitMod._ExpectedSaveVersion;
+
+        public EntitySerializer(ILogHandler logger)
+        {
+            NumFragmentsToUnlock = new Dictionary<TechType, int>();
+            RecipeDict = new Dictionary<TechType, Recipe>();
+            SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
+            _log = logger;
+        }
 
         /// <summary>
         /// Convert this class to a string for saving.
@@ -94,7 +104,7 @@ namespace SubnauticaRandomiser
         {
             if (NumFragmentsToUnlock.ContainsKey(type))
             {
-                LogHandler.Warn($"[ES] Tried to add duplicate key {type.AsString()} to FragmentNum master dictionary!");
+                _log.Warn($"[ES] Tried to add duplicate key {type.AsString()} to FragmentNum master dictionary!");
                 return false;
             }
             NumFragmentsToUnlock.Add(type, number);
@@ -111,7 +121,7 @@ namespace SubnauticaRandomiser
         {
             if (RecipeDict.ContainsKey(type))
             {
-                LogHandler.Warn($"[ES] Tried to add duplicate key {type.AsString()} to Recipe master dictionary!");
+                _log.Warn($"[ES] Tried to add duplicate key {type.AsString()} to Recipe master dictionary!");
                 return false;
             }
             RecipeDict.Add(type, r);
@@ -128,7 +138,7 @@ namespace SubnauticaRandomiser
         {
             if (SpawnDataDict.ContainsKey(type))
             {
-                LogHandler.Warn($"Tried to add duplicate key {type.AsString()} to SpawnData master dictionary!");
+                _log.Warn($"Tried to add duplicate key {type.AsString()} to SpawnData master dictionary!");
                 return false;
             }
             SpawnDataDict.Add(type, data);
