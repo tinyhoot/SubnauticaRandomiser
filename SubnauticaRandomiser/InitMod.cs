@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
@@ -12,6 +13,7 @@ using SubnauticaRandomiser.RandomiserObjects;
 using SubnauticaRandomiser.RandomiserObjects.Enums;
 using SubnauticaRandomiser.RandomiserObjects.Exceptions;
 
+[assembly:InternalsVisibleTo("Tests")]
 namespace SubnauticaRandomiser
 {
     [QModCore]
