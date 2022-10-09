@@ -9,7 +9,7 @@ namespace SubnauticaRandomiser
     public class RandomiserConfig : ConfigFile
     {
         private DateTime _timeButtonPressed = new DateTime();
-        private const double _buttonMinInterval = 0.5;
+        private const double _ButtonMinInterval = 0.5;
 
         // Every public variable listed here will end up in the config file.
         // Additionally, adding the relevant Attributes will also make them show up in the in-game options menu.
@@ -116,7 +116,7 @@ namespace SubnauticaRandomiser
 
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
-        public int iSaveVersion = InitMod.s_expectedSaveVersion;
+        public int iSaveVersion = InitMod._ExpectedSaveVersion;
 
         public void SanitiseConfigValues()
         {
@@ -151,7 +151,7 @@ namespace SubnauticaRandomiser
         /// <returns>True if the button was recently pressed, false if it was not.</returns>
         private bool WasButtonRecentlyPressed()
         {
-            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds< _buttonMinInterval)
+            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds< _ButtonMinInterval)
                 return false;
 
             _timeButtonPressed = DateTime.UtcNow;

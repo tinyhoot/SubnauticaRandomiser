@@ -56,7 +56,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
                 "*************************************************",
                 "",
-                "Generated on " + DateTime.Now + " with " + InitMod.s_versionDict[InitMod.s_expectedSaveVersion]
+                "Generated on " + DateTime.Now + " with " + InitMod.s_versionDict[InitMod._ExpectedSaveVersion]
             };
             _contentBasics = new[]
             {
@@ -184,7 +184,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         /// <returns>The prepared log entry.</returns>
         private string PrepareMD5()
         {
-            if (!InitMod.s_expectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
+            if (!InitMod._ExpectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
                 return "recipeInformation.csv has been modified: " + CSVReader.s_recipeCSVMD5;
             
             return "recipeInformation.csv is unmodified.";

@@ -144,7 +144,7 @@ namespace SubnauticaRandomiser
             {
                 LogHandler.Info("Recipe CSV seems to contain custom entries.");
             }
-            else if (!s_recipeCSVMD5.Equals(InitMod.s_expectedRecipeMD5))
+            else if (!s_recipeCSVMD5.Equals(InitMod._ExpectedRecipeMD5))
             {
                 LogHandler.Info("Recipe CSV seems to have been modified.");
             }

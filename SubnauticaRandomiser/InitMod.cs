@@ -19,12 +19,12 @@ namespace SubnauticaRandomiser
     {
         internal static string s_modDirectory;
         internal static RandomiserConfig s_config;
-        internal const string s_alternateStartFile = "alternateStarts.csv";
-        internal const string s_biomeFile = "biomeSlots.csv";
-        internal const string s_recipeFile = "recipeInformation.csv";
-        internal const string s_wreckageFile = "wreckInformation.csv";
-        internal const string s_expectedRecipeMD5 = "fb1f4990a52976c72ec957f82bf15bf4";
-        internal const int s_expectedSaveVersion = 4;
+        internal const string _AlternateStartFile = "alternateStarts.csv";
+        internal const string _BiomeFile = "biomeSlots.csv";
+        internal const string _RecipeFile = "recipeInformation.csv";
+        internal const string _WreckageFile = "wreckInformation.csv";
+        internal const string _ExpectedRecipeMD5 = "fb1f4990a52976c72ec957f82bf15bf4";
+        internal const int _ExpectedSaveVersion = 4;
         internal static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
         {
             [1] = "v0.5.1",
@@ -35,7 +35,7 @@ namespace SubnauticaRandomiser
 
         // The master list of everything that is modified by the mod.
         internal static EntitySerializer s_masterDict;
-        private const bool _debug_forceRandomise = false;
+        private const bool _Debug_forceRandomise = false;
 
         [QModPatch]
         public static void Initialise()
@@ -64,14 +64,14 @@ namespace SubnauticaRandomiser
             }
 
             // Triple checking things here in case the save got corrupted somehow.
-            if (!_debug_forceRandomise && s_masterDict != null)
+            if (!_Debug_forceRandomise && s_masterDict != null)
             {
                 ApplyAllChanges();
                 LogHandler.Info("Successfully loaded game state from disk.");
             }
             else
             {
-                if (_debug_forceRandomise)
+                if (_Debug_forceRandomise)
                     LogHandler.Warn("Set to forcibly re-randomise recipes.");
                 else
                     LogHandler.Warn("Failed to load game state from disk: dictionary empty.");
@@ -89,7 +89,7 @@ namespace SubnauticaRandomiser
         {
             s_masterDict = null;
             s_config.SanitiseConfigValues();
-            s_config.iSaveVersion = s_expectedSaveVersion;
+            s_config.iSaveVersion = _ExpectedSaveVersion;
 
             // Parse all the necessary input files.
             var (alternateStarts, biomes, databoxes, materials) = ParseInputFiles();
@@ -154,7 +154,7 @@ namespace SubnauticaRandomiser
         /// </summary>
         private static bool CheckSaveCompatibility()
         {
-            if (s_config.iSaveVersion == s_expectedSaveVersion)
+            if (s_config.iSaveVersion == _ExpectedSaveVersion)
                 return true;
             
             s_versionDict.TryGetValue(s_config.iSaveVersion, out string version);
@@ -179,7 +179,7 @@ namespace SubnauticaRandomiser
             var csvReader = new CSVReader();
 
             // Attempt to read and parse the CSV with all alternate starts.
-            var alternateStarts = csvReader.ParseAlternateStartFile(s_alternateStartFile);
+            var alternateStarts = csvReader.ParseAlternateStartFile(_AlternateStartFile);
             if (alternateStarts is null)
             {
                 LogHandler.Error("Failed to extract alternate start information from CSV.");
@@ -187,7 +187,7 @@ namespace SubnauticaRandomiser
             }
             
             // Attempt to read and parse the CSV with all biome information.
-            var biomes = csvReader.ParseBiomeFile(s_biomeFile);
+            var biomes = csvReader.ParseBiomeFile(_BiomeFile);
             if (biomes is null)
             {
                 LogHandler.Error("Failed to extract biome information from CSV.");
@@ -195,7 +195,7 @@ namespace SubnauticaRandomiser
             }
 
             // Attempt to read and parse the CSV with all recipe information.
-            var materials = csvReader.ParseRecipeFile(s_recipeFile);
+            var materials = csvReader.ParseRecipeFile(_RecipeFile);
             if (materials is null)
             {
                 LogHandler.Error("Failed to extract recipe information from CSV.");
@@ -203,7 +203,7 @@ namespace SubnauticaRandomiser
             }
 
             // Attempt to read and parse the CSV with wreckages and databox info.
-            var databoxes = csvReader.ParseWreckageFile(s_wreckageFile);
+            var databoxes = csvReader.ParseWreckageFile(_WreckageFile);
             if (databoxes is null || databoxes.Count == 0)
             {
                 LogHandler.Error("Failed to extract databox information from CSV.");
