@@ -12,6 +12,7 @@
     <LangVersion>8</LangVersion>
     <Nullable>warnings</Nullable>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -86,35 +87,27 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Reference Include="System" />
     <Reference Include="0Harmony">
       <HintPath>Subnautica\BepInEx\core\0Harmony.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp_publicized">
       <HintPath>Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass_publicized">
       <HintPath>Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="QModInstaller">
       <HintPath>Subnautica\BepInEx\plugins\QModManager\QModInstaller.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="SMLHelper">
       <HintPath>Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -67,6 +67,7 @@ Other:
 
 
 UNITTEST REFACTOR:
+- Change access modifiers across the whole project
 - Extract re-application of saved logic into its own class
 - Config: Perhaps rename. In WasRecentlyPressed(), use time as parameter
 - Biome: Should ParseType really be here?
