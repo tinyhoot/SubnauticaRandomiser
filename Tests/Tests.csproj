@@ -72,6 +72,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="ConfigDefaultsTests.cs" />
+        <Compile Include="Logic\ProgressionTreeTest.cs" />
         <Compile Include="Logic\Recipes\MaterialsTest.cs" />
         <Compile Include="Mocks\FakeLogger.cs" />
     </ItemGroup>

@@ -1,0 +1,10 @@
+# Specify filepatterns you want git to ignore.
+.idea
+.vs
+packages
+**/bin
+**/obj
+**/Properties
+SubnauticaRandomiser/Subnautica
+SubnauticaRandomiser.sln.DotSettings.user
+

@@ -6,12 +6,12 @@ using SubnauticaRandomiser.RandomiserObjects.Enums;
 
 namespace SubnauticaRandomiser.Logic
 {
-    public class ProgressionTree
+    internal class ProgressionTree
     {
-        private Dictionary<EProgressionNode, ProgressionPath> _depthDifficulties;
-        private Dictionary<EProgressionNode, List<TechType>> _essentialItems;
-        private Dictionary<EProgressionNode, List<TechType[]>> _electiveItems;
-        private Dictionary<TechType, TechType> _upgradeChains;
+        internal Dictionary<EProgressionNode, ProgressionPath> _depthDifficulties;
+        internal Dictionary<EProgressionNode, List<TechType>> _essentialItems;
+        internal Dictionary<EProgressionNode, List<TechType[]>> _electiveItems;
+        internal Dictionary<TechType, TechType> _upgradeChains;
         public Dictionary<TechType, int> BasicOutpostPieces;
         public Dictionary<TechType, bool> DepthProgressionItems;
 
@@ -20,6 +20,7 @@ namespace SubnauticaRandomiser.Logic
             _depthDifficulties = new Dictionary<EProgressionNode, ProgressionPath>();
             _essentialItems = new Dictionary<EProgressionNode, List<TechType>>();
             _electiveItems = new Dictionary<EProgressionNode, List<TechType[]>>();
+            _upgradeChains = new Dictionary<TechType, TechType>();
             BasicOutpostPieces = new Dictionary<TechType, int>();
             DepthProgressionItems = new Dictionary<TechType, bool>();
         }
@@ -177,7 +178,6 @@ namespace SubnauticaRandomiser.Logic
 
             // Assemble a vanilla upgrade chain. These are the upgrades as the
             // base game intends you to progress through them.
-            _upgradeChains = new Dictionary<TechType, TechType>();
             AddUpgradeChain(TechType.VehicleHullModule2, TechType.VehicleHullModule1);
             AddUpgradeChain(TechType.VehicleHullModule3, TechType.VehicleHullModule2);
             AddUpgradeChain(TechType.ExoHullModule2, TechType.ExoHullModule1);
@@ -243,7 +243,7 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Add a pathway of progression to an existing one ProgressionPath.
+        /// Add a pathway of progression to an existing ProgressionPath.
         /// </summary>
         /// <param name="node">The node to add a path for.</param>
         /// <param name="path">The TechType that allows for progression.</param>
