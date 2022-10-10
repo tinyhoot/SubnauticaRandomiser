@@ -1,7 +1,7 @@
 using NUnit.Framework;
 using SubnauticaRandomiser;
 
-namespace Tests
+namespace Tests.UnitTests
 {
     [TestFixture]
     public class ConfigDefaultsTests

@@ -71,10 +71,10 @@
         </Reference>
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="ConfigDefaultsTests.cs" />
-        <Compile Include="Logic\ProgressionTreeTest.cs" />
-        <Compile Include="Logic\Recipes\MaterialsTest.cs" />
         <Compile Include="Mocks\FakeLogger.cs" />
+        <Compile Include="UnitTests\ConfigDefaultsTests.cs" />
+        <Compile Include="UnitTests\Logic\ProgressionTreeTest.cs" />
+        <Compile Include="UnitTests\Logic\Recipes\MaterialsTest.cs" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="TestDataFiles\TestRecipeInformation.csv" />

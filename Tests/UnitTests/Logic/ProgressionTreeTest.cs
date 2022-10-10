@@ -4,7 +4,7 @@ using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.RandomiserObjects;
 using SubnauticaRandomiser.RandomiserObjects.Enums;
 
-namespace Tests.Logic
+namespace Tests.UnitTests.Logic
 {
     [TestFixture]
     public class ProgressionTreeTest

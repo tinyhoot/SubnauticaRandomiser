@@ -5,7 +5,7 @@ using SubnauticaRandomiser.RandomiserObjects;
 using SubnauticaRandomiser.RandomiserObjects.Enums;
 using Tests.Mocks;
 
-namespace Tests.Logic.Recipes
+namespace Tests.UnitTests.Logic.Recipes
 {
     [TestFixture]
     public class MaterialsTest
