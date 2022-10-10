@@ -9,13 +9,19 @@ namespace SubnauticaRandomiser
     public class RandomiserConfig : ConfigFile
     {
         private readonly ILogHandler _log;
-        private DateTime _timeButtonPressed;
+        private DateTime _lastButtonPress;
         private const double _ButtonMinInterval = 0.5;
 
         public RandomiserConfig()
         {
             _log = new LogHandler();
-            _timeButtonPressed = new DateTime();
+            _lastButtonPress = new DateTime();
+        }
+        
+        public RandomiserConfig(ILogHandler logger)
+        {
+            _log = logger;
+            _lastButtonPress = new DateTime();
         }
 
         // Every public variable listed here will end up in the config file.
@@ -83,7 +89,7 @@ namespace SubnauticaRandomiser
         {
             // Due to how the randomiser locks up when pressing the button, it is possible for the click to be
             // registered twice and randomisation to happen twice in a row. Prevent this here.
-            if (WasButtonRecentlyPressed())
+            if (IsButtonPressAllowed(DateTime.UtcNow))
                 return;
 
             Random random = new Random();
@@ -97,7 +103,7 @@ namespace SubnauticaRandomiser
         [Button("Randomise with same seed")]
         public void NewRandomOldSeed()
         {
-            if (WasButtonRecentlyPressed())
+            if (IsButtonPressAllowed(DateTime.UtcNow))
                 return;
             
             _log.MainMenuMessage("Randomising...");
@@ -135,7 +141,7 @@ namespace SubnauticaRandomiser
                 // Skip clamping values for special cases, and for non-numeric options.
                 if (!ConfigDefaults.Contains(name) || type == typeof(bool))
                 {
-                    // LogHandler.Debug("Skipping config sanity check for variable " + name);
+                    // _log.Debug("Skipping config sanity check for variable " + name);
                     continue;
                 }
 
@@ -155,13 +161,13 @@ namespace SubnauticaRandomiser
         /// Ensure the button is not accidentally pressed twice within a certain timeframe by checking against the
         /// system clock.
         /// </summary>
-        /// <returns>True if the button was recently pressed, false if it was not.</returns>
-        private bool WasButtonRecentlyPressed()
+        /// <returns>True if the button was not recently pressed, false if it was.</returns>
+        internal bool IsButtonPressAllowed(DateTime time)
         {
-            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds< _ButtonMinInterval)
+            if (time.Subtract(_lastButtonPress).TotalSeconds < _ButtonMinInterval)
                 return false;
 
-            _timeButtonPressed = DateTime.UtcNow;
+            _lastButtonPress = time;
             return true;
         }
     }

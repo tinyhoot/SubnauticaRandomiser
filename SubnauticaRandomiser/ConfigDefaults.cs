@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using SubnauticaRandomiser.Interfaces;
 
 namespace SubnauticaRandomiser
 {
@@ -46,36 +47,36 @@ namespace SubnauticaRandomiser
             { "fFragmentSpawnChanceMax", new[] { 0.6f, 0.01f, 10.0f } },
         };
 
-        internal static bool Contains(string key)
+        public static bool Contains(string key)
         {
             return s_defaults.ContainsKey(key);
         }
         
-        internal static object GetDefault(string key)
+        public static object GetDefault(string key)
         {
             if (!s_defaults.ContainsKey(key))
             {
-                //LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                //logger.Warn("Tried to get invalid key from config default dictionary: " + key);
                 return null;
             }
             return s_defaults[key][0];
         }
 
-        internal static object GetMax(string key)
+        public static object GetMax(string key)
         {
             if (!s_defaults.ContainsKey(key))
             {
-                //LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                //logger.Warn("Tried to get invalid key from config default dictionary: " + key);
                 return null;
             }
             return s_defaults[key][2];
         }
 
-        internal static object GetMin(string key)
+        public static object GetMin(string key)
         {
             if (!s_defaults.ContainsKey(key))
             {
-                //LogHandler.Warn("Tried to get invalid key from config default dictionary: " + key);
+                //logger.Warn("Tried to get invalid key from config default dictionary: " + key);
                 return null;
             }
             return s_defaults[key][1];

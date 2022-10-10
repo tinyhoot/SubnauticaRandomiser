@@ -47,6 +47,9 @@
         <Reference Include="Assembly-CSharp-firstpass">
           <HintPath>..\SubnauticaRandomiser\Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
         </Reference>
+        <Reference Include="Newtonsoft.Json">
+          <HintPath>..\SubnauticaRandomiser\Subnautica\Subnautica_Data\Managed\Newtonsoft.Json.dll</HintPath>
+        </Reference>
         <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
             <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
         </Reference>
@@ -75,6 +78,7 @@
         <Compile Include="UnitTests\ConfigDefaultsTests.cs" />
         <Compile Include="UnitTests\Logic\ProgressionTreeTest.cs" />
         <Compile Include="UnitTests\Logic\Recipes\MaterialsTest.cs" />
+        <Compile Include="UnitTests\RandomiserConfigTests.cs" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="TestDataFiles\TestRecipeInformation.csv" />
