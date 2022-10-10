@@ -81,7 +81,7 @@
         <Compile Include="UnitTests\RandomiserConfigTests.cs" />
     </ItemGroup>
     <ItemGroup>
-      <Content Include="TestDataFiles\TestRecipeInformation.csv" />
+      <None Include="TestDataFiles\TestRecipeInformation.csv" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\SubnauticaRandomiser\SubnauticaRandomiser.csproj">

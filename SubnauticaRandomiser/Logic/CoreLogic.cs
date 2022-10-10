@@ -95,7 +95,7 @@ namespace SubnauticaRandomiser.Logic
                 notRandomised.AddRange(_materials.GetAllCraftables());
                 
                 // Update the progression tree with recipes.
-                _tree.SetupRecipes();
+                _tree.SetupRecipes(_config.bVanillaUpgradeChains);
                 if (_config.bVanillaUpgradeChains)
                     _tree.ApplyUpgradeChainToPrerequisites(_materials.GetAll());
             }

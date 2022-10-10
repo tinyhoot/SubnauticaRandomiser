@@ -16,24 +16,27 @@ namespace SubnauticaRandomiser.Logic.Recipes
         protected Materials _materials => _logic._materials;
         protected ProgressionTree _tree => _logic._tree;
         protected Random _random => _logic._random;
-        protected ILogHandler _log;
+        protected ILogHandler _log => _logic._log;
         
         protected List<RandomiserIngredient> _ingredients = new List<RandomiserIngredient>();
         protected List<ETechTypeCategory> _blacklist = new List<ETechTypeCategory>();
-        protected LogicEntity _baseTheme;
+        protected BaseTheme _baseTheme;
 
-        protected Mode(CoreLogic logic, ILogHandler logger)
+        protected Mode(CoreLogic logic)
         {
             _logic = logic;
-            _log = logger;
 
-            _baseTheme = ChooseBaseTheme(100);
-            _log.Debug($"[R] Chosen {_baseTheme.TechType.AsString()} as base theme.");
+            if (_config.bDoBaseTheming)
+            {
+                _baseTheme = new BaseTheme(_materials, _log, _random);
+                _baseTheme.ChooseBaseTheme(100, _config.bUseFish);
+            }
+            
             //InitMod.s_masterDict.DictionaryInstance.Add(TechType.Titanium, _baseTheme.GetSerializableRecipe());
             //ChangeScrapMetalResult(_baseTheme);
         }
 
-        internal abstract LogicEntity RandomiseIngredients(LogicEntity entity);
+        public abstract LogicEntity RandomiseIngredients(LogicEntity entity);
         
         /// <summary>
         /// Add an ingredient to the list of ingredients used to form a recipe, but ensure its MaxUses field is
@@ -55,8 +58,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (!entity.HasUsesLeft())
             {
                 _materials.GetReachable().Remove(entity);
-                _log.Debug($"[R] ! Removing {entity} from materials list due to " +
-                                 $"max uses reached: {entity._usedInRecipes}");
+                _log.Debug($"[R] ! Removing {entity} from materials list due to " + 
+                           $"max uses reached: {entity._usedInRecipes}");
             }
         }
 
@@ -72,7 +75,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
         protected LogicEntity GetRandom(List<LogicEntity> list, List<ETechTypeCategory> blacklist = null)
         {
             if (list == null || list.Count == 0)
-                throw new InvalidOperationException("Failed to get valid entity from materials list: list is null or empty.");
+                throw new InvalidOperationException("Failed to get valid entity from materials list: "
+                                                    + "list is null or empty.");
 
             LogicEntity randomEntity = null;
             while (true)
@@ -88,75 +92,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
 
             return randomEntity;
-        }
-        
-        /// <summary>
-        /// If base theming is enabled and the given entity is a base piece, return the base theming ingredient.
-        /// </summary>
-        /// <param name="entity">The entity to check.</param>
-        /// <returns>A LogicEntity if the passed entity is a base piece, null otherwise.</returns>
-        [CanBeNull]
-        protected LogicEntity CheckForBaseTheming(LogicEntity entity)
-        {
-            if (_config.bDoBaseTheming && _baseTheme != null && entity.Category.Equals(ETechTypeCategory.BaseBasePieces))
-                return _baseTheme;
-
-            return null;
-        }
-        
-        /// <summary>
-        /// If vanilla upgrade chains are enabled, return that which this recipe upgrades from.
-        /// <example>Returns the basic Knife when given HeatBlade.</example>
-        /// </summary>
-        /// <param name="entity">The entity to check for downgrades.</param>
-        /// <returns>A LogicEntity if the given entity has a predecessor, null otherwise.</returns>
-        [CanBeNull]
-        protected LogicEntity CheckForVanillaUpgrades(LogicEntity entity)
-        {
-            LogicEntity result = null;
-
-            if (_config.bVanillaUpgradeChains)
-            {
-                TechType basicUpgrade = _tree.GetUpgradeChain(entity.TechType);
-                if (!basicUpgrade.Equals(TechType.None))
-                    result = _materials.GetAll().Find(x => x.TechType.Equals(basicUpgrade));
-            }
-
-            return result;
-        }
-        
-        /// <summary>
-        /// Choose a theming ingredient for the base from among a range of easily available options.
-        /// </summary>
-        /// <param name="depth">The maximum depth at which the material must be available.</param>
-        /// <returns>A random LogicEntity from the Raw Materials or (if enabled) Fish categories.</returns>
-        private LogicEntity ChooseBaseTheme(int depth)
-        {
-            List<LogicEntity> options = new List<LogicEntity>();
-
-            options.AddRange(_materials.GetAll().FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials)
-                                                     && x.AccessibleDepth < depth
-                                                     && !x.HasPrerequisites
-                                                     && x.MaxUsesPerGame == 0
-                                                     && x.GetItemSize() == 1));
-
-            if (_config.bUseFish)
-            {
-                options.AddRange(_materials.GetAll().FindAll(x => x.Category.Equals(ETechTypeCategory.Fish)
-                                                         && x.AccessibleDepth < depth
-                                                         && !x.HasPrerequisites
-                                                         && x.MaxUsesPerGame == 0
-                                                         && x.GetItemSize() == 1));
-            }
-
-            _log.Debug("LIST OF BASE THEME OPTIONS:");
-            foreach (LogicEntity ent in options)
-            {
-                _log.Debug(ent.TechType.AsString());
-            }
-            _log.Debug("END LIST");
-
-            return GetRandom(options);
         }
 
         // This function changes the output of the metal salvage recipe by removing

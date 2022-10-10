@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using SubnauticaRandomiser.Logic;
+using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.RandomiserObjects;
 using SubnauticaRandomiser.RandomiserObjects.Enums;
+using Tests.Mocks;
 
 namespace Tests.UnitTests.Logic
 {
@@ -167,6 +169,50 @@ namespace Tests.UnitTests.Logic
             _tree.AddUpgradeChain(TechType.Battery, TechType.Titanium);
             Assert.True(_tree.AddUpgradeChain(TechType.Seamoth, TechType.Titanium));
             Assert.False(_tree.AddUpgradeChain(TechType.Battery, TechType.Peeper));
+        }
+
+        [Test]
+        public void TestGetBaseOfUpgrade_Type()
+        {
+            _tree._upgradeChains.Add(TechType.Battery, TechType.Gold);
+            Assert.AreEqual(TechType.Gold, _tree.GetBaseOfUpgrade(TechType.Battery));
+        }
+        
+        [Test]
+        public void TestGetBaseOfUpgrade_Type_None()
+        {
+            _tree._upgradeChains.Add(TechType.Battery, TechType.Gold);
+            Assert.AreEqual(TechType.None, _tree.GetBaseOfUpgrade(TechType.Gold));
+            Assert.AreEqual(TechType.None, _tree.GetBaseOfUpgrade(TechType.Seamoth));
+        }
+
+        [Test]
+        public void TestGetBaseOfUpgrade_Entity()
+        {
+            List<LogicEntity> entities = new List<LogicEntity>
+            {
+                new LogicEntity(TechType.Titanium, ETechTypeCategory.RawMaterials),
+                new LogicEntity(TechType.Gold, ETechTypeCategory.RawMaterials),
+                new LogicEntity(TechType.Battery, ETechTypeCategory.Electronics)
+            };
+            Materials materials = new Materials(entities, new FakeLogger());
+            _tree._upgradeChains.Add(TechType.Battery, TechType.Gold);
+            Assert.AreEqual(TechType.Gold, _tree.GetBaseOfUpgrade(TechType.Battery, materials)?.TechType);
+        }
+        
+        [Test]
+        public void TestGetBaseOfUpgrade_Entity_Null()
+        {
+            List<LogicEntity> entities = new List<LogicEntity>
+            {
+                new LogicEntity(TechType.Titanium, ETechTypeCategory.RawMaterials),
+                new LogicEntity(TechType.Gold, ETechTypeCategory.RawMaterials),
+                new LogicEntity(TechType.Battery, ETechTypeCategory.Electronics)
+            };
+            Materials materials = new Materials(entities, new FakeLogger());
+            _tree._upgradeChains.Add(TechType.Battery, TechType.Gold);
+            Assert.Null(_tree.GetBaseOfUpgrade(TechType.Gold, materials));
+            Assert.Null(_tree.GetBaseOfUpgrade(TechType.Seamoth, materials));
         }
 
         [TestCase(TechType.Seaglide, ExpectedResult = true)]

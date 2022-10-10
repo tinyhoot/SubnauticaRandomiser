@@ -12,7 +12,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private int _basicOutpostSize;
         private List<LogicEntity> _reachableMaterials;
 
-        internal ModeBalanced(CoreLogic logic, ILogHandler logger) : base(logic, logger)
+        internal ModeBalanced(CoreLogic logic) : base(logic)
         {
             _basicOutpostSize = 0;
             _reachableMaterials = _materials.GetReachable();
@@ -25,7 +25,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="entity">The recipe to randomise ingredients for.</param>
         /// <returns>The modified entity.</returns>
         [NotNull]
-        internal override LogicEntity RandomiseIngredients(LogicEntity entity)
+        public override LogicEntity RandomiseIngredients(LogicEntity entity)
         {
             _ingredients = new List<RandomiserIngredient>();
             UpdateBlacklist(entity);
@@ -137,11 +137,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             // If base theming is enabled and this is a base piece, replace
             // the primary ingredient with a theming ingredient.
-            primaryIngredient = CheckForBaseTheming(entity) ?? primaryIngredient;
+            primaryIngredient = _baseTheme?.GetBaseTheme(entity) ?? primaryIngredient;
 
             // If vanilla upgrade chains are set to be preserved, replace
             // the primary ingredient with the base item.
-            primaryIngredient = CheckForVanillaUpgrades(entity) ?? primaryIngredient;
+            primaryIngredient = _tree.GetBaseOfUpgrade(entity.TechType, _materials) ?? primaryIngredient;
 
             return primaryIngredient;
         }

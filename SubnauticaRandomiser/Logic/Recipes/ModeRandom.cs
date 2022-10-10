@@ -10,7 +10,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
     {
         private List<LogicEntity> _reachableMaterials;
 
-        internal ModeRandom(CoreLogic logic, ILogHandler logger) : base(logic, logger)
+        internal ModeRandom(CoreLogic logic) : base(logic)
         {
             _reachableMaterials = _materials.GetReachable();
         }
@@ -20,7 +20,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// </summary>
         /// <param name="entity">The recipe to randomise ingredients for.</param>
         /// <returns>The modified entity.</returns>
-        internal override LogicEntity RandomiseIngredients(LogicEntity entity)
+        public override LogicEntity RandomiseIngredients(LogicEntity entity)
         {
             int number = _random.Next(1, _config.iMaxIngredientsPerRecipe + 1);
             int totalInvSize = 0;

@@ -29,10 +29,10 @@ namespace SubnauticaRandomiser.Logic.Recipes
             switch (_config.iRandomiserMode)
             {
                 case (0):
-                    _mode = new ModeBalanced(_logic, _log);
+                    _mode = new ModeBalanced(_logic);
                     break;
                 case (1):
-                    _mode = new ModeRandom(_logic, _log);
+                    _mode = new ModeRandom(_logic);
                     break;
                 default:
                     _log.Error("Invalid recipe mode: " + _config.iRandomiserMode);

@@ -67,6 +67,11 @@ Other:
 
 
 UNITTEST REFACTOR:
+- Complete rewrite of:
+    - CSVReader
+    - InitMod
+    - Potentially the logic modules. Write an interface ILogicModule that serves as 
+      a better baseline?
 - Change access modifiers across the whole project
 - Extract re-application of saved logic into its own class
 - Biome: Should ParseType really be here?
