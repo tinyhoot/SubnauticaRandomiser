@@ -2,8 +2,8 @@
 using System.Linq;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {

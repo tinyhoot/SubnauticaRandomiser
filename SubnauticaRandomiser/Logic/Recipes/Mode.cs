@@ -4,8 +4,8 @@ using JetBrains.Annotations;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {

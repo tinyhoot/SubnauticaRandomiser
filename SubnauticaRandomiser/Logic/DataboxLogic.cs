@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.Objects;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 

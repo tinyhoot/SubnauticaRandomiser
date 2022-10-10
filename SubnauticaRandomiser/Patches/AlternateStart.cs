@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using HarmonyLib;
-using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.Objects;
 using UnityEngine;
 
 namespace SubnauticaRandomiser.Patches

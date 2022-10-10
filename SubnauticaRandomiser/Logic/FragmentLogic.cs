@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Exceptions;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Exceptions;
 using static LootDistributionData;
 
 namespace SubnauticaRandomiser.Logic

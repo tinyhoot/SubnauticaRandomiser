@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 using Tests.Mocks;
 
 namespace Tests.UnitTests.Logic

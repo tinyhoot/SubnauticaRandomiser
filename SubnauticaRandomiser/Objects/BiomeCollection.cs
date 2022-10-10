@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects.Enums;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// A class representing a biome as the average player might know it. E.g. BloodKelp being made up of 14 smaller,

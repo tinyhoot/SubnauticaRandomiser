@@ -60,28 +60,28 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Compile Include="RandomiserConfig.cs" />
     <Compile Include="CSVReader.cs" />
     <Compile Include="LogHandler.cs" />
-    <Compile Include="RandomiserObjects\Blueprint.cs" />
-    <Compile Include="RandomiserObjects\Enums\EBiomeType.cs" />
-    <Compile Include="RandomiserObjects\Enums\EProgressionNode.cs" />
-    <Compile Include="RandomiserObjects\Enums\ETechTypeCategory.cs" />
-    <Compile Include="RandomiserObjects\Enums\EWreckage.cs" />
-    <Compile Include="RandomiserObjects\Exceptions\ParsingException.cs" />
-    <Compile Include="RandomiserObjects\Exceptions\RandomisationException.cs" />
-    <Compile Include="RandomiserObjects\RandomiserIngredient.cs" />
-    <Compile Include="RandomiserObjects\Recipe.cs" />
-    <Compile Include="RandomiserObjects\Databox.cs" />
-    <Compile Include="RandomiserObjects\RandomiserVector.cs" />
-    <Compile Include="RandomiserObjects\ProgressionPath.cs" />
-    <Compile Include="RandomiserObjects\SpoilerLog.cs" />
+    <Compile Include="Objects\Blueprint.cs" />
+    <Compile Include="Objects\Enums\EBiomeType.cs" />
+    <Compile Include="Objects\Enums\EProgressionNode.cs" />
+    <Compile Include="Objects\Enums\ETechTypeCategory.cs" />
+    <Compile Include="Objects\Enums\EWreckage.cs" />
+    <Compile Include="Objects\Exceptions\ParsingException.cs" />
+    <Compile Include="Objects\Exceptions\RandomisationException.cs" />
+    <Compile Include="Objects\RandomiserIngredient.cs" />
+    <Compile Include="Objects\Recipe.cs" />
+    <Compile Include="Objects\Databox.cs" />
+    <Compile Include="Objects\RandomiserVector.cs" />
+    <Compile Include="Objects\ProgressionPath.cs" />
+    <Compile Include="Objects\SpoilerLog.cs" />
     <Compile Include="Logic\CoreLogic.cs" />
     <Compile Include="Logic\ProgressionTree.cs" />
-    <Compile Include="RandomiserObjects\LogicEntity.cs" />
-    <Compile Include="RandomiserObjects\SpawnData.cs" />
+    <Compile Include="Objects\LogicEntity.cs" />
+    <Compile Include="Objects\SpawnData.cs" />
     <Compile Include="Logic\FragmentLogic.cs" />
     <Compile Include="EntitySerializer.cs" />
-    <Compile Include="RandomiserObjects\Biome.cs" />
-    <Compile Include="RandomiserObjects\BiomeCollection.cs" />
-    <Compile Include="RandomiserObjects\RandomiserBiomeData.cs" />
+    <Compile Include="Objects\Biome.cs" />
+    <Compile Include="Objects\BiomeCollection.cs" />
+    <Compile Include="Objects\RandomiserBiomeData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -112,7 +112,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="RandomiserObjects\" />
+    <Folder Include="Objects\" />
     <Folder Include="Logic\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

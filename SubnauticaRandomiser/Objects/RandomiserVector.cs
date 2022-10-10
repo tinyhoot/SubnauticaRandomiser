@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// A wrapper for Unity's Vector3 class to make it serializable.

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using SubnauticaRandomiser.Logic;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// A class representing the knowledge required for an entity to appear in the player's PDA.

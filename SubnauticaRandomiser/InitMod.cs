@@ -9,9 +9,9 @@ using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Patches;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
-using SubnauticaRandomiser.RandomiserObjects.Exceptions;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Objects.Exceptions;
 
 [assembly:InternalsVisibleTo("Tests")]
 namespace SubnauticaRandomiser

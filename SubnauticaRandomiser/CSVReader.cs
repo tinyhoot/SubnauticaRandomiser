@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using JetBrains.Annotations;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 

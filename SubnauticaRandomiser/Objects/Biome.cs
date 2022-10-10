@@ -1,7 +1,7 @@
 ﻿using System;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects.Enums;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// A class representing a single Biome as the game handles it, along with detailed info on spawn slots.

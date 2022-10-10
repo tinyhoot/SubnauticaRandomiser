@@ -1,8 +1,8 @@
 ﻿using System;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects.Enums;
 using UnityEngine;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// A databox containing a blueprint it unlocks.

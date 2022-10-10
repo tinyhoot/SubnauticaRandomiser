@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 using Random = System.Random;
 
 namespace SubnauticaRandomiser.Logic

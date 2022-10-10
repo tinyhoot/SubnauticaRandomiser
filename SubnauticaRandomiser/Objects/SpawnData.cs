@@ -4,7 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using static LootDistributionData;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// A wrapper for the game's SpawnData class to make it serializable.

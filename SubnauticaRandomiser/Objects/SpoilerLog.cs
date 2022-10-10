@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using SubnauticaRandomiser.Interfaces;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// Handles everything related to the spoiler log generated during randomisation.

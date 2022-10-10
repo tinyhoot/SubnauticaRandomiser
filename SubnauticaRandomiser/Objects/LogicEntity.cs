@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects.Enums;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// This class acts an abstract representation of anything that could or should be considered while randomising.

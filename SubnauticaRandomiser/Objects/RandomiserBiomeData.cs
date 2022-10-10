@@ -1,7 +1,7 @@
 ﻿using System;
 using static LootDistributionData;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// A wrapper for the game's BiomeData class to make it serializable.
