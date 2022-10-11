@@ -3,7 +3,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/tinyhoot/SubnauticaRandomiser)
 ![GitHub](https://img.shields.io/github/license/tinyhoot/SubnauticaRandomiser)
 [![CodeFactor](https://www.codefactor.io/repository/github/tinyhoot/subnauticarandomiser/badge/dev)](https://www.codefactor.io/repository/github/tinyhoot/subnauticarandomiser/overview/master)
-[![wakatime](https://wakatime.com/badge/user/d7c60741-27ca-486e-a1d0-e23b93d91114/project/acdd8cb2-0e10-422a-990f-d717dc24ae45.svg)](https://wakatime.com/badge/user/d7c60741-27ca-486e-a1d0-e23b93d91114/project/acdd8cb2-0e10-422a-990f-d717dc24ae45)
+[![wakatime](https://wakatime.com/badge/github/tinyhoot/SubnauticaRandomiser.svg)](https://wakatime.com/badge/github/tinyhoot/SubnauticaRandomiser)
 
 A Subnautica Mod that randomises many aspects of the game for replayability, originally based on [the first Subnautica randomizer](https://github.com/stephenengland/SubnauticaRandomizer).
 
@@ -14,7 +14,7 @@ The randomisation persists between play sessions and save games. If you decide t
 On first startup, the mod will randomise using recommended settings. You can either start playing immediately, or customise your experience in the mod options menu. Note that, should you choose to re-randomise from the mod options menu, you must **restart your game** for all changes to properly take effect.
 
 #### This mod randomises:
-* Recipes for most craftable things in the game, excluding decorative base pieces.
+* Recipes for most craftable things in the game, excluding decorative base pieces and food/water.
 * Blueprints found in databoxes
 * Fragment spawn rates and locations
 * Lifepod spawn location
