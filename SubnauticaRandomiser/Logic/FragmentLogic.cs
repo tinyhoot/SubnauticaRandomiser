@@ -21,7 +21,7 @@ namespace SubnauticaRandomiser.Logic
         private RandomiserConfig _config => _logic._config;
         private ILogHandler _log => _logic._log;
         private EntitySerializer _masterDict => _logic._masterDict;
-        private Random _random => _logic._random;
+        private IRandomHandler _random => _logic._random;
         private readonly List<Biome> _allBiomes;
         private readonly List<Biome> _availableBiomes;
         private static readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
@@ -268,7 +268,7 @@ namespace SubnauticaRandomiser.Logic
                     throw new RandomisationException("No valid biome options for depth " + depth);
             }
 
-            Biome biome = GetRandom(choices);
+            Biome biome = _random.Choice(choices);
             biome.Used++;
 
             // Remove the biome from the pool if it gets too populated.
@@ -479,20 +479,6 @@ namespace SubnauticaRandomiser.Logic
         private static string GetClassId(TechType type)
         {
             return CraftData.GetClassIdForTechType(type);
-        }
-
-        /// <summary>
-        /// Get a random element from the given list.
-        /// </summary>
-        /// <param name="list">The list to choose a member from.</param>
-        /// <typeparam name="T">The type of the objects contained in the list.</typeparam>
-        /// <returns>A random element of the list.</returns>
-        private T GetRandom<T>(List<T> list)
-        {
-            if (list is null || list.Count == 0)
-                return default(T);
-
-            return list[_random.Next(0, list.Count)];
         }
 
         /// <summary>

@@ -78,6 +78,7 @@
         <Compile Include="UnitTests\ConfigDefaultsTests.cs" />
         <Compile Include="UnitTests\Logic\ProgressionTreeTest.cs" />
         <Compile Include="UnitTests\Logic\Recipes\MaterialsTest.cs" />
+        <Compile Include="UnitTests\RandomHandlerTest.cs" />
         <Compile Include="UnitTests\RandomiserConfigTests.cs" />
     </ItemGroup>
     <ItemGroup>

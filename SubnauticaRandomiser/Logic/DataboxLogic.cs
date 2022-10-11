@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
@@ -13,9 +14,9 @@ namespace SubnauticaRandomiser.Logic
         private List<Databox> _databoxes => _logic._databoxes;
         private ILogHandler _log => _logic._log;
         private EntitySerializer _masterDict => _logic._masterDict;
-        private System.Random _random => _logic._random;
+        private IRandomHandler _random => _logic._random;
 
-        internal DataboxLogic(CoreLogic logic)
+        public DataboxLogic(CoreLogic logic)
         {
             _logic = logic;
         }
@@ -25,7 +26,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         /// <returns>The list of newly randomised databoxes.</returns>
         [NotNull]
-        internal List<Databox> RandomiseDataboxes()
+        public List<Databox> RandomiseDataboxes()
         {
             _masterDict.Databoxes = new Dictionary<RandomiserVector, TechType>();
             List<Databox> randomDataboxes = new List<Databox>();
@@ -38,15 +39,15 @@ namespace SubnauticaRandomiser.Logic
 
             foreach (Databox originalBox in _databoxes)
             {
-                int next = _random.Next(0, toBeRandomised.Count);
-                Databox replacementBox = _databoxes.Find(x => x.Coordinates.Equals(toBeRandomised[next]));
+                Vector3 next = _random.Choice(toBeRandomised);
+                Databox replacementBox = _databoxes.Find(x => x.Coordinates.Equals(next));
 
-                randomDataboxes.Add(new Databox(originalBox.TechType, toBeRandomised[next], replacementBox.Wreck, 
+                randomDataboxes.Add(new Databox(originalBox.TechType, next, replacementBox.Wreck, 
                     replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
-                _masterDict.Databoxes.Add(new RandomiserVector(toBeRandomised[next]), originalBox.TechType);
-                _log.Debug($"[D] Databox {toBeRandomised[next].ToString()} with {replacementBox}"
+                _masterDict.Databoxes.Add(new RandomiserVector(next), originalBox.TechType);
+                _log.Debug($"[D] Databox {next.ToString()} with {replacementBox}"
                            + " now contains " + originalBox);
-                toBeRandomised.RemoveAt(next);
+                toBeRandomised.Remove(next);
             }
 
             return randomDataboxes;

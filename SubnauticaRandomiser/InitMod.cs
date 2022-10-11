@@ -99,13 +99,13 @@ namespace SubnauticaRandomiser
             var (alternateStarts, biomes, databoxes, materials) = ParseInputFiles();
 
             // Create a new seed if the current one is just a default
-            Random random;
+            RandomHandler random;
             if (s_config.iSeed == 0)
             {
-                random = new Random();
+                random = new RandomHandler();
                 s_config.iSeed = random.Next();
             }
-            random = new Random(s_config.iSeed);
+            random = new RandomHandler(s_config.iSeed);
 
             // Randomise!
             CoreLogic logic = new CoreLogic(random, s_config, _log, materials, alternateStarts, biomes, databoxes);

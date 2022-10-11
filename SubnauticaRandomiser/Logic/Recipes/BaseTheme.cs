@@ -11,11 +11,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
     {
         private Materials _materials;
         private ILogHandler _log;
-        private Random _random;
+        private IRandomHandler _random;
 
         private LogicEntity _baseTheme;
 
-        public BaseTheme(Materials materials, ILogHandler logger, Random random)
+        public BaseTheme(Materials materials, ILogHandler logger, IRandomHandler random)
         {
             _materials = materials;
             _log = logger;
@@ -47,7 +47,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                                                                   && x.GetItemSize() == 1));
             }
 
-            _baseTheme = options[_random.Next(0, options.Count)];
+            _baseTheme = _random.Choice(options);
             _log.Debug($"[R] Chose {_baseTheme} as base theme.");
             return _baseTheme;
         }

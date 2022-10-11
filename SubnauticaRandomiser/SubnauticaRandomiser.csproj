@@ -44,6 +44,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
   <ItemGroup>
     <Compile Include="ConfigDefaults.cs" />
     <Compile Include="Interfaces\ILogHandler.cs" />
+    <Compile Include="Interfaces\IRandomHandler.cs" />
     <Compile Include="Logic\AlternateStartLogic.cs" />
     <Compile Include="Logic\Recipes\BaseTheme.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
@@ -57,6 +58,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Compile Include="Logic\Recipes\ModeRandom.cs" />
     <Compile Include="Logic\Recipes\RecipeLogic.cs" />
     <Compile Include="Patches\AlternateStart.cs" />
+    <Compile Include="RandomHandler.cs" />
     <Compile Include="RandomiserConfig.cs" />
     <Compile Include="CSVReader.cs" />
     <Compile Include="LogHandler.cs" />

@@ -4,7 +4,6 @@ using System.Linq;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
-using Random = System.Random;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -16,7 +15,7 @@ namespace SubnauticaRandomiser.Logic
         private RandomiserConfig _config => _logic._config;
         private ILogHandler _log => _logic._log;
         private EntitySerializer _masterDict => _logic._masterDict;
-        private Random _random => _logic._random;
+        private IRandomHandler _random => _logic._random;
 
         internal AlternateStartLogic(CoreLogic logic, Dictionary<EBiomeType, List<float[]>> alternateStarts)
         {
@@ -39,10 +38,10 @@ namespace SubnauticaRandomiser.Logic
             {
                 case "Random":
                     // Only use starts where you can actually reach the ground.
-                    return _logic.GetRandom(_alternateStarts.Keys.ToList()
+                    return _random.Choice(_alternateStarts.Keys.ToList()
                         .FindAll(biome => !biome.Equals(EBiomeType.None) && biome.GetAccessibleDepth() <= 100));
                 case "Chaotic Random":
-                    return _logic.GetRandom(_alternateStarts.Keys.ToList());
+                    return _random.Choice(_alternateStarts.Keys);
                 case "BulbZone":
                     return EBiomeType.KooshZone;
                 case "Floating Island":
@@ -71,8 +70,7 @@ namespace SubnauticaRandomiser.Logic
             }
 
             // Choose one of the possible spawning boxes within the biome.
-            int boxIdx = _random.Next(0, _alternateStarts[biome].Count);
-            float[] box = _alternateStarts[biome][boxIdx];
+            float[] box = _random.Choice(_alternateStarts[biome]);
             // Choose the specific spawn point within the box.
             int x = _random.Next((int)box[0], (int)box[2] + 1);
             int z = _random.Next((int)box[3], (int)box[1] + 1);

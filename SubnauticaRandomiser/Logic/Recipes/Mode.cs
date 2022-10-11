@@ -15,7 +15,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         protected RandomiserConfig _config => _logic._config;
         protected Materials _materials => _logic._materials;
         protected ProgressionTree _tree => _logic._tree;
-        protected Random _random => _logic._random;
+        protected IRandomHandler _random => _logic._random;
         protected ILogHandler _log => _logic._log;
         
         protected List<RandomiserIngredient> _ingredients = new List<RandomiserIngredient>();
@@ -81,7 +81,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             LogicEntity randomEntity = null;
             while (true)
             {
-                randomEntity = list[_random.Next(0, list.Count)];
+                randomEntity = _random.Choice(list);
 
                 if (blacklist != null && blacklist.Count > 0)
                 {

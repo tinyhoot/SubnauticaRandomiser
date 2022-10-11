@@ -133,7 +133,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (pIngredientCandidates.Count == 0)
                 pIngredientCandidates.Add(GetRandom(_reachableMaterials, _blacklist));
 
-            LogicEntity primaryIngredient = GetRandom(pIngredientCandidates);
+            LogicEntity primaryIngredient = _random.Choice(pIngredientCandidates);
 
             // If base theming is enabled and this is a base piece, replace
             // the primary ingredient with a theming ingredient.
@@ -205,7 +205,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (betterOptions.Count == 0)
                 betterOptions.AddRange(_reachableMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials)));
 
-            return GetRandom(betterOptions);
+            return _random.Choice(betterOptions);
         }
     }
 }

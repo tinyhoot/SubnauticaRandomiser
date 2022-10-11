@@ -20,7 +20,7 @@ namespace SubnauticaRandomiser.Logic
         internal readonly ILogHandler _log;
         internal readonly EntitySerializer _masterDict;
         internal readonly Materials _materials;
-        internal readonly System.Random _random;
+        internal readonly IRandomHandler _random;
         internal readonly SpoilerLog _spoilerLog;
         internal readonly ProgressionTree _tree;
 
@@ -29,7 +29,7 @@ namespace SubnauticaRandomiser.Logic
         internal readonly FragmentLogic _fragmentLogic;
         private readonly RecipeLogic _recipeLogic;
 
-        public CoreLogic(System.Random random, RandomiserConfig config, ILogHandler logger, List<LogicEntity> allMaterials,
+        public CoreLogic(IRandomHandler random, RandomiserConfig config, ILogHandler logger, List<LogicEntity> allMaterials,
             Dictionary<EBiomeType, List<float[]>> alternateStarts, List<BiomeCollection> biomes = null,
             List<Databox> databoxes = null)
         {
@@ -170,7 +170,7 @@ namespace SubnauticaRandomiser.Logic
             // certain recipes are done by a certain depth, e.g. waterparks by 500m.
             // Automatically fails if recipes do not get randomised.
             LogicEntity next = GetPriorityEntity(depth);
-            next ??= GetRandom(notRandomised);
+            next ??= _random.Choice(notRandomised);
 
             return next;
         }
@@ -333,7 +333,7 @@ namespace SubnauticaRandomiser.Logic
                 
                 if (types?.Length > 0)
                 {
-                    TechType nextType = GetRandom(new List<TechType>(types));
+                    TechType nextType = _random.Choice(types);
                     entity = _materials.Find(nextType);
                     _log.Debug($"Prioritising elective entity {entity} for depth {depth}");
                 }
@@ -441,19 +441,6 @@ namespace SubnauticaRandomiser.Logic
                     return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Get a random element from a list.
-        /// </summary>
-        public T GetRandom<T>(List<T> list)
-        {
-            if (list == null || list.Count == 0)
-            {
-                return default(T);
-            }
-
-            return list[_random.Next(0, list.Count)];
         }
     }
 }
