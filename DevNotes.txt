@@ -76,3 +76,4 @@ UNITTEST REFACTOR:
 - Extract re-application of saved logic into its own class
 - Biome: Should ParseType really be here?
 - Blueprint and LogicEntity: Ensure logging is done at a higher level than this.
+- EProgressionNode is a mess and needs cleaning.

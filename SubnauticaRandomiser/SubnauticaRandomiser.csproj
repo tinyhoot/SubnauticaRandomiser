@@ -43,6 +43,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ConfigDefaults.cs" />
+    <Compile Include="EnumHandler.cs" />
     <Compile Include="Interfaces\ILogHandler.cs" />
     <Compile Include="Interfaces\IRandomHandler.cs" />
     <Compile Include="Logic\AlternateStartLogic.cs" />

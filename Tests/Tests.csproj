@@ -76,8 +76,10 @@
     <ItemGroup>
         <Compile Include="Mocks\FakeLogger.cs" />
         <Compile Include="UnitTests\ConfigDefaultsTests.cs" />
+        <Compile Include="UnitTests\EnumHandlerTest.cs" />
         <Compile Include="UnitTests\Logic\ProgressionTreeTest.cs" />
         <Compile Include="UnitTests\Logic\Recipes\MaterialsTest.cs" />
+        <Compile Include="UnitTests\Objects\BiomeCollectionTest.cs" />
         <Compile Include="UnitTests\RandomHandlerTest.cs" />
         <Compile Include="UnitTests\RandomiserConfigTests.cs" />
     </ItemGroup>

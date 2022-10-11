@@ -9,7 +9,7 @@ namespace SubnauticaRandomiser.Objects
     /// A class representing the knowledge required for an entity to appear in the player's PDA.
     /// </summary>
     [Serializable]
-    public class Blueprint
+    internal class Blueprint
     {
         public TechType TechType;
         public List<TechType> UnlockConditions;

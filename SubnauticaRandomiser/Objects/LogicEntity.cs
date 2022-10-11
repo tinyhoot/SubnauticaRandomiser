@@ -13,7 +13,7 @@ namespace SubnauticaRandomiser.Objects
     /// The Randomiser will pass over every one of these entities and only consider itself done once each of them has
     /// the InLogic flag - meaning that it is considered accessible within the game.
     /// </summary>
-    public class LogicEntity
+    internal class LogicEntity
     {
         public readonly TechType TechType;
         public readonly ETechTypeCategory Category;

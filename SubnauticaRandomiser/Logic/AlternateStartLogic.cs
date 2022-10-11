@@ -50,7 +50,7 @@ namespace SubnauticaRandomiser.Logic
                     return EBiomeType.None;
             }
 
-            return (EBiomeType)Enum.Parse(typeof(EBiomeType), _config.sSpawnPoint);
+            return EnumHandler.Parse<EBiomeType>(_config.sSpawnPoint);
         }
 
         /// <summary>

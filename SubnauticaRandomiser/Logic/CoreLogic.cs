@@ -13,7 +13,7 @@ namespace SubnauticaRandomiser.Logic
     /// <summary>
     /// Acts as the core for handling all randomising logic in the mod, and turning modules on/off as needed.
     /// </summary>
-    public class CoreLogic
+    internal class CoreLogic
     {
         internal readonly RandomiserConfig _config;
         internal readonly List<Databox> _databoxes;

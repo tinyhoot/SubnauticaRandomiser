@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Objects
@@ -7,13 +8,13 @@ namespace SubnauticaRandomiser.Objects
     /// A class representing a biome as the average player might know it. E.g. BloodKelp being made up of 14 smaller,
     /// more detailed biomes.
     /// </summary>
-    public class BiomeCollection
+    internal class BiomeCollection
     {
         public List<Biome> BiomeList = new List<Biome>();
         public int AverageDepth;
         public readonly EBiomeType BiomeType;
 
-        public bool HasBiomes { get { return BiomeList.Count > 0; } }
+        public bool HasBiomes => BiomeList.Count > 0;
 
         public BiomeCollection(EBiomeType biomeType)
         {
@@ -51,7 +52,9 @@ namespace SubnauticaRandomiser.Objects
         /// <returns>True if successful, false if the collection already contained the biome.</returns>
         public bool Add(Biome biome)
         {
-            if (BiomeList.Contains(biome))
+            if (biome is null)
+                throw new ArgumentNullException();
+            if (BiomeList.Contains(biome) || BiomeList.Exists(b => b.Name.Equals(biome.Name)))
                 return false;
 
             BiomeList.Add(biome);
