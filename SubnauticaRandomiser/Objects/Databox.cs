@@ -8,7 +8,7 @@ namespace SubnauticaRandomiser.Objects
     /// A databox containing a blueprint it unlocks.
     /// </summary>
     [Serializable]
-    public class Databox
+    internal class Databox
     {
         public TechType TechType;
         public Vector3 Coordinates;
@@ -27,7 +27,7 @@ namespace SubnauticaRandomiser.Objects
 
         public override string ToString()
         {
-            return TechType.AsString();
+            return TechType.ToString();
         }
     }
 }

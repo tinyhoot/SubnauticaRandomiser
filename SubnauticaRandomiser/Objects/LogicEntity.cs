@@ -88,10 +88,6 @@ namespace SubnauticaRandomiser.Objects
             if (Blueprint is null || (Blueprint.UnlockConditions is null && Blueprint.UnlockDepth == 0))
                 return true;
 
-            // If the databox was randomised, do work to account for new locations.
-            if (logic._config.bRandomiseDataboxes && Blueprint.NeedsDatabox && !Blueprint.WasUpdated && logic._databoxes?.Count > 0)
-                Blueprint.UpdateDataboxUnlocks(logic);
-
             foreach (TechType condition in Blueprint.UnlockConditions ?? Enumerable.Empty<TechType>())
             {
                 LogicEntity conditionEntity = logic._materials.Find(condition);
