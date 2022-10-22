@@ -39,7 +39,7 @@ namespace SubnauticaRandomiser.Logic
             _spoilerLog = new SpoilerLog(config, logger, _masterDict);
             
             if (!_config.sSpawnPoint.StartsWith("Vanilla"))
-                _altStartLogic = new AlternateStartLogic(this, alternateStarts);
+                _altStartLogic = new AlternateStartLogic(alternateStarts, config, logger, random);
             if (_config.bRandomiseDataboxes)
                 _databoxLogic = new DataboxLogic(this, databoxes);
             if (_config.bRandomiseFragments || _config.bRandomiseNumFragments || _config.bRandomiseDuplicateScans)
@@ -56,7 +56,7 @@ namespace SubnauticaRandomiser.Logic
         {
             // Init the progression tree.
             _tree.SetupVanillaTree();
-            _altStartLogic?.Randomise();
+            _altStartLogic?.Randomise(_masterDict);
 
             if (_databoxLogic != null)
             {
