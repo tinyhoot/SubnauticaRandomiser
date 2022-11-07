@@ -30,7 +30,7 @@ namespace SubnauticaRandomiser
             [1] = "v0.5.1",
             [2] = "v0.6.1",
             [3] = "v0.7.0",
-            [4] = "v0.8.1"
+            [4] = "v0.8.2"
         };
 
         // The master list of everything that is modified by the mod.
