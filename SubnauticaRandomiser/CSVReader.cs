@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -12,6 +13,7 @@ namespace SubnauticaRandomiser
 {
     internal class CSVReader
     {
+        private readonly CultureInfo _culture;
         internal Dictionary<EBiomeType, List<float[]>> _csvAlternateStarts;
         internal List<BiomeCollection> _csvBiomeList;
         internal List<Databox> _csvDataboxList;
@@ -24,6 +26,8 @@ namespace SubnauticaRandomiser
 
         internal CSVReader()
         {
+            _culture = CultureInfo.InvariantCulture;
+            
             _csvBiomeList = new List<BiomeCollection>();
             _csvDataboxList = new List<Databox>();
             _csvRecipeList = new List<LogicEntity>();
@@ -103,7 +107,7 @@ namespace SubnauticaRandomiser
                 float[] parsedCoords = new float[4];
                 for (int i = 0; i < 4; i++)
                 {
-                    parsedCoords[i] = float.Parse(rawCoords[i]);
+                    parsedCoords[i] = float.Parse(rawCoords[i], _culture);
                 }
                 starts.Add(parsedCoords);
             }
@@ -623,7 +627,7 @@ namespace SubnauticaRandomiser
         /// <param name="column">The name of the column the value was in.</param>
         /// <returns>The parsed boolean value as appropriate.</returns>
         /// <exception cref="FormatException">Raised if the input value is unparseable.</exception>
-        private static bool StringToBool(string input, string column)
+        private bool StringToBool(string input, string column)
         {
             // If the string is "true" or "false", this just works.
             if (bool.TryParse(input, out bool output))
@@ -635,7 +639,7 @@ namespace SubnauticaRandomiser
             // Integers need a bit of extra handling.
             try
             {
-                inputInt = int.Parse(input);
+                inputInt = int.Parse(input, _culture);
             }
             catch (Exception)
             {
@@ -660,13 +664,13 @@ namespace SubnauticaRandomiser
         /// <param name="column">The name of the column the value was in.</param>
         /// <returns>The parsed float.</returns>
         /// <exception cref="FormatException">Raised if the input value is unparseable.</exception>
-        private static float StringToFloat(string input, string column)
+        private float StringToFloat(string input, string column)
         {
             float output;
 
             try
             {
-                output = float.Parse(input);
+                output = float.Parse(input, _culture);
             }
             catch (Exception)
             {
@@ -683,13 +687,13 @@ namespace SubnauticaRandomiser
         /// <param name="column">The name of the column the value was in.</param>
         /// <returns>The parsed integer.</returns>
         /// <exception cref="FormatException">Raised if the input value is unparseable.</exception>
-        private static int StringToInt(string input, string column)
+        private int StringToInt(string input, string column)
         {
             int output;
 
             try
             {
-                output = int.Parse(input);
+                output = int.Parse(input, _culture);
             }
             catch (Exception)
             {
