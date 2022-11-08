@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using SMLHelper.V2.Handlers;
-using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 
@@ -12,7 +11,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private int _basicOutpostSize;
         private List<LogicEntity> _reachableMaterials;
 
-        internal ModeBalanced(CoreLogic logic) : base(logic)
+        public ModeBalanced(CoreLogic logic) : base(logic)
         {
             _basicOutpostSize = 0;
             _reachableMaterials = _materials.GetReachable();
@@ -29,105 +28,92 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             _ingredients = new List<RandomiserIngredient>();
             UpdateBlacklist(entity);
-            double targetValue = entity.Value;
             int currentValue = 0;
-            entity.Value = 0;
             int totalSize = 0;
 
             _log.Debug("[R] Figuring out ingredients for " + entity);
 
-            LogicEntity primaryIngredient = ChoosePrimaryIngredient(entity, targetValue);
-
-            // Disallow the builder tool from being used in base pieces.
-            if (entity.Category.IsBasePiece() && primaryIngredient.TechType.Equals(TechType.Builder))
-                primaryIngredient = ReplaceWithSimilarValue(primaryIngredient);
-
+            LogicEntity primaryIngredient = ChoosePrimaryIngredient(entity);
             AddIngredientWithMaxUsesCheck(primaryIngredient, 1);
             currentValue += primaryIngredient.Value;
 
             _log.Debug("[R] > Adding primary ingredient " + primaryIngredient);
 
             // Now fill up with random materials until the value threshold is more or less met, as defined by fuzziness.
-            // Using a do-while since we want this to happen at least once.
-            do
+            while ((entity.Value - currentValue) > (entity.Value * _config.dRecipeValueVariance / 2))
             {
-                // Respect the maximum number of ingredients set in the config.
-                if (_config.iMaxIngredientsPerRecipe <= _ingredients.Count)
-                {
-                    _log.Debug("[R] ! Recipe has reached maximum allowed number of ingredients, stopping.");
+                // If a config value mandates an early stop, stop.
+                if (CheckForConfigStop(entity, totalSize))
                     break;
-                }
+
+                (LogicEntity ingredient, int number) = ChooseSecondaryIngredient(entity, currentValue, totalSize);
+                if (ingredient is null)
+                    continue;
                 
-                // If a recipe starts requiring too much space, shut it down early.
-                if (totalSize >= _config.iMaxInventorySizePerRecipe)
-                {
-                    _log.Debug("[R] ! Recipe is getting too large, stopping.");
-                    break;
-                }
-
-                LogicEntity ingredient = GetRandom(_reachableMaterials, _blacklist);
-
-                // Prevent duplicates.
-                if (_ingredients.Exists(x => x.techType == ingredient.TechType))
-                    continue;
-
-                // Disallow the builder tool from being used in base pieces.
-                if (entity.Category.IsBasePiece() && ingredient.TechType.Equals(TechType.Builder))
-                    continue;
-
-                // What's the maximum amount of this ingredient the recipe can
-                // still sustain?
-                int max = FindMaximum(ingredient, targetValue, currentValue);
-
-                // Figure out how many to actually use.
-                int number = _random.Next(1, max + 1);
-
-                // If a recipe starts requiring a lot of inventory space to
-                // complete, try to minimise adding more ingredients.
-                if (totalSize + (ingredient.GetItemSize() * number) > _config.iMaxInventorySizePerRecipe)
-                    number = 1;
-
                 AddIngredientWithMaxUsesCheck(ingredient, number);
                 currentValue += ingredient.Value * number;
                 totalSize += ingredient.GetItemSize() * number;
 
                 _log.Debug($"[R] > Adding ingredient: {ingredient}, {number}");
-                
-                // For special case of outpost base parts, be conservative with ingredients.
-                if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType) && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.6)
-                {
-                    _log.Debug("[R] ! Basic outpost size is getting too large, stopping.");
-                    break;
-                }
-            } while ((targetValue - currentValue) > (targetValue * _config.dRecipeValueVariance / 2));
+            }
 
             // Update the total size of everything needed to build a basic outpost.
             if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType))
                 _basicOutpostSize += (totalSize * _tree.BasicOutpostPieces[entity.TechType]);
-
+            
+            _log.Debug($"[R] > Recipe is now valued {currentValue} out of {entity.Value}");
             entity.Value = currentValue;
-            _log.Debug($"[R] > Recipe is now valued {currentValue} out of {targetValue}");
-
             entity.Recipe.Ingredients = _ingredients;
             entity.Recipe.CraftAmount = CraftDataHandler.GetTechData(entity.TechType).craftAmount;
             return entity;
         }
-        
+
+        /// <summary>
+        /// Check whether conditions have been reached that mandate an early stop as defined by config values.
+        /// </summary>
+        /// <param name="entity">The recipe to randomise ingredients for.</param>
+        /// <param name="totalSize">The current size required by all previously chosen ingredients for the recipe.</param>
+        /// <returns>True if the loop needs to stop, false if it can continue running.</returns>
+        private bool CheckForConfigStop(LogicEntity entity, int totalSize)
+        {
+            // Respect the maximum number of ingredients set in the config.
+            if (_ingredients.Count >= _config.iMaxIngredientsPerRecipe)
+            {
+                _log.Debug("[R] ! Recipe has reached maximum allowed number of ingredients, stopping.");
+                return true;
+            }
+            
+            // If a recipe starts requiring too much space, shut it down early.
+            if (totalSize >= _config.iMaxInventorySizePerRecipe)
+            {
+                _log.Debug("[R] ! Recipe is getting too large, stopping.");
+                return true;
+            }
+            
+            // For special case of outpost base parts, be conservative with ingredients.
+            if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType) && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.7)
+            {
+                _log.Debug("[R] ! Basic outpost size is getting too large, stopping.");
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Find a primary ingredient for the recipe. Its value should be a percentage of the total value of the entire
         /// recipe as defined in the config, +-10%.
         /// </summary>
         /// <param name="entity">The recipe to randomise ingredients for.</param>
-        /// <param name="targetValue">The target value of all ingredients for the recipe.</param>
-        /// <returns>The randomised recipe, modified in-place.</returns>
+        /// <returns>The LogicEntity representing the primary ingredient.</returns>
         [NotNull]
-        private LogicEntity ChoosePrimaryIngredient(LogicEntity entity, double targetValue)
+        private LogicEntity ChoosePrimaryIngredient(LogicEntity entity)
         {
-            List<LogicEntity> pIngredientCandidates = _reachableMaterials.FindAll(
-                                                                     x => (targetValue * (_config.dPrimaryIngredientValue + 0.1)) > x.Value
-                                                                       && (targetValue * (_config.dPrimaryIngredientValue - 0.1)) < x.Value
-                                                                       && !_blacklist.Contains(x.Category)
-                                                                       );
+            List<LogicEntity> pIngredientCandidates = _reachableMaterials.FindAll(x =>
+                (entity.Value * (_config.dPrimaryIngredientValue + 0.1)) > x.Value
+                && (entity.Value * (_config.dPrimaryIngredientValue - 0.1)) < x.Value
+                && !_blacklist.Contains(x.Category)
+            );
 
             // If we had no luck, just pick a random one.
             if (pIngredientCandidates.Count == 0)
@@ -142,8 +128,46 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // If vanilla upgrade chains are set to be preserved, replace
             // the primary ingredient with the base item.
             primaryIngredient = _tree.GetBaseOfUpgrade(entity.TechType, _materials) ?? primaryIngredient;
+            
+            // Disallow the builder tool from being used in base pieces.
+            if (entity.Category.IsBasePiece() && primaryIngredient.TechType.Equals(TechType.Builder))
+                primaryIngredient = ReplaceWithSimilarValue(primaryIngredient);
 
             return primaryIngredient;
+        }
+
+        /// <summary>
+        /// Find a secondary ingredient for the recipe.
+        /// </summary>
+        /// <param name="entity">The recipe to randomise ingredients for.</param>
+        /// <param name="currentValue">The current value of all previously chosen ingredients for the recipe.</param>
+        /// <param name="totalSize">The current size required by all previously chosen ingredients for the recipe.</param>
+        /// <returns>The LogicEntity representing the chosen ingredient along with how many.</returns>
+        private (LogicEntity ingredient, int number) ChooseSecondaryIngredient(LogicEntity entity, int currentValue,
+            int totalSize)
+        {
+            LogicEntity ingredient = GetRandom(_reachableMaterials, _blacklist);
+
+            // Prevent duplicates.
+            if (_ingredients.Exists(x => x.techType == ingredient.TechType))
+                return (null, -1);
+
+            // Disallow the builder tool from being used in base pieces.
+            if (entity.Category.IsBasePiece() && ingredient.TechType.Equals(TechType.Builder))
+                return (null, -1);
+
+            // What's the maximum amount of this ingredient the recipe can still sustain?
+            int max = FindMaximum(ingredient, entity.Value, currentValue);
+
+            // Figure out how many to actually use.
+            int number = _random.Next(1, max + 1);
+
+            // If a recipe starts requiring a lot of inventory space to complete, try to minimise adding more
+            // ingredients.
+            if (totalSize + (ingredient.GetItemSize() * number) > _config.iMaxInventorySizePerRecipe)
+                number = 1;
+            
+            return (ingredient, number);
         }
         
         /// <summary>
