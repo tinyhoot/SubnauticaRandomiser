@@ -77,3 +77,6 @@ UNITTEST REFACTOR:
 - Biome: Should ParseType really be here?
 - Blueprint and LogicEntity: Ensure logging is done at a higher level than this.
 - EProgressionNode is a mess and needs cleaning.
+- Classes that cannot get full coverage:
+    - ModeBalanced. Too much reliance on random outcomes to test.
+    - Moderandom. Same as above.
