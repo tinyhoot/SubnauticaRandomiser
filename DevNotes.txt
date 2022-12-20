@@ -71,11 +71,9 @@ UNITTEST REFACTOR:
     - CSVReader
     - InitMod
     - Potentially the logic modules. Write an interface ILogicModule that serves as 
-      a better baseline?
+      a better baseline? Rewrite config options as components?
 - Change access modifiers across the whole project
 - Extract re-application of saved logic into its own class
-- Biome: Should ParseType really be here?
-- Blueprint and LogicEntity: Ensure logging is done at a higher level than this.
 - EProgressionNode is a mess and needs cleaning.
 - Classes that cannot get full coverage:
     - ModeBalanced. Too much reliance on random outcomes to test.
