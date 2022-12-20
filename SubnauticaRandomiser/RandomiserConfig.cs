@@ -21,7 +21,7 @@ namespace SubnauticaRandomiser
         public RandomiserConfig(ILogHandler logger)
         {
             _log = logger;
-            _lastButtonPress = new DateTime();
+            _lastButtonPress = DateTime.UtcNow;
         }
 
         // Every public variable listed here will end up in the config file.
@@ -89,7 +89,7 @@ namespace SubnauticaRandomiser
         {
             // Due to how the randomiser locks up when pressing the button, it is possible for the click to be
             // registered twice and randomisation to happen twice in a row. Prevent this here.
-            if (IsButtonPressAllowed(DateTime.UtcNow))
+            if (!IsButtonPressAllowed(DateTime.UtcNow))
                 return;
 
             Random random = new Random();
@@ -103,7 +103,7 @@ namespace SubnauticaRandomiser
         [Button("Randomise with same seed")]
         public void NewRandomOldSeed()
         {
-            if (IsButtonPressAllowed(DateTime.UtcNow))
+            if (!IsButtonPressAllowed(DateTime.UtcNow))
                 return;
             
             _log.MainMenuMessage("Randomising...");
