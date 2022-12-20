@@ -62,7 +62,7 @@ namespace SubnauticaRandomiser.Logic
             {
                 // Just randomise those flat out for now, instead of including them in the core loop.
                 _databoxLogic.RandomiseDataboxes();
-                _databoxLogic.UpdateBlueprints(notRandomised);
+                _databoxLogic.UpdateBlueprints(_materials.GetAll());
                 _databoxLogic.LinkCyclopsHullModules(_materials);
             }
 
