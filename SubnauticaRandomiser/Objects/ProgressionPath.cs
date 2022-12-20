@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects.Enums;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// This class represents all the ways a progression roadblock (node) can be surpassed.

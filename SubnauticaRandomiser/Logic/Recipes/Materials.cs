@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Interfaces;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
@@ -12,16 +13,18 @@ namespace SubnauticaRandomiser.Logic.Recipes
         // this into a list since the searchability of _all is important,
         // and _reachable often gets iterated over anyway. Plus, lists have the
         // advantage of making it very easy to call up a random element.
-        private List<LogicEntity> _allMaterials;
-        private List<LogicEntity> _reachableMaterials;
+        private readonly List<LogicEntity> _allMaterials;
+        private readonly List<LogicEntity> _reachableMaterials;
+        private readonly ILogHandler _log;
 
-        internal List<LogicEntity> GetAll() => _allMaterials;
-        internal List<LogicEntity> GetReachable() => _reachableMaterials;
+        public List<LogicEntity> GetAll() => _allMaterials;
+        public List<LogicEntity> GetReachable() => _reachableMaterials;
 
-        internal Materials(List<LogicEntity> allMaterials)
+        public Materials(List<LogicEntity> allMaterials, ILogHandler logger)
         {
             _allMaterials = allMaterials;
             _reachableMaterials = new List<LogicEntity>();
+            _log = logger;
         }
         
         /// <summary>
@@ -30,7 +33,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="categories">The category of materials to consider.</param>
         /// <param name="maxDepth">The maximum depth at which the material is allowed to be available.</param>
         /// <returns>True if any new entries were added to the list of reachable materials, false otherwise.</returns>
-        internal bool AddReachable(ETechTypeCategory[] categories, int maxDepth)
+        public bool AddReachable(ETechTypeCategory[] categories, int maxDepth)
         {
             List<LogicEntity> additions = new List<LogicEntity>();
 
@@ -50,7 +53,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="invert">If true, invert the behaviour of the prerequisite to consider exclusively materials
         /// which do <i>not</i> require that TechType.</param>
         /// <returns>True if any new entries were added to the list of reachable materials, false otherwise.</returns>
-        internal bool AddReachableWithPrereqs(ETechTypeCategory[] categories, int maxDepth, TechType prerequisite, bool invert = false)
+        public bool AddReachableWithPrereqs(ETechTypeCategory[] categories, int maxDepth, TechType prerequisite, bool invert = false)
         {
             List<LogicEntity> additions = new List<LogicEntity>();
 
@@ -94,7 +97,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             foreach(LogicEntity ent in additions)
             {
-                LogHandler.Debug("[R] Adding to reachable materials: " + ent.TechType.AsString());
+                _log.Debug("[R] Adding to reachable materials: " + ent.TechType);
             }
             _reachableMaterials.AddRange(additions);
             return true;
@@ -105,7 +108,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// </summary>
         /// <param name="entity">The entity to add.</param>
         /// <returns>True if successful, false otherwise.</returns>
-        internal bool AddReachable(LogicEntity entity)
+        public bool AddReachable(LogicEntity entity)
         {
             return AddToReachableList(new List<LogicEntity> { entity });
         }
@@ -116,7 +119,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="category">The category to consider.</param>
         /// <param name="maxDepth">The maximum depth at which the entity is allowed to be available.</param>
         /// <returns>True if any new entities were added to the list, false otherwise.</returns>
-        internal bool AddReachable(ETechTypeCategory category, int maxDepth)
+        public bool AddReachable(ETechTypeCategory category, int maxDepth)
         {
             return AddReachable(new[] { category }, maxDepth);
         }
@@ -131,7 +134,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="invert">If true, invert the behaviour of the prerequisite to consider exclusively materials
         /// which do <i>not</i> require that TechType.</param>
         /// <returns>True if any new entries were added to the list of reachable materials, false otherwise.</returns>
-        internal bool AddReachableWithPrereqs(ETechTypeCategory category, int maxDepth, TechType prerequisite, bool invert = false)
+        public bool AddReachableWithPrereqs(ETechTypeCategory category, int maxDepth, TechType prerequisite, bool invert = false)
         {
             return AddReachableWithPrereqs(new[] { category }, maxDepth, prerequisite, invert);
         }
@@ -142,7 +145,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="type">The TechType.</param>
         /// <returns>The LogicEntity if found, null otherwise.</returns>
         [CanBeNull]
-        internal LogicEntity Find(TechType type)
+        public LogicEntity Find(TechType type)
         {
             return _allMaterials.Find(x => x.TechType.Equals(type));
         }
@@ -150,7 +153,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <summary>
         /// Get all entities that are capable of being crafted.
         /// </summary>
-        internal List<LogicEntity> GetAllCraftables()
+        public List<LogicEntity> GetAllCraftables()
         {
             var craftables = _allMaterials.FindAll(x => 
                 !x.Category.Equals(ETechTypeCategory.RawMaterials) 
@@ -165,7 +168,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <summary>
         /// Get all entities that are considered fragments.
         /// </summary>
-        internal List<LogicEntity> GetAllFragments()
+        public List<LogicEntity> GetAllFragments()
         {
             var fragments = _allMaterials.FindAll(x =>
                 x.Category.Equals(ETechTypeCategory.Fragments));
@@ -177,7 +180,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// Get all entities that are considered raw materials without prerequisites and accessible by the given depth.
         /// </summary>
         /// <param name="maxDepth">The maximum depth at which the raw materials must be available.</param>
-        internal List<LogicEntity> GetAllRawMaterials(int maxDepth = 2000)
+        public List<LogicEntity> GetAllRawMaterials(int maxDepth = 2000)
         {
             var rawMaterials = _allMaterials.FindAll(x =>
                 x.Category.Equals(ETechTypeCategory.RawMaterials) && x.AccessibleDepth <= maxDepth

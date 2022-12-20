@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Interfaces;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
@@ -20,7 +20,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// </summary>
         /// <param name="entity">The recipe to randomise ingredients for.</param>
         /// <returns>The modified entity.</returns>
-        internal override LogicEntity RandomiseIngredients(LogicEntity entity)
+        public override LogicEntity RandomiseIngredients(LogicEntity entity)
         {
             int number = _random.Next(1, _config.iMaxIngredientsPerRecipe + 1);
             int totalInvSize = 0;
@@ -52,11 +52,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 AddIngredientWithMaxUsesCheck(ingredientEntity, ingredient.amount);
                 totalInvSize += ingredientEntity.GetItemSize() * ingredient.amount;
 
-                LogHandler.Debug($"[R] > Adding ingredient: {ingredient.techType.AsString()}, {ingredient.amount}");
+                _log.Debug($"[R] > Adding ingredient: {ingredient.techType.AsString()}, {ingredient.amount}");
 
                 if (totalInvSize > _config.iMaxInventorySizePerRecipe)
                 {
-                    LogHandler.Debug("[R] ! Recipe is getting too large, stopping.");
+                    _log.Debug("[R] ! Recipe is getting too large, stopping.");
                     break;
                 }
             }

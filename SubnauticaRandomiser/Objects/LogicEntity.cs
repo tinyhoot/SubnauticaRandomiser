@@ -4,16 +4,16 @@ using System.IO;
 using System.Linq;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects.Enums;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// This class acts an abstract representation of anything that could or should be considered while randomising.
     /// The Randomiser will pass over every one of these entities and only consider itself done once each of them has
     /// the InLogic flag - meaning that it is considered accessible within the game.
     /// </summary>
-    public class LogicEntity
+    internal class LogicEntity
     {
         public readonly TechType TechType;
         public readonly ETechTypeCategory Category;
@@ -88,10 +88,6 @@ namespace SubnauticaRandomiser.RandomiserObjects
             if (Blueprint is null || (Blueprint.UnlockConditions is null && Blueprint.UnlockDepth == 0))
                 return true;
 
-            // If the databox was randomised, do work to account for new locations.
-            if (logic._config.bRandomiseDataboxes && Blueprint.NeedsDatabox && !Blueprint.WasUpdated && logic._databoxes?.Count > 0)
-                Blueprint.UpdateDataboxUnlocks(logic);
-
             foreach (TechType condition in Blueprint.UnlockConditions ?? Enumerable.Empty<TechType>())
             {
                 LogicEntity conditionEntity = logic._materials.Find(condition);
@@ -121,7 +117,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 {
                     if (!logic._masterDict.SpawnDataDict.ContainsKey(fragment))
                     {
-                        LogHandler.Debug($"[B] Entity {this} missing fragment {fragment.AsString()}");
+                        //LogHandler.Debug($"[B] Entity {this} missing fragment {fragment.AsString()}");
                         return false;
                     }
                 }

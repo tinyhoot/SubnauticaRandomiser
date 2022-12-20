@@ -1,14 +1,14 @@
 ﻿using System;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects.Enums;
 using UnityEngine;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// A databox containing a blueprint it unlocks.
     /// </summary>
     [Serializable]
-    public class Databox
+    internal class Databox
     {
         public TechType TechType;
         public Vector3 Coordinates;
@@ -27,7 +27,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
 
         public override string ToString()
         {
-            return TechType.AsString();
+            return TechType.ToString();
         }
     }
 }

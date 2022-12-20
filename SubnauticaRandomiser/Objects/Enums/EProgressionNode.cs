@@ -1,4 +1,4 @@
-﻿namespace SubnauticaRandomiser.RandomiserObjects.Enums
+﻿namespace SubnauticaRandomiser.Objects.Enums
 {
     public enum EProgressionNode
     {

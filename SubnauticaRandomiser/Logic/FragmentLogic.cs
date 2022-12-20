@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SMLHelper.V2.Handlers;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Exceptions;
+using SubnauticaRandomiser.Interfaces;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Exceptions;
 using static LootDistributionData;
 
 namespace SubnauticaRandomiser.Logic
@@ -18,8 +19,9 @@ namespace SubnauticaRandomiser.Logic
         
         private static Dictionary<TechType, List<string>> _classIdDatabase;
         private RandomiserConfig _config => _logic._config;
+        private ILogHandler _log => _logic._log;
         private EntitySerializer _masterDict => _logic._masterDict;
-        private Random _random => _logic._random;
+        private IRandomHandler _random => _logic._random;
         private readonly List<Biome> _allBiomes;
         private readonly List<Biome> _availableBiomes;
         private static readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
@@ -85,11 +87,11 @@ namespace SubnauticaRandomiser.Logic
             // Check whether the fragment fulfills its prerequisites.
             if (entity.AccessibleDepth >= reachableDepth)
             {
-                LogHandler.Debug($"[F] --- Fragment [{entity}] did not fulfill requirements, skipping.");
+                _log.Debug($"[F] --- Fragment [{entity}] did not fulfill requirements, skipping.");
                 return false;
             }
             
-            LogHandler.Debug($"[F] Randomising fragment {entity} for depth {reachableDepth}");
+            _log.Debug($"[F] Randomising fragment {entity} for depth {reachableDepth}");
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
@@ -121,7 +123,7 @@ namespace SubnauticaRandomiser.Logic
                     spawnList.Add(spawnData);
                 }
 
-                LogHandler.Debug($"[F] + Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
+                _log.Debug($"[F] + Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
             }
             
             // If recipes are not randomised, handle unlocking depth progression items.
@@ -150,7 +152,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         internal static void ResetFragmentSpawns()
         {
-            LogHandler.Debug("---Resetting vanilla fragment spawn rates---");
+            //_log.Debug("---Resetting vanilla fragment spawn rates---");
 
             // For the rest of all the randomisation, we need TechTypes to classId.
             // Unfortunately, for just this once, we need the opposite.
@@ -177,7 +179,7 @@ namespace SubnauticaRandomiser.Logic
                 }
             }
 
-            LogHandler.Debug("---Completed resetting vanilla fragment spawn rates---");
+            //_log.Debug("---Completed resetting vanilla fragment spawn rates---");
         }
         
         /// <summary>
@@ -201,7 +203,7 @@ namespace SubnauticaRandomiser.Logic
                         biomes.Add(b);
                 }
             }
-            LogHandler.Debug("---Total biomes suitable for fragments: "+biomes.Count);
+            _log.Debug("---Total biomes suitable for fragments: "+biomes.Count);
             return biomes;
         }
 
@@ -242,7 +244,7 @@ namespace SubnauticaRandomiser.Logic
                 return;
             
             int numFragments = _random.Next(_config.iMinFragmentsToUnlock, _config.iMaxFragmentsToUnlock + 1);
-            LogHandler.Debug($"[F] New number of fragments required for {entity}: {numFragments}");
+            _log.Debug($"[F] New number of fragments required for {entity}: {numFragments}");
             _masterDict.AddFragmentUnlockNum(entity.TechType, numFragments);
         }
 
@@ -260,13 +262,13 @@ namespace SubnauticaRandomiser.Logic
             // In case no good biome is available, ignore overpopulation restrictions and choose any.
             if (choices.Count == 0)
             {
-                LogHandler.Debug("[F] ! No valid biome choices, using fallback");
+                _log.Debug("[F] ! No valid biome choices, using fallback");
                 choices = _allBiomes.FindAll(x => x.AverageDepth <= depth);
                 if (choices.Count == 0)
                     throw new RandomisationException("No valid biome options for depth " + depth);
             }
 
-            Biome biome = GetRandom(choices);
+            Biome biome = _random.Choice(choices);
             biome.Used++;
 
             // Remove the biome from the pool if it gets too populated.
@@ -431,7 +433,7 @@ namespace SubnauticaRandomiser.Logic
             }
 
             unlockedProgressionItems.Add(recipe.TechType, true);
-            LogHandler.Debug($"[F][+] Added {recipe} to progression items.");
+            _log.Debug($"[F][+] Added {recipe} to progression items.");
             return true;
         }
         
@@ -480,20 +482,6 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Get a random element from the given list.
-        /// </summary>
-        /// <param name="list">The list to choose a member from.</param>
-        /// <typeparam name="T">The type of the objects contained in the list.</typeparam>
-        /// <returns>A random element of the list.</returns>
-        private T GetRandom<T>(List<T> list)
-        {
-            if (list is null || list.Count == 0)
-                return default(T);
-
-            return list[_random.Next(0, list.Count)];
-        }
-
-        /// <summary>
         /// Force Subnautica and SMLHelper to index and cache the classIds, setup the databases, and prepare a blank
         /// slate by removing all existing fragment spawns from the game.
         /// </summary>
@@ -513,14 +501,14 @@ namespace SubnauticaRandomiser.Logic
         // This is really just for testing purposes.
         internal void DumpBiomeDataEntities()
         {
-            LogHandler.Debug("---Dumping BiomeData---");
+            _log.Debug("---Dumping BiomeData---");
 
             // Grab a copy of all vanilla BiomeData. This loads it fresh from disk
             // and will thus be unaffected by any existing randomisation.
             LootDistributionData loot = LootDistributionData.Load(LootDistributionData.dataPath);
             var keys = UWE.PrefabDatabase.prefabFiles.Keys;
 
-            LogHandler.Debug("---Dumping valid prefabs");
+            _log.Debug("---Dumping valid prefabs");
             foreach (string classId in keys)
             {
                 if (!loot.GetPrefabData(classId, out SrcData data))
@@ -529,10 +517,10 @@ namespace SubnauticaRandomiser.Logic
                 // Any prefab with BiomeData will end up in the log files. This is
                 // the case even if that BiomeData specifies 0.0 spawn chance across
                 // the board and is thus "empty".
-                LogHandler.Debug("KEY: " + classId + ", VALUE: " + UWE.PrefabDatabase.prefabFiles[classId]);
+                _log.Debug("KEY: " + classId + ", VALUE: " + UWE.PrefabDatabase.prefabFiles[classId]);
             }
             
-            LogHandler.Debug("---Dumping Biomes");
+            _log.Debug("---Dumping Biomes");
             BiomeType[] biomes = (BiomeType[])Enum.GetValues(typeof(BiomeType));
             foreach (BiomeType biome in biomes)
             {
@@ -559,12 +547,12 @@ namespace SubnauticaRandomiser.Logic
                         }
                     }
                     //LogHandler.Debug("BIOME: " + biome.AsString() + ", VALID ENTRIES: " + valid + ", SUM: " + sum + ", OF WHICH FRAGMENTS: " + sumFragments);
-                    LogHandler.Debug(string.Format("{0}\t{1} entries\t{2} fragments\t{3} totalspawnrate\t{4} totalfragmentrate", biome.AsString(), valid, validFragments, sum, sumFragments));
+                    _log.Debug(string.Format("{0}\t{1} entries\t{2} fragments\t{3} totalspawnrate\t{4} totalfragmentrate", biome.AsString(), valid, validFragments, sum, sumFragments));
                 }
                 else
                 {
                     //LogHandler.Debug("No DstData for biome " + biome.AsString());
-                    LogHandler.Debug(string.Format("{0}\tNONE\t\t", biome.AsString()));
+                    _log.Debug(string.Format("{0}\tNONE\t\t", biome.AsString()));
                 }
             }
         }

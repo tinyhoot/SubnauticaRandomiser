@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using SubnauticaRandomiser.Interfaces;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// Handles everything related to the spoiler log generated during randomisation.
@@ -13,6 +14,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
     {
         internal const string _FileName = "spoilerlog.txt";
         private readonly RandomiserConfig _config;
+        private readonly ILogHandler _log;
         private readonly EntitySerializer _serializer;
         private readonly List<KeyValuePair<TechType, int>> _progression = new List<KeyValuePair<TechType, int>>();
 
@@ -23,9 +25,10 @@ namespace SubnauticaRandomiser.RandomiserObjects
         private string[] _contentDataboxes;
         private string[] _contentFragments;
 
-        internal SpoilerLog(RandomiserConfig config, EntitySerializer serializer)
+        internal SpoilerLog(RandomiserConfig config, ILogHandler logger, EntitySerializer serializer)
         {
             _config = config;
+            _log = logger;
             _serializer = serializer;
         }
         
@@ -56,7 +59,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
                 "*************************************************",
                 "",
-                "Generated on " + DateTime.Now + " with " + InitMod.s_versionDict[InitMod.s_expectedSaveVersion]
+                "Generated on " + DateTime.Now + " with " + InitMod.s_versionDict[InitMod._ExpectedSaveVersion]
             };
             _contentBasics = new[]
             {
@@ -123,7 +126,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 if (!userValue.Equals(defaultValue))
                     preparedAdvSettings.Add(field.Name + ": " + userValue);
             }
-            LogHandler.Debug("Added anomalies: " + preparedAdvSettings.Count);
+            _log.Debug("Added anomalies: " + preparedAdvSettings.Count);
 
             if (preparedAdvSettings.Count == 0)
                 preparedAdvSettings.Add("No advanced settings were modified.");
@@ -184,7 +187,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         /// <returns>The prepared log entry.</returns>
         private string PrepareMD5()
         {
-            if (!InitMod.s_expectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
+            if (!InitMod._ExpectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
                 return "recipeInformation.csv has been modified: " + CSVReader.s_recipeCSVMD5;
             
             return "recipeInformation.csv is unmodified.";
@@ -226,7 +229,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         {
             if (_progression.Exists(x => x.Key.Equals(type)))
             {
-                LogHandler.Warn("Tried to add duplicate progression item to spoiler log: " + type.AsString());
+                _log.Warn("Tried to add duplicate progression item to spoiler log: " + type.AsString());
                 return false;
             }
             
@@ -280,7 +283,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
                 await WriteTextToLog(file, lines.ToArray());
             }
 
-            LogHandler.Info("Wrote spoiler log to disk.");
+            _log.Info("Wrote spoiler log to disk.");
         }
 
         private async Task WriteTextToLog(StreamWriter file, string[] text)

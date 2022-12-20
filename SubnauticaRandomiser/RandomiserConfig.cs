@@ -1,15 +1,28 @@
 ﻿using System;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options.Attributes;
-using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.Interfaces;
 
 namespace SubnauticaRandomiser
 {
     [Menu("Randomiser")]
     public class RandomiserConfig : ConfigFile
     {
-        private DateTime _timeButtonPressed = new DateTime();
-        private const double _buttonMinInterval = 0.5;
+        private readonly ILogHandler _log;
+        private DateTime _lastButtonPress;
+        private const double _ButtonMinInterval = 0.5;
+
+        public RandomiserConfig()
+        {
+            _log = new LogHandler();
+            _lastButtonPress = new DateTime();
+        }
+        
+        public RandomiserConfig(ILogHandler logger)
+        {
+            _log = logger;
+            _lastButtonPress = DateTime.UtcNow;
+        }
 
         // Every public variable listed here will end up in the config file.
         // Additionally, adding the relevant Attributes will also make them show up in the in-game options menu.
@@ -76,28 +89,28 @@ namespace SubnauticaRandomiser
         {
             // Due to how the randomiser locks up when pressing the button, it is possible for the click to be
             // registered twice and randomisation to happen twice in a row. Prevent this here.
-            if (WasButtonRecentlyPressed())
+            if (!IsButtonPressAllowed(DateTime.UtcNow))
                 return;
 
             Random random = new Random();
             iSeed = random.Next();
-            LogHandler.MainMenuMessage("Changed seed to " + iSeed);
-            LogHandler.MainMenuMessage("Randomising...");
+            _log.MainMenuMessage("Changed seed to " + iSeed);
+            _log.MainMenuMessage("Randomising...");
             InitMod.Randomise();
-            LogHandler.MainMenuMessage("Finished randomising! Please restart the game for changes to take effect.");
+            _log.MainMenuMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
         [Button("Randomise with same seed")]
         public void NewRandomOldSeed()
         {
-            if (WasButtonRecentlyPressed())
+            if (!IsButtonPressAllowed(DateTime.UtcNow))
                 return;
             
-            LogHandler.MainMenuMessage("Randomising...");
+            _log.MainMenuMessage("Randomising...");
             // Ensure all manual changes to the config file are loaded.
             Load();
             InitMod.Randomise();
-            LogHandler.MainMenuMessage("Finished randomising! Please restart the game for changes to take effect.");
+            _log.MainMenuMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
@@ -116,7 +129,7 @@ namespace SubnauticaRandomiser
 
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
-        public int iSaveVersion = InitMod.s_expectedSaveVersion;
+        public int iSaveVersion = InitMod._ExpectedSaveVersion;
 
         public void SanitiseConfigValues()
         {
@@ -128,7 +141,7 @@ namespace SubnauticaRandomiser
                 // Skip clamping values for special cases, and for non-numeric options.
                 if (!ConfigDefaults.Contains(name) || type == typeof(bool))
                 {
-                    // LogHandler.Debug("Skipping config sanity check for variable " + name);
+                    // _log.Debug("Skipping config sanity check for variable " + name);
                     continue;
                 }
 
@@ -138,7 +151,7 @@ namespace SubnauticaRandomiser
                 if (value.CompareTo(ConfigDefaults.GetMin(name)) < 0
                     || value.CompareTo(ConfigDefaults.GetMax(name)) > 0)
                 {
-                    LogHandler.Debug("Resetting invalid config value for " + name);
+                    _log.Debug("Resetting invalid config value for " + name);
                     field.SetValue(this, ConfigDefaults.GetDefault(name));
                 }
             }
@@ -148,13 +161,13 @@ namespace SubnauticaRandomiser
         /// Ensure the button is not accidentally pressed twice within a certain timeframe by checking against the
         /// system clock.
         /// </summary>
-        /// <returns>True if the button was recently pressed, false if it was not.</returns>
-        private bool WasButtonRecentlyPressed()
+        /// <returns>True if the button was not recently pressed, false if it was.</returns>
+        internal bool IsButtonPressAllowed(DateTime time)
         {
-            if (DateTime.UtcNow.Subtract(_timeButtonPressed).TotalSeconds< _buttonMinInterval)
+            if (time.Subtract(_lastButtonPress).TotalSeconds < _ButtonMinInterval)
                 return false;
 
-            _timeButtonPressed = DateTime.UtcNow;
+            _lastButtonPress = time;
             return true;
         }
     }

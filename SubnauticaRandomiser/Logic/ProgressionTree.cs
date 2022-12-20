@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Logic.Recipes;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic
 {
-    public class ProgressionTree
+    internal class ProgressionTree
     {
-        private Dictionary<EProgressionNode, ProgressionPath> _depthDifficulties;
-        private Dictionary<EProgressionNode, List<TechType>> _essentialItems;
-        private Dictionary<EProgressionNode, List<TechType[]>> _electiveItems;
-        private Dictionary<TechType, TechType> _upgradeChains;
+        internal Dictionary<EProgressionNode, ProgressionPath> _depthDifficulties;
+        internal Dictionary<EProgressionNode, List<TechType>> _essentialItems;
+        internal Dictionary<EProgressionNode, List<TechType[]>> _electiveItems;
+        internal Dictionary<TechType, TechType> _upgradeChains;
         public Dictionary<TechType, int> BasicOutpostPieces;
         public Dictionary<TechType, bool> DepthProgressionItems;
 
@@ -20,6 +21,7 @@ namespace SubnauticaRandomiser.Logic
             _depthDifficulties = new Dictionary<EProgressionNode, ProgressionPath>();
             _essentialItems = new Dictionary<EProgressionNode, List<TechType>>();
             _electiveItems = new Dictionary<EProgressionNode, List<TechType[]>>();
+            _upgradeChains = new Dictionary<TechType, TechType>();
             BasicOutpostPieces = new Dictionary<TechType, int>();
             DepthProgressionItems = new Dictionary<TechType, bool>();
         }
@@ -137,7 +139,8 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Set up everything needed for randomising recipes.
         /// </summary>
-        public void SetupRecipes()
+        /// <param name="useVanillaUpgradeChains">If true, set up vanilla upgrade chains like Knife to Heatblade.</param>
+        public void SetupRecipes(bool useVanillaUpgradeChains)
         {
             if (_depthDifficulties.Count == 0)
                 SetupVanillaTree();
@@ -177,20 +180,22 @@ namespace SubnauticaRandomiser.Logic
 
             // Assemble a vanilla upgrade chain. These are the upgrades as the
             // base game intends you to progress through them.
-            _upgradeChains = new Dictionary<TechType, TechType>();
-            AddUpgradeChain(TechType.VehicleHullModule2, TechType.VehicleHullModule1);
-            AddUpgradeChain(TechType.VehicleHullModule3, TechType.VehicleHullModule2);
-            AddUpgradeChain(TechType.ExoHullModule2, TechType.ExoHullModule1);
-            AddUpgradeChain(TechType.CyclopsHullModule2, TechType.CyclopsHullModule1);
-            AddUpgradeChain(TechType.CyclopsHullModule3, TechType.CyclopsHullModule2);
-            
-            AddUpgradeChain(TechType.HeatBlade, TechType.Knife);
-            AddUpgradeChain(TechType.RepulsionCannon, TechType.PropulsionCannon);
-            AddUpgradeChain(TechType.SwimChargeFins, TechType.Fins);
-            AddUpgradeChain(TechType.UltraGlideFins, TechType.Fins);
-            AddUpgradeChain(TechType.DoubleTank, TechType.Tank);
-            AddUpgradeChain(TechType.PlasteelTank, TechType.DoubleTank);
-            AddUpgradeChain(TechType.HighCapacityTank, TechType.DoubleTank);
+            if (useVanillaUpgradeChains)
+            {
+                AddUpgradeChain(TechType.VehicleHullModule2, TechType.VehicleHullModule1);
+                AddUpgradeChain(TechType.VehicleHullModule3, TechType.VehicleHullModule2);
+                AddUpgradeChain(TechType.ExoHullModule2, TechType.ExoHullModule1);
+                AddUpgradeChain(TechType.CyclopsHullModule2, TechType.CyclopsHullModule1);
+                AddUpgradeChain(TechType.CyclopsHullModule3, TechType.CyclopsHullModule2);
+                
+                AddUpgradeChain(TechType.HeatBlade, TechType.Knife);
+                AddUpgradeChain(TechType.RepulsionCannon, TechType.PropulsionCannon);
+                AddUpgradeChain(TechType.SwimChargeFins, TechType.Fins);
+                AddUpgradeChain(TechType.UltraGlideFins, TechType.Fins);
+                AddUpgradeChain(TechType.DoubleTank, TechType.Tank);
+                AddUpgradeChain(TechType.PlasteelTank, TechType.DoubleTank);
+                AddUpgradeChain(TechType.HighCapacityTank, TechType.DoubleTank);
+            }
         }
         
         /// <summary>
@@ -243,7 +248,7 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Add a pathway of progression to an existing one ProgressionPath.
+        /// Add a pathway of progression to an existing ProgressionPath.
         /// </summary>
         /// <param name="node">The node to add a path for.</param>
         /// <param name="path">The TechType that allows for progression.</param>
@@ -310,6 +315,37 @@ namespace SubnauticaRandomiser.Logic
             
             _upgradeChains.Add(upgrade, ingredient);
             return true;
+        }
+        
+        /// <summary>
+        /// Get the ingredient required for a given upgrade, if any. E.g. Seamoth Depth MK2 will return MK1.
+        /// </summary>
+        /// <param name="upgrade">The "Tier 2" entity to investigate for ingredients.</param>
+        /// <returns>The TechType of the required "Tier 1" ingredient, or TechType.None if no such requirement exists.
+        /// </returns>
+        public TechType GetBaseOfUpgrade(TechType upgrade)
+        {
+            if (_upgradeChains.TryGetValue(upgrade, out TechType type))  
+                return type;
+
+            return TechType.None;
+        }
+
+        /// <summary>
+        /// If vanilla upgrade chains are enabled, return that which this recipe upgrades from.
+        /// <example>Returns the basic Knife when given HeatBlade.</example>
+        /// </summary>
+        /// <param name="upgrade">The upgrade to check for a base.</param>
+        /// <param name="materials">The list of all materials.</param>
+        /// <returns>A LogicEntity if the given upgrade has a base it upgrades from, null otherwise.</returns>
+        [CanBeNull]
+        public LogicEntity GetBaseOfUpgrade(TechType upgrade, Materials materials)
+        {
+            TechType basicEntity = GetBaseOfUpgrade(upgrade);
+            if (basicEntity.Equals(TechType.None))
+                return null;
+
+            return materials.Find(basicEntity);
         }
 
         /// <summary>
@@ -382,20 +418,6 @@ namespace SubnauticaRandomiser.Logic
             }
 
             return electives;
-        }
-        
-        /// <summary>
-        /// Get the ingredient required for a given upgrade, if any. E.g. Seamoth Depth MK2 will return MK1.
-        /// </summary>
-        /// <param name="upgrade">The "Tier 2" entity to investigate for ingredients.</param>
-        /// <returns>The TechType of the required "Tier 1" ingredient, or TechType.None if no such requirement exists.
-        /// </returns>
-        public TechType GetUpgradeChain(TechType upgrade)
-        {
-            if (_upgradeChains.TryGetValue(upgrade, out TechType type))  
-                return type;
-
-            return TechType.None;
         }
 
         /// <summary>

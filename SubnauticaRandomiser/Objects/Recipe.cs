@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// A wrapper for the game's TechData class to make it serializable.

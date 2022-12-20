@@ -1,46 +1,47 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
-using Random = System.Random;
+using SubnauticaRandomiser.Interfaces;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic
 {
     internal class AlternateStartLogic
     {
         private readonly Dictionary<EBiomeType, List<float[]>> _alternateStarts;
-        private readonly CoreLogic _logic;
+        private readonly RandomiserConfig _config;
+        private readonly ILogHandler _log;
+        private readonly IRandomHandler _random;
 
-        private RandomiserConfig _config => _logic._config;
-        private EntitySerializer _masterDict => _logic._masterDict;
-        private Random _random => _logic._random;
-
-        internal AlternateStartLogic(CoreLogic logic, Dictionary<EBiomeType, List<float[]>> alternateStarts)
+        public AlternateStartLogic(Dictionary<EBiomeType, List<float[]>> alternateStarts, RandomiserConfig config,
+            ILogHandler log, IRandomHandler random)
         {
-            _logic = logic;
             _alternateStarts = alternateStarts;
+            _config = config;
+            _log = log;
+            _random = random;
         }
 
-        internal void Randomise()
+        public void Randomise(EntitySerializer serializer)
         {
-            _masterDict.StartPoint = GetRandomStart();
+            serializer.StartPoint = GetRandomStart(_config.sSpawnPoint);
         }
 
         /// <summary>
         /// Convert the config value to a usable biome.
         /// </summary>
         /// <returns>The biome.</returns>
-        private EBiomeType GetBiome()
+        private EBiomeType GetBiome(string startBiome)
         {
-            switch (_config.sSpawnPoint)
+            switch (startBiome)
             {
                 case "Random":
                     // Only use starts where you can actually reach the ground.
-                    return _logic.GetRandom(_alternateStarts.Keys.ToList()
+                    return _random.Choice(_alternateStarts.Keys.ToList()
                         .FindAll(biome => !biome.Equals(EBiomeType.None) && biome.GetAccessibleDepth() <= 100));
                 case "Chaotic Random":
-                    return _logic.GetRandom(_alternateStarts.Keys.ToList());
+                    return _random.Choice(_alternateStarts.Keys);
                 case "BulbZone":
                     return EBiomeType.KooshZone;
                 case "Floating Island":
@@ -49,33 +50,33 @@ namespace SubnauticaRandomiser.Logic
                     return EBiomeType.None;
             }
 
-            return (EBiomeType)Enum.Parse(typeof(EBiomeType), _config.sSpawnPoint);
+            return EnumHandler.Parse<EBiomeType>(startBiome);
         }
 
         /// <summary>
         /// Find a suitable random spawn point for the lifepod.
         /// </summary>
         /// <returns>The new spawn point.</returns>
-        private RandomiserVector GetRandomStart()
+        /// <exception cref="ArgumentException">Raised if the startBiome is invalid or not in the database.</exception>
+        public RandomiserVector GetRandomStart(string startBiome)
         {
-            if (_config.sSpawnPoint.StartsWith("Vanilla"))
+            if (startBiome.StartsWith("Vanilla"))
                 return null;
             
-            EBiomeType biome = GetBiome();
+            EBiomeType biome = GetBiome(startBiome);
             if (!_alternateStarts.ContainsKey(biome))
             {
-                LogHandler.Error("[AS] No information found on chosen starting biome " + biome);
-                return new RandomiserVector(0, 0, 0);
+                _log.Error("[AS] No information found on chosen starting biome " + biome);
+                throw new ArgumentException($"Starting biome '{startBiome}' is invalid!");
             }
 
             // Choose one of the possible spawning boxes within the biome.
-            int boxIdx = _random.Next(0, _alternateStarts[biome].Count);
-            float[] box = _alternateStarts[biome][boxIdx];
+            float[] box = _random.Choice(_alternateStarts[biome]);
             // Choose the specific spawn point within the box.
             int x = _random.Next((int)box[0], (int)box[2] + 1);
             int z = _random.Next((int)box[3], (int)box[1] + 1);
 
-            LogHandler.Debug("[AS] Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
+            _log.Debug("[AS] Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
             return new RandomiserVector(x, 0, z);
         }
     }

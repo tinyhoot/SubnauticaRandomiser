@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
-using SubnauticaRandomiser.RandomiserObjects;
-using SubnauticaRandomiser.RandomiserObjects.Enums;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
     /// Acts as the core for handling all randomising logic in the mod, and turning modules on/off as needed.
     /// </summary>
-    public class CoreLogic
+    internal class CoreLogic
     {
         internal readonly RandomiserConfig _config;
-        internal readonly List<Databox> _databoxes;
+        internal readonly ILogHandler _log;
         internal readonly EntitySerializer _masterDict;
         internal readonly Materials _materials;
-        internal readonly System.Random _random;
+        internal readonly IRandomHandler _random;
         internal readonly SpoilerLog _spoilerLog;
         internal readonly ProgressionTree _tree;
 
@@ -27,21 +27,21 @@ namespace SubnauticaRandomiser.Logic
         internal readonly FragmentLogic _fragmentLogic;
         private readonly RecipeLogic _recipeLogic;
 
-        public CoreLogic(System.Random random, RandomiserConfig config, List<LogicEntity> allMaterials,
+        public CoreLogic(IRandomHandler random, RandomiserConfig config, ILogHandler logger, List<LogicEntity> allMaterials,
             Dictionary<EBiomeType, List<float[]>> alternateStarts, List<BiomeCollection> biomes = null,
             List<Databox> databoxes = null)
         {
             _config = config;
-            _databoxes = databoxes;
-            _masterDict = new EntitySerializer();
-            _materials = new Materials(allMaterials);
+            _log = logger;
+            _masterDict = new EntitySerializer(logger);
+            _materials = new Materials(allMaterials, logger);
             _random = random;
-            _spoilerLog = new SpoilerLog(config, _masterDict);
+            _spoilerLog = new SpoilerLog(config, logger, _masterDict);
             
             if (!_config.sSpawnPoint.StartsWith("Vanilla"))
-                _altStartLogic = new AlternateStartLogic(this, alternateStarts);
+                _altStartLogic = new AlternateStartLogic(alternateStarts, config, logger, random);
             if (_config.bRandomiseDataboxes)
-                _databoxLogic = new DataboxLogic(this);
+                _databoxLogic = new DataboxLogic(this, databoxes);
             if (_config.bRandomiseFragments || _config.bRandomiseNumFragments || _config.bRandomiseDuplicateScans)
                 _fragmentLogic = new FragmentLogic(this, biomes);
             if (_config.bRandomiseRecipes)
@@ -56,13 +56,14 @@ namespace SubnauticaRandomiser.Logic
         {
             // Init the progression tree.
             _tree.SetupVanillaTree();
-            _altStartLogic?.Randomise();
+            _altStartLogic?.Randomise(_masterDict);
 
             if (_databoxLogic != null)
             {
                 // Just randomise those flat out for now, instead of including them in the core loop.
                 _databoxLogic.RandomiseDataboxes();
-                LinkCyclopsHullModules();
+                _databoxLogic.UpdateBlueprints(_materials.GetAll());
+                _databoxLogic.LinkCyclopsHullModules(_materials);
             }
 
             if (_fragmentLogic != null)
@@ -92,7 +93,7 @@ namespace SubnauticaRandomiser.Logic
                 notRandomised.AddRange(_materials.GetAllCraftables());
                 
                 // Update the progression tree with recipes.
-                _tree.SetupRecipes();
+                _tree.SetupRecipes(_config.bVanillaUpgradeChains);
                 if (_config.bVanillaUpgradeChains)
                     _tree.ApplyUpgradeChainToPrerequisites(_materials.GetAll());
             }
@@ -106,7 +107,7 @@ namespace SubnauticaRandomiser.Logic
         /// a valid solution.</exception>
         internal EntitySerializer Randomise()
         {
-            LogHandler.Info("Randomising using logic-based system...");
+            _log.Info("Randomising using logic-based system...");
             
             List<LogicEntity> notRandomised = new List<LogicEntity>();
             Dictionary<TechType, bool> unlockedProgressionItems = new Dictionary<TechType, bool>();
@@ -122,8 +123,8 @@ namespace SubnauticaRandomiser.Logic
                 circuitbreaker++;
                 if (circuitbreaker > 3000)
                 {
-                    LogHandler.MainMenuMessage("Failed to randomise items: stuck in infinite loop!");
-                    LogHandler.Fatal("Encountered infinite loop, aborting!");
+                    _log.MainMenuMessage("Failed to randomise items: stuck in infinite loop!");
+                    _log.Fatal("Encountered infinite loop, aborting!");
                     throw new TimeoutException("Encountered infinite loop while randomising!");
                 }
                 
@@ -147,10 +148,10 @@ namespace SubnauticaRandomiser.Logic
                 }
 
                 if (success is null)
-                    LogHandler.Warn("Unsupported entity in loop: " + nextEntity);
+                    _log.Warn("Unsupported entity in loop: " + nextEntity);
             }
 
-            LogHandler.Info($"Finished randomising within {circuitbreaker} cycles!");
+            _log.Info($"Finished randomising within {circuitbreaker} cycles!");
             _spoilerLog.WriteLog();
 
             return _masterDict;
@@ -167,7 +168,7 @@ namespace SubnauticaRandomiser.Logic
             // certain recipes are done by a certain depth, e.g. waterparks by 500m.
             // Automatically fails if recipes do not get randomised.
             LogicEntity next = GetPriorityEntity(depth);
-            next ??= GetRandom(notRandomised);
+            next ??= _random.Choice(notRandomised);
 
             return next;
         }
@@ -195,7 +196,7 @@ namespace SubnauticaRandomiser.Logic
                 { TechType.PlasteelTank, new[] { 135, 0.1 } }
             };
 
-            LogHandler.Debug("===== Recalculating reachable depth =====");
+            _log.Debug("===== Recalculating reachable depth =====");
 
             // Get the deepest depth that can be reached by vehicle.
             foreach (EProgressionNode node in EProgressionNodeExtensions.AllDepthNodes)
@@ -230,7 +231,7 @@ namespace SubnauticaRandomiser.Logic
             // Given everything above, calculate the total.
             int totalDepth = CalculateTotalDepth(progressionItems, vehicleDepth, (int)soloDepthRaw);
             
-            LogHandler.Debug("===== New reachable depth: " + totalDepth + " =====");
+            _log.Debug("===== New reachable depth: " + totalDepth + " =====");
 
             return totalDepth;
         }
@@ -317,7 +318,7 @@ namespace SubnauticaRandomiser.Logic
                 if (!type.Equals(TechType.None))
                 {
                     entity = _materials.Find(type);
-                    LogHandler.Debug($"Prioritising essential entity {entity} for depth {depth}");
+                    _log.Debug($"Prioritising essential entity {entity} for depth {depth}");
                 }
             }
 
@@ -330,78 +331,13 @@ namespace SubnauticaRandomiser.Logic
                 
                 if (types?.Length > 0)
                 {
-                    TechType nextType = GetRandom(new List<TechType>(types));
+                    TechType nextType = _random.Choice(types);
                     entity = _materials.Find(nextType);
-                    LogHandler.Debug($"Prioritising elective entity {entity} for depth {depth}");
+                    _log.Debug($"Prioritising elective entity {entity} for depth {depth}");
                 }
             }
 
             return entity;
-        }
-        
-        /// <summary>
-        /// Cyclops hull modules are linked and unlock together once the blueprint for module1 is found. Do the work
-        /// for module1 and synchronise them.
-        /// </summary>
-        /// <exception cref="InvalidDataException">If the LogicEntity or databox for one of the hull modules cannot be
-        /// found.</exception>
-        private void LinkCyclopsHullModules()
-        {
-            if (!(_databoxes?.Count > 0))
-            {
-                LogHandler.Debug("Skipped linking Cyclops Hull Modules: Databoxes not randomised.");
-                return;
-            }
-
-            LogicEntity mod1 = _materials.Find(TechType.CyclopsHullModule1);
-            LogicEntity mod2 = _materials.Find(TechType.CyclopsHullModule2);
-            LogicEntity mod3 = _materials.Find(TechType.CyclopsHullModule3);
-
-            if (mod1 is null || mod2 is null || mod3 is null)
-                throw new InvalidDataException("Tried to link Cyclops Hull Modules, but found null.");
-            
-            int total = 0;
-            int number = 0;
-            int lasercutter = 0;
-            int propulsioncannon = 0;
-
-            foreach (Databox box in _databoxes.FindAll(x => x.TechType.Equals(mod1.TechType)))
-            {
-                total += (int)Math.Abs(box.Coordinates.y);
-                number++;
-
-                if (box.RequiresLaserCutter)
-                    lasercutter++;
-                if (box.RequiresPropulsionCannon)
-                    propulsioncannon++;
-            }
-            
-            if (number == 0)
-                throw new InvalidDataException("Entity " + this + " requires a databox, but 0 were found!");
-
-            mod1.Blueprint.UnlockDepth = total / number;
-            mod2.Blueprint.UnlockDepth = total / number;
-            mod3.Blueprint.UnlockDepth = total / number;
-
-            if (lasercutter / number >= 0.5)
-            {
-                mod1.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
-                mod2.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
-                mod3.Blueprint.UnlockConditions.Add(TechType.LaserCutter);
-            }
-
-            if (propulsioncannon / number >= 0.5)
-            {
-                mod1.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
-                mod2.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
-                mod3.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
-            }
-
-            mod1.Blueprint.WasUpdated = true;
-            mod2.Blueprint.WasUpdated = true;
-            mod3.Blueprint.WasUpdated = true;
-            
-            LogHandler.Debug("Linked Cyclops Hull Modules.");
         }
 
         /// <summary>
@@ -438,19 +374,6 @@ namespace SubnauticaRandomiser.Logic
                     return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Get a random element from a list.
-        /// </summary>
-        public T GetRandom<T>(List<T> list)
-        {
-            if (list == null || list.Count == 0)
-            {
-                return default(T);
-            }
-
-            return list[_random.Next(0, list.Count)];
         }
     }
 }

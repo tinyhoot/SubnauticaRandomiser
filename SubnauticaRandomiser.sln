@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		DataFiles\wreckInformation.csv = DataFiles\wreckInformation.csv
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{04F771FE-CA90-4C9D-B633-6366DE6855E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -24,6 +26,9 @@ Global
 		{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}.Debug|x86.Build.0 = Debug|x86
 		{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}.Release|x86.ActiveCfg = Release|x86
 		{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}.Release|x86.Build.0 = Release|x86
+		{04F771FE-CA90-4C9D-B633-6366DE6855E5}.Release|x86.ActiveCfg = Release|x86
+		{04F771FE-CA90-4C9D-B633-6366DE6855E5}.Debug|x86.ActiveCfg = Debug|x86
+		{04F771FE-CA90-4C9D-B633-6366DE6855E5}.Debug|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		outputpath = "$SUBNAUTICA_DIR/QMods/SubnauticaRandomiser"

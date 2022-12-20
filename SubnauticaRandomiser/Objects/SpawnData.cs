@@ -4,7 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using static LootDistributionData;
 
-namespace SubnauticaRandomiser.RandomiserObjects
+namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
     /// A wrapper for the game's SpawnData class to make it serializable.
@@ -31,7 +31,7 @@ namespace SubnauticaRandomiser.RandomiserObjects
         {
             if (BiomeDataList.Find(x => x.Biome.Equals(bd.Biome)) != null)
             {
-                LogHandler.Warn($"[SD] Tried to add duplicate biome {bd.Biome.AsString()} to SpawnData ID {ClassId}");
+                //LogHandler.Warn($"[SD] Tried to add duplicate biome {bd.Biome.AsString()} to SpawnData ID {ClassId}");
                 return;
             }
             BiomeDataList.Add(bd);

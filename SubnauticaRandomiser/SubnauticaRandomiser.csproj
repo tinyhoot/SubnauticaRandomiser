@@ -11,6 +11,8 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <LangVersion>8</LangVersion>
     <Nullable>warnings</Nullable>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,7 +43,11 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ConfigDefaults.cs" />
+    <Compile Include="EnumHandler.cs" />
+    <Compile Include="Interfaces\ILogHandler.cs" />
+    <Compile Include="Interfaces\IRandomHandler.cs" />
     <Compile Include="Logic\AlternateStartLogic.cs" />
+    <Compile Include="Logic\Recipes\BaseTheme.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
     <Compile Include="Patches\DeconstructionFix.cs" />
     <Compile Include="Patches\FragmentPatcher.cs" />
@@ -51,73 +57,65 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Compile Include="Logic\Recipes\Mode.cs" />
     <Compile Include="Logic\Recipes\ModeBalanced.cs" />
     <Compile Include="Logic\Recipes\ModeRandom.cs" />
-    <Compile Include="Logic\Recipes\ModeSubstitute.cs" />
     <Compile Include="Logic\Recipes\RecipeLogic.cs" />
     <Compile Include="Patches\AlternateStart.cs" />
+    <Compile Include="RandomHandler.cs" />
     <Compile Include="RandomiserConfig.cs" />
     <Compile Include="CSVReader.cs" />
     <Compile Include="LogHandler.cs" />
-    <Compile Include="RandomiserObjects\Blueprint.cs" />
-    <Compile Include="RandomiserObjects\Enums\EBiomeType.cs" />
-    <Compile Include="RandomiserObjects\Enums\EProgressionNode.cs" />
-    <Compile Include="RandomiserObjects\Enums\ETechTypeCategory.cs" />
-    <Compile Include="RandomiserObjects\Enums\EWreckage.cs" />
-    <Compile Include="RandomiserObjects\Exceptions\ParsingException.cs" />
-    <Compile Include="RandomiserObjects\Exceptions\RandomisationException.cs" />
-    <Compile Include="RandomiserObjects\RandomiserIngredient.cs" />
-    <Compile Include="RandomiserObjects\Recipe.cs" />
-    <Compile Include="RandomiserObjects\Databox.cs" />
-    <Compile Include="RandomiserObjects\RandomiserVector.cs" />
-    <Compile Include="RandomiserObjects\ProgressionPath.cs" />
-    <Compile Include="RandomiserObjects\SpoilerLog.cs" />
+    <Compile Include="Objects\Blueprint.cs" />
+    <Compile Include="Objects\Enums\EBiomeType.cs" />
+    <Compile Include="Objects\Enums\EProgressionNode.cs" />
+    <Compile Include="Objects\Enums\ETechTypeCategory.cs" />
+    <Compile Include="Objects\Enums\EWreckage.cs" />
+    <Compile Include="Objects\Exceptions\ParsingException.cs" />
+    <Compile Include="Objects\Exceptions\RandomisationException.cs" />
+    <Compile Include="Objects\RandomiserIngredient.cs" />
+    <Compile Include="Objects\Recipe.cs" />
+    <Compile Include="Objects\Databox.cs" />
+    <Compile Include="Objects\RandomiserVector.cs" />
+    <Compile Include="Objects\ProgressionPath.cs" />
+    <Compile Include="Objects\SpoilerLog.cs" />
     <Compile Include="Logic\CoreLogic.cs" />
     <Compile Include="Logic\ProgressionTree.cs" />
-    <Compile Include="RandomiserObjects\LogicEntity.cs" />
-    <Compile Include="RandomiserObjects\SpawnData.cs" />
+    <Compile Include="Objects\LogicEntity.cs" />
+    <Compile Include="Objects\SpawnData.cs" />
     <Compile Include="Logic\FragmentLogic.cs" />
     <Compile Include="EntitySerializer.cs" />
-    <Compile Include="RandomiserObjects\Biome.cs" />
-    <Compile Include="RandomiserObjects\BiomeCollection.cs" />
-    <Compile Include="RandomiserObjects\RandomiserBiomeData.cs" />
+    <Compile Include="Objects\Biome.cs" />
+    <Compile Include="Objects\BiomeCollection.cs" />
+    <Compile Include="Objects\RandomiserBiomeData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="0Harmony">
       <HintPath>Subnautica\BepInEx\core\0Harmony.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp_publicized">
       <HintPath>Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass_publicized">
       <HintPath>Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="QModInstaller">
       <HintPath>Subnautica\BepInEx\plugins\QModManager\QModInstaller.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="SMLHelper">
       <HintPath>Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="RandomiserObjects\" />
+    <Folder Include="Objects\" />
     <Folder Include="Logic\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

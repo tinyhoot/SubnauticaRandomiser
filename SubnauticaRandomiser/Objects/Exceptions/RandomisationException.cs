@@ -1,6 +1,6 @@
 using System;
 
-namespace SubnauticaRandomiser.RandomiserObjects.Exceptions
+namespace SubnauticaRandomiser.Objects.Exceptions
 {
     /// <summary>
     /// Represents grave errors that occur during randomisation.

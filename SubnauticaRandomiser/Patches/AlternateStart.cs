@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using HarmonyLib;
-using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.Objects;
 using UnityEngine;
 
 namespace SubnauticaRandomiser.Patches
@@ -23,7 +23,7 @@ namespace SubnauticaRandomiser.Patches
                 // Has not been randomised, don't do anything.
                 return;
 
-            LogHandler.Debug("[AS] Replacing lifepod spawnpoint with " + InitMod.s_masterDict.StartPoint);
+            FileLog.Log("[AS] Replacing lifepod spawnpoint with " + InitMod.s_masterDict.StartPoint);
             __result = InitMod.s_masterDict.StartPoint.ToUnityVector();
         }
     }

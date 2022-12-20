@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using HarmonyLib;
-using SubnauticaRandomiser.RandomiserObjects;
+using SubnauticaRandomiser.Objects;
 using UnityEngine;
 
 namespace SubnauticaRandomiser.Patches
@@ -16,7 +16,7 @@ namespace SubnauticaRandomiser.Patches
             BlueprintHandTarget blueprint = __instance.databoxPrefab.GetComponent<BlueprintHandTarget>();
             Vector3 position = __instance.transform.position;
 
-            LogHandler.Debug("[OnSpawn] Found blueprint " + blueprint.unlockTechType.AsString() + " at " 
+            FileLog.Log("[OnSpawn] Found blueprint " + blueprint.unlockTechType.AsString() + " at " 
                              + position.ToString());
 
             ReplaceDatabox(boxDict, position, blueprint);
@@ -37,7 +37,7 @@ namespace SubnauticaRandomiser.Patches
             if (blueprint == null)
                 return;
 
-            LogHandler.Debug("[OnLoad] Found blueprint " + blueprint.unlockTechType.AsString());
+            FileLog.Log("[OnLoad] Found blueprint " + blueprint.unlockTechType.AsString());
             ReplaceDatabox(InitMod.s_masterDict.Databoxes, uid.transform.position, blueprint);
         }
 
@@ -49,7 +49,7 @@ namespace SubnauticaRandomiser.Patches
             {
                 if (vector.EqualsUnityVector(position))
                 {
-                    LogHandler.Debug("[D] Replacing databox " + position.ToString() + " with "
+                    FileLog.Log("[D] Replacing databox " + position.ToString() + " with "
                                      + boxDict[vector].AsString());
                     blueprint.unlockTechType = boxDict[vector];
                 }
