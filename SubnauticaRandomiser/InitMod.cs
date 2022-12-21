@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using BepInEx;
 using HarmonyLib;
-using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
@@ -16,8 +16,8 @@ using SubnauticaRandomiser.Objects.Exceptions;
 [assembly:InternalsVisibleTo("Tests")]
 namespace SubnauticaRandomiser
 {
-    [QModCore]
-    public static class InitMod
+    [BepInPlugin("com.github.tinyhoot.SubnauticaRandomiser", "Subnautica Randomiser", "0.8.2")]
+    public class InitMod : BaseUnityPlugin
     {
         internal static string s_modDirectory;
         internal static RandomiserConfig s_config;
@@ -39,9 +39,8 @@ namespace SubnauticaRandomiser
         internal static EntitySerializer s_masterDict;
         private static LogHandler _log;
         private const bool _Debug_forceRandomise = false;
-
-        [QModPatch]
-        public static void Initialise()
+        
+        private void Awake()
         {
             _log = new LogHandler();
             _log.Info("Randomiser starting up!");

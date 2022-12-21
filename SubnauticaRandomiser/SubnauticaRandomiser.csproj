@@ -34,12 +34,12 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>mkdir $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-cp $(OutDir)SubnauticaRandomiser.dll $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-cp $(SolutionDir)mod.json $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-cp $(SolutionDir)ReadMe-Documentation.txt $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-mkdir $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFiles
-cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFiles</PostBuildEvent>
+    <PostBuildEvent>mkdir $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
+cp $(OutDir)SubnauticaRandomiser.dll $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
+cp $(SolutionDir)mod.json $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
+cp $(SolutionDir)ReadMe-Documentation.txt $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
+mkdir $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles
+cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ConfigDefaults.cs" />
@@ -87,6 +87,9 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Compile Include="Objects\RandomiserBiomeData.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="BepInEx">
+      <HintPath>Subnautica\BepInEx\core\BepInEx.dll</HintPath>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="0Harmony">
@@ -97,9 +100,6 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass_publicized">
       <HintPath>Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
-    </Reference>
-    <Reference Include="QModInstaller">
-      <HintPath>Subnautica\BepInEx\plugins\QModManager\QModInstaller.dll</HintPath>
     </Reference>
     <Reference Include="SMLHelper">
       <HintPath>Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>

@@ -1,43 +1,50 @@
 ﻿using System;
-using QModManager.API;
+using BepInEx.Logging;
 using SubnauticaRandomiser.Interfaces;
-using Logger = QModManager.Utility.Logger;
 namespace SubnauticaRandomiser
 {
     /// A class for handling all the logging that the main program might ever want to do.
     /// Also includes main menu messages for relaying information to the user directly.
     [Serializable]
-    public class LogHandler : ILogHandler
+    internal class LogHandler : ILogHandler
     {
+        private readonly ManualLogSource _log;
+
+        public LogHandler()
+        {
+            _log = Logger.CreateLogSource("Randomiser");
+        }
+        
         public void Debug(string message)
         {
-            Logger.Log(Logger.Level.Debug, message);
+            _log.LogDebug(message);
         }
         
         public void Info(string message)
         {
-            Logger.Log(Logger.Level.Info, message);
+            _log.LogInfo(message);
         }
 
         public void Warn(string message)
         {
-            Logger.Log(Logger.Level.Warn, message);
+            _log.LogWarning(message);
         }
 
         public void Error(string message)
         {
-            Logger.Log(Logger.Level.Error, message);
+            _log.LogError(message);
         }
 
         public void Fatal(string message)
         {
-            Logger.Log(Logger.Level.Fatal, message);
+            _log.LogFatal(message);
         }
 
         /// Send a message through QModManager's main menu system.
         public void MainMenuMessage(string message)
         {
-            QModServices.Main.AddCriticalMessage(message);
+            _log.LogMessage("Main Menu Message: " + message);
+            //QModServices.Main.AddCriticalMessage(message);
         }
     }
 }
