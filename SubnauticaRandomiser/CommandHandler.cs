@@ -16,6 +16,7 @@ namespace SubnauticaRandomiser
         {
 #if DEBUG
             DevConsole.RegisterConsoleCommand(this, "dumpKnownTech", false, false);
+            DevConsole.RegisterConsoleCommand(this, "dumpPrefabs", false, false);
 #endif
         }
         
@@ -23,6 +24,12 @@ namespace SubnauticaRandomiser
         {
             InitMod._log.InGameMessage("Dumping known tech");
             DataDumper.LogKnownTech();
+        }
+
+        private void OnConsoleCommand_dumpPrefabs(NotificationCenter.Notification n)
+        {
+            InitMod._log.InGameMessage("Dumping prefabs");
+            DataDumper.LogPrefabs();
         }
     }
 }

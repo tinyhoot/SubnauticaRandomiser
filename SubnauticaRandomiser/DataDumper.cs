@@ -21,5 +21,16 @@ namespace SubnauticaRandomiser
                 }
             }
         }
+
+        public static void LogPrefabs()
+        {
+            // Cache the ids, otherwise this logs nothing.
+            _ = CraftData.GetClassIdForTechType(TechType.Titanium);
+            var keys = UWE.PrefabDatabase.prefabFiles.Keys;
+            foreach (string classId in keys)
+            {
+                InitMod._log.Debug($"classId: {classId}, prefab: {UWE.PrefabDatabase.prefabFiles[classId]}");
+            }
+        }
     }
 }
