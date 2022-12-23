@@ -40,11 +40,11 @@ namespace SubnauticaRandomiser
             _log.LogFatal(message);
         }
 
-        /// Send a message through QModManager's main menu system.
+        /// Send a message to the main menu screen.
         public void MainMenuMessage(string message)
         {
             _log.LogMessage("Main Menu Message: " + message);
-            //QModServices.Main.AddCriticalMessage(message);
+            ErrorMessage.AddMessage("[ERROR] " + message);
         }
     }
 }
