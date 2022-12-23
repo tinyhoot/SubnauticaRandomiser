@@ -8,13 +8,8 @@ namespace SubnauticaRandomiser
     [Serializable]
     internal class LogHandler : ILogHandler
     {
-        private readonly ManualLogSource _log;
+        private static readonly ManualLogSource _log = Logger.CreateLogSource("Randomiser");
 
-        public LogHandler()
-        {
-            _log = Logger.CreateLogSource("Randomiser");
-        }
-        
         public void Debug(string message)
         {
             _log.LogDebug(message);

@@ -33,7 +33,7 @@ namespace SubnauticaRandomiser.Logic
         {
             _config = config;
             _log = logger;
-            _masterDict = new EntitySerializer(logger);
+            _masterDict = new EntitySerializer();
             _materials = new Materials(allMaterials, logger);
             _random = random;
             _spoilerLog = new SpoilerLog(config, logger, _masterDict);
