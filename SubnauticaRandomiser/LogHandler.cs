@@ -35,11 +35,15 @@ namespace SubnauticaRandomiser
             _log.LogFatal(message);
         }
 
-        /// Send a message to the main menu screen.
-        public void MainMenuMessage(string message)
+        /// Send an in-game message to the player.
+        public void InGameMessage(string message, bool error = false)
         {
             _log.LogMessage("Main Menu Message: " + message);
-            ErrorMessage.AddMessage("[ERROR] " + message);
+            
+            if (error)
+                ErrorMessage.AddMessage("[ERROR] " + message);
+            else
+                ErrorMessage.AddMessage(message);
         }
     }
 }

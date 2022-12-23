@@ -123,7 +123,7 @@ namespace SubnauticaRandomiser.Logic
                 circuitbreaker++;
                 if (circuitbreaker > 3000)
                 {
-                    _log.MainMenuMessage("Failed to randomise items: stuck in infinite loop!");
+                    _log.InGameMessage("Failed to randomise items: stuck in infinite loop!");
                     _log.Fatal("Encountered infinite loop, aborting!");
                     throw new TimeoutException("Encountered infinite loop while randomising!");
                 }

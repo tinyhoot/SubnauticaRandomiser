@@ -28,7 +28,7 @@ namespace Tests.Mocks
         {
         }
 
-        public void MainMenuMessage(string message)
+        public void InGameMessage(string message, bool error = false)
         {
         }
     }

@@ -114,8 +114,8 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                _log.MainMenuMessage("ERROR: Something went wrong. Please report this error with the config.json"
-                                           + " from your mod folder on NexusMods.");
+                _log.InGameMessage("ERROR: Something went wrong. Please report this error with the config.json"
+                                           + " from your mod folder on NexusMods.", true);
                 _log.Fatal($"{ex.GetType()}: {ex.Message}");
                 
                 // Ensure that the randomiser crashes completely if things go wrong this badly.
@@ -164,10 +164,10 @@ namespace SubnauticaRandomiser
             if (string.IsNullOrEmpty(version))
                 version = "unknown or corrupted.";
 
-            _log.MainMenuMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.");
-            _log.MainMenuMessage("The last supported version for your savegame is " + version);
-            _log.MainMenuMessage("To protect your previous savegame, no changes to the game have been made.");
-            _log.MainMenuMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json");
+            _log.InGameMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.", true);
+            _log.InGameMessage("The last supported version for your savegame is " + version, true);
+            _log.InGameMessage("To protect your previous savegame, no changes to the game have been made.", true);
+            _log.InGameMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json", true);
             return false;
         }
 
