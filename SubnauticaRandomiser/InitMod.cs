@@ -282,26 +282,12 @@ namespace SubnauticaRandomiser
             var original = AccessTools.Method(typeof(RandomStart), nameof(RandomStart.GetRandomStartPoint));
             var postfix = AccessTools.Method(typeof(AlternateStart), nameof(AlternateStart.OverrideStart));
             harmony.Patch(original, postfix: new HarmonyMethod(postfix));
-            
-            // Make corridors return the correct building materials.
-            original = AccessTools.Method(typeof(BaseDeconstructable), nameof(BaseDeconstructable.Deconstruct));
-            var prefix = AccessTools.Method(typeof(DeconstructionFix), nameof(DeconstructionFix.FixCorridors));
-            harmony.Patch(original, prefix: new HarmonyMethod(prefix));
-            
+
             // Swapping databoxes.
             if (s_masterDict?.Databoxes?.Count > 0)
             {
-                // original = AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start));
-                // prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnSpawn));
-                // harmony.Patch(original, new HarmonyMethod(prefix));
-                //
-                // original = AccessTools.Method(typeof(ProtobufSerializer),
-                //     nameof(ProtobufSerializer.DeserializeIntoGameObject));
-                // postfix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnLoad));
-                // harmony.Patch(original, postfix: new HarmonyMethod(postfix));
-
                 original = AccessTools.Method(typeof(BlueprintHandTarget), nameof(BlueprintHandTarget.Start));
-                prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDatabox));
+                var prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDatabox));
                 harmony.Patch(original, prefix: new HarmonyMethod(prefix));
             }
 

@@ -50,7 +50,6 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Logic\AlternateStartLogic.cs" />
     <Compile Include="Logic\Recipes\BaseTheme.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
-    <Compile Include="Patches\DeconstructionFix.cs" />
     <Compile Include="Patches\FragmentPatcher.cs" />
     <Compile Include="InitMod.cs" />
     <Compile Include="Logic\DataboxLogic.cs" />
