@@ -36,7 +36,6 @@
   <PropertyGroup>
     <PostBuildEvent>mkdir $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
 cp $(OutDir)SubnauticaRandomiser.dll $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
-cp $(SolutionDir)mod.json $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
 cp $(SolutionDir)ReadMe-Documentation.txt $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
 mkdir $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles
 cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles</PostBuildEvent>
