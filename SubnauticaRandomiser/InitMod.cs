@@ -37,7 +37,7 @@ namespace SubnauticaRandomiser
 
         // The master list of everything that is modified by the mod.
         internal static EntitySerializer s_masterDict;
-        private static LogHandler _log;
+        internal static LogHandler _log;
         private const bool _Debug_forceRandomise = false;
         
         private void Awake()
