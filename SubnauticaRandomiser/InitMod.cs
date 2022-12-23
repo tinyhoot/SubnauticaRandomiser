@@ -54,6 +54,10 @@ namespace SubnauticaRandomiser
             // version's state.
             if (!CheckSaveCompatibility())
                 return;
+            
+            // Register console commands.
+            var cmd = gameObject.AddComponent<CommandHandler>();
+            cmd.RegisterCommands();
 
             // Try and restore a game state from disk.
             try
