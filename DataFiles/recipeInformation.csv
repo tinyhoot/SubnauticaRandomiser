@@ -78,7 +78,7 @@ ReinforcedDiveSuit,Equipment,300,,110,3,Databox,198
 MapRoomHudChip,Equipment,300,,95,3,BaseMapRoom,
 Pipe,Equipment,0,,25,,,
 PipeSurfaceFloater,Equipment,0,,25,,,
-StillSuit,Equipment,300,,120,3,Databox,215
+WaterFiltrationSuit,Equipment,300,,120,3,Databox,215
 Tank,Equipment,0,,35,3,,
 Beacon,Deployables,0,,25,,BeaconFragment,14
 Constructor,Deployables,100,,215,,ConstructorFragment,14
@@ -145,7 +145,10 @@ BaseCorridorX,BaseBasePieces,0,,35,,,
 BaseCorridorGlassI,BaseBasePieces,0,,55,,,
 BaseCorridorGlassL,BaseBasePieces,0,,30,,,
 BaseFoundation,BaseBasePieces,100,,45,,,
+BaseGlassDome,BaseBasePieces,0,,175,,BaseRoom,
 BaseHatch,BaseBasePieces,0,,35,,,
+BaseLargeGlassDome,BaseBasePieces,0,,350,,BaseRoom,
+BaseLargeRoom,BaseBasePieces,0,,280,,BaseRoom,
 BaseMapRoom,BaseBasePieces,200,,90,,BaseMapRoomFragment,198
 BaseMoonPool,BaseBasePieces,200,,250,,MoonPoolFragment,222
 BaseObservatory,BaseBasePieces,0,,155,,,
