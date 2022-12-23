@@ -17,6 +17,7 @@ using SubnauticaRandomiser.Objects.Exceptions;
 namespace SubnauticaRandomiser
 {
     [BepInPlugin("com.github.tinyhoot.SubnauticaRandomiser", "Subnautica Randomiser", "0.8.2")]
+    [BepInDependency("com.ahk1221.smlhelper", "~2.15")]
     public class InitMod : BaseUnityPlugin
     {
         internal static string s_modDirectory;
@@ -25,7 +26,7 @@ namespace SubnauticaRandomiser
         internal const string _BiomeFile = "biomeSlots.csv";
         internal const string _RecipeFile = "recipeInformation.csv";
         internal const string _WreckageFile = "wreckInformation.csv";
-        internal const string _ExpectedRecipeMD5 = "fb1f4990a52976c72ec957f82bf15bf4";
+        internal const string _ExpectedRecipeMD5 = "11cc2c8e44db4473c6e0d196b869d582";
         internal const int _ExpectedSaveVersion = 4;
         internal static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
         {
