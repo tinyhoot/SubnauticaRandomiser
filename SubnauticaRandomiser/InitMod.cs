@@ -286,14 +286,18 @@ namespace SubnauticaRandomiser
             // Swapping databoxes.
             if (s_masterDict?.Databoxes?.Count > 0)
             {
-                original = AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start));
-                prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnSpawn));
-                harmony.Patch(original, new HarmonyMethod(prefix));
-                
-                original = AccessTools.Method(typeof(ProtobufSerializer),
-                    nameof(ProtobufSerializer.DeserializeIntoGameObject));
-                postfix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnLoad));
-                harmony.Patch(original, postfix: new HarmonyMethod(postfix));
+                // original = AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start));
+                // prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnSpawn));
+                // harmony.Patch(original, new HarmonyMethod(prefix));
+                //
+                // original = AccessTools.Method(typeof(ProtobufSerializer),
+                //     nameof(ProtobufSerializer.DeserializeIntoGameObject));
+                // postfix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnLoad));
+                // harmony.Patch(original, postfix: new HarmonyMethod(postfix));
+
+                original = AccessTools.Method(typeof(BlueprintHandTarget), nameof(BlueprintHandTarget.Start));
+                prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDatabox));
+                harmony.Patch(original, prefix: new HarmonyMethod(prefix));
             }
 
             // Changing duplicate scan rewards.
