@@ -59,7 +59,7 @@ namespace SubnauticaRandomiser.Objects
                 "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
                 "*************************************************",
                 "",
-                "Generated on " + DateTime.Now + " with " + InitMod.s_versionDict[InitMod._ExpectedSaveVersion]
+                "Generated on " + DateTime.Now + " with " + InitMod.VERSION
             };
             _contentBasics = new[]
             {

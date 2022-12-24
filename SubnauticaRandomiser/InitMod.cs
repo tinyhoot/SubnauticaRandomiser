@@ -16,10 +16,13 @@ using SubnauticaRandomiser.Objects.Exceptions;
 [assembly:InternalsVisibleTo("Tests")]
 namespace SubnauticaRandomiser
 {
-    [BepInPlugin("com.github.tinyhoot.SubnauticaRandomiser", "Subnautica Randomiser", "0.8.2")]
-    [BepInDependency("com.ahk1221.smlhelper", "~2.15")]
+    [BepInPlugin(GUID, "Subnautica Randomiser", VERSION)]
+    [BepInDependency("com.ahk1221.smlhelper", "2.15")]
     public class InitMod : BaseUnityPlugin
     {
+        public const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
+        public const string VERSION = "0.9.0";
+        
         internal static string s_modDirectory;
         internal static RandomiserConfig s_config;
         internal const string _AlternateStartFile = "alternateStarts.csv";
@@ -27,13 +30,14 @@ namespace SubnauticaRandomiser
         internal const string _RecipeFile = "recipeInformation.csv";
         internal const string _WreckageFile = "wreckInformation.csv";
         internal const string _ExpectedRecipeMD5 = "11cc2c8e44db4473c6e0d196b869d582";
-        internal const int _ExpectedSaveVersion = 4;
+        internal const int _ExpectedSaveVersion = 5;
         internal static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
         {
             [1] = "v0.5.1",
             [2] = "v0.6.1",
             [3] = "v0.7.0",
-            [4] = "v0.8.2"
+            [4] = "v0.8.2",
+            [5] = "v" + VERSION
         };
 
         // The master list of everything that is modified by the mod.
@@ -44,7 +48,7 @@ namespace SubnauticaRandomiser
         private void Awake()
         {
             _log = new LogHandler();
-            _log.Info("Randomiser starting up!");
+            _log.Info($"Subnautica Randomiser v{VERSION} starting up!");
 
             // Register options menu.
             s_modDirectory = GetSubnauticaRandomiserDirectory();
@@ -276,7 +280,7 @@ namespace SubnauticaRandomiser
         /// </summary>
         private static void EnableHarmonyPatching()
         {
-            Harmony harmony = new Harmony("SubnauticaRandomiser");
+            Harmony harmony = new Harmony(GUID);
             
             // Alternate starting location.
             var original = AccessTools.Method(typeof(RandomStart), nameof(RandomStart.GetRandomStartPoint));
