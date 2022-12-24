@@ -8,7 +8,6 @@ namespace SubnauticaRandomiser
     /// </summary>
     internal class CommandHandler : MonoBehaviour
     {
-
         /// <summary>
         /// Register the console commands added by this mod.
         /// </summary>

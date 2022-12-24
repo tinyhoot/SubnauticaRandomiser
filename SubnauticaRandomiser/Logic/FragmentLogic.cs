@@ -224,7 +224,7 @@ namespace SubnauticaRandomiser.Logic
         private float CalcFragmentSpawnRate(Biome biome)
         {
             // Set a percentage between Min and Max% of the biome's combined original spawn rates.
-            float percentage = _config.fFragmentSpawnChanceMin + (float)_random.NextDouble()
+            float percentage = (_config.fFragmentSpawnChanceMin + (float)_random.NextDouble())
                 * (_config.fFragmentSpawnChanceMax - _config.fFragmentSpawnChanceMin);
             // If the number of scans needed per fragment is very high, increase the spawn rate proportionally.
             int maxFragments = (int)ConfigDefaults.GetDefault("iMaxFragmentsToUnlock");
