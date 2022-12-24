@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 
 namespace SubnauticaRandomiser
@@ -38,16 +37,14 @@ namespace SubnauticaRandomiser
         public Dictionary<TechType, Recipe> RecipeDict;
         // All modified fragment spawn rates.
         public Dictionary<TechType, List<SpawnData>> SpawnDataDict;
-        private readonly ILogHandler _log;
-        
+
         public const int SaveVersion = InitMod._ExpectedSaveVersion;
 
-        public EntitySerializer(ILogHandler logger)
+        public EntitySerializer()
         {
             NumFragmentsToUnlock = new Dictionary<TechType, int>();
             RecipeDict = new Dictionary<TechType, Recipe>();
             SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
-            _log = logger;
         }
 
         /// <summary>
@@ -104,7 +101,7 @@ namespace SubnauticaRandomiser
         {
             if (NumFragmentsToUnlock.ContainsKey(type))
             {
-                _log.Warn($"[ES] Tried to add duplicate key {type.AsString()} to FragmentNum master dictionary!");
+                //_log.Warn($"[ES] Tried to add duplicate key {type.AsString()} to FragmentNum master dictionary!");
                 return false;
             }
             NumFragmentsToUnlock.Add(type, number);
@@ -121,7 +118,7 @@ namespace SubnauticaRandomiser
         {
             if (RecipeDict.ContainsKey(type))
             {
-                _log.Warn($"[ES] Tried to add duplicate key {type.AsString()} to Recipe master dictionary!");
+                //_log.Warn($"[ES] Tried to add duplicate key {type.AsString()} to Recipe master dictionary!");
                 return false;
             }
             RecipeDict.Add(type, r);
@@ -138,7 +135,7 @@ namespace SubnauticaRandomiser
         {
             if (SpawnDataDict.ContainsKey(type))
             {
-                _log.Warn($"Tried to add duplicate key {type.AsString()} to SpawnData master dictionary!");
+                //_log.Warn($"Tried to add duplicate key {type.AsString()} to SpawnData master dictionary!");
                 return false;
             }
             SpawnDataDict.Add(type, data);

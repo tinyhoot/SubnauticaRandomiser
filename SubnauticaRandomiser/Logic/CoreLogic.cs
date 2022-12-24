@@ -33,7 +33,7 @@ namespace SubnauticaRandomiser.Logic
         {
             _config = config;
             _log = logger;
-            _masterDict = new EntitySerializer(logger);
+            _masterDict = new EntitySerializer();
             _materials = new Materials(allMaterials, logger);
             _random = random;
             _spoilerLog = new SpoilerLog(config, logger, _masterDict);
@@ -123,7 +123,7 @@ namespace SubnauticaRandomiser.Logic
                 circuitbreaker++;
                 if (circuitbreaker > 3000)
                 {
-                    _log.MainMenuMessage("Failed to randomise items: stuck in infinite loop!");
+                    _log.InGameMessage("Failed to randomise items: stuck in infinite loop!");
                     _log.Fatal("Encountered infinite loop, aborting!");
                     throw new TimeoutException("Encountered infinite loop while randomising!");
                 }

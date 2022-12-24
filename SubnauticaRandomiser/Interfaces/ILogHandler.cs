@@ -12,6 +12,6 @@ namespace SubnauticaRandomiser.Interfaces
 
         public void Fatal(string message);
 
-        public void MainMenuMessage(string message);
+        public void InGameMessage(string message, bool error = false);
     }
 }

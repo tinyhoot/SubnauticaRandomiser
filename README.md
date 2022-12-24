@@ -1,17 +1,15 @@
 # Subnautica Randomiser
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/tinyhoot/SubnauticaRandomiser)
-![GitHub](https://img.shields.io/github/license/tinyhoot/SubnauticaRandomiser)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/tinyhoot/SubnauticaRandomiser)](https://github.com/tinyhoot/SubnauticaRandomiser/releases)
+[![GitHub](https://img.shields.io/github/license/tinyhoot/SubnauticaRandomiser)](https://github.com/tinyhoot/SubnauticaRandomiser/blob/master/LICENSE)
 [![CodeFactor](https://www.codefactor.io/repository/github/tinyhoot/subnauticarandomiser/badge/dev)](https://www.codefactor.io/repository/github/tinyhoot/subnauticarandomiser/overview/master)
 [![wakatime](https://wakatime.com/badge/github/tinyhoot/SubnauticaRandomiser.svg)](https://wakatime.com/badge/github/tinyhoot/SubnauticaRandomiser)
 
-A Subnautica Mod that randomises many aspects of the game for replayability, originally based on [the first Subnautica randomizer](https://github.com/stephenengland/SubnauticaRandomizer).
+A Subnautica Mod that randomises many aspects of the game for replayability, originally based on [the first Subnautica randomizer](https://github.com/stephenengland/SubnauticaRandomizer). Over time, this project grew to become completely independent and today no longer shares any code with the original. 
 
-This mod can make the game considerably more difficult, and the varying availability of fragments and ingredients may also make it harder to collect enough of what you need. Since ingredients can vary so wildly, use of a blueprint tracker mod like [this one on nexus](https://www.nexusmods.com/subnautica/mods/22) is recommended.
+On first startup, the mod will randomise using recommended settings. You can either start playing immediately, or customise your experience in the mod options menu. Note that, should you choose to re-randomise from the mod options menu, you must _**restart your game**_ for all changes to properly take effect.
 
-The randomisation persists between play sessions and save games. If you decide to stop playing for the day, everything will remain randomised as it was. 
-
-On first startup, the mod will randomise using recommended settings. You can either start playing immediately, or customise your experience in the mod options menu. Note that, should you choose to re-randomise from the mod options menu, you must **restart your game** for all changes to properly take effect.
+The randomisation persists between play sessions and save games. This means you don't have to play it all through in one sitting, but also that you cannot have different save files with different seeds.
 
 #### This mod randomises:
 * Recipes for most craftable things in the game, excluding decorative base pieces and food/water.
@@ -32,20 +30,21 @@ On first startup, the mod will randomise using recommended settings. You can eit
 - ✔️ Share your seed with friends
 
 ## How to Use
-1. Install [QModManager](https://www.nexusmods.com/subnautica/mods/201)
+1. Install [BepInEx](https://www.nexusmods.com/subnautica/mods/1108)
 2. Install [SMLHelper](https://www.nexusmods.com/subnautica/mods/113)
-   1. (Optional) Install [BlueprintTracker](https://www.nexusmods.com/subnautica/mods/22)
-3. Extract this mod into your Subnautica/QMods folder
-   1. (Optional) Edit the config in the in-game options menu to your liking
-   2. Press the "Randomise with new seed" button
-   3. Restart the game to apply your changes
+3. Extract this mod into your Subnautica/BepInEx/plugins folder
+   * (Optional) Edit the config in the in-game options menu to your liking
+   * Press the "Randomise with new seed" button
+   * Restart the game to apply your changes
 4. Enjoy!
 
 ## How to Build
 * git clone
 * Add a SUBNAUTICA_DIR variable to your PATH pointing to your install directory of Subnautica
-* Install QModManager and SMLHelper
-* In Visual Studio, update the project's assembly references to point to the correct locations on your computer.
-  * For more information, see [QMod Wiki](https://github.com/SubnauticaModding/QModManager/wiki/Libraries)
-  * In addition, you'll need a publicised version of Subnautica's `Assembly-CSharp.dll`. Start the game once using [the BepinEx plugin](https://github.com/MrPurple6411/Bepinex-Tools/releases/) for this.
-* Building in the Release configuration should leave you with a `SubnauticaRandomiser.dll` in `SubnauticaRandomiser/bin/Release/`
+* Install BepInEx and SMLHelper
+* Copy all dependencies to the project's empty `Dependencies` folder. This includes:
+  * BepInEx
+  * SMLHelper
+  * Several Unity assemblies from the game folder
+  * Publicised versions of Subnautica's `Assembly-CSharp.dll`. Start the game once using [the BepinEx publiciser](https://github.com/MrPurple6411/Bepinex-Tools/releases/) to generate them.
+* Building in the Release configuration should leave you with a `SubnauticaRandomiser.dll` in `SubnauticaRandomiser/bin/Release/` and automatically update the installed version in `$SUBNAUTICA_DIR/BepInEx/plugins`

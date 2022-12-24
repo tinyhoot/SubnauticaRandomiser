@@ -224,7 +224,7 @@ namespace SubnauticaRandomiser.Logic
         private float CalcFragmentSpawnRate(Biome biome)
         {
             // Set a percentage between Min and Max% of the biome's combined original spawn rates.
-            float percentage = _config.fFragmentSpawnChanceMin + (float)_random.NextDouble()
+            float percentage = (_config.fFragmentSpawnChanceMin + (float)_random.NextDouble())
                 * (_config.fFragmentSpawnChanceMax - _config.fFragmentSpawnChanceMin);
             // If the number of scans needed per fragment is very high, increase the spawn rate proportionally.
             int maxFragments = (int)ConfigDefaults.GetDefault("iMaxFragmentsToUnlock");
@@ -310,12 +310,12 @@ namespace SubnauticaRandomiser.Logic
             foreach (string classId in keys)
             {
                 string dataPath = UWE.PrefabDatabase.prefabFiles[classId];
-                //LogHandler.Debug($"KEY: {classId}, VALUE: {UWE.PrefabDatabase.prefabFiles[classId]}");
+                //InitMod._log.Debug($"KEY: {classId}, VALUE: {UWE.PrefabDatabase.prefabFiles[classId]}");
 
                 // If the prefab is not part of the predefined dictionary of fragments,
                 // discard it and continue. Acts as a filter for only those fragments
                 // which have actual BiomeData used by the game.
-                if (!_fragmentDataPaths.TryGetValue(Path.GetFileName(dataPath), out TechType type))
+                if (!_fragmentDataPaths.TryGetValue(Path.GetFileNameWithoutExtension(dataPath), out TechType type))
                     continue;
 
                 if (!_classIdDatabase.ContainsKey(type))

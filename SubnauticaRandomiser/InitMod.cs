@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using BepInEx;
 using HarmonyLib;
-using QModManager.API.ModLoading;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
@@ -16,35 +16,39 @@ using SubnauticaRandomiser.Objects.Exceptions;
 [assembly:InternalsVisibleTo("Tests")]
 namespace SubnauticaRandomiser
 {
-    [QModCore]
-    public static class InitMod
+    [BepInPlugin(GUID, "Subnautica Randomiser", VERSION)]
+    [BepInDependency("com.ahk1221.smlhelper", "2.15")]
+    public class InitMod : BaseUnityPlugin
     {
+        public const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
+        public const string VERSION = "0.9.0";
+        
         internal static string s_modDirectory;
         internal static RandomiserConfig s_config;
         internal const string _AlternateStartFile = "alternateStarts.csv";
         internal const string _BiomeFile = "biomeSlots.csv";
         internal const string _RecipeFile = "recipeInformation.csv";
         internal const string _WreckageFile = "wreckInformation.csv";
-        internal const string _ExpectedRecipeMD5 = "fb1f4990a52976c72ec957f82bf15bf4";
-        internal const int _ExpectedSaveVersion = 4;
+        internal const string _ExpectedRecipeMD5 = "11cc2c8e44db4473c6e0d196b869d582";
+        internal const int _ExpectedSaveVersion = 5;
         internal static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
         {
             [1] = "v0.5.1",
             [2] = "v0.6.1",
             [3] = "v0.7.0",
-            [4] = "v0.8.2"
+            [4] = "v0.8.2",
+            [5] = "v" + VERSION
         };
 
         // The master list of everything that is modified by the mod.
         internal static EntitySerializer s_masterDict;
-        private static LogHandler _log;
+        internal static LogHandler _log;
         private const bool _Debug_forceRandomise = false;
-
-        [QModPatch]
-        public static void Initialise()
+        
+        private void Awake()
         {
             _log = new LogHandler();
-            _log.Info("Randomiser starting up!");
+            _log.Info($"Subnautica Randomiser v{VERSION} starting up!");
 
             // Register options menu.
             s_modDirectory = GetSubnauticaRandomiserDirectory();
@@ -55,6 +59,10 @@ namespace SubnauticaRandomiser
             // version's state.
             if (!CheckSaveCompatibility())
                 return;
+            
+            // Register console commands.
+            var cmd = gameObject.AddComponent<CommandHandler>();
+            cmd.RegisterCommands();
 
             // Try and restore a game state from disk.
             try
@@ -115,8 +123,8 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                _log.MainMenuMessage("ERROR: Something went wrong. Please report this error with the config.json"
-                                           + " from your mod folder on NexusMods.");
+                _log.InGameMessage("ERROR: Something went wrong. Please report this error with the config.json"
+                                           + " from your mod folder on NexusMods.", true);
                 _log.Fatal($"{ex.GetType()}: {ex.Message}");
                 
                 // Ensure that the randomiser crashes completely if things go wrong this badly.
@@ -165,10 +173,10 @@ namespace SubnauticaRandomiser
             if (string.IsNullOrEmpty(version))
                 version = "unknown or corrupted.";
 
-            _log.MainMenuMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.");
-            _log.MainMenuMessage("The last supported version for your savegame is " + version);
-            _log.MainMenuMessage("To protect your previous savegame, no changes to the game have been made.");
-            _log.MainMenuMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json");
+            _log.InGameMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.", true);
+            _log.InGameMessage("The last supported version for your savegame is " + version, true);
+            _log.InGameMessage("To protect your previous savegame, no changes to the game have been made.", true);
+            _log.InGameMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json", true);
             return false;
         }
 
@@ -272,29 +280,19 @@ namespace SubnauticaRandomiser
         /// </summary>
         private static void EnableHarmonyPatching()
         {
-            Harmony harmony = new Harmony("SubnauticaRandomiser");
+            Harmony harmony = new Harmony(GUID);
             
             // Alternate starting location.
             var original = AccessTools.Method(typeof(RandomStart), nameof(RandomStart.GetRandomStartPoint));
             var postfix = AccessTools.Method(typeof(AlternateStart), nameof(AlternateStart.OverrideStart));
             harmony.Patch(original, postfix: new HarmonyMethod(postfix));
-            
-            // Make corridors return the correct building materials.
-            original = AccessTools.Method(typeof(BaseDeconstructable), nameof(BaseDeconstructable.Deconstruct));
-            var prefix = AccessTools.Method(typeof(DeconstructionFix), nameof(DeconstructionFix.FixCorridors));
-            harmony.Patch(original, prefix: new HarmonyMethod(prefix));
-            
+
             // Swapping databoxes.
             if (s_masterDict?.Databoxes?.Count > 0)
             {
-                original = AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start));
-                prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnSpawn));
-                harmony.Patch(original, new HarmonyMethod(prefix));
-                
-                original = AccessTools.Method(typeof(ProtobufSerializer),
-                    nameof(ProtobufSerializer.DeserializeIntoGameObject));
-                postfix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDataboxOnLoad));
-                harmony.Patch(original, postfix: new HarmonyMethod(postfix));
+                original = AccessTools.Method(typeof(BlueprintHandTarget), nameof(BlueprintHandTarget.Start));
+                var prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDatabox));
+                harmony.Patch(original, prefix: new HarmonyMethod(prefix));
             }
 
             // Changing duplicate scan rewards.

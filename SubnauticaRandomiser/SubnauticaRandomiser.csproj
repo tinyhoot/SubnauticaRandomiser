@@ -34,22 +34,22 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>mkdir $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-cp $(OutDir)SubnauticaRandomiser.dll $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-cp $(SolutionDir)mod.json $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-cp $(SolutionDir)ReadMe-Documentation.txt $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser
-mkdir $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFiles
-cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFiles</PostBuildEvent>
+    <PostBuildEvent>mkdir $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
+cp $(OutDir)SubnauticaRandomiser.dll $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
+cp $(SolutionDir)ReadMe-Documentation.txt $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
+mkdir $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles
+cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CommandHandler.cs" />
     <Compile Include="ConfigDefaults.cs" />
+    <Compile Include="DataDumper.cs" />
     <Compile Include="EnumHandler.cs" />
     <Compile Include="Interfaces\ILogHandler.cs" />
     <Compile Include="Interfaces\IRandomHandler.cs" />
     <Compile Include="Logic\AlternateStartLogic.cs" />
     <Compile Include="Logic\Recipes\BaseTheme.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
-    <Compile Include="Patches\DeconstructionFix.cs" />
     <Compile Include="Patches\FragmentPatcher.cs" />
     <Compile Include="InitMod.cs" />
     <Compile Include="Logic\DataboxLogic.cs" />
@@ -87,31 +87,39 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/QMods/SubnauticaRandomiser/DataFi
     <Compile Include="Objects\RandomiserBiomeData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
     <Reference Include="0Harmony">
-      <HintPath>Subnautica\BepInEx\core\0Harmony.dll</HintPath>
+      <HintPath>..\Dependencies\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp_publicized">
-      <HintPath>Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\Dependencies\Assembly-CSharp_publicized.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass_publicized">
-      <HintPath>Subnautica\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\Dependencies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="QModInstaller">
-      <HintPath>Subnautica\BepInEx\plugins\QModManager\QModInstaller.dll</HintPath>
+    <Reference Include="BepInEx">
+      <HintPath>..\Dependencies\BepInEx.dll</HintPath>
+      <Private>False</Private>
     </Reference>
+    <Reference Include="mscorlib" />
     <Reference Include="SMLHelper">
-      <HintPath>Subnautica\QMods\Modding Helper\SMLHelper.dll</HintPath>
+      <HintPath>..\Dependencies\SMLHelper.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\Dependencies\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\Dependencies\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>

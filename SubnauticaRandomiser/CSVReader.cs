@@ -54,7 +54,7 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                _log.MainMenuMessage("Failed to read alternate start CSV!");
+                _log.InGameMessage("Failed to read alternate start CSV!");
                 _log.Error(ex.Message);
                 return null;
             }
@@ -138,7 +138,7 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                _log.MainMenuMessage("Failed to read recipe CSV! Aborting.");
+                _log.InGameMessage("Failed to read recipe CSV! Aborting.");
                 _log.Error(ex.Message);
                 return null;
             }
@@ -315,7 +315,7 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                _log.MainMenuMessage("Failed to read biome CSV! Aborting.");
+                _log.InGameMessage("Failed to read biome CSV! Aborting.");
                 _log.Error(ex.Message);
                 return null;
             }
@@ -431,7 +431,7 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                _log.MainMenuMessage("Failed to read wreckage CSV!");
+                _log.InGameMessage("Failed to read wreckage CSV!");
                 _log.Error(ex.Message);
                 return null;
             }

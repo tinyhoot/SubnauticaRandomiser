@@ -94,10 +94,10 @@ namespace SubnauticaRandomiser
 
             Random random = new Random();
             iSeed = random.Next();
-            _log.MainMenuMessage("Changed seed to " + iSeed);
-            _log.MainMenuMessage("Randomising...");
+            _log.InGameMessage("Changed seed to " + iSeed);
+            _log.InGameMessage("Randomising...");
             InitMod.Randomise();
-            _log.MainMenuMessage("Finished randomising! Please restart the game for changes to take effect.");
+            _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
         [Button("Randomise with same seed")]
@@ -106,11 +106,11 @@ namespace SubnauticaRandomiser
             if (!IsButtonPressAllowed(DateTime.UtcNow))
                 return;
             
-            _log.MainMenuMessage("Randomising...");
+            _log.InGameMessage("Randomising...");
             // Ensure all manual changes to the config file are loaded.
             Load();
             InitMod.Randomise();
-            _log.MainMenuMessage("Finished randomising! Please restart the game for changes to take effect.");
+            _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
