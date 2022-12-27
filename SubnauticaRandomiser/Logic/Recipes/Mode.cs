@@ -150,6 +150,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 _blacklist.Add(ETechTypeCategory.Tools);
             if (_config.iUpgradesAsIngredients == 0 || (_config.iUpgradesAsIngredients == 1 && entity.CanFunctionAsIngredient()))
             {
+                _blacklist.Add(ETechTypeCategory.ScannerRoom);
                 _blacklist.Add(ETechTypeCategory.VehicleUpgrades);
                 _blacklist.Add(ETechTypeCategory.WorkBenchUpgrades);
             }
