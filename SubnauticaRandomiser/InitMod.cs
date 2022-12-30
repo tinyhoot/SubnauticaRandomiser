@@ -21,7 +21,7 @@ namespace SubnauticaRandomiser
     public class InitMod : BaseUnityPlugin
     {
         public const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
-        public const string VERSION = "0.9.0";
+        public const string VERSION = "0.9.1";
         
         internal static string s_modDirectory;
         internal static RandomiserConfig s_config;
