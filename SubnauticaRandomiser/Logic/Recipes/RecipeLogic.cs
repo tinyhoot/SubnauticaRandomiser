@@ -50,7 +50,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         internal bool RandomiseRecipe(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems, int reachableDepth)
         {
             // Does this recipe have all of its prerequisites fulfilled? Skip this check if the recipe is a priority.
-            if (!(_tree.IsPriorityEntity(entity)
+            if (!(_tree.IsPriorityEntity(entity, reachableDepth)
                   || (entity.CheckBlueprintFulfilled(_logic, reachableDepth) && entity.CheckPrerequisitesFulfilled(_logic))))
             {
                 _log.Debug($"[R] --- Recipe [{entity}] did not fulfill requirements, skipping.");

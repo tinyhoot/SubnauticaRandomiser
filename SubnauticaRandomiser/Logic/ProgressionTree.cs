@@ -162,11 +162,10 @@ namespace SubnauticaRandomiser.Logic
             AddEssentialItem(EProgressionNode.Depth0m, TechType.BaseHatch);
             AddEssentialItem(EProgressionNode.Depth0m, TechType.Fabricator);
 
+            AddEssentialItem(EProgressionNode.Depth100m, TechType.Builder);
             AddEssentialItem(EProgressionNode.Depth100m, TechType.BaseRoom);
             AddEssentialItem(EProgressionNode.Depth100m, TechType.Seaglide);
             AddEssentialItem(EProgressionNode.Depth100m, TechType.Tank);
-
-            AddEssentialItem(EProgressionNode.Depth200m, TechType.Builder);
 
             AddEssentialItem(EProgressionNode.Depth300m, TechType.BaseWaterPark);
 
@@ -421,15 +420,20 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Check whether the given entity is part of any essential or elective items in any node.
+        /// Check whether the given entity is part of any essential or elective items in any node up to the given depth.
         /// </summary>
         /// <param name="entity">The entity to check.</param>
+        /// <param name="depth">Consider entities up to this depth.</param>
         /// <returns>True if the entity is part of essential or elective items, false otherwise.</returns>
-        public bool IsPriorityEntity(LogicEntity entity)
+        public bool IsPriorityEntity(LogicEntity entity, int depth)
         {
-            if (_essentialItems.Values.Any(list => list.Contains(entity.TechType)))
+            if (_essentialItems
+                .Where(kv => !kv.Key.isDeeperThan(depth))
+                .Any(kv => kv.Value.Contains(entity.TechType)))
                 return true;
-            if (_electiveItems.Values.Any(list => list.Any(arr => arr.Contains(entity.TechType))))
+            if (_electiveItems
+                .Where(kv => !kv.Key.isDeeperThan(depth))
+                .Any(kv => kv.Value.Any(arr => arr.Contains(entity.TechType))))
                 return true;
 
             return false;

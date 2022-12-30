@@ -216,7 +216,7 @@ namespace Tests.UnitTests.Logic
         }
 
         [TestCase(TechType.Seaglide, ExpectedResult = true)]
-        [TestCase(TechType.Battery, ExpectedResult = true)]
+        [TestCase(TechType.Battery, ExpectedResult = false)]
         [TestCase(TechType.Seamoth, ExpectedResult = false)]
         public bool TestIsPriorityEntity(TechType techType)
         {
@@ -224,7 +224,7 @@ namespace Tests.UnitTests.Logic
             _tree._electiveItems.Add(EProgressionNode.Depth300m, new List<TechType[]>{ new [] { TechType.Battery }});
 
             LogicEntity entity = new LogicEntity(techType, ETechTypeCategory.None);
-            return _tree.IsPriorityEntity(entity);
+            return _tree.IsPriorityEntity(entity, 128);
         }
 
         [TestCase(TechType.Benzene, ExpectedResult = true)]

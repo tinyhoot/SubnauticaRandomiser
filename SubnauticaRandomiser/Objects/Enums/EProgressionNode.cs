@@ -27,5 +27,15 @@
             EProgressionNode.Depth1300m,
             EProgressionNode.Depth1700m
         };
+
+        /// <summary>
+        /// Is this node deeper the given depth?
+        /// </summary>
+        public static bool isDeeperThan(this EProgressionNode node, int depth)
+        {
+            if (node.Equals(EProgressionNode.None))
+                return false;
+            return (int)node > depth;
+        }
     }
 }
