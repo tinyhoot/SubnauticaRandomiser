@@ -23,68 +23,9 @@ namespace SubnauticaRandomiser
             _log = logger;
             _lastButtonPress = DateTime.UtcNow;
         }
-
-        // Every public variable listed here will end up in the config file.
-        // Additionally, adding the relevant Attributes will also make them show up in the in-game options menu.
-        public int iSeed = 0;
-
-        [Choice("Mode", "Balanced", "Chaotic")]
-        public int iRandomiserMode = (int)ConfigDefaults.GetDefault("iRandomiserMode");
-
-        [Choice("Spawnpoint", "Vanilla", "Random", "Chaotic Random", "BloodKelp", "BulbZone", "CragField",
-            "CrashZone", "Dunes", "Floating Island", "GrandReef", "GrassyPlateaus", "Kelp", "Mountains",
-            "MushroomForest", "SeaTreaderPath", "SparseReef", "UnderwaterIslands", "Void")]
-        public string sSpawnPoint = "Vanilla";
-
-        [Toggle("Use fish in logic?")] public bool bUseFish = (bool)ConfigDefaults.GetDefault("bUseFish");
-
-        [Toggle("Use eggs in logic?")] public bool bUseEggs = (bool)ConfigDefaults.GetDefault("bUseEggs");
-
-        [Toggle("Use seeds in logic?")] public bool bUseSeeds = (bool)ConfigDefaults.GetDefault("bUseSeeds");
-
-        [Toggle("Randomise blueprints in databoxes?")]
-        public bool bRandomiseDataboxes = (bool)ConfigDefaults.GetDefault("bRandomiseDataboxes");
-
-        [Toggle("Randomise fragment locations?")]
-        public bool bRandomiseFragments = (bool)ConfigDefaults.GetDefault("bRandomiseFragments");
-
-        [Toggle("Randomise number of fragments needed?")]
-        public bool bRandomiseNumFragments = (bool)ConfigDefaults.GetDefault("bRandomiseNumFragments");
-
-        [Toggle("Randomise duplicate scan rewards?")]
-        public bool bRandomiseDuplicateScans = (bool)ConfigDefaults.GetDefault("bRandomiseDuplicateScans");
-
-        [Toggle("Randomise recipes?")]
-        public bool bRandomiseRecipes = (bool)ConfigDefaults.GetDefault("bRandomiseRecipes");
-
-        [Toggle("Respect vanilla upgrade chains?")]
-        public bool bVanillaUpgradeChains = (bool)ConfigDefaults.GetDefault("bVanillaUpgradeChains");
-
-        [Toggle("Theme base parts around a common ingredient?")]
-        public bool bDoBaseTheming = (bool)ConfigDefaults.GetDefault("bDoBaseTheming");
-
-        [Choice("Include equipment as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
-        public int iEquipmentAsIngredients = (int)ConfigDefaults.GetDefault("iEquipmentAsIngredients");
-
-        [Choice("Include tools as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
-        public int iToolsAsIngredients = (int)ConfigDefaults.GetDefault("iToolsAsIngredients");
-
-        [Choice("Include upgrades as ingredients?", "Never", "Top-level recipes only", "Unrestricted")]
-        public int iUpgradesAsIngredients = (int)ConfigDefaults.GetDefault("iUpgradesAsIngredients");
-
-        [Slider("Max number of a single ingredient", 1, 10, DefaultValue = 5)]
-        public int iMaxAmountPerIngredient = (int)ConfigDefaults.GetDefault("iMaxAmountPerIngredient");
-
-        [Slider("Max ingredients per recipe", 1, 10, DefaultValue = 7)]
-        public int iMaxIngredientsPerRecipe = (int)ConfigDefaults.GetDefault("iMaxIngredientsPerRecipe");
-
-        [Slider("Max biomes to spawn each fragment in", 3, 10, DefaultValue = 5)]
-        public int iMaxBiomesPerFragment = (int)ConfigDefaults.GetDefault("iMaxBiomesPerFragment");
-
-        [Slider("Max number of fragments needed", 1, 20, DefaultValue = 5)]
-        public int iMaxFragmentsToUnlock = (int)ConfigDefaults.GetDefault("iMaxFragmentsToUnlock");
-
-        [Button("Randomise with new seed")]
+        
+        [Button("Randomise!", Order = 0,
+            Tooltip = "Apply your config changes and randomise. Restart your game afterwards!")]
         public void NewRandomNewSeed()
         {
             // Due to how the randomiser locks up when pressing the button, it is possible for the click to be
@@ -100,7 +41,8 @@ namespace SubnauticaRandomiser
             _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
-        [Button("Randomise with same seed")]
+        [Button("Apply config from disk", Order = 0,
+            Tooltip = "If someone else gave you their config.json, click this to load it. Restart your game afterwards!")]
         public void NewRandomOldSeed()
         {
             if (!IsButtonPressAllowed(DateTime.UtcNow))
@@ -112,6 +54,83 @@ namespace SubnauticaRandomiser
             InitMod.Randomise();
             _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
+
+        // Every public variable listed here will end up in the config file.
+        // Additionally, adding the relevant Attributes will also make them show up in the in-game options menu.
+        public int iSeed = 0;
+
+        [Choice("Spawnpoint biome", "Vanilla", "Random", "Chaotic Random", "BloodKelp", "BulbZone",
+            "CragField", "CrashZone", "Dunes", "Floating Island", "GrandReef", "GrassyPlateaus", "Kelp", "Mountains",
+            "MushroomForest", "SeaTreaderPath", "SparseReef", "UnderwaterIslands", "Void",
+            Tooltip = "Random is limited to early game biomes, Chaotic Random chooses from ALL available biomes.")]
+        public string sSpawnPoint = "Vanilla";
+
+        [Toggle("Randomise blueprints in databoxes?",
+            Tooltip = "Databoxes will be in the same locations, but contain different blueprints.")]
+        public bool bRandomiseDataboxes = (bool)ConfigDefaults.GetDefault("bRandomiseDataboxes");
+
+        [Toggle("Randomise fragment locations?")]
+        public bool bRandomiseFragments = (bool)ConfigDefaults.GetDefault("bRandomiseFragments");
+
+        [Toggle("Randomise number of fragments needed?",
+            Tooltip = "Randomises how many fragments need to be scanned for the blueprint to unlock.")]
+        public bool bRandomiseNumFragments = (bool)ConfigDefaults.GetDefault("bRandomiseNumFragments");
+        
+        [Slider("Max number of fragments needed", 1, 20, DefaultValue = 5,
+            Tooltip = "The number of scans needed to unlock a blueprint will never exceed this value.")]
+        public int iMaxFragmentsToUnlock = (int)ConfigDefaults.GetDefault("iMaxFragmentsToUnlock");
+        
+        [Slider("Max biomes to spawn each fragment in", 3, 10, DefaultValue = 5,
+            Tooltip = "Use with caution. Very low/high values can make it difficult to find enough fragments.")]
+        public int iMaxBiomesPerFragment = (int)ConfigDefaults.GetDefault("iMaxBiomesPerFragment");
+
+        [Toggle("Randomise duplicate scan rewards?",
+            Tooltip = "When scanning a fragment you already unlocked, changes the two titanium to a random low-mid value reward.")]
+        public bool bRandomiseDuplicateScans = (bool)ConfigDefaults.GetDefault("bRandomiseDuplicateScans");
+
+        [Toggle("Randomise recipes?")]
+        public bool bRandomiseRecipes = (bool)ConfigDefaults.GetDefault("bRandomiseRecipes");
+        
+        [Choice("Recipe mode", "Balanced", "Chaotic",
+            Tooltip = "Balanced tries to stick to standard expectations of what should be expensive and what shouldn't. Chaotic is almost purely random.")]
+        public int iRandomiserMode = (int)ConfigDefaults.GetDefault("iRandomiserMode");
+
+        [Toggle("Use fish as ingredients?")]
+        public bool bUseFish = (bool)ConfigDefaults.GetDefault("bUseFish");
+
+        [Toggle("Use eggs as ingredients?")]
+        public bool bUseEggs = (bool)ConfigDefaults.GetDefault("bUseEggs");
+
+        [Toggle("Use seeds as ingredients?")]
+        public bool bUseSeeds = (bool)ConfigDefaults.GetDefault("bUseSeeds");
+
+        [Choice("Include equipment as ingredients?", "Never", "Top-level recipes only", "Unrestricted",
+            Tooltip = "Top-level recipes are recipes which cannot be re-used as ingredients, such as base pieces.")]
+        public int iEquipmentAsIngredients = (int)ConfigDefaults.GetDefault("iEquipmentAsIngredients");
+
+        [Choice("Include tools as ingredients?", "Never", "Top-level recipes only", "Unrestricted",
+            Tooltip = "Top-level recipes are recipes which cannot be re-used as ingredients, such as base pieces.")]
+        public int iToolsAsIngredients = (int)ConfigDefaults.GetDefault("iToolsAsIngredients");
+
+        [Choice("Include upgrades as ingredients?", "Never", "Top-level recipes only", "Unrestricted",
+            Tooltip = "Top-level recipes are recipes which cannot be re-used as ingredients, such as base pieces.")]
+        public int iUpgradesAsIngredients = (int)ConfigDefaults.GetDefault("iUpgradesAsIngredients");
+        
+        [Toggle("Enforce vanilla upgrade chains?",
+            Tooltip = "If enabled, forces upgrades to be sequential. E.g. vehicle depth upgrade 3 will always require upgrade 2 first.")]
+        public bool bVanillaUpgradeChains = (bool)ConfigDefaults.GetDefault("bVanillaUpgradeChains");
+
+        [Toggle("Theme base parts around a common ingredient?",
+            Tooltip = "If enabled, every base part will require the same random ingredient in addition to its other ingredients.")]
+        public bool bDoBaseTheming = (bool)ConfigDefaults.GetDefault("bDoBaseTheming");
+
+        [Slider("Max number of a single ingredient", 1, 10, DefaultValue = 5,
+            Tooltip = "Recipes cannot require more than this many of a single ingredient at once, e.g. no more than 5 titanium.")]
+        public int iMaxAmountPerIngredient = (int)ConfigDefaults.GetDefault("iMaxAmountPerIngredient");
+
+        [Slider("Max ingredient types per recipe", 1, 10, DefaultValue = 7,
+            Tooltip = "Recipes cannot require more than this many different ingredients.")]
+        public int iMaxIngredientsPerRecipe = (int)ConfigDefaults.GetDefault("iMaxIngredientsPerRecipe");
 
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
         public int iDepthSearchTime = (int)ConfigDefaults.GetDefault("iDepthSearchTime");
