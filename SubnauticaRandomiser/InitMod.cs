@@ -302,6 +302,9 @@ namespace SubnauticaRandomiser
                 var transpiler = AccessTools.Method(typeof(FragmentPatcher), nameof(FragmentPatcher.Transpiler));
                 harmony.Patch(original, transpiler: new HarmonyMethod(transpiler));
             }
+            
+            // Always apply bugfixes.
+            harmony.PatchAll(typeof(VanillaBugfixes));
         }
     }
 }
