@@ -2,7 +2,7 @@
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/tinyhoot/SubnauticaRandomiser)](https://github.com/tinyhoot/SubnauticaRandomiser/releases)
 [![GitHub](https://img.shields.io/github/license/tinyhoot/SubnauticaRandomiser)](https://github.com/tinyhoot/SubnauticaRandomiser/blob/master/LICENSE)
-[![CodeFactor](https://www.codefactor.io/repository/github/tinyhoot/subnauticarandomiser/badge/dev)](https://www.codefactor.io/repository/github/tinyhoot/subnauticarandomiser/overview/master)
+[![CodeFactor](https://www.codefactor.io/repository/github/tinyhoot/subnauticarandomiser/badge/master)](https://www.codefactor.io/repository/github/tinyhoot/subnauticarandomiser/overview/master)
 [![wakatime](https://wakatime.com/badge/github/tinyhoot/SubnauticaRandomiser.svg)](https://wakatime.com/badge/github/tinyhoot/SubnauticaRandomiser)
 
 A Subnautica Mod that randomises many aspects of the game for replayability, originally based on [the first Subnautica randomizer](https://github.com/stephenengland/SubnauticaRandomizer). Over time, this project grew to become completely independent and today no longer shares any code with the original. 
