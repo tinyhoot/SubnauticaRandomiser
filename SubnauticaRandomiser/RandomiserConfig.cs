@@ -64,10 +64,16 @@ namespace SubnauticaRandomiser
             "MushroomForest", "SeaTreaderPath", "SparseReef", "UnderwaterIslands", "Void",
             Tooltip = "Random is limited to early game biomes, Chaotic Random chooses from ALL available biomes.")]
         public string sSpawnPoint = "Vanilla";
+        
+        [Toggle("------------------------------------------------------------------------------------------")]
+        public bool visualDivider1 = true;
 
         [Toggle("Randomise blueprints in databoxes?",
             Tooltip = "Databoxes will be in the same locations, but contain different blueprints.")]
         public bool bRandomiseDataboxes = (bool)ConfigDefaults.GetDefault("bRandomiseDataboxes");
+
+        [Toggle("------------------------------------------------------------------------------------------")]
+        public bool visualDivider2 = true;
 
         [Toggle("Randomise fragment locations?")]
         public bool bRandomiseFragments = (bool)ConfigDefaults.GetDefault("bRandomiseFragments");
@@ -87,6 +93,9 @@ namespace SubnauticaRandomiser
         [Toggle("Randomise duplicate scan rewards?",
             Tooltip = "When scanning a fragment you already unlocked, changes the two titanium to a random low-mid value reward.")]
         public bool bRandomiseDuplicateScans = (bool)ConfigDefaults.GetDefault("bRandomiseDuplicateScans");
+        
+        [Toggle("------------------------------------------------------------------------------------------")]
+        public bool visualDivider3 = true;
 
         [Toggle("Randomise recipes?")]
         public bool bRandomiseRecipes = (bool)ConfigDefaults.GetDefault("bRandomiseRecipes");
