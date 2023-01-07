@@ -15,9 +15,9 @@ namespace SubnauticaRandomiser.Logic
         private List<Databox> _databoxes;
         private readonly CoreLogic _logic;
         
-        private ILogHandler _log => _logic._log;
-        private EntitySerializer _masterDict => _logic._masterDict;
-        private IRandomHandler _random => _logic._random;
+        private ILogHandler _log => _logic._Log;
+        private EntitySerializer _serializer => _logic._Serializer;
+        private IRandomHandler _random => _logic._Random;
 
         public DataboxLogic(CoreLogic logic, List<Databox> databoxes)
         {
@@ -124,7 +124,7 @@ namespace SubnauticaRandomiser.Logic
         [NotNull]
         public List<Databox> RandomiseDataboxes()
         {
-            _masterDict.Databoxes = new Dictionary<RandomiserVector, TechType>();
+            _serializer.Databoxes = new Dictionary<RandomiserVector, TechType>();
             List<Databox> randomDataboxes = new List<Databox>();
             List<Vector3> toBeRandomised = new List<Vector3>();
 
@@ -140,7 +140,7 @@ namespace SubnauticaRandomiser.Logic
 
                 randomDataboxes.Add(new Databox(originalBox.TechType, next, replacementBox.Wreck, 
                     replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
-                _masterDict.Databoxes.Add(new RandomiserVector(next), originalBox.TechType);
+                _serializer.Databoxes.Add(new RandomiserVector(next), originalBox.TechType);
                 _log.Debug($"[D] Databox {next.ToString()} with {replacementBox}"
                            + " now contains " + originalBox);
                 toBeRandomised.Remove(next);

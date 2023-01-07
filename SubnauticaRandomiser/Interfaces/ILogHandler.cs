@@ -1,6 +1,6 @@
 namespace SubnauticaRandomiser.Interfaces
 {
-    public interface ILogHandler
+    internal interface ILogHandler
     {
         public void Debug(string message);
         

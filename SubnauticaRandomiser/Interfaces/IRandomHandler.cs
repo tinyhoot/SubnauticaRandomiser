@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace SubnauticaRandomiser.Interfaces
 {
-    public interface IRandomHandler
+    internal interface IRandomHandler
     {
         /// <summary>
         /// Get a nonnegative random integer.

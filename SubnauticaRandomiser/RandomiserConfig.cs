@@ -6,7 +6,7 @@ using SubnauticaRandomiser.Interfaces;
 namespace SubnauticaRandomiser
 {
     [Menu("Randomiser")]
-    public class RandomiserConfig : ConfigFile
+    internal class RandomiserConfig : ConfigFile
     {
         private readonly ILogHandler _log;
         private DateTime _lastButtonPress;
@@ -37,7 +37,7 @@ namespace SubnauticaRandomiser
             iSeed = random.Next();
             _log.InGameMessage("Changed seed to " + iSeed);
             _log.InGameMessage("Randomising...");
-            InitMod.Randomise();
+            Initialiser.Randomise();
             _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
@@ -51,7 +51,7 @@ namespace SubnauticaRandomiser
             _log.InGameMessage("Randomising...");
             // Ensure all manual changes to the config file are loaded.
             Load();
-            InitMod.Randomise();
+            Initialiser.Randomise();
             _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
@@ -154,10 +154,11 @@ namespace SubnauticaRandomiser
         public double dRecipeValueVariance = (double)ConfigDefaults.GetDefault("dRecipeValueVariance");
         public float fFragmentSpawnChanceMin = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMin");
         public float fFragmentSpawnChanceMax = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMax");
+        public bool debug_forceRandomise = false;
 
         // Way down here since it tends to take up some space and scrolling is annoying.
         public string sBase64Seed = "";
-        public int iSaveVersion = InitMod._ExpectedSaveVersion;
+        public int iSaveVersion = Initialiser._ExpectedSaveVersion;
 
         public void SanitiseConfigValues()
         {

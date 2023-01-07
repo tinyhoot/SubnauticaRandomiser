@@ -18,10 +18,10 @@ namespace SubnauticaRandomiser.Logic
         private readonly CoreLogic _logic;
         
         private static Dictionary<TechType, List<string>> _classIdDatabase;
-        private RandomiserConfig _config => _logic._config;
-        private ILogHandler _log => _logic._log;
-        private EntitySerializer _masterDict => _logic._masterDict;
-        private IRandomHandler _random => _logic._random;
+        private RandomiserConfig _config => _logic._Config;
+        private ILogHandler _log => _logic._Log;
+        private EntitySerializer _serializer => _logic._Serializer;
+        private IRandomHandler _random => _logic._Random;
         private readonly List<Biome> _allBiomes;
         private readonly List<Biome> _availableBiomes;
         private static readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
@@ -245,7 +245,7 @@ namespace SubnauticaRandomiser.Logic
             
             int numFragments = _random.Next(_config.iMinFragmentsToUnlock, _config.iMaxFragmentsToUnlock + 1);
             _log.Debug($"[F] New number of fragments required for {entity}: {numFragments}");
-            _masterDict.AddFragmentUnlockNum(entity.TechType, numFragments);
+            _serializer.AddFragmentUnlockNum(entity.TechType, numFragments);
         }
 
         /// <summary>
@@ -283,16 +283,16 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         internal void CreateDuplicateScanYieldDict()
         {
-            _masterDict.FragmentMaterialYield = new Dictionary<TechType, float>();
-            var materials = _logic._materials.GetAllRawMaterials(50);
+            _serializer.FragmentMaterialYield = new Dictionary<TechType, float>();
+            var materials = _logic._Materials.GetAllRawMaterials(50);
             // Gaining seeds from fragments is not great for balance. Remove that.
-            materials.Remove(_logic._materials.Find(TechType.CreepvineSeedCluster));
+            materials.Remove(_logic._Materials.Find(TechType.CreepvineSeedCluster));
 
             foreach (LogicEntity entity in materials)
             {
                 // Two random calls will tend to produce less extreme and more evenly distributed values.
                 double weight = _random.NextDouble() + _random.NextDouble();
-                _masterDict.AddDuplicateFragmentMaterial(entity.TechType, (float)weight);
+                _serializer.AddDuplicateFragmentMaterial(entity.TechType, (float)weight);
             }
         }
         
@@ -391,9 +391,9 @@ namespace SubnauticaRandomiser.Logic
         {
             // Find the recipe that needs the given fragment as a prerequisite, i.e. the recipe that is unlocked
             // by the fragment.
-            LogicEntity recipe = _logic._materials.GetAll()
+            LogicEntity recipe = _logic._Materials.GetAll()
                 .Find(e => e.Blueprint?.Fragments?.Contains(entity.TechType) ?? false);
-            if (recipe is null || !_logic._tree.IsProgressionItem(recipe)
+            if (recipe is null || !_logic._Tree.IsProgressionItem(recipe)
                                || unlockedProgressionItems.ContainsKey(recipe.TechType))
                 return false;
 
@@ -441,24 +441,24 @@ namespace SubnauticaRandomiser.Logic
         /// Re-apply spawnList from a saved game. This will fail to catch all existing fragment spawns if called in a
         /// previously randomised game.
         /// </summary>
-        internal static void ApplyMasterDict(EntitySerializer masterDict)
+        internal static void ApplyMasterDict(EntitySerializer serializer)
         {
-            if (masterDict.SpawnDataDict?.Count > 0)
+            if (serializer.SpawnDataDict?.Count > 0)
             {
                 Init();
                             
-                foreach (TechType key in masterDict.SpawnDataDict.Keys)
+                foreach (TechType key in serializer.SpawnDataDict.Keys)
                 {
-                    foreach (SpawnData spawnData in masterDict.SpawnDataDict[key])
+                    foreach (SpawnData spawnData in serializer.SpawnDataDict[key])
                     {
                         LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
                     }
                 }
             }
             
-            foreach (TechType key in masterDict.NumFragmentsToUnlock.Keys)
+            foreach (TechType key in serializer.NumFragmentsToUnlock.Keys)
             {
-                PDAHandler.EditFragmentsToScan(key, masterDict.NumFragmentsToUnlock[key]);
+                PDAHandler.EditFragmentsToScan(key, serializer.NumFragmentsToUnlock[key]);
             }
         }
         
@@ -470,7 +470,7 @@ namespace SubnauticaRandomiser.Logic
         internal void ApplyRandomisedFragment(LogicEntity entity, List<SpawnData> spawnList)
         {
             entity.SpawnData = spawnList;
-            _masterDict.AddSpawnData(entity.TechType, spawnList);
+            _serializer.AddSpawnData(entity.TechType, spawnList);
         }
 
         /// <summary>
@@ -493,68 +493,6 @@ namespace SubnauticaRandomiser.Logic
 
             PrepareClassIdDatabase();
             ResetFragmentSpawns();
-        }
-
-        // -------------------------------------------
-        // -------------------------------------------
-        // -------------------------------------------
-        // This is really just for testing purposes.
-        internal void DumpBiomeDataEntities()
-        {
-            _log.Debug("---Dumping BiomeData---");
-
-            // Grab a copy of all vanilla BiomeData. This loads it fresh from disk
-            // and will thus be unaffected by any existing randomisation.
-            LootDistributionData loot = LootDistributionData.Load(LootDistributionData.dataPath);
-            var keys = UWE.PrefabDatabase.prefabFiles.Keys;
-
-            _log.Debug("---Dumping valid prefabs");
-            foreach (string classId in keys)
-            {
-                if (!loot.GetPrefabData(classId, out SrcData data))
-                    continue;
-                
-                // Any prefab with BiomeData will end up in the log files. This is
-                // the case even if that BiomeData specifies 0.0 spawn chance across
-                // the board and is thus "empty".
-                _log.Debug("KEY: " + classId + ", VALUE: " + UWE.PrefabDatabase.prefabFiles[classId]);
-            }
-            
-            _log.Debug("---Dumping Biomes");
-            BiomeType[] biomes = (BiomeType[])Enum.GetValues(typeof(BiomeType));
-            foreach (BiomeType biome in biomes)
-            {
-                if (loot.GetBiomeLoot(biome, out DstData distributionData))
-                {
-                    int valid = 0;
-                    int validFragments = 0;
-                    float sum = 0f;
-                    float sumFragments = 0f;
-                    foreach (var prefab in distributionData.prefabs)
-                    {
-                        if (string.IsNullOrEmpty(prefab.classId) || prefab.classId.Equals("None"))
-                            continue;
-
-                        valid++;
-                        sum += prefab.probability;
-
-                        if (UWE.WorldEntityDatabase.TryGetInfo(prefab.classId, out UWE.WorldEntityInfo info)){
-                            if (info != null && !info.techType.Equals(TechType.None) && info.techType.AsString().ToLower().Contains("fragment"))
-                            {
-                                validFragments++;
-                                sumFragments += prefab.probability;
-                            }
-                        }
-                    }
-                    //LogHandler.Debug("BIOME: " + biome.AsString() + ", VALID ENTRIES: " + valid + ", SUM: " + sum + ", OF WHICH FRAGMENTS: " + sumFragments);
-                    _log.Debug(string.Format("{0}\t{1} entries\t{2} fragments\t{3} totalspawnrate\t{4} totalfragmentrate", biome.AsString(), valid, validFragments, sum, sumFragments));
-                }
-                else
-                {
-                    //LogHandler.Debug("No DstData for biome " + biome.AsString());
-                    _log.Debug(string.Format("{0}\tNONE\t\t", biome.AsString()));
-                }
-            }
         }
     }
 }

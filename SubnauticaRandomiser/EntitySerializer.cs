@@ -24,7 +24,7 @@ namespace SubnauticaRandomiser
     /// </list>
     /// </summary>
     [Serializable]
-    public class EntitySerializer
+    internal class EntitySerializer
     {
         public RandomiserVector StartPoint;
         // All databoxes and their new locations.
@@ -38,7 +38,7 @@ namespace SubnauticaRandomiser
         // All modified fragment spawn rates.
         public Dictionary<TechType, List<SpawnData>> SpawnDataDict;
 
-        public const int SaveVersion = InitMod._ExpectedSaveVersion;
+        public const int SaveVersion = Initialiser._ExpectedSaveVersion;
 
         public EntitySerializer()
         {

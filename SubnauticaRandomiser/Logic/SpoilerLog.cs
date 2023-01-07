@@ -4,15 +4,16 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using SubnauticaRandomiser.Interfaces;
+using SubnauticaRandomiser.Objects;
 
-namespace SubnauticaRandomiser.Objects
+namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
     /// Handles everything related to the spoiler log generated during randomisation.
     /// </summary>
-    public class SpoilerLog
+    internal class SpoilerLog
     {
-        internal const string _FileName = "spoilerlog.txt";
+        private const string _FileName = "spoilerlog.txt";
         private readonly RandomiserConfig _config;
         private readonly ILogHandler _log;
         private readonly EntitySerializer _serializer;
@@ -25,7 +26,7 @@ namespace SubnauticaRandomiser.Objects
         private string[] _contentDataboxes;
         private string[] _contentFragments;
 
-        internal SpoilerLog(RandomiserConfig config, ILogHandler logger, EntitySerializer serializer)
+        public SpoilerLog(RandomiserConfig config, ILogHandler logger, EntitySerializer serializer)
         {
             _config = config;
             _log = logger;
@@ -59,7 +60,7 @@ namespace SubnauticaRandomiser.Objects
                 "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
                 "*************************************************",
                 "",
-                "Generated on " + DateTime.Now + " with " + InitMod.VERSION
+                "Generated on " + DateTime.Now + " with " + Initialiser.VERSION
             };
             _contentBasics = new[]
             {
@@ -135,7 +136,7 @@ namespace SubnauticaRandomiser.Objects
         }
         
         /// <summary>
-        /// Grab the randomised boxes from masterDict, and sort them alphabetically.
+        /// Grab the randomised boxes from the serializer, and sort them alphabetically.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
         private string[] PrepareDataboxes()
@@ -154,7 +155,7 @@ namespace SubnauticaRandomiser.Objects
         }
 
         /// <summary>
-        /// Grab the randomise fragments from masterDict, and sort them alphabetically.
+        /// Grab the randomise fragments from the serializer, and sort them alphabetically.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
         private string[] PrepareFragments()
@@ -187,7 +188,7 @@ namespace SubnauticaRandomiser.Objects
         /// <returns>The prepared log entry.</returns>
         private string PrepareMD5()
         {
-            if (!InitMod._ExpectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
+            if (!Initialiser._ExpectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
                 return "recipeInformation.csv has been modified: " + CSVReader.s_recipeCSVMD5;
             
             return "recipeInformation.csv is unmodified.";
@@ -225,7 +226,7 @@ namespace SubnauticaRandomiser.Objects
         /// <param name="type">The progression item.</param>
         /// <param name="depth">The depth it unlocks or was unlocked at.</param>
         /// <returns>True if successful, false if the entry already exists.</returns>
-        internal bool AddProgressionEntry(TechType type, int depth)
+        public bool AddProgressionEntry(TechType type, int depth)
         {
             if (_progression.Exists(x => x.Key.Equals(type)))
             {
@@ -245,7 +246,7 @@ namespace SubnauticaRandomiser.Objects
         /// </summary>
         /// <param name="depth">The new depth to update the entry with.</param>
         /// <returns>True if successful, false if the update failed, e.g. if there are no entries in the list.</returns>
-        internal bool UpdateLastProgressionEntry(int depth)
+        public bool UpdateLastProgressionEntry(int depth)
         {
             if (_progression.Count == 0)
                 return false;
@@ -259,7 +260,7 @@ namespace SubnauticaRandomiser.Objects
         /// <summary>
         /// Write the log to disk.
         /// </summary>
-        internal async Task WriteLog()
+        public async Task WriteLog()
         {
             List<string> lines = new List<string>();
             PrepareStrings();
@@ -278,7 +279,7 @@ namespace SubnauticaRandomiser.Objects
             lines.AddRange(_contentFragments);
             lines.AddRange(PrepareFragments());
 
-            using (StreamWriter file = new StreamWriter(Path.Combine(InitMod.s_modDirectory, _FileName)))
+            using (StreamWriter file = new StreamWriter(Path.Combine(Initialiser._ModDirectory, _FileName)))
             {
                 await WriteTextToLog(file, lines.ToArray());
             }
