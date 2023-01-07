@@ -14,9 +14,16 @@ namespace SubnauticaRandomiser
         public void RegisterCommands()
         {
 #if DEBUG
-            DevConsole.RegisterConsoleCommand(this, "dumpKnownTech", false, false);
-            DevConsole.RegisterConsoleCommand(this, "dumpPrefabs", false, false);
+            DevConsole.RegisterConsoleCommand(this, "dumpBiomes");
+            DevConsole.RegisterConsoleCommand(this, "dumpKnownTech");
+            DevConsole.RegisterConsoleCommand(this, "dumpPrefabs");
 #endif
+        }
+
+        private void OnConsoleCommand_dumpBiomes(NotificationCenter.Notification n)
+        {
+            Initialiser._Log.InGameMessage("Dumping biomes");
+            DataDumper.LogBiomes();
         }
         
         private void OnConsoleCommand_dumpKnownTech(NotificationCenter.Notification n)
