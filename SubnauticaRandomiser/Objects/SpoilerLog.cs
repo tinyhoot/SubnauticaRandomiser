@@ -59,7 +59,7 @@ namespace SubnauticaRandomiser.Objects
                 "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
                 "*************************************************",
                 "",
-                "Generated on " + DateTime.Now + " with " + InitMod.VERSION
+                "Generated on " + DateTime.Now + " with " + Initialiser.VERSION
             };
             _contentBasics = new[]
             {
@@ -187,7 +187,7 @@ namespace SubnauticaRandomiser.Objects
         /// <returns>The prepared log entry.</returns>
         private string PrepareMD5()
         {
-            if (!InitMod._ExpectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
+            if (!Initialiser._ExpectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
                 return "recipeInformation.csv has been modified: " + CSVReader.s_recipeCSVMD5;
             
             return "recipeInformation.csv is unmodified.";
@@ -278,7 +278,7 @@ namespace SubnauticaRandomiser.Objects
             lines.AddRange(_contentFragments);
             lines.AddRange(PrepareFragments());
 
-            using (StreamWriter file = new StreamWriter(Path.Combine(InitMod._ModDirectory, _FileName)))
+            using (StreamWriter file = new StreamWriter(Path.Combine(Initialiser._ModDirectory, _FileName)))
             {
                 await WriteTextToLog(file, lines.ToArray());
             }

@@ -19,7 +19,7 @@ namespace SubnauticaRandomiser
 {
     [BepInPlugin(GUID, NAME, VERSION)]
     [BepInDependency("com.ahk1221.smlhelper", "2.15")]
-    internal class InitMod : BaseUnityPlugin
+    internal class Initialiser : BaseUnityPlugin
     {
         private const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
         public const string NAME = "Subnautica Randomiser";
@@ -46,15 +46,14 @@ namespace SubnauticaRandomiser
         // Everything the mod every modifies is stored in here.
         internal static EntitySerializer _Serializer;
         internal static ILogHandler _Log;
-        private const bool _Debug_forceRandomise = false;
-        
+
         private void Awake()
         {
             _Log = new LogHandler();
             _Log.Info($"{NAME} v{VERSION} starting up!");
 
             // Register options menu.
-            _ModDirectory = GetSubnauticaRandomiserDirectory();
+            _ModDirectory = GetModDirectory();
             _Config = OptionsPanelHandler.Main.RegisterModOptions<RandomiserConfig>();
             _Log.Debug("Registered options menu.");
 
@@ -67,32 +66,8 @@ namespace SubnauticaRandomiser
             CommandHandler cmd = gameObject.AddComponent<CommandHandler>();
             cmd.RegisterCommands();
 
-            // Try and restore a game state from disk.
-            try
-            {
-                _Serializer = RestoreGameStateFromDisk();
-            }
-            catch (Exception ex)
-            {
-                _Log.Warn("Could not load game state from disk.");
-                _Log.Warn(ex.Message);
-            }
-
-            // Triple checking things here in case the save got corrupted somehow.
-            if (!_Debug_forceRandomise && _Serializer != null)
-            {
-                ApplyAllChanges();
-                _Log.Info("Successfully loaded game state from disk.");
-            }
-            else
-            {
-                if (_Debug_forceRandomise)
-                    _Log.Warn("Set to forcibly re-randomise recipes.");
-                else
-                    _Log.Warn("Failed to load game state from disk: dictionary empty.");
-
-                Randomise();
-            }
+            // Apply randomisation.
+            SetupGameState();
 
             _Log.Info("Finished loading.");
         }
@@ -100,7 +75,7 @@ namespace SubnauticaRandomiser
         /// <summary>
         /// Randomise the game, discarding any earlier randomisation data.
         /// </summary>
-        internal static void Randomise()
+        public static void Randomise()
         {
             _Serializer = null;
             _Config.SanitiseConfigValues();
@@ -144,7 +119,7 @@ namespace SubnauticaRandomiser
         /// Apply all changes contained within the serialiser.
         /// </summary>
         /// <exception cref="InvalidDataException">If the serialiser is null or invalid.</exception>
-        internal static void ApplyAllChanges()
+        private static void ApplyAllChanges()
         {
             if (_Serializer is null)
                 throw new InvalidDataException("Cannot apply randomisation changes: MasterDict is null!");
@@ -181,6 +156,28 @@ namespace SubnauticaRandomiser
             _Log.InGameMessage("To protect your previous savegame, no changes to the game have been made.", true);
             _Log.InGameMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json", true);
             return false;
+        }
+        
+        /// <summary>
+        /// Enables all necessary harmony patches based on the randomisation state in the serialiser.
+        /// </summary>
+        private static void EnableHarmonyPatching()
+        {
+            Harmony harmony = new Harmony(GUID);
+            
+            // Alternate starting location.
+            harmony.PatchAll(typeof(AlternateStart));
+
+            // Swapping databoxes.
+            if (_Serializer?.Databoxes?.Count > 0)
+                harmony.PatchAll(typeof(DataboxPatcher));
+
+            // Changing duplicate scan rewards.
+            if (_Serializer?.FragmentMaterialYield?.Count > 0)
+                harmony.PatchAll(typeof(FragmentPatcher));
+
+            // Always apply bugfixes.
+            harmony.PatchAll(typeof(VanillaBugfixes));
         }
 
         /// <summary>
@@ -229,29 +226,11 @@ namespace SubnauticaRandomiser
         }
 
         /// <summary>
-        /// Serialise the current randomisation state to disk.
-        /// </summary>
-        internal static void SaveGameStateToDisk()
-        {
-            if (_Serializer != null)
-            {
-                string base64 = _Serializer.ToBase64String();
-                _Config.sBase64Seed = base64;
-                _Config.Save();
-                _Log.Debug("Saved game state to disk!");
-            }
-            else
-            {
-                _Log.Error("Could not save game state to disk: invalid data.");
-            }
-        }
-
-        /// <summary>
         /// Attempt to deserialise a randomisation state from disk.
         /// </summary>
         /// <returns>The EntitySerializer as previously written to disk.</returns>
         /// <exception cref="InvalidDataException">Raised if the game state is corrupted in some way.</exception>
-        internal static EntitySerializer RestoreGameStateFromDisk()
+        private static EntitySerializer RestoreGameStateFromDisk()
         {
             if (string.IsNullOrEmpty(_Config.sBase64Seed))
             {
@@ -268,46 +247,60 @@ namespace SubnauticaRandomiser
 
             return dictionary;
         }
+        
+        /// <summary>
+        /// Serialise the current randomisation state to disk.
+        /// </summary>
+        private static void SaveGameStateToDisk()
+        {
+            if (_Serializer != null)
+            {
+                string base64 = _Serializer.ToBase64String();
+                _Config.sBase64Seed = base64;
+                _Config.Save();
+                _Log.Debug("Saved game state to disk!");
+            }
+            else
+            {
+                _Log.Error("Could not save game state to disk: invalid data.");
+            }
+        }
+
+        /// <summary>
+        /// Try to restore the game state from a previous session. If that fails, start fresh and randomise.
+        /// </summary>
+        private static void SetupGameState()
+        {
+            // Try and restore a game state from disk.
+            try
+            {
+                _Serializer = RestoreGameStateFromDisk();
+            }
+            catch (Exception ex)
+            {
+                _Log.Warn("Could not load game state from disk.");
+                _Log.Warn(ex.Message);
+            }
+            
+            if (_Config.debug_forceRandomise || _Serializer is null)
+            {
+                if (_Config.debug_forceRandomise)
+                    _Log.Warn("Ignoring previous game state: Config forces fresh randomisation.");
+                Randomise();
+            }
+            else
+            {
+                ApplyAllChanges();
+                _Log.Info("Successfully loaded game state from disk.");
+            }
+        }
 
         /// <summary>
         /// Get the installation directory of the mod.
         /// </summary>
-        internal static string GetSubnauticaRandomiserDirectory()
+        internal static string GetModDirectory()
         {
             return new FileInfo(Assembly.GetExecutingAssembly().Location).Directory?.FullName;
-        }
-
-        /// <summary>
-        /// Enables all necessary harmony patches based on the randomisation state in the serialiser.
-        /// Must use manual patching since PatchAll() will not respect any config settings.
-        /// </summary>
-        private static void EnableHarmonyPatching()
-        {
-            Harmony harmony = new Harmony(GUID);
-            
-            // Alternate starting location.
-            var original = AccessTools.Method(typeof(RandomStart), nameof(RandomStart.GetRandomStartPoint));
-            var postfix = AccessTools.Method(typeof(AlternateStart), nameof(AlternateStart.OverrideStart));
-            harmony.Patch(original, postfix: new HarmonyMethod(postfix));
-
-            // Swapping databoxes.
-            if (_Serializer?.Databoxes?.Count > 0)
-            {
-                original = AccessTools.Method(typeof(BlueprintHandTarget), nameof(BlueprintHandTarget.Start));
-                var prefix = AccessTools.Method(typeof(DataboxPatcher), nameof(DataboxPatcher.PatchDatabox));
-                harmony.Patch(original, prefix: new HarmonyMethod(prefix));
-            }
-
-            // Changing duplicate scan rewards.
-            if (_Serializer?.FragmentMaterialYield?.Count > 0)
-            {
-                original = AccessTools.Method(typeof(PDAScanner), nameof(PDAScanner.Scan));
-                var transpiler = AccessTools.Method(typeof(FragmentPatcher), nameof(FragmentPatcher.Transpiler));
-                harmony.Patch(original, transpiler: new HarmonyMethod(transpiler));
-            }
-            
-            // Always apply bugfixes.
-            harmony.PatchAll(typeof(VanillaBugfixes));
         }
     }
 }

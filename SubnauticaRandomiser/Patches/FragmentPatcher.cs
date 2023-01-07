@@ -6,7 +6,7 @@ using HarmonyLib;
 
 namespace SubnauticaRandomiser.Patches
 {
-    // [HarmonyPatch]
+    [HarmonyPatch]
     internal class FragmentPatcher
     {
         /// <summary>
@@ -20,7 +20,7 @@ namespace SubnauticaRandomiser.Patches
         [HarmonyPatch(typeof(PDAScanner), nameof(PDAScanner.Scan))]
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codeInstructions)
         {
-            InitMod._Log.Debug("[F] Starting transpiler for duplicate scan results.");
+            Initialiser._Log.Debug("[F] Starting transpiler for duplicate scan results.");
 
             List<CodeInstruction> instructions = new List<CodeInstruction>(codeInstructions);
 
@@ -45,7 +45,7 @@ namespace SubnauticaRandomiser.Patches
                     {
                         // Found the instruction pushing TechType 16 (Titanium) onto the stack.
                         methodArgsIndex = i + j;
-                        InitMod._Log.Debug("[F] Found arg0 Titanium at index " + methodArgsIndex);
+                        Initialiser._Log.Debug("[F] Found arg0 Titanium at index " + methodArgsIndex);
 
                         // The original method takes four arguments, but the replacement needs
                         // only one. Replace the first argument with the scan target (conveniently
@@ -57,7 +57,7 @@ namespace SubnauticaRandomiser.Patches
                         instructions[methodArgsIndex + 4].operand
                             = typeof(FragmentPatcher).GetMethod("YieldMaterial", new[] { typeof(TechType) });
 
-                        InitMod._Log.Debug("[F] Successfully altered CodeInstructions.");
+                        Initialiser._Log.Debug("[F] Successfully altered CodeInstructions.");
                         break;
                     }
                 }
@@ -65,7 +65,7 @@ namespace SubnauticaRandomiser.Patches
             }
 
             if (methodArgsIndex == 0)
-                InitMod._Log.Error("[F] Failed to find argument index while trying to transpile fragment scan rewards!");
+                Initialiser._Log.Error("[F] Failed to find argument index while trying to transpile fragment scan rewards!");
 
             return instructions.AsEnumerable();
         }
@@ -77,7 +77,7 @@ namespace SubnauticaRandomiser.Patches
         public static void YieldMaterial(TechType target)
         {
             // If the options for yields were not randomised, just go with the game's default behaviour.
-            if (!(InitMod._Serializer?.FragmentMaterialYield?.Count > 0))
+            if (!(Initialiser._Serializer?.FragmentMaterialYield?.Count > 0))
             {
                 CraftData.AddToInventory(TechType.Titanium, 2, false, true);
                 return;
@@ -85,8 +85,8 @@ namespace SubnauticaRandomiser.Patches
 
             Random rand = new Random();
             TechType type = GetRandomMaterial(rand);
-            int number = rand.Next(1, InitMod._Config?.iMaxDuplicateScanYield + 1 ?? 4);
-            InitMod._Log.Debug($"[F] Replacing duplicate fragment scan yield of target {target} with {type}");
+            int number = rand.Next(1, Initialiser._Config?.iMaxDuplicateScanYield + 1 ?? 4);
+            Initialiser._Log.Debug($"[F] Replacing duplicate fragment scan yield of target {target} with {type}");
             CraftData.AddToInventory(type, number, false, true);
         }
 
@@ -97,22 +97,22 @@ namespace SubnauticaRandomiser.Patches
         /// <returns>The TechType of the chosen material, or Titanium if an error occurred.</returns>
         private static TechType GetRandomMaterial(Random rand)
         {
-            if (!(InitMod._Serializer?.FragmentMaterialYield?.Count > 0))
+            if (!(Initialiser._Serializer?.FragmentMaterialYield?.Count > 0))
                 return TechType.Titanium;
 
-            double sumOfWeights = InitMod._Serializer.FragmentMaterialYield.Sum(x => x.Value);
+            double sumOfWeights = Initialiser._Serializer.FragmentMaterialYield.Sum(x => x.Value);
             double choice = sumOfWeights * rand.NextDouble();
 
             // Add up the weights of the material options until the value of 'choice' is exceeded, and choose that one.
             double sum = 0.0;
-            foreach (var kv in InitMod._Serializer.FragmentMaterialYield)
+            foreach (var kv in Initialiser._Serializer.FragmentMaterialYield)
             {
                 sum += kv.Value;
                 if (sum >= choice)
                     return kv.Key;
             }
 
-            InitMod._Log.Error("[F] Failed to choose random material for duplicate fragment scan.");
+            Initialiser._Log.Error("[F] Failed to choose random material for duplicate fragment scan.");
             return TechType.Titanium;
         }
     }

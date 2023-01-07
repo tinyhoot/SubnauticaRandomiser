@@ -151,7 +151,7 @@ namespace SubnauticaRandomiser
             {
                 _log.Info("Recipe CSV seems to contain custom entries.");
             }
-            else if (!s_recipeCSVMD5.Equals(InitMod._ExpectedRecipeMD5))
+            else if (!s_recipeCSVMD5.Equals(Initialiser._ExpectedRecipeMD5))
             {
                 _log.Info("Recipe CSV seems to have been modified.");
             }
@@ -561,7 +561,7 @@ namespace SubnauticaRandomiser
         /// <returns>The absolute path.</returns>
         private static string GetDataPath(string fileName)
         {
-            string dataFolder = Path.Combine(InitMod._ModDirectory, "DataFiles");
+            string dataFolder = Path.Combine(Initialiser._ModDirectory, "DataFiles");
             return Path.Combine(dataFolder, fileName);
         }
 

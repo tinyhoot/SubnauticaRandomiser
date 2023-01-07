@@ -21,13 +21,13 @@ namespace SubnauticaRandomiser
         
         private void OnConsoleCommand_dumpKnownTech(NotificationCenter.Notification n)
         {
-            InitMod._Log.InGameMessage("Dumping known tech");
+            Initialiser._Log.InGameMessage("Dumping known tech");
             DataDumper.LogKnownTech();
         }
 
         private void OnConsoleCommand_dumpPrefabs(NotificationCenter.Notification n)
         {
-            InitMod._Log.InGameMessage("Dumping prefabs");
+            Initialiser._Log.InGameMessage("Dumping prefabs");
             DataDumper.LogPrefabs();
         }
     }

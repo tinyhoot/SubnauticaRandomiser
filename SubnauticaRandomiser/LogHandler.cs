@@ -14,7 +14,7 @@ namespace SubnauticaRandomiser
     [Serializable]
     internal class LogHandler : ILogHandler
     {
-        private static readonly ManualLogSource _log = Logger.CreateLogSource(InitMod.NAME);
+        private static readonly ManualLogSource _log = Logger.CreateLogSource(Initialiser.NAME);
         private readonly List<string> _ingameMessages;
         private bool _isReady;
 

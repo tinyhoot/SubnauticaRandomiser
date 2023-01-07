@@ -9,15 +9,15 @@ namespace SubnauticaRandomiser
         {
             foreach (var tech in KnownTech.compoundTech)
             {
-                InitMod._Log.Debug($"Compound: {tech.techType}, {tech.dependencies}");
+                Initialiser._Log.Debug($"Compound: {tech.techType}, {tech.dependencies}");
             }
 
             foreach (var tech in KnownTech.analysisTech)
             {
-                InitMod._Log.Debug($"Scanning {tech.techType} unlocks:");
+                Initialiser._Log.Debug($"Scanning {tech.techType} unlocks:");
                 foreach (var unlock in tech.unlockTechTypes)
                 {
-                    InitMod._Log.Debug($"-- {unlock}");
+                    Initialiser._Log.Debug($"-- {unlock}");
                 }
             }
         }
@@ -29,7 +29,7 @@ namespace SubnauticaRandomiser
             var keys = UWE.PrefabDatabase.prefabFiles.Keys;
             foreach (string classId in keys)
             {
-                InitMod._Log.Debug($"classId: {classId}, prefab: {UWE.PrefabDatabase.prefabFiles[classId]}");
+                Initialiser._Log.Debug($"classId: {classId}, prefab: {UWE.PrefabDatabase.prefabFiles[classId]}");
             }
         }
     }

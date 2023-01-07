@@ -69,12 +69,9 @@ Other:
 UNITTEST REFACTOR:
 - Complete rewrite of:
     - CSVReader
-    - InitMod
     - Potentially the logic modules. Write an interface ILogicModule that serves as 
       a better baseline? Rewrite config options as components?
-- Change access modifiers across the whole project
 - Extract re-application of saved logic into its own class
-- EProgressionNode is a mess and needs cleaning.
 - Classes that cannot get full coverage:
     - ModeBalanced. Too much reliance on random outcomes to test.
     - Moderandom. Same as above.
