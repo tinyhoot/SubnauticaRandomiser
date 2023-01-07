@@ -23,7 +23,7 @@ namespace SubnauticaRandomiser.Patches
                 // Has not been randomised, don't do anything.
                 return;
 
-            FileLog.Log("[AS] Replacing lifepod spawnpoint with " + InitMod.s_masterDict.StartPoint);
+            InitMod._log.Debug("[AS] Replacing lifepod spawnpoint with " + InitMod.s_masterDict.StartPoint);
             __result = InitMod.s_masterDict.StartPoint.ToUnityVector();
         }
     }
