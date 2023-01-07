@@ -12,11 +12,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
     internal abstract class Mode
     {
         protected readonly CoreLogic _logic;
-        protected RandomiserConfig _config => _logic._config;
-        protected Materials _materials => _logic._materials;
-        protected ProgressionTree _tree => _logic._tree;
-        protected IRandomHandler _random => _logic._random;
-        protected ILogHandler _log => _logic._log;
+        protected RandomiserConfig _config => _logic._Config;
+        protected Materials _materials => _logic._Materials;
+        protected ProgressionTree _tree => _logic._Tree;
+        protected IRandomHandler _random => _logic._Random;
+        protected ILogHandler _log => _logic._Log;
         
         protected List<RandomiserIngredient> _ingredients = new List<RandomiserIngredient>();
         protected List<ETechTypeCategory> _blacklist = new List<ETechTypeCategory>();

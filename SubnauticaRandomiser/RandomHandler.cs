@@ -4,7 +4,7 @@ using SubnauticaRandomiser.Interfaces;
 
 namespace SubnauticaRandomiser
 {
-    public class RandomHandler : IRandomHandler
+    internal class RandomHandler : IRandomHandler
     {
         private readonly Random _random;
 

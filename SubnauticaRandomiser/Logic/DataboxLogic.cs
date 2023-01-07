@@ -15,9 +15,9 @@ namespace SubnauticaRandomiser.Logic
         private List<Databox> _databoxes;
         private readonly CoreLogic _logic;
         
-        private ILogHandler _log => _logic._log;
-        private EntitySerializer _masterDict => _logic._masterDict;
-        private IRandomHandler _random => _logic._random;
+        private ILogHandler _log => _logic._Log;
+        private EntitySerializer _masterDict => _logic._Serializer;
+        private IRandomHandler _random => _logic._Random;
 
         public DataboxLogic(CoreLogic logic, List<Databox> databoxes)
         {

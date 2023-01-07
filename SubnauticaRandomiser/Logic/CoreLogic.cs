@@ -14,13 +14,13 @@ namespace SubnauticaRandomiser.Logic
     /// </summary>
     internal class CoreLogic
     {
-        internal readonly RandomiserConfig _config;
-        internal readonly ILogHandler _log;
-        internal readonly EntitySerializer _masterDict;
-        internal readonly Materials _materials;
-        internal readonly IRandomHandler _random;
-        internal readonly SpoilerLog _spoilerLog;
-        internal readonly ProgressionTree _tree;
+        internal readonly RandomiserConfig _Config;
+        internal readonly ILogHandler _Log;
+        internal readonly EntitySerializer _Serializer;
+        internal readonly Materials _Materials;
+        internal readonly IRandomHandler _Random;
+        internal readonly SpoilerLog _SpoilerLog;
+        internal readonly ProgressionTree _Tree;
 
         private readonly AlternateStartLogic _altStartLogic;
         private readonly DataboxLogic _databoxLogic;
@@ -31,22 +31,22 @@ namespace SubnauticaRandomiser.Logic
             Dictionary<EBiomeType, List<float[]>> alternateStarts, List<BiomeCollection> biomes = null,
             List<Databox> databoxes = null)
         {
-            _config = config;
-            _log = logger;
-            _masterDict = new EntitySerializer();
-            _materials = new Materials(allMaterials, logger);
-            _random = random;
-            _spoilerLog = new SpoilerLog(config, logger, _masterDict);
+            _Config = config;
+            _Log = logger;
+            _Serializer = new EntitySerializer();
+            _Materials = new Materials(allMaterials, logger);
+            _Random = random;
+            _SpoilerLog = new SpoilerLog(config, logger, _Serializer);
             
-            if (!_config.sSpawnPoint.StartsWith("Vanilla"))
+            if (!_Config.sSpawnPoint.StartsWith("Vanilla"))
                 _altStartLogic = new AlternateStartLogic(alternateStarts, config, logger, random);
-            if (_config.bRandomiseDataboxes)
+            if (_Config.bRandomiseDataboxes)
                 _databoxLogic = new DataboxLogic(this, databoxes);
-            if (_config.bRandomiseFragments || _config.bRandomiseNumFragments || _config.bRandomiseDuplicateScans)
+            if (_Config.bRandomiseFragments || _Config.bRandomiseNumFragments || _Config.bRandomiseDuplicateScans)
                 _fragmentLogic = new FragmentLogic(this, biomes);
-            if (_config.bRandomiseRecipes)
+            if (_Config.bRandomiseRecipes)
                 _recipeLogic = new RecipeLogic(this);
-            _tree = new ProgressionTree();
+            _Tree = new ProgressionTree();
         }
 
         /// <summary>
@@ -55,34 +55,34 @@ namespace SubnauticaRandomiser.Logic
         private void Setup(List<LogicEntity> notRandomised)
         {
             // Init the progression tree.
-            _tree.SetupVanillaTree();
-            _altStartLogic?.Randomise(_masterDict);
+            _Tree.SetupVanillaTree();
+            _altStartLogic?.Randomise(_Serializer);
 
             if (_databoxLogic != null)
             {
                 // Just randomise those flat out for now, instead of including them in the core loop.
                 _databoxLogic.RandomiseDataboxes();
-                _databoxLogic.UpdateBlueprints(_materials.GetAll());
-                _databoxLogic.LinkCyclopsHullModules(_materials);
+                _databoxLogic.UpdateBlueprints(_Materials.GetAll());
+                _databoxLogic.LinkCyclopsHullModules(_Materials);
             }
 
             if (_fragmentLogic != null)
             {
-                if (_config.bRandomiseFragments)
+                if (_Config.bRandomiseFragments)
                 {
-                    _tree.SetupFragments();
+                    _Tree.SetupFragments();
                     // Initialise the fragment cache and remove vanilla spawns.
                     FragmentLogic.Init();
                     // Queue up all fragments to be randomised.
-                    notRandomised.AddRange(_materials.GetAllFragments());
+                    notRandomised.AddRange(_Materials.GetAllFragments());
                 }
                 
                 // Randomise the number of fragment scans required per blueprint.
-                if (_config.bRandomiseNumFragments)
-                    _fragmentLogic.RandomiseNumFragments(_materials.GetAllFragments());
+                if (_Config.bRandomiseNumFragments)
+                    _fragmentLogic.RandomiseNumFragments(_Materials.GetAllFragments());
                 
                 // Randomise duplicate scan rewards.
-                if (_config.bRandomiseDuplicateScans)
+                if (_Config.bRandomiseDuplicateScans)
                     _fragmentLogic.CreateDuplicateScanYieldDict();
             }
             
@@ -90,12 +90,12 @@ namespace SubnauticaRandomiser.Logic
             {
                 _recipeLogic.UpdateReachableMaterials(0);
                 // Queue up all craftables to be randomised.
-                notRandomised.AddRange(_materials.GetAllCraftables());
+                notRandomised.AddRange(_Materials.GetAllCraftables());
                 
                 // Update the progression tree with recipes.
-                _tree.SetupRecipes(_config.bVanillaUpgradeChains);
-                if (_config.bVanillaUpgradeChains)
-                    _tree.ApplyUpgradeChainToPrerequisites(_materials.GetAll());
+                _Tree.SetupRecipes(_Config.bVanillaUpgradeChains);
+                if (_Config.bVanillaUpgradeChains)
+                    _Tree.ApplyUpgradeChainToPrerequisites(_Materials.GetAll());
             }
         }
         
@@ -107,7 +107,7 @@ namespace SubnauticaRandomiser.Logic
         /// a valid solution.</exception>
         internal EntitySerializer Randomise()
         {
-            _log.Info("Randomising using logic-based system...");
+            _Log.Info("Randomising using logic-based system...");
             
             List<LogicEntity> notRandomised = new List<LogicEntity>();
             Dictionary<TechType, bool> unlockedProgressionItems = new Dictionary<TechType, bool>();
@@ -123,8 +123,8 @@ namespace SubnauticaRandomiser.Logic
                 circuitbreaker++;
                 if (circuitbreaker > 3000)
                 {
-                    _log.InGameMessage("Failed to randomise items: stuck in infinite loop!");
-                    _log.Fatal("Encountered infinite loop, aborting!");
+                    _Log.InGameMessage("Failed to randomise items: stuck in infinite loop!");
+                    _Log.Fatal("Encountered infinite loop, aborting!");
                     throw new TimeoutException("Encountered infinite loop while randomising!");
                 }
                 
@@ -148,13 +148,13 @@ namespace SubnauticaRandomiser.Logic
                 }
 
                 if (success is null)
-                    _log.Warn("Unsupported entity in loop: " + nextEntity);
+                    _Log.Warn("Unsupported entity in loop: " + nextEntity);
             }
 
-            _log.Info($"Finished randomising within {circuitbreaker} cycles!");
-            _spoilerLog.WriteLog();
+            _Log.Info($"Finished randomising within {circuitbreaker} cycles!");
+            _SpoilerLog.WriteLog();
 
-            return _masterDict;
+            return _Serializer;
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace SubnauticaRandomiser.Logic
             // certain recipes are done by a certain depth, e.g. waterparks by 500m.
             // Automatically fails if recipes do not get randomised.
             LogicEntity next = GetPriorityEntity(depth);
-            next ??= _random.Choice(notRandomised);
+            next ??= _Random.Choice(notRandomised);
 
             return next;
         }
@@ -196,12 +196,12 @@ namespace SubnauticaRandomiser.Logic
                 { TechType.PlasteelTank, new[] { 135, 0.1 } }
             };
 
-            _log.Debug("===== Recalculating reachable depth =====");
+            _Log.Debug("===== Recalculating reachable depth =====");
 
             // Get the deepest depth that can be reached by vehicle.
             foreach (EProgressionNode node in EProgressionNodeExtensions.AllDepthNodes)
             {
-                foreach (TechType[] path in _tree?.GetProgressionPath(node)?.Pathways ?? Enumerable.Empty<TechType[]>())
+                foreach (TechType[] path in _Tree?.GetProgressionPath(node)?.Pathways ?? Enumerable.Empty<TechType[]>())
                 {
                     if (CheckDictForAllTechTypes(progressionItems, path))
                         vehicleDepth = Math.Max(vehicleDepth, (int)node);
@@ -231,7 +231,7 @@ namespace SubnauticaRandomiser.Logic
             // Given everything above, calculate the total.
             int totalDepth = CalculateTotalDepth(progressionItems, vehicleDepth, (int)soloDepthRaw);
             
-            _log.Debug("===== New reachable depth: " + totalDepth + " =====");
+            _Log.Debug("===== New reachable depth: " + totalDepth + " =====");
 
             return totalDepth;
         }
@@ -271,9 +271,9 @@ namespace SubnauticaRandomiser.Logic
         {
             // If there is a rebreather, all the funky calculations are redundant.
             if (progressionItems.ContainsKey(TechType.Rebreather))
-                return vehicleDepth + Math.Min(soloDepthRaw, _config.iMaxDepthWithoutVehicle);
+                return vehicleDepth + Math.Min(soloDepthRaw, _Config.iMaxDepthWithoutVehicle);
 
-            return vehicleDepth + Math.Min(CalculateSoloDepth(vehicleDepth, soloDepthRaw), _config.iMaxDepthWithoutVehicle);
+            return vehicleDepth + Math.Min(CalculateSoloDepth(vehicleDepth, soloDepthRaw), _Config.iMaxDepthWithoutVehicle);
         }
 
         /// <summary>
@@ -289,8 +289,8 @@ namespace SubnauticaRandomiser.Logic
             if (progressionItems.Count <= numItems)
                 return currentDepth;
             
-            int newDepth = CalculateReachableDepth(progressionItems, _config.iDepthSearchTime);
-            _spoilerLog.UpdateLastProgressionEntry(newDepth);
+            int newDepth = CalculateReachableDepth(progressionItems, _Config.iDepthSearchTime);
+            _SpoilerLog.UpdateLastProgressionEntry(newDepth);
             currentDepth = Math.Max(currentDepth, newDepth);
             _recipeLogic?.UpdateReachableMaterials(currentDepth);
 
@@ -305,20 +305,20 @@ namespace SubnauticaRandomiser.Logic
         [CanBeNull]
         private LogicEntity GetPriorityEntity(int depth)
         {
-            List<TechType> essentialItems = _tree.GetEssentialItems(depth);
-            List<TechType[]> electiveItems = _tree.GetElectiveItems(depth);
+            List<TechType> essentialItems = _Tree.GetEssentialItems(depth);
+            List<TechType[]> electiveItems = _Tree.GetElectiveItems(depth);
             LogicEntity entity = null;
 
             // Always get one of the essential items first, if available.
             if (essentialItems.Count > 0)
             {
                 TechType type = essentialItems.Find(x =>
-                    !_masterDict.RecipeDict.ContainsKey(x) && !_masterDict.SpawnDataDict.ContainsKey(x));
+                    !_Serializer.RecipeDict.ContainsKey(x) && !_Serializer.SpawnDataDict.ContainsKey(x));
                 
                 if (!type.Equals(TechType.None))
                 {
-                    entity = _materials.Find(type);
-                    _log.Debug($"Prioritising essential entity {entity} for depth {depth}");
+                    entity = _Materials.Find(type);
+                    _Log.Debug($"Prioritising essential entity {entity} for depth {depth}");
                 }
             }
 
@@ -327,13 +327,13 @@ namespace SubnauticaRandomiser.Logic
             if (entity is null && electiveItems.Count > 0)
             {
                 TechType[] types = electiveItems.Find(arr => arr.All(x =>
-                    !_masterDict.RecipeDict.ContainsKey(x) && !_masterDict.SpawnDataDict.ContainsKey(x)));
+                    !_Serializer.RecipeDict.ContainsKey(x) && !_Serializer.SpawnDataDict.ContainsKey(x)));
                 
                 if (types?.Length > 0)
                 {
-                    TechType nextType = _random.Choice(types);
-                    entity = _materials.Find(nextType);
-                    _log.Debug($"Prioritising elective entity {entity} for depth {depth}");
+                    TechType nextType = _Random.Choice(types);
+                    entity = _Materials.Find(nextType);
+                    _Log.Debug($"Prioritising elective entity {entity} for depth {depth}");
                 }
             }
 

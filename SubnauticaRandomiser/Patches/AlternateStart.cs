@@ -19,12 +19,12 @@ namespace SubnauticaRandomiser.Patches
             if (__result.y > 50f)
                 // User is likely using Lifepod Unleashed, skip randomising in that case.
                 return;
-            if (InitMod.s_masterDict?.StartPoint is null)
+            if (InitMod._Serializer?.StartPoint is null)
                 // Has not been randomised, don't do anything.
                 return;
 
-            InitMod._log.Debug("[AS] Replacing lifepod spawnpoint with " + InitMod.s_masterDict.StartPoint);
-            __result = InitMod.s_masterDict.StartPoint.ToUnityVector();
+            InitMod._Log.Debug("[AS] Replacing lifepod spawnpoint with " + InitMod._Serializer.StartPoint);
+            __result = InitMod._Serializer.StartPoint.ToUnityVector();
         }
     }
 }

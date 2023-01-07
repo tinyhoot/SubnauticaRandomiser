@@ -24,7 +24,7 @@ namespace SubnauticaRandomiser
     /// </list>
     /// </summary>
     [Serializable]
-    public class EntitySerializer
+    internal class EntitySerializer
     {
         public RandomiserVector StartPoint;
         // All databoxes and their new locations.

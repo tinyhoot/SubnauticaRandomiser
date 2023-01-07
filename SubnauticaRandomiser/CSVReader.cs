@@ -15,10 +15,10 @@ namespace SubnauticaRandomiser
     internal class CSVReader
     {
         private readonly CultureInfo _culture;
-        internal Dictionary<EBiomeType, List<float[]>> _csvAlternateStarts;
-        internal List<BiomeCollection> _csvBiomeList;
-        internal List<Databox> _csvDataboxList;
-        internal List<LogicEntity> _csvRecipeList;
+        private Dictionary<EBiomeType, List<float[]>> _csvAlternateStarts;
+        private List<BiomeCollection> _csvBiomeList;
+        private List<Databox> _csvDataboxList;
+        private List<LogicEntity> _csvRecipeList;
         private readonly ILogHandler _log;
         internal static string s_recipeCSVMD5;
 
@@ -561,7 +561,7 @@ namespace SubnauticaRandomiser
         /// <returns>The absolute path.</returns>
         private static string GetDataPath(string fileName)
         {
-            string dataFolder = Path.Combine(InitMod.s_modDirectory, "DataFiles");
+            string dataFolder = Path.Combine(InitMod._ModDirectory, "DataFiles");
             return Path.Combine(dataFolder, fileName);
         }
 

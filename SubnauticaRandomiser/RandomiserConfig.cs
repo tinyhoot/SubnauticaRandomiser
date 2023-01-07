@@ -6,7 +6,7 @@ using SubnauticaRandomiser.Interfaces;
 namespace SubnauticaRandomiser
 {
     [Menu("Randomiser")]
-    public class RandomiserConfig : ConfigFile
+    internal class RandomiserConfig : ConfigFile
     {
         private readonly ILogHandler _log;
         private DateTime _lastButtonPress;

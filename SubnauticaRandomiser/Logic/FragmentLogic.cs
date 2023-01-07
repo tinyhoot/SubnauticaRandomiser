@@ -18,10 +18,10 @@ namespace SubnauticaRandomiser.Logic
         private readonly CoreLogic _logic;
         
         private static Dictionary<TechType, List<string>> _classIdDatabase;
-        private RandomiserConfig _config => _logic._config;
-        private ILogHandler _log => _logic._log;
-        private EntitySerializer _masterDict => _logic._masterDict;
-        private IRandomHandler _random => _logic._random;
+        private RandomiserConfig _config => _logic._Config;
+        private ILogHandler _log => _logic._Log;
+        private EntitySerializer _masterDict => _logic._Serializer;
+        private IRandomHandler _random => _logic._Random;
         private readonly List<Biome> _allBiomes;
         private readonly List<Biome> _availableBiomes;
         private static readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
@@ -284,9 +284,9 @@ namespace SubnauticaRandomiser.Logic
         internal void CreateDuplicateScanYieldDict()
         {
             _masterDict.FragmentMaterialYield = new Dictionary<TechType, float>();
-            var materials = _logic._materials.GetAllRawMaterials(50);
+            var materials = _logic._Materials.GetAllRawMaterials(50);
             // Gaining seeds from fragments is not great for balance. Remove that.
-            materials.Remove(_logic._materials.Find(TechType.CreepvineSeedCluster));
+            materials.Remove(_logic._Materials.Find(TechType.CreepvineSeedCluster));
 
             foreach (LogicEntity entity in materials)
             {
@@ -391,9 +391,9 @@ namespace SubnauticaRandomiser.Logic
         {
             // Find the recipe that needs the given fragment as a prerequisite, i.e. the recipe that is unlocked
             // by the fragment.
-            LogicEntity recipe = _logic._materials.GetAll()
+            LogicEntity recipe = _logic._Materials.GetAll()
                 .Find(e => e.Blueprint?.Fragments?.Contains(entity.TechType) ?? false);
-            if (recipe is null || !_logic._tree.IsProgressionItem(recipe)
+            if (recipe is null || !_logic._Tree.IsProgressionItem(recipe)
                                || unlockedProgressionItems.ContainsKey(recipe.TechType))
                 return false;
 

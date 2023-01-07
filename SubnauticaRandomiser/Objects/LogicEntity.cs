@@ -90,7 +90,7 @@ namespace SubnauticaRandomiser.Objects
 
             foreach (TechType condition in Blueprint.UnlockConditions ?? Enumerable.Empty<TechType>())
             {
-                LogicEntity conditionEntity = logic._materials.Find(condition);
+                LogicEntity conditionEntity = logic._Materials.Find(condition);
                 if (conditionEntity is null)
                     continue;
 
@@ -98,24 +98,24 @@ namespace SubnauticaRandomiser.Objects
                 // fruitlessly searches for a bladderfish which never enters its algorithm.
                 // Eggs and seeds are never problematic in vanilla, but are covered in case users add their own
                 // modded items with those.
-                if ((!logic._config.bUseFish && conditionEntity.Category.Equals(ETechTypeCategory.Fish))
-                    || (!logic._config.bUseEggs && conditionEntity.Category.Equals(ETechTypeCategory.Eggs))
-                    || (!logic._config.bUseSeeds && conditionEntity.Category.Equals(ETechTypeCategory.Seeds)))
+                if ((!logic._Config.bUseFish && conditionEntity.Category.Equals(ETechTypeCategory.Fish))
+                    || (!logic._Config.bUseEggs && conditionEntity.Category.Equals(ETechTypeCategory.Eggs))
+                    || (!logic._Config.bUseSeeds && conditionEntity.Category.Equals(ETechTypeCategory.Seeds)))
                     continue;
 
-                if (logic._masterDict.RecipeDict.ContainsKey(condition)
-                    || logic._materials.GetReachable().Exists(x => x.TechType.Equals(condition)))
+                if (logic._Serializer.RecipeDict.ContainsKey(condition)
+                    || logic._Materials.GetReachable().Exists(x => x.TechType.Equals(condition)))
                     continue;
                 
                 return false;
             }
 
             // Ensure that necessary fragments have already been randomised.
-            if (logic._config.bRandomiseFragments && Blueprint.Fragments?.Count > 0)
+            if (logic._Config.bRandomiseFragments && Blueprint.Fragments?.Count > 0)
             {
                 foreach (TechType fragment in Blueprint.Fragments)
                 {
-                    if (!logic._masterDict.SpawnDataDict.ContainsKey(fragment))
+                    if (!logic._Serializer.SpawnDataDict.ContainsKey(fragment))
                     {
                         //LogHandler.Debug($"[B] Entity {this} missing fragment {fragment.AsString()}");
                         return false;
@@ -136,13 +136,13 @@ namespace SubnauticaRandomiser.Objects
          public bool CheckPrerequisitesFulfilled(CoreLogic logic)
          {
              // The builder tool must always be randomised before any base pieces ever become accessible.
-             if (Category.IsBasePiece() && !logic._masterDict.RecipeDict.ContainsKey(TechType.Builder))
+             if (Category.IsBasePiece() && !logic._Serializer.RecipeDict.ContainsKey(TechType.Builder))
                  return false;
 
              if (Prerequisites is null || Prerequisites.Count == 0)
                  return true;
 
-             return Prerequisites.All(type => logic._masterDict.RecipeDict.ContainsKey(type));
+             return Prerequisites.All(type => logic._Serializer.RecipeDict.ContainsKey(type));
          }
 
         /// <summary>

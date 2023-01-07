@@ -278,7 +278,7 @@ namespace SubnauticaRandomiser.Objects
             lines.AddRange(_contentFragments);
             lines.AddRange(PrepareFragments());
 
-            using (StreamWriter file = new StreamWriter(Path.Combine(InitMod.s_modDirectory, _FileName)))
+            using (StreamWriter file = new StreamWriter(Path.Combine(InitMod._ModDirectory, _FileName)))
             {
                 await WriteTextToLog(file, lines.ToArray());
             }

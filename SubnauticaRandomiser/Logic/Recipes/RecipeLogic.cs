@@ -14,11 +14,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private readonly CoreLogic _logic;
         private readonly Mode _mode;
 
-        private RandomiserConfig _config => _logic._config;
-        private ILogHandler _log => _logic._log;
-        private EntitySerializer _masterDict => _logic._masterDict;
-        private Materials _materials => _logic._materials;
-        private ProgressionTree _tree => _logic._tree;
+        private RandomiserConfig _config => _logic._Config;
+        private ILogHandler _log => _logic._Log;
+        private EntitySerializer _masterDict => _logic._Serializer;
+        private Materials _materials => _logic._Materials;
+        private ProgressionTree _tree => _logic._Tree;
 
         public RecipeLogic(CoreLogic coreLogic)
         {
@@ -81,7 +81,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (_tree.DepthProgressionItems.ContainsKey(entity.TechType) && !unlockedProgressionItems.ContainsKey(entity.TechType))
             {
                 unlockedProgressionItems.Add(entity.TechType, true);
-                _logic._spoilerLog.AddProgressionEntry(entity.TechType, 0);
+                _logic._SpoilerLog.AddProgressionEntry(entity.TechType, 0);
 
                 _log.Debug($"[R][+] Added {entity} to progression items.");
             }
