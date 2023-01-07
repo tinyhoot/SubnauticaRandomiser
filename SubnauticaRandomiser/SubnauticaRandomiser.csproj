@@ -43,6 +43,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Interfaces\IRandomHandler.cs" />
     <Compile Include="Logic\AlternateStartLogic.cs" />
     <Compile Include="Logic\Recipes\BaseTheme.cs" />
+    <Compile Include="Logic\SpoilerLog.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
     <Compile Include="Patches\VanillaBugfixes.cs" />
     <Compile Include="Patches\FragmentPatcher.cs" />
@@ -70,7 +71,6 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Objects\Databox.cs" />
     <Compile Include="Objects\RandomiserVector.cs" />
     <Compile Include="Objects\ProgressionPath.cs" />
-    <Compile Include="Objects\SpoilerLog.cs" />
     <Compile Include="Logic\CoreLogic.cs" />
     <Compile Include="Logic\ProgressionTree.cs" />
     <Compile Include="Objects\LogicEntity.cs" />
