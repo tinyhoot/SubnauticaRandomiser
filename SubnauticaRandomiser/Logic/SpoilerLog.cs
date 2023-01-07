@@ -136,7 +136,7 @@ namespace SubnauticaRandomiser.Logic
         }
         
         /// <summary>
-        /// Grab the randomised boxes from masterDict, and sort them alphabetically.
+        /// Grab the randomised boxes from the serializer, and sort them alphabetically.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
         private string[] PrepareDataboxes()
@@ -155,7 +155,7 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Grab the randomise fragments from masterDict, and sort them alphabetically.
+        /// Grab the randomise fragments from the serializer, and sort them alphabetically.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
         private string[] PrepareFragments()

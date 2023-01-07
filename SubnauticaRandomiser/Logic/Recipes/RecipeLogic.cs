@@ -16,7 +16,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
         private RandomiserConfig _config => _logic._Config;
         private ILogHandler _log => _logic._Log;
-        private EntitySerializer _masterDict => _logic._Serializer;
+        private EntitySerializer _serializer => _logic._Serializer;
         private Materials _materials => _logic._Materials;
         private ProgressionTree _tree => _logic._Tree;
 
@@ -98,16 +98,16 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="depth">The maximum depth to consider.</param>
         internal void UpdateReachableMaterials(int depth)
         {
-            if (_masterDict.ContainsKnife())
+            if (_serializer.ContainsKnife())
                 _materials.AddReachable(ETechTypeCategory.RawMaterials, depth);
             else
                 _materials.AddReachableWithPrereqs(ETechTypeCategory.RawMaterials, depth, TechType.Knife, true);
 
             if (_config.bUseFish)
                 _materials.AddReachable(ETechTypeCategory.Fish, depth);
-            if (_config.bUseSeeds && _masterDict.ContainsKnife())
+            if (_config.bUseSeeds && _serializer.ContainsKnife())
                 _materials.AddReachable(ETechTypeCategory.Seeds, depth);
-            if (_config.bUseEggs && _masterDict.RecipeDict.ContainsKey(TechType.BaseWaterPark))
+            if (_config.bUseEggs && _serializer.RecipeDict.ContainsKey(TechType.BaseWaterPark))
                 _materials.AddReachable(ETechTypeCategory.Eggs, depth);
         }
 
@@ -117,20 +117,20 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="recipe">The recipe to change.</param>
         internal void ApplyRandomisedRecipe(Recipe recipe)
         {
-            _masterDict.AddRecipe(recipe.TechType, recipe);
+            _serializer.AddRecipe(recipe.TechType, recipe);
         }
 
         /// <summary>
         /// Apply all recipe changes stored in the masterDict to the game.
         /// </summary>
-        /// <param name="masterDict">The master dictionary.</param>
-        internal static void ApplyMasterDict(EntitySerializer masterDict)
+        /// <param name="serializer">The master dictionary.</param>
+        internal static void ApplyMasterDict(EntitySerializer serializer)
         {
-            Dictionary<TechType, Recipe>.KeyCollection keys = masterDict.RecipeDict.Keys;
+            Dictionary<TechType, Recipe>.KeyCollection keys = serializer.RecipeDict.Keys;
 
             foreach (TechType key in keys)
             {
-                CraftDataHandler.SetTechData(key, masterDict.RecipeDict[key]);
+                CraftDataHandler.SetTechData(key, serializer.RecipeDict[key]);
             }
 
             // TODO Once scrap metal is working, un-commenting this will apply the change on every startup.

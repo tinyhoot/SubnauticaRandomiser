@@ -20,7 +20,7 @@ namespace SubnauticaRandomiser.Logic
         private static Dictionary<TechType, List<string>> _classIdDatabase;
         private RandomiserConfig _config => _logic._Config;
         private ILogHandler _log => _logic._Log;
-        private EntitySerializer _masterDict => _logic._Serializer;
+        private EntitySerializer _serializer => _logic._Serializer;
         private IRandomHandler _random => _logic._Random;
         private readonly List<Biome> _allBiomes;
         private readonly List<Biome> _availableBiomes;
@@ -245,7 +245,7 @@ namespace SubnauticaRandomiser.Logic
             
             int numFragments = _random.Next(_config.iMinFragmentsToUnlock, _config.iMaxFragmentsToUnlock + 1);
             _log.Debug($"[F] New number of fragments required for {entity}: {numFragments}");
-            _masterDict.AddFragmentUnlockNum(entity.TechType, numFragments);
+            _serializer.AddFragmentUnlockNum(entity.TechType, numFragments);
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         internal void CreateDuplicateScanYieldDict()
         {
-            _masterDict.FragmentMaterialYield = new Dictionary<TechType, float>();
+            _serializer.FragmentMaterialYield = new Dictionary<TechType, float>();
             var materials = _logic._Materials.GetAllRawMaterials(50);
             // Gaining seeds from fragments is not great for balance. Remove that.
             materials.Remove(_logic._Materials.Find(TechType.CreepvineSeedCluster));
@@ -292,7 +292,7 @@ namespace SubnauticaRandomiser.Logic
             {
                 // Two random calls will tend to produce less extreme and more evenly distributed values.
                 double weight = _random.NextDouble() + _random.NextDouble();
-                _masterDict.AddDuplicateFragmentMaterial(entity.TechType, (float)weight);
+                _serializer.AddDuplicateFragmentMaterial(entity.TechType, (float)weight);
             }
         }
         
@@ -441,24 +441,24 @@ namespace SubnauticaRandomiser.Logic
         /// Re-apply spawnList from a saved game. This will fail to catch all existing fragment spawns if called in a
         /// previously randomised game.
         /// </summary>
-        internal static void ApplyMasterDict(EntitySerializer masterDict)
+        internal static void ApplyMasterDict(EntitySerializer serializer)
         {
-            if (masterDict.SpawnDataDict?.Count > 0)
+            if (serializer.SpawnDataDict?.Count > 0)
             {
                 Init();
                             
-                foreach (TechType key in masterDict.SpawnDataDict.Keys)
+                foreach (TechType key in serializer.SpawnDataDict.Keys)
                 {
-                    foreach (SpawnData spawnData in masterDict.SpawnDataDict[key])
+                    foreach (SpawnData spawnData in serializer.SpawnDataDict[key])
                     {
                         LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
                     }
                 }
             }
             
-            foreach (TechType key in masterDict.NumFragmentsToUnlock.Keys)
+            foreach (TechType key in serializer.NumFragmentsToUnlock.Keys)
             {
-                PDAHandler.EditFragmentsToScan(key, masterDict.NumFragmentsToUnlock[key]);
+                PDAHandler.EditFragmentsToScan(key, serializer.NumFragmentsToUnlock[key]);
             }
         }
         
@@ -470,7 +470,7 @@ namespace SubnauticaRandomiser.Logic
         internal void ApplyRandomisedFragment(LogicEntity entity, List<SpawnData> spawnList)
         {
             entity.SpawnData = spawnList;
-            _masterDict.AddSpawnData(entity.TechType, spawnList);
+            _serializer.AddSpawnData(entity.TechType, spawnList);
         }
 
         /// <summary>

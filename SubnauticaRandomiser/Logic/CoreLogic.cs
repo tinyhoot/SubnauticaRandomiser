@@ -363,14 +363,14 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Check wether any of the given TechTypes have already been randomised.
         /// </summary>
-        /// <param name="masterDict">The master dictionary.</param>
+        /// <param name="serializer">The master dictionary.</param>
         /// <param name="types">The TechTypes.</param>
         /// <returns>True if any TechType in the array has been randomised, false otherwise.</returns>
-        public bool ContainsAny(EntitySerializer masterDict, TechType[] types)
+        public bool ContainsAny(EntitySerializer serializer, TechType[] types)
         {
             foreach (TechType type in types)
             {
-                if (masterDict.RecipeDict.ContainsKey(type))
+                if (serializer.RecipeDict.ContainsKey(type))
                     return true;
             }
             return false;

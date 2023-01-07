@@ -122,7 +122,7 @@ namespace SubnauticaRandomiser
         private static void ApplyAllChanges()
         {
             if (_Serializer is null)
-                throw new InvalidDataException("Cannot apply randomisation changes: MasterDict is null!");
+                throw new InvalidDataException("Cannot apply randomisation changes: Serializer is null!");
             
             // Load recipe changes.
             if (_Serializer.RecipeDict?.Count > 0)
