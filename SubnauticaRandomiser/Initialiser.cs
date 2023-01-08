@@ -167,6 +167,8 @@ namespace SubnauticaRandomiser
             
             // Alternate starting location.
             harmony.PatchAll(typeof(AlternateStart));
+            
+            harmony.PatchAll(typeof(AuroraPatcher));
 
             // Swapping databoxes.
             if (_Serializer?.Databoxes?.Count > 0)
