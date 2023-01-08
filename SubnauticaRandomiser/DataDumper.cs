@@ -66,6 +66,15 @@ namespace SubnauticaRandomiser
             }
         }
 
+        public static void LogPDAEncyclopedia()
+        {
+            foreach (var kvpair in PDAEncyclopedia.mapping)
+            {
+                Initialiser._Log.Debug($"Key: {kvpair.Key}, Path: {kvpair.Value.path}");
+                Initialiser._Log.Debug(Language.main.Get("EncyDesc_" + kvpair.Key));
+            }
+        }
+
         public static void LogPrefabs()
         {
             // Cache the ids, otherwise this logs nothing.
