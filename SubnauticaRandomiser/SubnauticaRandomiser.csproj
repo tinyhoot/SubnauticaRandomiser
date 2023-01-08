@@ -47,6 +47,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Logic\SpoilerLog.cs" />
     <Compile Include="Patches\AuroraPatcher.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
+    <Compile Include="Patches\LanguagePatcher.cs" />
     <Compile Include="Patches\VanillaBugfixes.cs" />
     <Compile Include="Patches\FragmentPatcher.cs" />
     <Compile Include="Initialiser.cs" />

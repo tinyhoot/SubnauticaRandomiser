@@ -170,7 +170,10 @@ namespace SubnauticaRandomiser
             
             // Patching key codes.
             if (_Serializer?.DoorKeyCodes?.Count > 0)
+            {
                 harmony.PatchAll(typeof(AuroraPatcher));
+                harmony.PatchAll(typeof(LanguagePatcher));
+            }
 
             // Swapping databoxes.
             if (_Serializer?.Databoxes?.Count > 0)
