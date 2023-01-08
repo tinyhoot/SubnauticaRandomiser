@@ -33,6 +33,7 @@ namespace SubnauticaRandomiser.Logic
             foreach (string classId in keypadPrefabClassIds)
             {
                 int code = _random.Next(0, 9999);
+                _log.Debug($"[AR] Assigning accessCode {code} to {classId}");
                 keyCodes.Add(classId, code.ToString().PadLeft(4, '0'));
             }
 

@@ -59,7 +59,8 @@ namespace SubnauticaRandomiser.Logic
             // Init the progression tree.
             _Tree.SetupVanillaTree();
             _altStartLogic?.Randomise(_Serializer);
-            _auroraLogic.RandomiseDoorCodes();
+            if (_Config.bRandomiseDoorCodes)
+                _auroraLogic.RandomiseDoorCodes();
 
             if (_databoxLogic != null)
             {

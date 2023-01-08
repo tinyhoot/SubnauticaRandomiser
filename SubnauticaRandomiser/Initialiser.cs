@@ -168,7 +168,9 @@ namespace SubnauticaRandomiser
             // Alternate starting location.
             harmony.PatchAll(typeof(AlternateStart));
             
-            harmony.PatchAll(typeof(AuroraPatcher));
+            // Patching key codes.
+            if (_Serializer?.DoorKeyCodes?.Count > 0)
+                harmony.PatchAll(typeof(AuroraPatcher));
 
             // Swapping databoxes.
             if (_Serializer?.Databoxes?.Count > 0)

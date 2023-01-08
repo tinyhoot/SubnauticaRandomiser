@@ -140,6 +140,12 @@ namespace SubnauticaRandomiser
         [Slider("Max ingredient types per recipe", 1, 10, DefaultValue = 7,
             Tooltip = "Recipes cannot require more than this many different ingredients.")]
         public int iMaxIngredientsPerRecipe = (int)ConfigDefaults.GetDefault("iMaxIngredientsPerRecipe");
+        
+        [Toggle("------------------------------------------------------------------------------------------")]
+        public bool visualDivider4 = true;
+
+        [Toggle("Randomise Aurora door codes?")]
+        public bool bRandomiseDoorCodes = (bool)ConfigDefaults.GetDefault("bRandomiseDoorCodes");
 
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
         public int iDepthSearchTime = (int)ConfigDefaults.GetDefault("iDepthSearchTime");
