@@ -1,3 +1,4 @@
+using System;
 using HarmonyLib;
 
 namespace SubnauticaRandomiser.Patches
@@ -22,6 +23,20 @@ namespace SubnauticaRandomiser.Patches
             }
 
             __instance.accessCode = Initialiser._Serializer.DoorKeyCodes[id.classId];
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HandTarget), nameof(HandTarget.Awake))]
+        public static void ChangeSupplyBoxContents(ref HandTarget __instance)
+        {
+            if (__instance.GetType() != typeof(SupplyCrate))
+                return;
+            
+            RandomHandler rand = new RandomHandler();
+            TechType content = rand.Choice(Initialiser._Serializer.SupplyBoxContents);
+            // It is not enough to change a techtype, the box must load and spawn the correct prefab for its contents.
+            PrefabPlaceholdersGroup group = __instance.gameObject.EnsureComponent<PrefabPlaceholdersGroup>();
+            group.prefabPlaceholders[0].prefabClassId = CraftData.GetClassIdForTechType(content);
         }
     }
 }

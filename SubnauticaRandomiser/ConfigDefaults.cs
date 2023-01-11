@@ -32,6 +32,7 @@ namespace SubnauticaRandomiser
             { "iMaxBiomesPerFragment", new[] { 5, 3, 10 } },
             { "iMaxFragmentsToUnlock", new[] { 5, 1, 30 } },
             { "bRandomiseDoorCodes", new[] { true, true, true } },
+            { "bRandomiseSupplyBoxes", new[] { true, true, true } },
 
             // Advanced settings start here.
             { "iDepthSearchTime", new[] { 15, 0, 45 } },

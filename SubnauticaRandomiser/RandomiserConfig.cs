@@ -146,6 +146,9 @@ namespace SubnauticaRandomiser
 
         [Toggle("Randomise Aurora door codes?")]
         public bool bRandomiseDoorCodes = (bool)ConfigDefaults.GetDefault("bRandomiseDoorCodes");
+        
+        [Toggle("Randomise supply box contents?")]
+        public bool bRandomiseSupplyBoxes = (bool)ConfigDefaults.GetDefault("bRandomiseSupplyBoxes");
 
         public string ADVANCED_SETTINGS_BELOW_THIS_POINT = "ADVANCED_SETTINGS_BELOW_THIS_POINT";
         public int iDepthSearchTime = (int)ConfigDefaults.GetDefault("iDepthSearchTime");

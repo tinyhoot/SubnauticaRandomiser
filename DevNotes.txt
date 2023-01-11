@@ -61,8 +61,6 @@ Other:
 
 - ensure easy radiation suit
 - for priority items, first force their prerequisites.
-- aurora: randomise door codes
-- randomise supply box contents
 
 
 UNITTEST REFACTOR:

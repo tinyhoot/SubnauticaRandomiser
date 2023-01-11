@@ -61,6 +61,8 @@ namespace SubnauticaRandomiser.Logic
             _altStartLogic?.Randomise(_Serializer);
             if (_Config.bRandomiseDoorCodes)
                 _auroraLogic.RandomiseDoorCodes();
+            if (_Config.bRandomiseSupplyBoxes)
+                _auroraLogic.RandomiseSupplyBoxes();
 
             if (_databoxLogic != null)
             {

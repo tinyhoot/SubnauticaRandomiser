@@ -41,6 +41,8 @@ namespace SubnauticaRandomiser
         public Dictionary<TechType, Recipe> RecipeDict;
         // All modified fragment spawn rates.
         public Dictionary<TechType, List<SpawnData>> SpawnDataDict;
+        // All possible supply box contents.
+        public List<TechType> SupplyBoxContents;
 
         public const int SaveVersion = Initialiser._ExpectedSaveVersion;
         [NonSerialized]

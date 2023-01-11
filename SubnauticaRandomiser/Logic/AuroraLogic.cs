@@ -41,5 +41,30 @@ namespace SubnauticaRandomiser.Logic
 
             _serializer.DoorKeyCodes = keyCodes;
         }
+
+        /// <summary>
+        /// Prepare a new list of possible contents for supply boxes.
+        /// TODO: Do not use a hardcoded list, instead dynamically choose things from available recipes at X depth.
+        /// </summary>
+        public void RandomiseSupplyBoxes()
+        {
+            List<TechType> options = new List<TechType>
+            {
+                TechType.Battery,
+                TechType.PowerCell,
+                TechType.Bleach,
+                TechType.Glass,
+                TechType.Lubricant,
+                TechType.TitaniumIngot,
+                TechType.FireExtinguisher,
+                TechType.FirstAidKit,
+                TechType.Pipe,
+                TechType.PipeSurfaceFloater,
+                TechType.NutrientBlock,
+                TechType.DisinfectedWater,
+                TechType.FilteredWater
+            };
+            _serializer.SupplyBoxContents = options;
+        }
     }
 }
