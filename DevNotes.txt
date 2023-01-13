@@ -59,11 +59,8 @@ Other:
   poop and shale into something useful on the fly, or make shale always contain
   something useful in the first place.
 
-- display some kind of warning at the beginning if you're inside the explosion radius?
 - ensure easy radiation suit
 - for priority items, first force their prerequisites.
-- aurora: randomise door codes
-- randomise supply box contents
 
 
 UNITTEST REFACTOR:

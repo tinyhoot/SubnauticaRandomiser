@@ -16,6 +16,7 @@ namespace SubnauticaRandomiser
 #if DEBUG
             DevConsole.RegisterConsoleCommand(this, "dumpBiomes");
             DevConsole.RegisterConsoleCommand(this, "dumpKnownTech");
+            DevConsole.RegisterConsoleCommand(this, "dumpEncyclopedia");
             DevConsole.RegisterConsoleCommand(this, "dumpPrefabs");
 #endif
         }
@@ -24,6 +25,17 @@ namespace SubnauticaRandomiser
         {
             Initialiser._Log.InGameMessage("Dumping biomes");
             DataDumper.LogBiomes();
+        }
+
+        private void OnConsoleCommand_dumpEncyclopedia(NotificationCenter.Notification n)
+        {
+            if (!PDAEncyclopedia.initialized)
+            {
+                Initialiser._Log.InGameMessage("PDA Encyclopedia is not yet initialised, please wait.");
+                return;
+            }
+            Initialiser._Log.InGameMessage("Dumping PDA Encyclopedia");
+            DataDumper.LogPDAEncyclopedia();
         }
         
         private void OnConsoleCommand_dumpKnownTech(NotificationCenter.Notification n)

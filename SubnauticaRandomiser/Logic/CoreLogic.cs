@@ -23,6 +23,7 @@ namespace SubnauticaRandomiser.Logic
         internal readonly ProgressionTree _Tree;
 
         private readonly AlternateStartLogic _altStartLogic;
+        private readonly AuroraLogic _auroraLogic;
         private readonly DataboxLogic _databoxLogic;
         internal readonly FragmentLogic _fragmentLogic;
         private readonly RecipeLogic _recipeLogic;
@@ -33,13 +34,14 @@ namespace SubnauticaRandomiser.Logic
         {
             _Config = config;
             _Log = logger;
-            _Serializer = new EntitySerializer();
+            _Serializer = new EntitySerializer(logger);
             _Materials = new Materials(allMaterials, logger);
             _Random = random;
             _SpoilerLog = new SpoilerLog(config, logger, _Serializer);
             
             if (!_Config.sSpawnPoint.StartsWith("Vanilla"))
                 _altStartLogic = new AlternateStartLogic(alternateStarts, config, logger, random);
+            _auroraLogic = new AuroraLogic(this);
             if (_Config.bRandomiseDataboxes)
                 _databoxLogic = new DataboxLogic(this, databoxes);
             if (_Config.bRandomiseFragments || _Config.bRandomiseNumFragments || _Config.bRandomiseDuplicateScans)
@@ -57,6 +59,10 @@ namespace SubnauticaRandomiser.Logic
             // Init the progression tree.
             _Tree.SetupVanillaTree();
             _altStartLogic?.Randomise(_Serializer);
+            if (_Config.bRandomiseDoorCodes)
+                _auroraLogic.RandomiseDoorCodes();
+            if (_Config.bRandomiseSupplyBoxes)
+                _auroraLogic.RandomiseSupplyBoxes();
 
             if (_databoxLogic != null)
             {
