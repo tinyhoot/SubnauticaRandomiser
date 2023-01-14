@@ -9,7 +9,8 @@ namespace SubnauticaRandomiser.Interfaces
         /// Randomise anything which does not require use of the main loop. This method is called before the main loop
         /// is run.
         /// </summary>
-        public void Randomise();
+        /// <param name="serializer">The serialisation instance used for this seed.</param>
+        public void Randomise(EntitySerializer serializer);
         
         /// <summary>
         /// Randomise the given entity. The implementing class will only receive entities of the type(s) for which it

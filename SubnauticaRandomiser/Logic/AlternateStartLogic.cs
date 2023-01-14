@@ -1,31 +1,50 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HarmonyLib;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Patches;
+using UnityEngine;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
-    internal class AlternateStartLogic
+    [RequireComponent(typeof(CoreLogic))]
+    internal class AlternateStartLogic : MonoBehaviour, ILogicModule
     {
-        private readonly Dictionary<EBiomeType, List<float[]>> _alternateStarts;
-        private readonly RandomiserConfig _config;
-        private readonly ILogHandler _log;
-        private readonly IRandomHandler _random;
+        private Dictionary<EBiomeType, List<float[]>> _alternateStarts;
+        private RandomiserConfig _config;
+        private ILogHandler _log;
+        private IRandomHandler _random;
+        private CoreLogic _coreLogic;
 
-        public AlternateStartLogic(Dictionary<EBiomeType, List<float[]>> alternateStarts, RandomiserConfig config,
-            ILogHandler log, IRandomHandler random)
+        public void Awake()
         {
-            _alternateStarts = alternateStarts;
-            _config = config;
-            _log = log;
-            _random = random;
+            _coreLogic = GetComponent<CoreLogic>();
+            _config = _coreLogic._Config;
+            _log = _coreLogic._Log;
+            _random = _coreLogic._Random;
+            
+            // Parse the list of valid alternate starts from a file.
+            // TODO: StartCoroutine();
+            xx
         }
 
         public void Randomise(EntitySerializer serializer)
         {
             serializer.StartPoint = GetRandomStart(_config.sSpawnPoint);
+        }
+
+        public LogicEntity RandomiseEntity(LogicEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetupHarmonyPatches(Harmony harmony)
+        {
+            harmony.PatchAll(typeof(AlternateStart));
         }
 
         /// <summary>
