@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SubnauticaRandomiser.Logic;
-using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Objects
@@ -15,6 +12,7 @@ namespace SubnauticaRandomiser.Objects
     /// </summary>
     internal class LogicEntity
     {
+        public readonly EntityType Type;
         public readonly TechType TechType;
         public readonly ETechTypeCategory Category;
         public Blueprint Blueprint;             // For making it show up in the PDA
@@ -33,10 +31,11 @@ namespace SubnauticaRandomiser.Objects
         public bool HasSpawnData => !(SpawnData is null);
         public bool IsFragment => Category.Equals(ETechTypeCategory.Fragments);
 
-        public LogicEntity(TechType type, ETechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null,
+        public LogicEntity(EntityType type, TechType techType, ETechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null,
             List<SpawnData> spawnData = null, List<TechType> prerequisites = null, bool inLogic = false, int value = 0)
         {
-            TechType = type;
+            Type = type;
+            TechType = techType;
             Category = category;
             Blueprint = blueprint;
             Recipe = recipe;

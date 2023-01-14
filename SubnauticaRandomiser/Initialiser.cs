@@ -6,13 +6,14 @@ using System.Runtime.CompilerServices;
 using BepInEx;
 using HarmonyLib;
 using SMLHelper.V2.Handlers;
-using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Exceptions;
+using UnityEngine;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 [assembly:InternalsVisibleTo("Tests")]
 namespace SubnauticaRandomiser
@@ -46,6 +47,7 @@ namespace SubnauticaRandomiser
         // Everything the mod every modifies is stored in here.
         internal static EntitySerializer _Serializer;
         internal static ILogHandler _Log;
+        internal static GameObject _Logic;
 
         private void Awake()
         {
@@ -271,6 +273,14 @@ namespace SubnauticaRandomiser
             {
                 _Log.Error("Could not save game state to disk: invalid data.");
             }
+        }
+
+        private void SetupGameObject()
+        {
+            // Instantiating this automatically starts running the Awake() methods of all components.
+            _Logic = new GameObject("Randomiser Logic", typeof(CoreLogic));
+            // Set this plugin (or BepInEx) as the parent of the logic GameObject.
+            _Logic.transform.parent = transform;
         }
 
         /// <summary>

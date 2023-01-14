@@ -6,19 +6,21 @@ using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
+using UnityEngine;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
     /// Acts as the core for handling all randomising logic in the mod, and turning modules on/off as needed.
     /// </summary>
-    internal class CoreLogic
+    internal class CoreLogic : MonoBehaviour
     {
-        internal readonly RandomiserConfig _Config;
-        internal readonly ILogHandler _Log;
-        internal readonly EntitySerializer _Serializer;
+        internal RandomiserConfig _Config { get; private set; }
+        internal ILogHandler _Log { get; private set; }
+        internal EntitySerializer _Serializer { get; private set; }
         internal readonly Materials _Materials;
-        internal readonly IRandomHandler _Random;
+        internal IRandomHandler _Random { get; private set; }
         internal readonly SpoilerLog _SpoilerLog;
         internal readonly ProgressionTree _Tree;
 
@@ -26,7 +28,44 @@ namespace SubnauticaRandomiser.Logic
         private readonly AuroraLogic _auroraLogic;
         private readonly DataboxLogic _databoxLogic;
         internal readonly FragmentLogic _fragmentLogic;
-        private readonly RecipeLogic _recipeLogic;
+        private RecipeLogic _recipeLogic;
+
+        private Dictionary<EntityType, ILogicModule> _entityHandlers;
+        
+        /// <summary>
+        /// Invoked during the setup stage, before the main loop begins.
+        /// </summary>
+        public event EventHandler OnSetup;
+        
+        /// <summary>
+        /// Invoked once the next entity to be randomised has been determined.
+        /// </summary>
+        public event EventHandler OnEntityChosen;
+
+        /// <summary>
+        /// Invoked whenever an entity has been successfully randomised and added to the logic.
+        /// </summary>
+        public event EventHandler OnEntityRandomised;
+
+        /// <summary>
+        /// Invoked once the main loop has successfully completed.
+        /// </summary>
+        public event EventHandler OnMainLoopComplete;
+        
+        public void Awake()
+        {
+            _entityHandlers = new Dictionary<EntityType, ILogicModule>();
+            
+            _Config = Initialiser._Config;
+            _Log = Initialiser._Log;
+            _Serializer = new EntitySerializer(_Log);
+            _Random = new RandomHandler(_Config.iSeed);
+        }
+
+        public void Start()
+        {
+            
+        }
 
         public CoreLogic(IRandomHandler random, RandomiserConfig config, ILogHandler logger, List<LogicEntity> allMaterials,
             Dictionary<EBiomeType, List<float[]>> alternateStarts, List<BiomeCollection> biomes = null,
@@ -366,20 +405,22 @@ namespace SubnauticaRandomiser.Logic
             return allItemsPresent;
         }
 
-        /// <summary>
-        /// Check wether any of the given TechTypes have already been randomised.
-        /// </summary>
-        /// <param name="serializer">The master dictionary.</param>
-        /// <param name="types">The TechTypes.</param>
-        /// <returns>True if any TechType in the array has been randomised, false otherwise.</returns>
-        public bool ContainsAny(EntitySerializer serializer, TechType[] types)
+        public void RegisterEntityHandler(EntityType type, ILogicModule module)
         {
-            foreach (TechType type in types)
-            {
-                if (serializer.RecipeDict.ContainsKey(type))
-                    return true;
-            }
-            return false;
+            if (_entityHandlers.ContainsKey(type))
+                throw new ArgumentException($"A handler for entity type '{type}' already exists: "
+                                            + $"{_entityHandlers[type].GetType()}");
+            
+            _entityHandlers.Add(type, module);
+        }
+
+        /// <summary>
+        /// Register a component module for use with the randomiser.
+        /// </summary>
+        /// <returns>The instantiated component.</returns>
+        public T RegisterModule<T>() where T : MonoBehaviour, ILogicModule
+        {
+            return gameObject.EnsureComponent<T>();
         }
     }
 }
