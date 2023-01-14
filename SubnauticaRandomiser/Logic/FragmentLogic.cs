@@ -2,28 +2,36 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using HarmonyLib;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Objects.Events;
 using SubnauticaRandomiser.Objects.Exceptions;
+using SubnauticaRandomiser.Patches;
+using UnityEngine;
 using static LootDistributionData;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
     /// Handles everything related to randomising fragments.
     /// </summary>
-    internal class FragmentLogic
+    [RequireComponent(typeof(CoreLogic))]
+    internal class FragmentLogic : MonoBehaviour, ILogicModule
     {
-        private readonly CoreLogic _logic;
+        private CoreLogic _coreLogic;
+        private RandomiserConfig _config;
+        private ILogHandler _log;
+        private EntitySerializer _serializer;
+        private IRandomHandler _random;
         
         private static Dictionary<TechType, List<string>> _classIdDatabase;
-        private RandomiserConfig _config => _logic._Config;
-        private ILogHandler _log => _logic._Log;
-        private EntitySerializer _serializer => _logic._Serializer;
-        private IRandomHandler _random => _logic._Random;
-        private readonly List<Biome> _allBiomes;
-        private readonly List<Biome> _availableBiomes;
+        private List<Biome> _allBiomes;
+        private List<Biome> _availableBiomes;
         private static readonly Dictionary<string, TechType> _fragmentDataPaths = new Dictionary<string, TechType>
         {
             { "BaseBioReactor_Fragment", TechType.BaseBioReactorFragment },
@@ -60,38 +68,48 @@ namespace SubnauticaRandomiser.Logic
             { "Workbench_Fragment", TechType.WorkbenchFragment }
         };
 
-        /// <summary>
-        /// Handle the logic for everything related to fragments.
-        /// </summary>
-        internal FragmentLogic(CoreLogic coreLogic, List<BiomeCollection> biomeList)
+        public void Awake()
         {
-            _logic = coreLogic;
+            _coreLogic = GetComponent<CoreLogic>();
+            _config = _coreLogic._Config;
+            _log = _coreLogic._Log;
+            _random = _coreLogic._Random;
+            _serializer = _coreLogic._Serializer;
             
-            _allBiomes = GetAvailableFragmentBiomes(biomeList);
-            _availableBiomes = GetAvailableFragmentBiomes(biomeList).Where(x => !x.Name.ToLower().Contains("barrier")).ToList();
+            if (_config.bRandomiseFragments)
+            {
+                // Handle any fragment entities using this component.
+                _coreLogic.OnCollectRandomisableEntities += OnCollectRandomisableEntities;
+                _coreLogic.RegisterEntityHandler(EntityType.Fragment, this);
+                // Reset all existing fragment spawns.
+                Init();
+            }
+            
+            ParseDataFileAsync().Start();
         }
-        
-        /// <summary>
-        /// Randomise the spawn points for a given fragment.
-        /// </summary>
-        /// <param name="entity">The fragment entity to randomise.</param>
-        /// <param name="unlockedProgressionItems">The dictionary of already unlocked progression items.</param>
-        /// <param name="reachableDepth">The maximum depth to consider.</param>
-        /// <returns>True if the fragment was successfully randomised, false otherwise.</returns>
-        /// <exception cref="ArgumentException">Raised if the fragment name is invalid.</exception>
-        internal bool RandomiseFragment(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems, int reachableDepth)
+
+        public void Randomise(EntitySerializer serializer)
+        {
+            if (_config.bRandomiseNumFragments)
+                RandomiseNumFragments(_coreLogic._Materials.GetAllFragments());
+            // Randomise duplicate scan rewards.
+            if (_config.bRandomiseDuplicateScans)
+                CreateDuplicateScanYieldDict();
+        }
+
+        public LogicEntity RandomiseEntity(LogicEntity entity)
         {
             if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList))
                 throw new ArgumentException($"Failed to find fragment '{entity}' in classId database!");
             
             // Check whether the fragment fulfills its prerequisites.
-            if (entity.AccessibleDepth >= reachableDepth)
+            if (entity.AccessibleDepth >= _coreLogic.ReachableDepth)
             {
                 _log.Debug($"[F] --- Fragment [{entity}] did not fulfill requirements, skipping.");
-                return false;
+                return null;
             }
             
-            _log.Debug($"[F] Randomising fragment {entity} for depth {reachableDepth}");
+            _log.Debug($"[F] Randomising fragment {entity} for depth {_coreLogic.ReachableDepth}");
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
@@ -100,7 +118,7 @@ namespace SubnauticaRandomiser.Logic
             for (int i = 0; i < biomeCount; i++)
             {
                 // Choose a random biome.
-                Biome biome = ChooseBiome(spawnList, reachableDepth);
+                Biome biome = ChooseBiome(spawnList, _coreLogic.ReachableDepth);
                 
                 // Calculate spawn rate.
                 float spawnRate = CalcFragmentSpawnRate(biome);
@@ -127,90 +145,32 @@ namespace SubnauticaRandomiser.Logic
             }
             
             // If recipes are not randomised, handle unlocking depth progression items.
+            // TODO: Move to progression tracker
             if (!_config.bRandomiseRecipes)
                 UpdateProgressionItems(entity, unlockedProgressionItems);
 
             ApplyRandomisedFragment(entity, spawnList);
-            return true;
+            return entity;
+        }
+
+        public void SetupHarmonyPatches(Harmony harmony)
+        {
+            if (_coreLogic._Serializer?.FragmentMaterialYield?.Count > 0)
+                harmony.PatchAll(typeof(FragmentPatcher));
         }
 
         /// <summary>
-        /// Change the number of scans required to unlock the blueprint for all fragments.
+        /// Queue up all fragments to be randomised.
         /// </summary>
-        /// <param name="fragments">The list of fragments to change scan numbers for.</param>
-        internal void RandomiseNumFragments(List<LogicEntity> fragments)
+        private void OnCollectRandomisableEntities(object sender, CollectEntitiesEventArgs args)
         {
-            foreach (LogicEntity entity in fragments)
-            {
-                ChangeNumFragmentsToUnlock(entity);
-            }
-        }
-
-        /// <summary>
-        /// Go through all the BiomeData in the game and reset any fragment spawn rates to 0.0f, effectively "deleting"
-        /// them from the game until the randomiser has decided on a new distribution.
-        /// </summary>
-        internal static void ResetFragmentSpawns()
-        {
-            //_log.Debug("---Resetting vanilla fragment spawn rates---");
-
-            // For the rest of all the randomisation, we need TechTypes to classId.
-            // Unfortunately, for just this once, we need the opposite.
-            Dictionary<string, TechType> fragmentDatabase = ReverseClassIdDatabase();
-
-            // Grab a copy of all vanilla BiomeData. This loads it fresh from disk
-            // and will thus be unaffected by any existing randomisation.
-            LootDistributionData loot = LootDistributionData.Load(LootDistributionData.dataPath);
-
-            foreach (KeyValuePair<BiomeType, DstData> keyValuePair in loot.dstDistribution)
-            {
-                BiomeType biome = keyValuePair.Key;
-                DstData dstData = keyValuePair.Value;
-
-                foreach (PrefabData prefab in dstData.prefabs)
-                {
-                    // Ensure the prefab is actually a fragment.
-                    if (fragmentDatabase.ContainsKey(prefab.classId))
-                    {
-                        // Whatever spawn chance there was before, set it to 0.
-                        LootDistributionHandler.EditLootDistributionData(prefab.classId, biome, 0f, 0);
-                        //LogHandler.Debug("Reset spawn chance to 0 for " + fragmentDatabase[prefab.classId].AsString() + " in " + biome.AsString());
-                    }
-                }
-            }
-
-            //_log.Debug("---Completed resetting vanilla fragment spawn rates---");
-        }
-        
-        /// <summary>
-        /// Get all biomes that have fragment rate data, i.e. which contained fragments in vanilla.
-        /// TODO: Can be expanded to include non-vanilla ones.
-        /// </summary>
-        /// <param name="collections">A list of all biomes in the game.</param>
-        /// <returns>A list of Biomes with active fragment spawn rates.</returns>
-        private List<Biome> GetAvailableFragmentBiomes(List<BiomeCollection> collections)
-        {
-            List<Biome> biomes = new List<Biome>();
-
-            foreach (BiomeCollection col in collections)
-            {
-                if (!col.HasBiomes)
-                    continue;
-
-                foreach (Biome b in col.BiomeList)
-                {
-                    if (b.FragmentRate != null)
-                        biomes.Add(b);
-                }
-            }
-            _log.Debug("---Total biomes suitable for fragments: "+biomes.Count);
-            return biomes;
+            args.toBeRandomised.AddRange(_coreLogic._Materials.GetAllFragments());
         }
 
         /// <summary>
         /// Add all biomes that are locked behind needing a laser cutter to the list of available biomes.
         /// </summary>
-        internal void AddLaserCutterBiomes()
+        private void AddLaserCutterBiomes()
         {
             var additions = _allBiomes.Where(x => x.Name.ToLower().Contains("barrier"));
             _availableBiomes.AddRange(additions);
@@ -281,12 +241,12 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Set up the dictionary of possible rewards for scanning an already unlocked fragment.
         /// </summary>
-        internal void CreateDuplicateScanYieldDict()
+        private void CreateDuplicateScanYieldDict()
         {
             _serializer.FragmentMaterialYield = new Dictionary<TechType, float>();
-            var materials = _logic._Materials.GetAllRawMaterials(50);
+            var materials = _coreLogic._Materials.GetAllRawMaterials(50);
             // Gaining seeds from fragments is not great for balance. Remove that.
-            materials.Remove(_logic._Materials.Find(TechType.CreepvineSeedCluster));
+            materials.Remove(_coreLogic._Materials.Find(TechType.CreepvineSeedCluster));
 
             foreach (LogicEntity entity in materials)
             {
@@ -294,6 +254,14 @@ namespace SubnauticaRandomiser.Logic
                 double weight = _random.NextDouble() + _random.NextDouble();
                 _serializer.AddDuplicateFragmentMaterial(entity.TechType, (float)weight);
             }
+        }
+        
+        private async Task ParseDataFileAsync()
+        {
+            List<Biome> biomes = await CSVReader.ParseDataFileAsync(Initialiser._BiomeFile, CSVReader.ParseBiomeLine);
+            // Set up the lists of biomes.
+            _allBiomes = biomes.Where(b => b.FragmentRate != null).ToList();
+            _availableBiomes = _allBiomes.Where(b => !b.Name.ToLower().Contains("barrier")).ToList();
         }
         
         /// <summary>
@@ -326,10 +294,56 @@ namespace SubnauticaRandomiser.Logic
         }
         
         /// <summary>
+        /// Change the number of scans required to unlock the blueprint for all fragments.
+        /// </summary>
+        /// <param name="fragments">The list of fragments to change scan numbers for.</param>
+        private void RandomiseNumFragments(List<LogicEntity> fragments)
+        {
+            foreach (LogicEntity entity in fragments)
+            {
+                ChangeNumFragmentsToUnlock(entity);
+            }
+        }
+        
+        /// <summary>
+        /// Go through all the BiomeData in the game and reset any fragment spawn rates to 0.0f, effectively "deleting"
+        /// them from the game until the randomiser has decided on a new distribution.
+        /// </summary>
+        private static void ResetFragmentSpawns()
+        {
+            //_log.Debug("---Resetting vanilla fragment spawn rates---");
+
+            // For the rest of all the randomisation, we need TechTypes to classId.
+            // Unfortunately, for just this once, we need the opposite.
+            Dictionary<string, TechType> fragmentDatabase = ReverseClassIdDatabase();
+
+            // Grab a copy of all vanilla BiomeData. This loads it fresh from disk
+            // and will thus be unaffected by any existing randomisation.
+            LootDistributionData loot = LootDistributionData.Load(LootDistributionData.dataPath);
+
+            foreach (KeyValuePair<BiomeType, DstData> keyValuePair in loot.dstDistribution)
+            {
+                BiomeType biome = keyValuePair.Key;
+                DstData dstData = keyValuePair.Value;
+
+                foreach (PrefabData prefab in dstData.prefabs)
+                {
+                    // Ensure the prefab is actually a fragment.
+                    if (fragmentDatabase.ContainsKey(prefab.classId))
+                    {
+                        // Whatever spawn chance there was before, set it to 0.
+                        LootDistributionHandler.EditLootDistributionData(prefab.classId, biome, 0f, 0);
+                    }
+                }
+            }
+            //_log.Debug("---Completed resetting vanilla fragment spawn rates---");
+        }
+        
+        /// <summary>
         /// Reverse the classId dictionary to allow for ID to TechType matching.
         /// </summary>
         /// <returns>The inverted dictionary.</returns>
-        internal static Dictionary<string, TechType> ReverseClassIdDatabase()
+        private static Dictionary<string, TechType> ReverseClassIdDatabase()
         {
             Dictionary<string, TechType> database = new Dictionary<string, TechType>();
 
@@ -391,9 +405,9 @@ namespace SubnauticaRandomiser.Logic
         {
             // Find the recipe that needs the given fragment as a prerequisite, i.e. the recipe that is unlocked
             // by the fragment.
-            LogicEntity recipe = _logic._Materials.GetAll()
+            LogicEntity recipe = _coreLogic._Materials.GetAll()
                 .Find(e => e.Blueprint?.Fragments?.Contains(entity.TechType) ?? false);
-            if (recipe is null || !_logic._Tree.IsProgressionItem(recipe)
+            if (recipe is null || !_coreLogic._Tree.IsProgressionItem(recipe)
                                || unlockedProgressionItems.ContainsKey(recipe.TechType))
                 return false;
 

@@ -15,11 +15,12 @@ namespace SubnauticaRandomiser.Logic
     [RequireComponent(typeof(CoreLogic))]
     internal class AlternateStartLogic : MonoBehaviour, ILogicModule
     {
-        private Dictionary<EBiomeType, List<float[]>> _alternateStarts;
+        private CoreLogic _coreLogic;
         private RandomiserConfig _config;
         private ILogHandler _log;
         private IRandomHandler _random;
-        private CoreLogic _coreLogic;
+        
+        private Dictionary<EBiomeType, List<float[]>> _alternateStarts;
 
         public void Awake()
         {

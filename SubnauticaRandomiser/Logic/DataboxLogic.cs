@@ -15,8 +15,8 @@ namespace SubnauticaRandomiser.Logic
     [RequireComponent(typeof(CoreLogic))]
     internal class DataboxLogic : MonoBehaviour, ILogicModule
     {
-        private List<Databox> _databoxes;
         private CoreLogic _coreLogic;
+        private List<Databox> _databoxes;
         private ILogHandler _log;
         private IRandomHandler _random;
 

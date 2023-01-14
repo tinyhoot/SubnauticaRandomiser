@@ -6,6 +6,7 @@ using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Objects.Events;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
@@ -23,6 +24,8 @@ namespace SubnauticaRandomiser.Logic
         internal IRandomHandler _Random { get; private set; }
         internal readonly SpoilerLog _SpoilerLog;
         internal readonly ProgressionTree _Tree;
+        
+        public int ReachableDepth { get; private set; }
 
         private readonly AlternateStartLogic _altStartLogic;
         private readonly AuroraLogic _auroraLogic;
@@ -36,6 +39,11 @@ namespace SubnauticaRandomiser.Logic
         /// Invoked during the setup stage, before the main loop begins.
         /// </summary>
         public event EventHandler OnSetup;
+
+        /// <summary>
+        /// Invoked during the setup stage. Use this event to add LogicEntities to the main loop.
+        /// </summary>
+        public event EventHandler<CollectEntitiesEventArgs> OnCollectRandomisableEntities;
         
         /// <summary>
         /// Invoked once the next entity to be randomised has been determined.
