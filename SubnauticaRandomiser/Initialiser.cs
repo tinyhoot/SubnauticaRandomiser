@@ -9,9 +9,6 @@ using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Patches;
-using SubnauticaRandomiser.Objects;
-using SubnauticaRandomiser.Objects.Enums;
-using SubnauticaRandomiser.Objects.Exceptions;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
@@ -29,10 +26,10 @@ namespace SubnauticaRandomiser
         // Files and structure.
         internal static string _ModDirectory;
         internal static RandomiserConfig _Config;
-        private const string _AlternateStartFile = "alternateStarts.csv";
-        private const string _BiomeFile = "biomeSlots.csv";
-        private const string _RecipeFile = "recipeInformation.csv";
-        private const string _WreckageFile = "wreckInformation.csv";
+        public const string _AlternateStartFile = "alternateStarts.csv";
+        public const string _BiomeFile = "biomeSlots.csv";
+        public const string _RecipeFile = "recipeInformation.csv";
+        public const string _WreckageFile = "wreckInformation.csv";
         internal const string _ExpectedRecipeMD5 = "11cc2c8e44db4473c6e0d196b869d582";
         internal const int _ExpectedSaveVersion = 5;
         private static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
@@ -187,51 +184,6 @@ namespace SubnauticaRandomiser
 
             // Always apply bugfixes.
             harmony.PatchAll(typeof(VanillaBugfixes));
-        }
-
-        /// <summary>
-        /// Parse all CSV files needed for randomisation.
-        /// </summary>
-        /// <returns>The parsed objects.</returns>
-        /// <exception cref="ParsingException">Raised if a file could not be parsed.</exception>
-        private static (Dictionary<EBiomeType, List<float[]>> starts, List<BiomeCollection> biomes, List<Databox>
-            databoxes, List<LogicEntity> materials) ParseInputFiles()
-        {
-            var csvReader = new CSVReader(_Log);
-
-            // Attempt to read and parse the CSV with all alternate starts.
-            var alternateStarts = csvReader.ParseAlternateStartFile(_AlternateStartFile);
-            if (alternateStarts is null)
-            {
-                _Log.Error("Failed to extract alternate start information from CSV.");
-                throw new ParsingException("Failed to extract alternate start information: null.");
-            }
-            
-            // Attempt to read and parse the CSV with all biome information.
-            var biomes = csvReader.ParseBiomeFile(_BiomeFile);
-            if (biomes is null)
-            {
-                _Log.Error("Failed to extract biome information from CSV.");
-                throw new ParsingException("Failed to extract biome information: null");
-            }
-
-            // Attempt to read and parse the CSV with all recipe information.
-            var materials = csvReader.ParseRecipeFile(_RecipeFile);
-            if (materials is null)
-            {
-                _Log.Error("Failed to extract recipe information from CSV.");
-                throw new ParsingException("Failed to extract recipe information: null");
-            }
-
-            // Attempt to read and parse the CSV with wreckages and databox info.
-            var databoxes = csvReader.ParseWreckageFile(_WreckageFile);
-            if (databoxes is null || databoxes.Count == 0)
-            {
-                _Log.Error("Failed to extract databox information from CSV.");
-                throw new ParsingException("Failed to extract databox information: null");
-            }
-
-            return (alternateStarts, biomes, databoxes, materials);
         }
 
         /// <summary>

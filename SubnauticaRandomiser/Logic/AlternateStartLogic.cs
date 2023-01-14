@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using HarmonyLib;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
@@ -28,8 +29,7 @@ namespace SubnauticaRandomiser.Logic
             _random = _coreLogic._Random;
             
             // Parse the list of valid alternate starts from a file.
-            // TODO: StartCoroutine();
-            xx
+            ParseDataFileAsync().Start();
         }
 
         public void Randomise(EntitySerializer serializer)
@@ -97,6 +97,11 @@ namespace SubnauticaRandomiser.Logic
 
             _log.Debug("[AS] Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
             return new RandomiserVector(x, 0, z);
+        }
+
+        private async Task ParseDataFileAsync()
+        {
+            _alternateStarts = await CSVReader.ParseAlternateStartAsync(Initialiser._AlternateStartFile);
         }
     }
 }
