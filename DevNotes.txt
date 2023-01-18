@@ -64,10 +64,6 @@ Other:
 
 
 UNITTEST REFACTOR:
-- Complete rewrite of:
-    - CSVReader
-    - Potentially the logic modules. Write an interface ILogicModule that serves as 
-      a better baseline? Rewrite config options as components?
 - Extract re-application of saved logic into its own class
 - Classes that cannot get full coverage:
     - ModeBalanced. Too much reliance on random outcomes to test.

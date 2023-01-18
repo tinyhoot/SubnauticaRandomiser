@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using HarmonyLib;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
@@ -85,34 +86,6 @@ namespace SubnauticaRandomiser.Logic
             EnableModules();
         }
 
-        public void Start()
-        {
-            
-        }
-
-        public CoreLogic(IRandomHandler random, RandomiserConfig config, ILogHandler logger, List<LogicEntity> allMaterials,
-            Dictionary<EBiomeType, List<float[]>> alternateStarts, List<BiomeCollection> biomes = null,
-            List<Databox> databoxes = null)
-        {
-            _Config = config;
-            _Log = logger;
-            _Serializer = new EntitySerializer(logger);
-            _Materials = new Materials(allMaterials, logger);
-            _Random = random;
-            _SpoilerLog = new SpoilerLog(config, logger, _Serializer);
-            
-            if (!_Config.sSpawnPoint.StartsWith("Vanilla"))
-                _altStartLogic = new AlternateStartLogic(alternateStarts, config, logger, random);
-            _auroraLogic = new AuroraLogic(this);
-            if (_Config.bRandomiseDataboxes)
-                _databoxLogic = new DataboxLogic(this, databoxes);
-            if (_Config.bRandomiseFragments || _Config.bRandomiseNumFragments || _Config.bRandomiseDuplicateScans)
-                _fragmentLogic = new FragmentLogic(this, biomes);
-            if (_Config.bRandomiseRecipes)
-                _recipeLogic = new RecipeLogic(this);
-            _Tree = new ProgressionTree();
-        }
-
         private void EnableModules()
         {
             if (!_Config.sSpawnPoint.Equals("Vanilla"))
@@ -125,11 +98,20 @@ namespace SubnauticaRandomiser.Logic
                 RegisterModule<RecipeLogic>();
         }
 
+        public void StartRandomisation()
+        {
+            List<LogicEntity> mainEntities = Setup();
+            RandomisePreLoop();
+            RandomiseMainEntities(mainEntities);
+            EnableHarmony();
+        }
+
         /// <summary>
         /// Set up all the necessary structures for later.
         /// </summary>
         private List<LogicEntity> Setup()
         {
+            _Log.Info("[Core] Setting up...");
             OnSetup(this, EventArgs.Empty);
             _manager.TriggerSetupEvents();
             
@@ -188,6 +170,18 @@ namespace SubnauticaRandomiser.Logic
                     _Tree.ApplyUpgradeChainToPrerequisites(_Materials.GetAll());
             }
         }
+
+        /// <summary>
+        /// Call the generic randomisation method of each registered module.
+        /// </summary>
+        private void RandomisePreLoop()
+        {
+            _Log.Info("[Core] Randomising: Pre-loop content");
+            foreach (ILogicModule module in _modules)
+            {
+                module.Randomise(_Serializer);
+            }
+        }
         
         /// <summary>
         /// Start the main loop of the randomisation process.
@@ -195,12 +189,9 @@ namespace SubnauticaRandomiser.Logic
         /// <returns>A serialisation instance containing all changes made.</returns>
         /// <exception cref="TimeoutException">Raised to prevent infinite loops if the core loop takes too long to find
         /// a valid solution.</exception>
-        internal EntitySerializer RandomiseMainEntities()
+        private EntitySerializer RandomiseMainEntities(List<LogicEntity> notRandomised)
         {
             _Log.Info("[Core] Randomising: Entering main loop");
-
-            // Set up basic structures.
-            List<LogicEntity> notRandomised = Setup();
 
             int circuitbreaker = 0;
             while (notRandomised.Count > 0)
@@ -268,6 +259,15 @@ namespace SubnauticaRandomiser.Logic
             OnEntityChosen(this, new EntityEventArgs(next));
 
             return next;
+        }
+
+        private void EnableHarmony()
+        {
+            Harmony harmony = new Harmony(Initialiser.GUID);
+            foreach (ILogicModule module in _modules)
+            {
+                module.SetupHarmonyPatches(harmony);
+            }
         }
 
         /// <summary>

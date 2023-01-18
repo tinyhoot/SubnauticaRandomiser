@@ -19,7 +19,7 @@ namespace SubnauticaRandomiser
     [BepInDependency("com.ahk1221.smlhelper", "2.15")]
     internal class Initialiser : BaseUnityPlugin
     {
-        private const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
+        public const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
         public const string NAME = "Subnautica Randomiser";
         public const string VERSION = "0.9.2";
         

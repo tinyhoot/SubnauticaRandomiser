@@ -78,6 +78,8 @@ namespace SubnauticaRandomiser.Logic
             _random = _coreLogic._Random;
             _serializer = _coreLogic._Serializer;
 
+            // Register events.
+            _manager.OnSetupPriority += OnSetupPriorityEntities;
             _manager.OnSetupProgression += OnSetupProgression;
             
             if (_config.bRandomiseFragments)
@@ -107,13 +109,13 @@ namespace SubnauticaRandomiser.Logic
                 throw new ArgumentException($"Failed to find fragment '{entity}' in classId database!");
             
             // Check whether the fragment fulfills its prerequisites.
-            if (entity.AccessibleDepth >= _coreLogic.ReachableDepth)
+            if (entity.AccessibleDepth > _manager.ReachableDepth)
             {
                 _log.Debug($"[F] --- Fragment [{entity}] did not fulfill requirements, skipping.");
-                return null;
+                return false;
             }
             
-            _log.Debug($"[F] Randomising fragment {entity} for depth {_coreLogic.ReachableDepth}");
+            _log.Debug($"[F] Randomising fragment {entity} for depth {_manager.ReachableDepth}");
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
@@ -122,7 +124,7 @@ namespace SubnauticaRandomiser.Logic
             for (int i = 0; i < biomeCount; i++)
             {
                 // Choose a random biome.
-                Biome biome = ChooseBiome(spawnList, _coreLogic.ReachableDepth);
+                Biome biome = ChooseBiome(spawnList, _manager.ReachableDepth);
                 
                 // Calculate spawn rate.
                 float spawnRate = CalcFragmentSpawnRate(biome);
@@ -147,14 +149,9 @@ namespace SubnauticaRandomiser.Logic
 
                 _log.Debug($"[F] + Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
             }
-            
-            // If recipes are not randomised, handle unlocking depth progression items.
-            // TODO: Move to progression tracker
-            if (!_config.bRandomiseRecipes)
-                UpdateProgressionItems(entity, unlockedProgressionItems);
 
             ApplyRandomisedFragment(entity, spawnList);
-            return entity;
+            return true;
         }
 
         public void SetupHarmonyPatches(Harmony harmony)
@@ -193,12 +190,14 @@ namespace SubnauticaRandomiser.Logic
             HashSet<TechType> additions = new HashSet<TechType>
             {
                 TechType.LaserCutter,
-                TechType.LaserCutterFragment,
                 TechType.PropulsionCannon,
                 TechType.RepulsionCannon,
                 TechType.Welder
             };
             args.ProgressionEntities.AddRange(additions);
+            // Limit this to only if fragment entities are part of the logic, else this will make the main loop hang.
+            if (_config.bRandomiseFragments)
+                args.ProgressionEntities.Add(TechType.LaserCutterFragment);
         }
 
         /// <summary>
@@ -431,6 +430,7 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// When randomising a fragment while recipe randomisation is disabled, ensure that the item previously locked
         /// by the fragment is added to the collection of progression items, if necessary.
+        /// TODO: Convert to using events
         /// </summary>
         /// <param name="entity">The fragment being randomised.</param>
         /// <param name="unlockedProgressionItems">The progression items.</param>
