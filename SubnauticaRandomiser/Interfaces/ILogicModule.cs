@@ -13,10 +13,11 @@ namespace SubnauticaRandomiser.Interfaces
         public void Randomise(EntitySerializer serializer);
         
         /// <summary>
-        /// Randomise the given entity. The implementing class will only receive entities of the type(s) for which it
-        /// registered itself as handler. If no handler was registered, this method is never called.
+        /// Attempt to randomise the given entity. The implementing class will only receive entities of the type(s)
+        /// for which it registered itself as handler. If no handler was registered, this method is never called.
         /// </summary>
-        public LogicEntity RandomiseEntity(LogicEntity entity);
+        /// <returns>True if successful, false if not.</returns>
+        public bool RandomiseEntity(ref LogicEntity entity);
         
         /// <summary>
         /// If the module needs to register any patches with Harmony, do it in this method.

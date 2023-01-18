@@ -3,21 +3,25 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Events;
+using UnityEngine;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
     /// Handles everything related to the spoiler log generated during randomisation.
     /// </summary>
-    internal class SpoilerLog
+    [RequireComponent(typeof(CoreLogic), typeof(ProgressionManager))]
+    internal class SpoilerLog : MonoBehaviour
     {
-        private const string _FileName = "spoilerlog.txt";
-        private readonly RandomiserConfig _config;
-        private readonly ILogHandler _log;
-        private readonly EntitySerializer _serializer;
-        private readonly List<KeyValuePair<TechType, int>> _progression = new List<KeyValuePair<TechType, int>>();
+        private CoreLogic _coreLogic;
+        private ProgressionManager _manager;
+        private RandomiserConfig _config;
+        private ILogHandler _log;
+        private EntitySerializer _serializer;
+        private readonly List<Tuple<TechType, int>> _progression = new List<Tuple<TechType, int>>();
 
         private List<string> _basicOptions;
         private string[] _contentHeader;
@@ -25,14 +29,53 @@ namespace SubnauticaRandomiser.Logic
         private string[] _contentAdvanced;
         private string[] _contentDataboxes;
         private string[] _contentFragments;
-
-        public SpoilerLog(RandomiserConfig config, ILogHandler logger, EntitySerializer serializer)
-        {
-            _config = config;
-            _log = logger;
-            _serializer = serializer;
-        }
         
+        private const string _FileName = "spoilerlog.txt";
+
+        private void Awake()
+        {
+            _coreLogic = GetComponent<CoreLogic>();
+            _manager = GetComponent<ProgressionManager>();
+            _config = _coreLogic._Config;
+            _log = _coreLogic._Log;
+            _serializer = _coreLogic._Serializer;
+            
+            // Register events.
+            _coreLogic.OnMainLoopComplete += OnMainLoopComplete;
+            _manager.OnDepthIncrease += OnDepthIncrease;
+            _manager.OnProgression += OnProgression;
+        }
+
+        /// <summary>
+        /// When a progression entity causes the reachable depth to increase, update the responsible entity.
+        /// </summary>
+        private void OnDepthIncrease(object sender, EntityEventArgs args)
+        {
+            UpdateLastProgressionEntry(_manager.ReachableDepth);
+        }
+
+        /// <summary>
+        /// Once the main loop completes, all randomising is over. Write the spoiler log to disk.
+        /// </summary>
+        private void OnMainLoopComplete(object sender, EventArgs args)
+        {
+            WriteLogAsync().Start();
+        }
+
+        /// <summary>
+        /// Log every progression entity as soon as it unlocks.
+        /// </summary>
+        private void OnProgression(object sender, EntityEventArgs args)
+        {
+            AddProgressionEntry(args.LogicEntity.TechType, _manager.ReachableDepth);
+        }
+
+        private void AddProgressionEntry(TechType techType, int depth)
+        {
+            Tuple<TechType, int> entry = new Tuple<TechType, int>(techType, depth);
+            _progression.Add(entry);
+        }
+
         /// <summary>
         /// Prepare the more basic aspects of the log.
         /// </summary>
@@ -188,9 +231,6 @@ namespace SubnauticaRandomiser.Logic
         /// <returns>The prepared log entry.</returns>
         private string PrepareMD5()
         {
-            if (!Initialiser._ExpectedRecipeMD5.Equals(CSVReader.s_recipeCSVMD5))
-                return "recipeInformation.csv has been modified: " + CSVReader.s_recipeCSVMD5;
-            
             return "recipeInformation.csv is unmodified.";
         }
         
@@ -207,66 +247,46 @@ namespace SubnauticaRandomiser.Logic
             List <string> preparedProgressionPath = new List<string>();
             int lastDepth = 0;
 
-            foreach (KeyValuePair<TechType, int> pair in _progression)
+            foreach (Tuple<TechType, int> pair in _progression)
             {
-                if (pair.Value > lastDepth)
-                    preparedProgressionPath.Add("Craft " + pair.Key.AsString() + " to reach " + pair.Value + "m");
+                if (pair.Item2 > lastDepth)
+                    preparedProgressionPath.Add($"Craft {pair.Item1} to reach {pair.Item2}m");
                 else
-                    preparedProgressionPath.Add("Unlocked " + pair.Key.AsString() + ".");
+                    preparedProgressionPath.Add($"Unlocked {pair.Item1}.");
 
-                lastDepth = pair.Value;
+                lastDepth = pair.Item2;
             }
 
             return preparedProgressionPath.ToArray();
         }
 
         /// <summary>
-        /// Add an entry for a progression item to the spoiler log.
-        /// </summary>
-        /// <param name="type">The progression item.</param>
-        /// <param name="depth">The depth it unlocks or was unlocked at.</param>
-        /// <returns>True if successful, false if the entry already exists.</returns>
-        public bool AddProgressionEntry(TechType type, int depth)
-        {
-            if (_progression.Exists(x => x.Key.Equals(type)))
-            {
-                _log.Warn("Tried to add duplicate progression item to spoiler log: " + type.AsString());
-                return false;
-            }
-            
-            var kvpair = new KeyValuePair<TechType, int>(type, depth);
-            _progression.Add(kvpair);
-            return true;
-        }
-        
-        /// <summary>
         /// When a progression item first gets unlocked, its depth reflects the depth required to reach it, rather than
         /// what it makes accessible; update that here.
         /// Always changes the latest addition to the spoiler log.
         /// </summary>
         /// <param name="depth">The new depth to update the entry with.</param>
-        /// <returns>True if successful, false if the update failed, e.g. if there are no entries in the list.</returns>
-        public bool UpdateLastProgressionEntry(int depth)
+        private void UpdateLastProgressionEntry(int depth)
         {
             if (_progression.Count == 0)
-                return false;
+                return;
 
-            // Since this is a list of immutable k-v pairs, it must be removed and replaced entirely.
-            TechType type = _progression[_progression.Count - 1].Key;
+            // Since this is a list of immutable tuples, it must be removed and replaced entirely.
+            TechType type = _progression[_progression.Count - 1].Item1;
             _progression.RemoveAt(_progression.Count - 1);
-            return AddProgressionEntry(type, depth);
+            AddProgressionEntry(type, depth);
         }
 
         /// <summary>
         /// Write the log to disk.
         /// </summary>
-        public async Task WriteLog()
+        public async Task WriteLogAsync()
         {
             List<string> lines = new List<string>();
             PrepareStrings();
 
             lines.AddRange(_contentHeader);
-            lines.Add(PrepareMD5());
+            // lines.Add(PrepareMD5());
             
             lines.AddRange(_contentBasics);
             lines.AddRange(PrepareAdvancedSettings());
@@ -287,7 +307,7 @@ namespace SubnauticaRandomiser.Logic
             _log.Info("Wrote spoiler log to disk.");
         }
 
-        private async Task WriteTextToLog(StreamWriter file, string[] text)
+        private async Task WriteTextToLog(StreamWriter file, IEnumerable<string> text)
         {
             foreach (string line in text)
             {

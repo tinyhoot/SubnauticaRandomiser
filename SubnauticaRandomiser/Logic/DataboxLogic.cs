@@ -6,6 +6,8 @@ using HarmonyLib;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Objects.Events;
 using SubnauticaRandomiser.Patches;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
@@ -26,6 +28,11 @@ namespace SubnauticaRandomiser.Logic
             _log = _coreLogic._Log;
             _random = _coreLogic._Random;
             
+            // Register this module as a handler for databox entities.
+            _coreLogic.RegisterEntityHandler(EntityType.Databox, this);
+            // Register events.
+            _coreLogic.OnCollectRandomisableEntities += OnCollectDataboxes;
+
             ParseDataFileAsync().Start();
         }
 
@@ -36,7 +43,7 @@ namespace SubnauticaRandomiser.Logic
             LinkCyclopsHullModules(_coreLogic._Materials);
         }
 
-        public LogicEntity RandomiseEntity(LogicEntity entity)
+        public bool RandomiseEntity(ref LogicEntity entity)
         {
             throw new NotImplementedException();
         }
@@ -44,6 +51,15 @@ namespace SubnauticaRandomiser.Logic
         public void SetupHarmonyPatches(Harmony harmony)
         {
             harmony.PatchAll(typeof(DataboxPatcher));
+        }
+
+        /// <summary>
+        /// Add databox entities into the main loop.
+        /// </summary>
+        private void OnCollectDataboxes(object sender, CollectEntitiesEventArgs args)
+        {
+            // TODO: convert databoxes to proper logicEntities on parse.
+            // args.ToBeRandomised.AddRange();
         }
 
         /// <summary>

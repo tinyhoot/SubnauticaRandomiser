@@ -38,7 +38,7 @@ namespace SubnauticaRandomiser.Logic
             serializer.StartPoint = GetRandomStart(_config.sSpawnPoint);
         }
 
-        public LogicEntity RandomiseEntity(LogicEntity entity)
+        public bool RandomiseEntity(ref LogicEntity entity)
         {
             throw new NotImplementedException();
         }

@@ -101,7 +101,7 @@ namespace SubnauticaRandomiser.Logic
                 CreateDuplicateScanYieldDict();
         }
 
-        public LogicEntity RandomiseEntity(LogicEntity entity)
+        public bool RandomiseEntity(ref LogicEntity entity)
         {
             if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList))
                 throw new ArgumentException($"Failed to find fragment '{entity}' in classId database!");

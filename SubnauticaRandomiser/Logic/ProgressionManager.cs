@@ -44,7 +44,7 @@ namespace SubnauticaRandomiser.Logic
         /// Invoked when the successful randomisation of a progression item caused the maximum reachable depth to
         /// increase. Always executes <em>after</em> the event for a progression item.
         /// </summary>
-        public event EventHandler OnDepthIncrease;
+        public event EventHandler<EntityEventArgs> OnDepthIncrease;
 
         private void Awake()
         {
@@ -316,7 +316,7 @@ namespace SubnauticaRandomiser.Logic
             {
                 ReachableDepth = newDepth;
                 UpdatePriorityEntities(ReachableDepth);
-                OnDepthIncrease(this, EventArgs.Empty);
+                OnDepthIncrease(this, new EntityEventArgs(entity));
             }
         }
 

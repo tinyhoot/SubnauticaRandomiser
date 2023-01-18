@@ -19,12 +19,12 @@ namespace SubnauticaRandomiser.Logic
         internal RandomiserConfig _Config { get; private set; }
         internal ILogHandler _Log { get; private set; }
         internal EntitySerializer _Serializer { get; private set; }
-        internal readonly Materials _Materials;
+        internal Materials _Materials { get; private set; }
         internal IRandomHandler _Random { get; private set; }
-        internal readonly SpoilerLog _SpoilerLog;
         internal readonly ProgressionTree _Tree;
         
         private ProgressionManager _manager;
+        private SpoilerLog _spoilerLog;
 
         private readonly AlternateStartLogic _altStartLogic;
         private readonly AuroraLogic _auroraLogic;
@@ -33,6 +33,7 @@ namespace SubnauticaRandomiser.Logic
         private RecipeLogic _recipeLogic;
 
         private Dictionary<EntityType, ILogicModule> _entityHandlers;
+        private List<ILogicModule> _modules;
         private List<LogicEntity> _priorityEntities;
         
         /// <summary>
@@ -59,18 +60,29 @@ namespace SubnauticaRandomiser.Logic
         /// Invoked once the main loop has successfully completed.
         /// </summary>
         public event EventHandler OnMainLoopComplete;
+
+        /// <summary>
+        /// Invoked once all randomisation has taken place and completed.
+        /// </summary>
+        public event EventHandler OnPostRandomisation;
         
         public void Awake()
         {
-            _manager = gameObject.EnsureComponent<ProgressionManager>();
-            
             _entityHandlers = new Dictionary<EntityType, ILogicModule>();
+            _modules = new List<ILogicModule>();
             _priorityEntities = new List<LogicEntity>();
             
             _Config = Initialiser._Config;
             _Log = Initialiser._Log;
+            // This makes the async function run sync, but in this specific case that's necessary for more setup.
+            List<LogicEntity> allMaterials = CSVReader.ParseDataFileAsync(Initialiser._RecipeFile, CSVReader.ParseRecipeLine).Result;
+            _Materials = new Materials(allMaterials, _Log);
             _Serializer = new EntitySerializer(_Log);
             _Random = new RandomHandler(_Config.iSeed);
+            
+            _manager = gameObject.EnsureComponent<ProgressionManager>();
+            _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
+            EnableModules();
         }
 
         public void Start()
@@ -101,12 +113,30 @@ namespace SubnauticaRandomiser.Logic
             _Tree = new ProgressionTree();
         }
 
+        private void EnableModules()
+        {
+            if (!_Config.sSpawnPoint.Equals("Vanilla"))
+                RegisterModule<AlternateStartLogic>();
+            if (_Config.bRandomiseDataboxes)
+                RegisterModule<DataboxLogic>();
+            if (_Config.bRandomiseFragments || _Config.bRandomiseNumFragments || _Config.bRandomiseDuplicateScans)
+                RegisterModule<FragmentLogic>();
+            if (_Config.bRandomiseRecipes)
+                RegisterModule<RecipeLogic>();
+        }
+
         /// <summary>
         /// Set up all the necessary structures for later.
         /// </summary>
-        private void Setup(List<LogicEntity> notRandomised)
+        private List<LogicEntity> Setup()
         {
+            OnSetup(this, EventArgs.Empty);
             _manager.TriggerSetupEvents();
+            
+            // Set up the list of entities that need to be randomised in the main loop.
+            CollectEntitiesEventArgs args = new CollectEntitiesEventArgs();
+            OnCollectRandomisableEntities(this, args);
+            //return args.ToBeRandomised;
             
             // ----- OLD STUFF BELOW -----
             
@@ -160,61 +190,51 @@ namespace SubnauticaRandomiser.Logic
         }
         
         /// <summary>
-        /// Start the randomisation process.
+        /// Start the main loop of the randomisation process.
         /// </summary>
         /// <returns>A serialisation instance containing all changes made.</returns>
         /// <exception cref="TimeoutException">Raised to prevent infinite loops if the core loop takes too long to find
         /// a valid solution.</exception>
-        internal EntitySerializer Randomise()
+        internal EntitySerializer RandomiseMainEntities()
         {
-            _Log.Info("Randomising using logic-based system...");
-            
-            List<LogicEntity> notRandomised = new List<LogicEntity>();
-            Dictionary<TechType, bool> unlockedProgressionItems = new Dictionary<TechType, bool>();
+            _Log.Info("[Core] Randomising: Entering main loop");
 
             // Set up basic structures.
-            Setup(notRandomised);
+            List<LogicEntity> notRandomised = Setup();
 
             int circuitbreaker = 0;
-            int currentDepth = 0;
-            int numProgressionItems = -1; // This forces a depth calculation on the first loop.
             while (notRandomised.Count > 0)
             {
                 circuitbreaker++;
                 if (circuitbreaker > 3000)
                 {
-                    _Log.InGameMessage("Failed to randomise items: stuck in infinite loop!");
-                    _Log.Fatal("Encountered infinite loop, aborting!");
+                    _Log.InGameMessage("[Core] Failed to randomise items: stuck in infinite loop!");
+                    _Log.Fatal("[Core] Encountered infinite loop, aborting!");
                     throw new TimeoutException("Encountered infinite loop while randomising!");
                 }
-                
-                // Update depth and reachable materials.
-                currentDepth = UpdateReachableDepth(currentDepth, unlockedProgressionItems, numProgressionItems);
-                numProgressionItems = unlockedProgressionItems.Count;
 
-                LogicEntity nextEntity = ChooseNextEntity(notRandomised, currentDepth);
-
+                LogicEntity nextEntity = ChooseNextEntity(notRandomised);
                 // Choose a logic appropriate to the entity.
-                bool? success = null;
-                if (nextEntity.IsFragment)
-                    success = _fragmentLogic.RandomiseFragment(nextEntity, unlockedProgressionItems, currentDepth);
-                else if (nextEntity.HasRecipe)
-                    success = _recipeLogic.RandomiseRecipe(nextEntity, unlockedProgressionItems, currentDepth);
-                
-                if (success == true)
+                ILogicModule handler = _entityHandlers.GetOrDefault(nextEntity.Type, null);
+                if (handler is null)
+                {
+                    _Log.Warn($"[Core] Unsupported entity in main loop: {nextEntity.Type} {nextEntity}");
+                    notRandomised.Remove(nextEntity);
+                    continue;
+                }
+
+                bool success = handler.RandomiseEntity(ref nextEntity);
+                if (success)
                 {
                     notRandomised.Remove(nextEntity);
                     nextEntity.InLogic = true;
                     OnEntityRandomised(this, new EntityEventArgs(nextEntity));
                     _manager.TriggerProgressionEvents(nextEntity);
                 }
-
-                if (success is null)
-                    _Log.Warn("Unsupported entity in loop: " + nextEntity);
             }
-
-            _Log.Info($"Finished randomising within {circuitbreaker} cycles!");
-            _SpoilerLog.WriteLog();
+            
+            _Log.Info($"[Core] Finished randomising within {circuitbreaker} cycles!");
+            OnMainLoopComplete(this, EventArgs.Empty);
 
             return _Serializer;
         }
@@ -232,7 +252,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         /// <returns>The next entity.</returns>
         [NotNull]
-        private LogicEntity ChooseNextEntity(List<LogicEntity> notRandomised, int depth)
+        private LogicEntity ChooseNextEntity(List<LogicEntity> notRandomised)
         {
             // Make sure the list of absolutely essential items is done first, for each depth level. This guarantees
             // certain recipes are done by a certain depth, e.g. waterparks by 500m.
@@ -272,46 +292,11 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Update the depth that can be reached and trigger any changes that need to happen if a new significant
-        /// threshold has been passed.
+        /// Register a logic module as a handler for a specific entity type. This will cause that handler's
+        /// RandomiseEntity() method to be called whenever an entity of that type needs to be randomised.
         /// </summary>
-        /// <param name="currentDepth">The previously reachable depth.</param>
-        /// <param name="progressionItems">The unlocked progression items.</param>
-        /// <param name="numItems">The number of progression items on the previous cycle.</param>
-        /// <returns>The new maximum depth.</returns>
-        private int UpdateReachableDepth(int currentDepth, Dictionary<TechType, bool> progressionItems, int numItems)
-        {
-            if (progressionItems.Count <= numItems)
-                return currentDepth;
-            
-            int newDepth = CalculateReachableDepth(progressionItems, _Config.iDepthSearchTime);
-            _SpoilerLog.UpdateLastProgressionEntry(newDepth);
-            currentDepth = Math.Max(currentDepth, newDepth);
-            _recipeLogic?.UpdateReachableMaterials(currentDepth);
-
-            return currentDepth;
-        }
-
-        /// <summary>
-        /// Check whether all TechTypes given in the array are present in the given dictionary.
-        /// </summary>
-        /// <param name="dict">The dictionary to check.</param>
-        /// <param name="types">The array of TechTypes.</param>
-        /// <returns>True if all TechTypes are present in the dictionary, false otherwise.</returns>
-        private static bool CheckDictForAllTechTypes(Dictionary<TechType, bool> dict, TechType[] types)
-        {
-            bool allItemsPresent = true;
-
-            foreach (TechType t in types)
-            {
-                allItemsPresent &= dict.ContainsKey(t);
-                if (!allItemsPresent)
-                    break;
-            }
-
-            return allItemsPresent;
-        }
-
+        /// <exception cref="ArgumentException">Thrown if a handler for the given type of entity already
+        /// exists. There can be only one per type.</exception>
         public void RegisterEntityHandler(EntityType type, ILogicModule module)
         {
             if (_entityHandlers.ContainsKey(type))
@@ -325,9 +310,11 @@ namespace SubnauticaRandomiser.Logic
         /// Register a component module for use with the randomiser.
         /// </summary>
         /// <returns>The instantiated component.</returns>
-        public T RegisterModule<T>() where T : MonoBehaviour, ILogicModule
+        public TLogicModule RegisterModule<TLogicModule>() where TLogicModule : MonoBehaviour, ILogicModule
         {
-            return gameObject.EnsureComponent<T>();
+            TLogicModule component = gameObject.EnsureComponent<TLogicModule>();
+            _modules.Add(component);
+            return component;
         }
     }
 }
