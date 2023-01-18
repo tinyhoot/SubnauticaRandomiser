@@ -20,10 +20,11 @@ namespace SubnauticaRandomiser.Logic
     /// <summary>
     /// Handles everything related to randomising fragments.
     /// </summary>
-    [RequireComponent(typeof(CoreLogic))]
+    [RequireComponent(typeof(CoreLogic), typeof(ProgressionManager))]
     internal class FragmentLogic : MonoBehaviour, ILogicModule
     {
         private CoreLogic _coreLogic;
+        private ProgressionManager _manager;
         private RandomiserConfig _config;
         private ILogHandler _log;
         private EntitySerializer _serializer;
@@ -71,10 +72,13 @@ namespace SubnauticaRandomiser.Logic
         public void Awake()
         {
             _coreLogic = GetComponent<CoreLogic>();
+            _manager = GetComponent<ProgressionManager>();
             _config = _coreLogic._Config;
             _log = _coreLogic._Log;
             _random = _coreLogic._Random;
             _serializer = _coreLogic._Serializer;
+
+            _manager.OnSetupProgression += OnSetupProgression;
             
             if (_config.bRandomiseFragments)
             {
@@ -164,7 +168,37 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void OnCollectRandomisableEntities(object sender, CollectEntitiesEventArgs args)
         {
-            args.toBeRandomised.AddRange(_coreLogic._Materials.GetAllFragments());
+            args.ToBeRandomised.AddRange(_coreLogic._Materials.GetAllFragments());
+        }
+
+        /// <summary>
+        /// Ensure that certain fragments are always randomised by a certain depth.
+        /// </summary>
+        private void OnSetupPriorityEntities(object sender, SetupPriorityEventArgs args)
+        {
+            // Ensure this setup is only done when the event is called from the manager itself.
+            if (!(sender is ProgressionManager manager))
+                return;
+
+            manager.AddEssentialEntities(0, new[] { TechType.SeaglideFragment });
+            manager.AddEssentialEntities(100, new[] { TechType.LaserCutterFragment });
+            manager.AddEssentialEntities(200, new[] { TechType.BaseBioReactorFragment });
+        }
+
+        /// <summary>
+        /// Mark items which let you access more fragments as priority items.
+        /// </summary>
+        private void OnSetupProgression(object sender, SetupProgressionEventArgs args)
+        {
+            HashSet<TechType> additions = new HashSet<TechType>
+            {
+                TechType.LaserCutter,
+                TechType.LaserCutterFragment,
+                TechType.PropulsionCannon,
+                TechType.RepulsionCannon,
+                TechType.Welder
+            };
+            args.ProgressionEntities.AddRange(additions);
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Objects.Events;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
@@ -38,6 +39,49 @@ namespace SubnauticaRandomiser.Logic.Recipes
                     _log.Error("Invalid recipe mode: " + _config.iRandomiserMode);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Ensure that certain recipes are always randomised by a certain depth.
+        /// </summary>
+        private void OnSetupPriorityEntities(object sender, SetupPriorityEventArgs args)
+        {
+            // Ensure this setup is only done when the event is called from the manager itself.
+            if (!(sender is ProgressionManager manager))
+                return;
+            
+            manager.AddEssentialEntities(0, new []
+            {
+                TechType.Scanner,
+                TechType.Welder,
+                TechType.SmallStorage,
+                TechType.BaseHatch,
+                TechType.Fabricator,
+            });
+            manager.AddEssentialEntities(100, new []
+            {
+                TechType.Builder,
+                TechType.BaseRoom,
+                TechType.Seaglide,
+                TechType.Tank,
+            });
+            manager.AddEssentialEntities(300, new []
+            {
+                TechType.BaseWaterPark,
+            });
+            
+            manager.AddElectiveEntities(100, new []
+            {
+                new [] { TechType.Battery, TechType.BatteryCharger },
+            });
+            manager.AddElectiveEntities(200, new []
+            {
+                new [] { TechType.BaseBioReactor, TechType.SolarPanel },
+                new [] { TechType.PowerCell, TechType.PowerCellCharger, TechType.SeamothSolarCharge },
+                new [] { TechType.BaseBulkhead, TechType.BaseFoundation, TechType.BaseReinforcement },
+            });
+            
+            // TODO: Vanilla upgrade chains.
         }
 
         /// <summary>

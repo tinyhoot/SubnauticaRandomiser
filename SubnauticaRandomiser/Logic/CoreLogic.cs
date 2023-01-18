@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
@@ -25,7 +24,7 @@ namespace SubnauticaRandomiser.Logic
         internal readonly SpoilerLog _SpoilerLog;
         internal readonly ProgressionTree _Tree;
         
-        public int ReachableDepth { get; private set; }
+        private ProgressionManager _manager;
 
         private readonly AlternateStartLogic _altStartLogic;
         private readonly AuroraLogic _auroraLogic;
@@ -34,6 +33,7 @@ namespace SubnauticaRandomiser.Logic
         private RecipeLogic _recipeLogic;
 
         private Dictionary<EntityType, ILogicModule> _entityHandlers;
+        private List<LogicEntity> _priorityEntities;
         
         /// <summary>
         /// Invoked during the setup stage, before the main loop begins.
@@ -48,12 +48,12 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Invoked once the next entity to be randomised has been determined.
         /// </summary>
-        public event EventHandler OnEntityChosen;
+        public event EventHandler<EntityEventArgs> OnEntityChosen;
 
         /// <summary>
         /// Invoked whenever an entity has been successfully randomised and added to the logic.
         /// </summary>
-        public event EventHandler OnEntityRandomised;
+        public event EventHandler<EntityEventArgs> OnEntityRandomised;
 
         /// <summary>
         /// Invoked once the main loop has successfully completed.
@@ -62,7 +62,10 @@ namespace SubnauticaRandomiser.Logic
         
         public void Awake()
         {
+            _manager = gameObject.EnsureComponent<ProgressionManager>();
+            
             _entityHandlers = new Dictionary<EntityType, ILogicModule>();
+            _priorityEntities = new List<LogicEntity>();
             
             _Config = Initialiser._Config;
             _Log = Initialiser._Log;
@@ -103,6 +106,10 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void Setup(List<LogicEntity> notRandomised)
         {
+            _manager.TriggerSetupEvents();
+            
+            // ----- OLD STUFF BELOW -----
+            
             // Init the progression tree.
             _Tree.SetupVanillaTree();
             _altStartLogic?.Randomise(_Serializer);
@@ -198,6 +205,8 @@ namespace SubnauticaRandomiser.Logic
                 {
                     notRandomised.Remove(nextEntity);
                     nextEntity.InLogic = true;
+                    OnEntityRandomised(this, new EntityEventArgs(nextEntity));
+                    _manager.TriggerProgressionEvents(nextEntity);
                 }
 
                 if (success is null)
@@ -211,6 +220,14 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
+        /// Add one or more entities to prioritise on the next main loop cycle.
+        /// </summary>
+        public void AddPriorityEntities(IEnumerable<LogicEntity> entities)
+        {
+            _priorityEntities.AddRange(entities);
+        }
+
+        /// <summary>
         /// Get the next entity to be randomised, prioritising essential or elective ones.
         /// </summary>
         /// <returns>The next entity.</returns>
@@ -219,114 +236,39 @@ namespace SubnauticaRandomiser.Logic
         {
             // Make sure the list of absolutely essential items is done first, for each depth level. This guarantees
             // certain recipes are done by a certain depth, e.g. waterparks by 500m.
-            // Automatically fails if recipes do not get randomised.
-            LogicEntity next = GetPriorityEntity(depth);
+            LogicEntity next = null;
+            if (_priorityEntities.Count > 0)
+            {
+                next = _priorityEntities[0];
+                _priorityEntities.RemoveAt(0);
+            }
             next ??= _Random.Choice(notRandomised);
+
+            // Invoke the associated event.
+            OnEntityChosen(this, new EntityEventArgs(next));
 
             return next;
         }
 
         /// <summary>
-        /// This function calculates the maximum reachable depth based on what vehicles the player has attained, as well
-        /// as how much further they can go "on foot"
+        /// Check whether the given LogicEntity has already been randomised.
         /// </summary>
-        /// <param name="progressionItems">A list of all currently reachable items relevant for progression.</param>
-        /// <param name="depthTime">The minimum time that it must be possible to spend at the reachable depth before
-        /// resurfacing.</param>
-        /// <returns>The reachable depth.</returns>
-        internal int CalculateReachableDepth(Dictionary<TechType, bool> progressionItems, int depthTime = 15)
+        public bool HasRandomised(LogicEntity entity)
         {
-            const double swimmingSpeed = 4.7;  // Always assume that the player is holding a tool.
-            const double seaglideSpeed = 11.0;
-            bool seaglide = progressionItems.ContainsKey(TechType.Seaglide);
-            double finSpeed = 0.0;
-            int vehicleDepth = 0;
-            Dictionary<TechType, double[]> tanks = new Dictionary<TechType, double[]>
-            {
-                { TechType.Tank, new[] { 75, 0.4 } },  // Tank type, oxygen, weight factor.
-                { TechType.DoubleTank, new[] { 135, 0.47 } },
-                { TechType.HighCapacityTank, new[] { 225, 0.6 } },
-                { TechType.PlasteelTank, new[] { 135, 0.1 } }
-            };
-
-            _Log.Debug("===== Recalculating reachable depth =====");
-
-            // Get the deepest depth that can be reached by vehicle.
-            foreach (EProgressionNode node in EProgressionNodeExtensions.AllDepthNodes)
-            {
-                foreach (TechType[] path in _Tree?.GetProgressionPath(node)?.Pathways ?? Enumerable.Empty<TechType[]>())
-                {
-                    if (CheckDictForAllTechTypes(progressionItems, path))
-                        vehicleDepth = Math.Max(vehicleDepth, (int)node);
-                }
-            }
-
-            if (progressionItems.ContainsKey(TechType.Fins))
-                finSpeed = 1.41;
-            if (progressionItems.ContainsKey(TechType.UltraGlideFins))
-                finSpeed = 1.88;
-
-            // How deep can the player go without any tanks?
-            double soloDepthRaw = (45 - depthTime) * (seaglide ? seaglideSpeed : swimmingSpeed + finSpeed) / 2;
-
-            // How deep can they go with tanks?
-            foreach (var kv in tanks)
-            {
-                if (progressionItems.ContainsKey(kv.Key))
-                {
-                    // Value[0] is the oxygen granted by the tank, Value[1] its weight factor.
-                    double depth = (kv.Value[0] - depthTime)
-                        * (seaglide ? seaglideSpeed : swimmingSpeed + finSpeed - kv.Value[1]) / 2;
-                    soloDepthRaw = Math.Max(soloDepthRaw, depth);
-                }
-            }
-
-            // Given everything above, calculate the total.
-            int totalDepth = CalculateTotalDepth(progressionItems, vehicleDepth, (int)soloDepthRaw);
-            
-            _Log.Debug("===== New reachable depth: " + totalDepth + " =====");
-
-            return totalDepth;
+            return entity.InLogic;
         }
 
         /// <summary>
-        /// Calculate the depth that can be comfortably reached on foot.
+        /// Check whether the given TechType has already been randomised.
+        /// TODO: Improve to not look up entity every single time.
         /// </summary>
-        /// <param name="vehicleDepth">The depth reachable by vehicle.</param>
-        /// <param name="soloDepthRaw">The raw depth reachable on foot given no depth restrictions.</param>
-        /// <returns>The depth that can be covered on foot in addition to the depth reachable by vehicle.</returns>
-        private int CalculateSoloDepth(int vehicleDepth, int soloDepthRaw)
+        /// <exception cref="ArgumentNullException">If the TechType does not have an associated LogicEntity.</exception>
+        public bool HasRandomised(TechType techType)
         {
-            // Ensure that a number stays between a lower and upper bound. (e.g. 0 < x < 100)
-            double limit(double x, double upperBound) => Math.Max(0, Math.Min(x, upperBound));
-            // Calculate how much of the 0-100m and 100-200m range is already covered by vehicles.
-            double[] vehicleDepths = { limit(vehicleDepth, 100), limit(vehicleDepth - 100, 100) };
-            double[] soloDepths =
-            {
-                limit(soloDepthRaw, 100 - vehicleDepths[0]),
-                limit(soloDepthRaw + vehicleDepths[0] - 100, 100 - vehicleDepths[1]),
-                limit(soloDepthRaw + vehicleDepths[1] - 200, 10000)
-            };
-            
-            // Below 100 meters, air is consumed three times as fast.
-            // Below 200 meters, it is consumed five times as fast.
-            return (int)(soloDepths[0] + (soloDepths[1] / 3) + (soloDepths[2] / 5));
-        }
-
-        /// <summary>
-        /// Calculate the total depth that can be reached given the available equipment.
-        /// </summary>
-        /// <param name="progressionItems">The unlocked progression items.</param>
-        /// <param name="vehicleDepth">The depth reachable by vehicle.</param>
-        /// <param name="soloDepthRaw">The raw depth reachable on foot given no oxygen restrictions.</param>
-        /// <returns>The total depth coverable by extending vehicle depth with a solo journey.</returns>
-        private int CalculateTotalDepth(Dictionary<TechType, bool> progressionItems, int vehicleDepth, int soloDepthRaw)
-        {
-            // If there is a rebreather, all the funky calculations are redundant.
-            if (progressionItems.ContainsKey(TechType.Rebreather))
-                return vehicleDepth + Math.Min(soloDepthRaw, _Config.iMaxDepthWithoutVehicle);
-
-            return vehicleDepth + Math.Min(CalculateSoloDepth(vehicleDepth, soloDepthRaw), _Config.iMaxDepthWithoutVehicle);
+            LogicEntity entity = _Materials.Find(techType);
+            if (entity is null)
+                throw new ArgumentNullException(nameof(techType), $"There is no LogicEntity corresponding to {techType}!");
+            return entity.InLogic;
         }
 
         /// <summary>
@@ -348,49 +290,6 @@ namespace SubnauticaRandomiser.Logic
             _recipeLogic?.UpdateReachableMaterials(currentDepth);
 
             return currentDepth;
-        }
-
-        /// <summary>
-        /// Get an essential or elective entity for the currently reachable depth, prioritising essential ones.
-        /// </summary>
-        /// <param name="depth">The maximum depth to consider.</param>
-        /// <returns>A LogicEntity, or null if all have been processed already.</returns>
-        [CanBeNull]
-        private LogicEntity GetPriorityEntity(int depth)
-        {
-            List<TechType> essentialItems = _Tree.GetEssentialItems(depth);
-            List<TechType[]> electiveItems = _Tree.GetElectiveItems(depth);
-            LogicEntity entity = null;
-
-            // Always get one of the essential items first, if available.
-            if (essentialItems.Count > 0)
-            {
-                TechType type = essentialItems.Find(x =>
-                    !_Serializer.RecipeDict.ContainsKey(x) && !_Serializer.SpawnDataDict.ContainsKey(x));
-                
-                if (!type.Equals(TechType.None))
-                {
-                    entity = _Materials.Find(type);
-                    _Log.Debug($"Prioritising essential entity {entity} for depth {depth}");
-                }
-            }
-
-            // Similarly, if all essential items are done, grab one from among the elective items and leave the rest
-            // up to chance.
-            if (entity is null && electiveItems.Count > 0)
-            {
-                TechType[] types = electiveItems.Find(arr => arr.All(x =>
-                    !_Serializer.RecipeDict.ContainsKey(x) && !_Serializer.SpawnDataDict.ContainsKey(x)));
-                
-                if (types?.Length > 0)
-                {
-                    TechType nextType = _Random.Choice(types);
-                    entity = _Materials.Find(nextType);
-                    _Log.Debug($"Prioritising elective entity {entity} for depth {depth}");
-                }
-            }
-
-            return entity;
         }
 
         /// <summary>

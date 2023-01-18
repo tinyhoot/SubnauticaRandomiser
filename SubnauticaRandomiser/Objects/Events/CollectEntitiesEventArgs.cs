@@ -5,6 +5,6 @@ namespace SubnauticaRandomiser.Objects.Events
 {
     internal class CollectEntitiesEventArgs : EventArgs
     {
-        public List<LogicEntity> toBeRandomised = new List<LogicEntity>();
+        public List<LogicEntity> ToBeRandomised = new List<LogicEntity>();
     }
 }
