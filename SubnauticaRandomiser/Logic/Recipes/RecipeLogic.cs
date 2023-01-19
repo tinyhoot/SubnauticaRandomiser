@@ -57,6 +57,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // Register events.
             _coreLogic.OnCollectRandomisableEntities += OnCollectRandomisableEntities;
             _coreLogic.OnSetup += OnSetup;
+            _entityHandler.OnEnterLogic += OnEntityEnterLogic;
             _manager.OnProgression += OnProgression;
             _manager.OnSetupPriority += OnSetupPriorityEntities;
             _manager.OnSetupProgression += OnSetupProgressionEntitites;
@@ -107,6 +108,16 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private void OnCollectRandomisableEntities(object sender, CollectEntitiesEventArgs args)
         {
             args.ToBeRandomised.AddRange(_entityHandler.GetAllCraftables());
+        }
+
+        /// <summary>
+        /// When an entity enters the logic, add it is an ingredient if possible.
+        /// </summary>
+        private void OnEntityEnterLogic(object sender, EntityEventArgs args)
+        {
+            LogicEntity entity = args.LogicEntity;
+            if (entity.CanFunctionAsIngredient() && entity.HasUsesLeft())
+                ValidIngredients.Add(entity);
         }
 
         /// <summary>

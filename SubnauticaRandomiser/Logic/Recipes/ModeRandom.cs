@@ -7,7 +7,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal class ModeRandom : Mode
     {
-        private List<LogicEntity> _reachableMaterials => _entityHandler.GetReachable();
 
         internal ModeRandom(CoreLogic coreLogic, RecipeLogic recipeLogic) : base(coreLogic, recipeLogic)
         {
@@ -27,7 +26,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             for (int i = 1; i <= number; i++)
             {
-                LogicEntity ingredientEntity = GetRandom(_reachableMaterials, _blacklist);
+                LogicEntity ingredientEntity = GetRandom(_recipeLogic.ValidIngredients, _blacklist);
 
                 // Prevent duplicates.
                 if (_ingredients.Exists(x => x.techType == ingredientEntity.TechType))

@@ -223,7 +223,7 @@ namespace SubnauticaRandomiser.Logic
                 if (success)
                 {
                     notRandomised.Remove(nextEntity);
-                    nextEntity.InLogic = true;
+                    _EntityHandler.AddToLogic(nextEntity);
                     OnEntityRandomised(this, new EntityEventArgs(nextEntity));
                     _manager.TriggerProgressionEvents(nextEntity);
                 }

@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Objects.Events;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
@@ -27,6 +29,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _log = logger;
         }
 
+        public event EventHandler<EntityEventArgs> OnEnterLogic;
+
         /// <summary>
         /// Mark a single entity as accessible in logic.
         /// </summary>
@@ -39,6 +43,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _log.Debug($"Added entity to logic: {entity}");
             entity.InLogic = true;
             _inLogic.Add(entity);
+            OnEnterLogic(this, new EntityEventArgs(entity));
             return true;
         }
 
