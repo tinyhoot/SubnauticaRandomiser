@@ -80,9 +80,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Objects\Recipe.cs" />
     <Compile Include="Objects\Databox.cs" />
     <Compile Include="Objects\RandomiserVector.cs" />
-    <Compile Include="Objects\ProgressionPath.cs" />
     <Compile Include="Logic\CoreLogic.cs" />
-    <Compile Include="Logic\ProgressionTree.cs" />
     <Compile Include="Objects\LogicEntity.cs" />
     <Compile Include="Objects\SpawnData.cs" />
     <Compile Include="Logic\FragmentLogic.cs" />
