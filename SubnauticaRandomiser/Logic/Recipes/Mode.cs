@@ -14,7 +14,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         protected readonly CoreLogic _coreLogic;
         protected readonly RecipeLogic _recipeLogic;
         protected RandomiserConfig _config => _coreLogic._Config;
-        protected Materials _materials => _coreLogic._Materials;
+        protected EntityHandler _entityHandler => _coreLogic._EntityHandler;
         protected IRandomHandler _random => _coreLogic._Random;
         protected ILogHandler _log => _coreLogic._Log;
         
@@ -28,7 +28,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _recipeLogic = recipeLogic;
 
             if (_config.bDoBaseTheming)
-                _baseTheme = new BaseTheme(_materials, _log, _random);
+                _baseTheme = new BaseTheme(_entityHandler, _log, _random);
 
             //InitMod.s_masterDict.DictionaryInstance.Add(TechType.Titanium, _baseTheme.GetSerializableRecipe());
             //ChangeScrapMetalResult(_baseTheme);
@@ -54,18 +54,18 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             // Ensure that limited ingredients are not overused. Particularly
             // intended for cuddlefish.
-            int remainder = entity.MaxUsesPerGame - entity._usedInRecipes;
+            int remainder = entity.MaxUsesPerGame - entity.UsedInRecipes;
             if (entity.MaxUsesPerGame != 0 && remainder > 0 && remainder < amount)
                 amount = remainder;
 
             _ingredients.Add(new RandomiserIngredient(entity.TechType, amount));
-            entity._usedInRecipes++;
+            entity.UsedInRecipes++;
 
             if (!entity.HasUsesLeft())
             {
-                _materials.GetReachable().Remove(entity);
-                _log.Debug($"[R] ! Removing {entity} from materials list due to " + 
-                           $"max uses reached: {entity._usedInRecipes}");
+                _recipeLogic.ValidIngredients.Remove(entity);
+                _log.Debug($"[R] ! Removing {entity} ingredients list due to " + 
+                           $"max uses reached: {entity.UsedInRecipes}");
             }
         }
 
@@ -78,7 +78,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>A random, non-blacklisted element from the list.</returns>
         /// <exception cref="InvalidOperationException">Raised if the list is null or empty.</exception>
         [NotNull]
-        protected LogicEntity GetRandom(List<LogicEntity> list, List<ETechTypeCategory> blacklist = null)
+        protected LogicEntity GetRandom(ICollection<LogicEntity> list, List<ETechTypeCategory> blacklist = null)
         {
             if (list == null || list.Count == 0)
                 throw new InvalidOperationException("Failed to get valid entity from materials list: "
@@ -89,7 +89,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             {
                 randomEntity = _random.Choice(list);
 
-                if (blacklist != null && blacklist.Count > 0)
+                if (blacklist?.Count > 0)
                 {
                     if (blacklist.Contains(randomEntity.Category))
                         continue;

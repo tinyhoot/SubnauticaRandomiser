@@ -12,29 +12,27 @@ namespace SubnauticaRandomiser.Objects
     /// </summary>
     internal class LogicEntity
     {
-        public readonly EntityType Type;
+        public readonly EntityType EntityType;
         public readonly TechType TechType;
         public readonly ETechTypeCategory Category;
         public Blueprint Blueprint;             // For making it show up in the PDA
         public Recipe Recipe;                   // For actually crafting it
         public List<SpawnData> SpawnData;       // For spawning it naturally in the world
         public List<TechType> Prerequisites;    // What is absolutely mandatory before getting this?
-        public bool InLogic;                    // Is this available for randomising other entities?
+        public bool InLogic;                    // Has this already been randomised?
         public int AccessibleDepth;             // How deep down must you reach to get to this?
-
-        public int Value;                       // Rough value/rarity in relation to other entities
         public int MaxUsesPerGame;              // How often can this get used in recipes?
-        internal int _usedInRecipes;            // How often did this get used in recipes?
+        public int UsedInRecipes;               // How often did this get used in recipes?
+        public int Value;                       // Rough value/rarity in relation to other entities
 
-        public bool HasPrerequisites => !(Prerequisites is null) && Prerequisites.Count > 0;
+        public bool HasPrerequisites => Prerequisites?.Count > 0;
         public bool HasRecipe => !(Recipe is null);
         public bool HasSpawnData => !(SpawnData is null);
-        public bool IsFragment => Category.Equals(ETechTypeCategory.Fragments);
 
-        public LogicEntity(EntityType type, TechType techType, ETechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null,
+        public LogicEntity(EntityType entityType, TechType techType, ETechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null,
             List<SpawnData> spawnData = null, List<TechType> prerequisites = null, bool inLogic = false, int value = 0)
         {
-            Type = type;
+            EntityType = entityType;
             TechType = techType;
             Category = category;
             Blueprint = blueprint;
@@ -43,10 +41,9 @@ namespace SubnauticaRandomiser.Objects
             Prerequisites = prerequisites;
             InLogic = inLogic;
             AccessibleDepth = 0;
-
-            Value = value;
             MaxUsesPerGame = 0;
-            _usedInRecipes = 0;
+            UsedInRecipes = 0;
+            Value = value;
         }
         
         /// <summary>
@@ -56,24 +53,7 @@ namespace SubnauticaRandomiser.Objects
         /// <returns>True if it can act as an ingredient, false if not.</returns>
         public bool CanFunctionAsIngredient()
         {
-            ETechTypeCategory[] bad = { ETechTypeCategory.BaseBasePieces,
-                                        ETechTypeCategory.BaseExternalModules,
-                                        ETechTypeCategory.BaseGenerators,
-                                        ETechTypeCategory.BaseInternalModules,
-                                        ETechTypeCategory.BaseInternalPieces,
-                                        ETechTypeCategory.Deployables,
-                                        ETechTypeCategory.None,
-                                        ETechTypeCategory.Rocket,
-                                        ETechTypeCategory.Vehicles,
-                                        ETechTypeCategory.Fragments};
-
-            foreach (ETechTypeCategory cat in bad)
-            {
-                if (cat.Equals(Category))
-                    return false;
-            }
-
-            return true;
+            return Category.IsIngredient();
         }
         
          /// <summary>
@@ -89,7 +69,7 @@ namespace SubnauticaRandomiser.Objects
 
             foreach (TechType condition in Blueprint.UnlockConditions ?? Enumerable.Empty<TechType>())
             {
-                LogicEntity conditionEntity = logic._Materials.Find(condition);
+                LogicEntity conditionEntity = logic._EntityHandler.GetEntity(condition);
                 if (conditionEntity is null)
                     continue;
 
@@ -102,8 +82,7 @@ namespace SubnauticaRandomiser.Objects
                     || (!logic._Config.bUseSeeds && conditionEntity.Category.Equals(ETechTypeCategory.Seeds)))
                     continue;
 
-                if (logic._Serializer.RecipeDict.ContainsKey(condition)
-                    || logic._Materials.GetReachable().Exists(x => x.TechType.Equals(condition)))
+                if (logic._EntityHandler.IsInLogic(conditionEntity))
                     continue;
                 
                 return false;
@@ -166,7 +145,7 @@ namespace SubnauticaRandomiser.Objects
             if (MaxUsesPerGame <= 0)
                 return true;
 
-            if (_usedInRecipes < MaxUsesPerGame)
+            if (UsedInRecipes < MaxUsesPerGame)
                 return true;
 
             return false;

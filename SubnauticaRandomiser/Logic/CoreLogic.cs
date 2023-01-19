@@ -20,7 +20,7 @@ namespace SubnauticaRandomiser.Logic
         internal RandomiserConfig _Config { get; private set; }
         internal ILogHandler _Log { get; private set; }
         internal EntitySerializer _Serializer { get; private set; }
-        internal Materials _Materials { get; private set; }
+        internal EntityHandler _EntityHandler { get; private set; }
         internal IRandomHandler _Random { get; private set; }
 
         private ProgressionManager _manager;
@@ -82,7 +82,7 @@ namespace SubnauticaRandomiser.Logic
             _Log = Initialiser._Log;
             // This makes the async function run sync, but in this specific case that's necessary for more setup.
             List<LogicEntity> allMaterials = CSVReader.ParseDataFileAsync(Initialiser._RecipeFile, CSVReader.ParseRecipeLine).Result;
-            _Materials = new Materials(allMaterials, _Log);
+            _EntityHandler = new EntityHandler(allMaterials, _Log);
             _Serializer = new EntitySerializer(_Log);
             _Random = new RandomHandler(_Config.iSeed);
             
@@ -139,8 +139,8 @@ namespace SubnauticaRandomiser.Logic
             {
                 // Just randomise those flat out for now, instead of including them in the core loop.
                 _databoxLogic.RandomiseDataboxes();
-                _databoxLogic.UpdateBlueprints(_Materials.GetAll());
-                _databoxLogic.LinkCyclopsHullModules(_Materials);
+                _databoxLogic.UpdateBlueprints(_EntityHandler.GetAll());
+                _databoxLogic.LinkCyclopsHullModules(_EntityHandler);
             }
 
             if (_fragmentLogic != null)
@@ -151,12 +151,12 @@ namespace SubnauticaRandomiser.Logic
                     // Initialise the fragment cache and remove vanilla spawns.
                     FragmentLogic.Init();
                     // Queue up all fragments to be randomised.
-                    notRandomised.AddRange(_Materials.GetAllFragments());
+                    notRandomised.AddRange(_EntityHandler.GetAllFragments());
                 }
                 
                 // Randomise the number of fragment scans required per blueprint.
                 if (_Config.bRandomiseNumFragments)
-                    _fragmentLogic.RandomiseNumFragments(_Materials.GetAllFragments());
+                    _fragmentLogic.RandomiseNumFragments(_EntityHandler.GetAllFragments());
                 
                 // Randomise duplicate scan rewards.
                 if (_Config.bRandomiseDuplicateScans)
@@ -167,12 +167,12 @@ namespace SubnauticaRandomiser.Logic
             {
                 _recipeLogic.UpdateReachableMaterials(0);
                 // Queue up all craftables to be randomised.
-                notRandomised.AddRange(_Materials.GetAllCraftables());
+                notRandomised.AddRange(_EntityHandler.GetAllCraftables());
                 
                 // Update the progression tree with recipes.
                 _Tree.SetupRecipes(_Config.bVanillaUpgradeChains);
                 if (_Config.bVanillaUpgradeChains)
-                    _Tree.ApplyUpgradeChainToPrerequisites(_Materials.GetAll());
+                    _Tree.ApplyUpgradeChainToPrerequisites(_EntityHandler.GetAll());
             }
         }
 
@@ -211,10 +211,10 @@ namespace SubnauticaRandomiser.Logic
 
                 LogicEntity nextEntity = ChooseNextEntity(notRandomised);
                 // Choose a logic appropriate to the entity.
-                ILogicModule handler = _entityHandlers.GetOrDefault(nextEntity.Type, null);
+                ILogicModule handler = _entityHandlers.GetOrDefault(nextEntity.EntityType, null);
                 if (handler is null)
                 {
-                    _Log.Warn($"[Core] Unsupported entity in main loop: {nextEntity.Type} {nextEntity}");
+                    _Log.Warn($"[Core] Unsupported entity in main loop: {nextEntity.EntityType} {nextEntity}");
                     notRandomised.Remove(nextEntity);
                     continue;
                 }
@@ -290,7 +290,7 @@ namespace SubnauticaRandomiser.Logic
         /// <exception cref="ArgumentNullException">If the TechType does not have an associated LogicEntity.</exception>
         public bool HasRandomised(TechType techType)
         {
-            LogicEntity entity = _Materials.Find(techType);
+            LogicEntity entity = _EntityHandler.GetEntity(techType);
             if (entity is null)
                 throw new ArgumentNullException(nameof(techType), $"There is no LogicEntity corresponding to {techType}!");
             return entity.InLogic;

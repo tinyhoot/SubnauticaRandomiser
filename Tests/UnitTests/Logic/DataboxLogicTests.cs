@@ -117,9 +117,9 @@ namespace Tests.UnitTests.Logic
             LogicEntity mod3 = new LogicEntity(TechType.CyclopsHullModule3, ETechTypeCategory.VehicleUpgrades,
                 new Blueprint(TechType.CyclopsHullModule3, null, null, true, 20));
             List<LogicEntity> modules = new List<LogicEntity> { mod1, mod2, mod3 };
-            Materials materials = new Materials(modules, new FakeLogger());
+            EntityHandler entityHandler = new EntityHandler(modules, new FakeLogger());
 
-            _databoxLogic.LinkCyclopsHullModules(materials);
+            _databoxLogic.LinkCyclopsHullModules(entityHandler);
             Assert.AreEqual(mod1.Blueprint.UnlockDepth, mod2.Blueprint.UnlockDepth);
             Assert.AreEqual(mod1.Blueprint.UnlockConditions, mod2.Blueprint.UnlockConditions);
             Assert.AreEqual(mod1.Blueprint.UnlockDepth, mod3.Blueprint.UnlockDepth);
@@ -135,9 +135,9 @@ namespace Tests.UnitTests.Logic
             LogicEntity mod2 = new LogicEntity(TechType.CyclopsHullModule2, ETechTypeCategory.VehicleUpgrades,
                 new Blueprint(TechType.CyclopsHullModule2, null, null, true, 30));
             List<LogicEntity> modules = new List<LogicEntity> { mod1, mod2 };
-            Materials materials = new Materials(modules, new FakeLogger());
+            EntityHandler entityHandler = new EntityHandler(modules, new FakeLogger());
 
-            Assert.Throws<ArgumentException>(() => _databoxLogic.LinkCyclopsHullModules(materials));
+            Assert.Throws<ArgumentException>(() => _databoxLogic.LinkCyclopsHullModules(entityHandler));
         }
 
         [Test]

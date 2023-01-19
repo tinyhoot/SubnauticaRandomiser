@@ -1,4 +1,6 @@
-﻿namespace SubnauticaRandomiser.Objects.Enums
+﻿using System.Linq;
+
+namespace SubnauticaRandomiser.Objects.Enums
 {
     public enum ETechTypeCategory
     {
@@ -25,47 +27,69 @@
         BaseInternalModules,
         BaseInternalPieces,
         BaseGenerators,
-        Fragments
+        Fragments,
+        Databoxes,
     }
 
     public static class TTCategoryExtensions
     {
+        private static readonly ETechTypeCategory[] _basePieces = new[]
+        {
+            ETechTypeCategory.BaseBasePieces,
+            ETechTypeCategory.BaseExternalModules,
+            ETechTypeCategory.BaseInternalModules,
+            ETechTypeCategory.BaseInternalPieces,
+            ETechTypeCategory.BaseGenerators,
+        };
+
+        private static readonly ETechTypeCategory[] _notCraftables = new[]
+        {
+            ETechTypeCategory.None,
+            ETechTypeCategory.Eggs,
+            ETechTypeCategory.Fish,
+            ETechTypeCategory.Seeds,
+            ETechTypeCategory.RawMaterials,
+            ETechTypeCategory.Fragments,
+            ETechTypeCategory.Databoxes,
+        };
+        
+        private static readonly ETechTypeCategory[] _notIngredients = new[]
+        {
+            ETechTypeCategory.BaseBasePieces,
+            ETechTypeCategory.BaseExternalModules,
+            ETechTypeCategory.BaseGenerators,
+            ETechTypeCategory.BaseInternalModules,
+            ETechTypeCategory.BaseInternalPieces,
+            ETechTypeCategory.Deployables,
+            ETechTypeCategory.None,
+            ETechTypeCategory.Rocket,
+            ETechTypeCategory.Vehicles,
+            ETechTypeCategory.Fragments,
+            ETechTypeCategory.Databoxes,
+        };
+
         /// <summary>
-        /// Checks whether this category is made up of base pieces.
+        /// Check whether this category is made up of base pieces.
         /// </summary>
-        /// <returns>True if the category belongs to base pieces, falls otherwise.</returns>
         public static bool IsBasePiece(this ETechTypeCategory category)
         {
-            switch (category)
-            {
-                case (ETechTypeCategory.BaseBasePieces):
-                case (ETechTypeCategory.BaseExternalModules):
-                case (ETechTypeCategory.BaseInternalModules):
-                case (ETechTypeCategory.BaseInternalPieces):
-                case (ETechTypeCategory.BaseGenerators):
-                    return true;
-                default:
-                    return false;
-            }
+            return _basePieces.Contains(category);
         }
 
         /// <summary>
-        /// Checks whether this category is capable of showing up in the PDA as a craftable item.
+        /// Check whether this category is capable of showing up in the PDA as a craftable item.
         /// </summary>
-        /// <returns>True if the category can be craftable, false otherwise.</returns>
-        public static bool CanHaveRecipe(this ETechTypeCategory category)
+        public static bool IsCraftable(this ETechTypeCategory category)
         {
-            switch (category)
-            {
-                case (ETechTypeCategory.Eggs):
-                case (ETechTypeCategory.Fish):
-                case (ETechTypeCategory.Seeds):
-                case (ETechTypeCategory.RawMaterials):
-                case (ETechTypeCategory.Fragments):
-                    return false;
-                default:
-                    return true;
-            }
+            return !_notCraftables.Contains(category);
+        }
+
+        /// <summary>
+        /// Check whether this category can function as an ingredient in recipes.
+        /// </summary>
+        public static bool IsIngredient(this ETechTypeCategory category)
+        {
+            return !_notIngredients.Contains(category);
         }
     }
 }

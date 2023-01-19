@@ -39,8 +39,8 @@ namespace SubnauticaRandomiser.Logic
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             RandomiseDataboxes(serializer);
-            UpdateBlueprints(_coreLogic._Materials.GetAll());
-            LinkCyclopsHullModules(_coreLogic._Materials);
+            UpdateBlueprints(_coreLogic._EntityHandler.GetAll());
+            LinkCyclopsHullModules(_coreLogic._EntityHandler);
         }
 
         public bool RandomiseEntity(ref LogicEntity entity)
@@ -124,11 +124,11 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         /// <exception cref="ArgumentException">If the LogicEntity or databox for one of the hull modules cannot be
         /// found.</exception>
-        public void LinkCyclopsHullModules(Materials materials)
+        public void LinkCyclopsHullModules(EntityHandler entityHandler)
         {
-            LogicEntity mod1 = materials.Find(TechType.CyclopsHullModule1);
-            LogicEntity mod2 = materials.Find(TechType.CyclopsHullModule2);
-            LogicEntity mod3 = materials.Find(TechType.CyclopsHullModule3);
+            LogicEntity mod1 = entityHandler.GetEntity(TechType.CyclopsHullModule1);
+            LogicEntity mod2 = entityHandler.GetEntity(TechType.CyclopsHullModule2);
+            LogicEntity mod3 = entityHandler.GetEntity(TechType.CyclopsHullModule3);
 
             if (mod1 is null || mod2 is null || mod3 is null)
                 throw new ArgumentException("Tried to link Cyclops Hull Modules, but found null for entities.");

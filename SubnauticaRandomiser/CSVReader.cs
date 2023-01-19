@@ -232,7 +232,7 @@ namespace SubnauticaRandomiser
 
             // Only if the category corresponds to a techtype commonly associated with a craftable thing, ship the
             // entity with a recipe.
-            if (category.CanHaveRecipe())
+            if (category.IsCraftable())
                 recipe = new Recipe(techType);
 
             _log.Debug($"Registering entity: {techType.AsString()}, {category}, {depth}, {prereqList.Count}"

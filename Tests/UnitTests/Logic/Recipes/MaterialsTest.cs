@@ -11,7 +11,7 @@ namespace Tests.UnitTests.Logic.Recipes
     public class MaterialsTest
     {
         private List<LogicEntity> _allMaterials;
-        private Materials _mat;
+        private EntityHandler _mat;
 
         [SetUp]
         public void Init()
@@ -27,7 +27,7 @@ namespace Tests.UnitTests.Logic.Recipes
                 new LogicEntity(TechType.SeaCrownSeed, ETechTypeCategory.Seeds, prerequisites: new List<TechType>(){TechType.Knife}){ AccessibleDepth = 100},
                 new LogicEntity(TechType.BeaconFragment, ETechTypeCategory.Fragments)
             };
-            _mat = new Materials(_allMaterials, new FakeLogger());
+            _mat = new EntityHandler(_allMaterials, new FakeLogger());
         }
 
         [TestCase(ETechTypeCategory.RawMaterials, 0, ExpectedResult = true)]
@@ -38,7 +38,7 @@ namespace Tests.UnitTests.Logic.Recipes
         [TestCase(ETechTypeCategory.Eggs, 0, ExpectedResult = false)]
         public bool TestAddReachable_Category(ETechTypeCategory category, int maxDepth)
         {
-            return _mat.AddReachable(category, maxDepth);
+            return _mat.AddToLogic(category, maxDepth);
         }
 
         [TestCase(new[]{ ETechTypeCategory.RawMaterials }, 0)]
@@ -48,7 +48,7 @@ namespace Tests.UnitTests.Logic.Recipes
         [TestCase(new[]{ ETechTypeCategory.Fish, ETechTypeCategory.Equipment }, 100)]
         public void TestAddReachable_Categories(ETechTypeCategory[] categories, int maxDepth)
         {
-            Assert.True(_mat.AddReachable(categories, maxDepth));
+            Assert.True(_mat.AddToLogic(categories, maxDepth));
         }
         
         [TestCase(new[]{ ETechTypeCategory.RawMaterials }, -1)]
@@ -57,7 +57,7 @@ namespace Tests.UnitTests.Logic.Recipes
         [TestCase(new[]{ ETechTypeCategory.AdvancedMaterials}, 100)]
         public void TestAddReachable_Categories_Fail(ETechTypeCategory[] categories, int maxDepth)
         {
-            Assert.False(_mat.AddReachable(categories, maxDepth));
+            Assert.False(_mat.AddToLogic(categories, maxDepth));
         }
 
         [TestCase(TechType.Titanium, ETechTypeCategory.RawMaterials, ExpectedResult = true)]
@@ -83,7 +83,7 @@ namespace Tests.UnitTests.Logic.Recipes
         [TestCase(ETechTypeCategory.Seeds, -1, TechType.Knife, ExpectedResult = false)]
         public bool TestAddReachableWithPrereqs(ETechTypeCategory category, int maxDepth, TechType prereq)
         {
-            return _mat.AddReachableWithPrereqs(category, maxDepth, prereq);
+            return _mat.AddToLogic(category, maxDepth, prereq);
         }
 
         [TestCase(ETechTypeCategory.RawMaterials, 100, TechType.Knife, ExpectedResult = true)]
@@ -92,7 +92,7 @@ namespace Tests.UnitTests.Logic.Recipes
         [TestCase(ETechTypeCategory.Seeds, -1, TechType.Knife, ExpectedResult = false)]
         public bool TestAddReachableWithPrereqs_Invert(ETechTypeCategory category, int maxDepth, TechType prereq)
         {
-            return _mat.AddReachableWithPrereqs(category, maxDepth, prereq, invert: true);
+            return _mat.AddToLogic(category, maxDepth, prereq, invert: true);
         }
         
         [TestCase(new[]{ ETechTypeCategory.RawMaterials, ETechTypeCategory.Electronics }, 100, TechType.Knife, ExpectedResult = false)]
@@ -100,7 +100,7 @@ namespace Tests.UnitTests.Logic.Recipes
         [TestCase(new[]{ ETechTypeCategory.RawMaterials, ETechTypeCategory.Seeds }, -1, TechType.Knife, ExpectedResult = false)]
         public bool TestAddReachableWithPrereqs_Multiple(ETechTypeCategory[] categories, int maxDepth, TechType prereq)
         {
-            return _mat.AddReachableWithPrereqs(categories, maxDepth, prereq);
+            return _mat.AddToLogic(categories, maxDepth, prereq);
         }
         
         [TestCase(new[]{ ETechTypeCategory.RawMaterials, ETechTypeCategory.Electronics }, 100, TechType.Knife, ExpectedResult = true)]
@@ -109,19 +109,19 @@ namespace Tests.UnitTests.Logic.Recipes
         [TestCase(new[]{ ETechTypeCategory.RawMaterials, ETechTypeCategory.Seeds }, -1, TechType.Knife, ExpectedResult = false)]
         public bool TestAddReachableWithPrereqs_Multiple_Invert(ETechTypeCategory[] categories, int maxDepth, TechType prereq)
         {
-            return _mat.AddReachableWithPrereqs(categories, maxDepth, prereq, invert: true);
+            return _mat.AddToLogic(categories, maxDepth, prereq, invert: true);
         }
 
         [Test]
         public void TestFind()
         {
-            Assert.AreEqual(TechType.Titanium, _mat.Find(TechType.Titanium)?.TechType);
+            Assert.AreEqual(TechType.Titanium, _mat.GetEntity(TechType.Titanium)?.TechType);
         }
 
         [Test]
         public void TestFind_Null()
         {
-            Assert.Null(_mat.Find(TechType.DiveSuit));
+            Assert.Null(_mat.GetEntity(TechType.DiveSuit));
         }
 
         [Test]

@@ -7,7 +7,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal class ModeRandom : Mode
     {
-        private List<LogicEntity> _reachableMaterials => _materials.GetReachable();
+        private List<LogicEntity> _reachableMaterials => _entityHandler.GetReachable();
 
         internal ModeRandom(CoreLogic coreLogic, RecipeLogic recipeLogic) : base(coreLogic, recipeLogic)
         {

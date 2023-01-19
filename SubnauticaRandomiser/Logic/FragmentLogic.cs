@@ -97,7 +97,7 @@ namespace SubnauticaRandomiser.Logic
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             if (_config.bRandomiseNumFragments)
-                RandomiseNumFragments(_coreLogic._Materials.GetAllFragments());
+                RandomiseNumFragments(_coreLogic._EntityHandler.GetAllFragments());
             // Randomise duplicate scan rewards.
             if (_config.bRandomiseDuplicateScans)
                 CreateDuplicateScanYieldDict();
@@ -165,7 +165,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void OnCollectRandomisableEntities(object sender, CollectEntitiesEventArgs args)
         {
-            args.ToBeRandomised.AddRange(_coreLogic._Materials.GetAllFragments());
+            args.ToBeRandomised.AddRange(_coreLogic._EntityHandler.GetAllFragments());
         }
 
         /// <summary>
@@ -277,9 +277,9 @@ namespace SubnauticaRandomiser.Logic
         private void CreateDuplicateScanYieldDict()
         {
             _serializer.FragmentMaterialYield = new Dictionary<TechType, float>();
-            var materials = _coreLogic._Materials.GetAllRawMaterials(50);
+            var materials = _coreLogic._EntityHandler.GetAllRawMaterials(50);
             // Gaining seeds from fragments is not great for balance. Remove that.
-            materials.Remove(_coreLogic._Materials.Find(TechType.CreepvineSeedCluster));
+            materials.Remove(_coreLogic._EntityHandler.GetEntity(TechType.CreepvineSeedCluster));
 
             foreach (LogicEntity entity in materials)
             {
@@ -439,7 +439,7 @@ namespace SubnauticaRandomiser.Logic
         {
             // Find the recipe that needs the given fragment as a prerequisite, i.e. the recipe that is unlocked
             // by the fragment.
-            LogicEntity recipe = _coreLogic._Materials.GetAll()
+            LogicEntity recipe = _coreLogic._EntityHandler.GetAll()
                 .Find(e => e.Blueprint?.Fragments?.Contains(entity.TechType) ?? false);
             if (recipe is null || !_coreLogic._Tree.IsProgressionItem(recipe)
                                || unlockedProgressionItems.ContainsKey(recipe.TechType))

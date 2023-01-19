@@ -52,6 +52,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Objects\Events\EntityEventArgs.cs" />
     <Compile Include="Objects\Events\SetupPriorityEventArgs.cs" />
     <Compile Include="Objects\Events\SetupProgressionEventArgs.cs" />
+    <Compile Include="Objects\LogicEntityEqualityComparer.cs" />
     <Compile Include="Patches\AuroraPatcher.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
     <Compile Include="Patches\LanguagePatcher.cs" />
@@ -59,7 +60,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Patches\FragmentPatcher.cs" />
     <Compile Include="Initialiser.cs" />
     <Compile Include="Logic\DataboxLogic.cs" />
-    <Compile Include="Logic\Recipes\Materials.cs" />
+    <Compile Include="Logic\Recipes\EntityHandler.cs" />
     <Compile Include="Logic\Recipes\Mode.cs" />
     <Compile Include="Logic\Recipes\ModeBalanced.cs" />
     <Compile Include="Logic\Recipes\ModeRandom.cs" />

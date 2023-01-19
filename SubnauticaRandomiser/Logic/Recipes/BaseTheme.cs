@@ -9,15 +9,15 @@ namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal class BaseTheme
     {
-        private Materials _materials;
+        private EntityHandler _entityHandler;
         private ILogHandler _log;
         private IRandomHandler _random;
 
         private LogicEntity _baseTheme;
 
-        public BaseTheme(Materials materials, ILogHandler logger, IRandomHandler random)
+        public BaseTheme(EntityHandler entityHandler, ILogHandler logger, IRandomHandler random)
         {
-            _materials = materials;
+            _entityHandler = entityHandler;
             _log = logger;
             _random = random;
         }
@@ -30,21 +30,19 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>A random LogicEntity from the Raw Materials or (if enabled) Fish categories.</returns>
         public LogicEntity ChooseBaseTheme(int depth, bool useFish = false)
         {
-            List<LogicEntity> options = new List<LogicEntity>();
-
-            options.AddRange(_materials.GetAll().FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials)
-                                                              && x.AccessibleDepth < depth
-                                                              && !x.HasPrerequisites
-                                                              && x.MaxUsesPerGame == 0
-                                                              && x.GetItemSize() == 1));
+            var options = _entityHandler.GetAll().FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials)
+                                                               && x.AccessibleDepth < depth
+                                                               && !x.HasPrerequisites
+                                                               && x.MaxUsesPerGame == 0
+                                                               && x.GetItemSize() == 1);
 
             if (useFish)
             {
-                options.AddRange(_materials.GetAll().FindAll(x => x.Category.Equals(ETechTypeCategory.Fish)
-                                                                  && x.AccessibleDepth < depth
-                                                                  && !x.HasPrerequisites
-                                                                  && x.MaxUsesPerGame == 0
-                                                                  && x.GetItemSize() == 1));
+                options.AddRange(_entityHandler.GetAll().FindAll(x => x.Category.Equals(ETechTypeCategory.Fish)
+                                                                      && x.AccessibleDepth < depth
+                                                                      && !x.HasPrerequisites
+                                                                      && x.MaxUsesPerGame == 0
+                                                                      && x.GetItemSize() == 1));
             }
 
             _baseTheme = _random.Choice(options);

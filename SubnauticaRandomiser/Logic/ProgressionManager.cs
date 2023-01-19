@@ -343,7 +343,7 @@ namespace SubnauticaRandomiser.Logic
             List<LogicEntity> additions = new List<LogicEntity>();
             foreach (TechType techType in GetUnusedPriorityEntities(depth))
             {
-                LogicEntity entity = _coreLogic._Materials.Find(techType);
+                LogicEntity entity = _coreLogic._EntityHandler.GetEntity(techType);
                 additions.Add(entity);
                 _log.Debug($"[PM] Adding priority entity {entity} to priority queue for depth {depth}");
             }

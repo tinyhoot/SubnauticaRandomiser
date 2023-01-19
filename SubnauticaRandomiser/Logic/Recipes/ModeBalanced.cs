@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using SMLHelper.V2.Handlers;
 using SubnauticaRandomiser.Objects;
@@ -9,7 +10,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
     internal class ModeBalanced : Mode
     {
         private int _basicOutpostSize;
-        private List<LogicEntity> _reachableMaterials => _materials.GetReachable();
+        private HashSet<LogicEntity> _validIngredients => _recipeLogic.ValidIngredients;
 
         public ModeBalanced(CoreLogic coreLogic, RecipeLogic recipeLogic) : base(coreLogic, recipeLogic)
         {
@@ -109,15 +110,14 @@ namespace SubnauticaRandomiser.Logic.Recipes
         [NotNull]
         private LogicEntity ChoosePrimaryIngredient(LogicEntity entity)
         {
-            List<LogicEntity> pIngredientCandidates = _reachableMaterials.FindAll(x =>
-                (entity.Value * (_config.dPrimaryIngredientValue + 0.1)) > x.Value
-                && (entity.Value * (_config.dPrimaryIngredientValue - 0.1)) < x.Value
-                && !_blacklist.Contains(x.Category)
-            );
+            double maxValue = entity.Value * (_config.dPrimaryIngredientValue + 0.1);
+            double minValue = entity.Value * (_config.dPrimaryIngredientValue - 0.1);
+            List<LogicEntity> pIngredientCandidates = _validIngredients
+                .Where(e => minValue < e.Value && e.Value < maxValue && !_blacklist.Contains(e.Category)).ToList();
 
             // If we had no luck, just pick a random one.
             if (pIngredientCandidates.Count == 0)
-                pIngredientCandidates.Add(GetRandom(_reachableMaterials, _blacklist));
+                pIngredientCandidates.Add(GetRandom(_validIngredients, _blacklist));
 
             LogicEntity primaryIngredient = _random.Choice(pIngredientCandidates);
 
@@ -127,7 +127,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             // If vanilla upgrade chains are set to be preserved, replace
             // the primary ingredient with the base item.
-            primaryIngredient = _recipeLogic.GetBaseOfUpgrade(entity.TechType, _materials) ?? primaryIngredient;
+            primaryIngredient = _recipeLogic.GetBaseOfUpgrade(entity.TechType, _entityHandler) ?? primaryIngredient;
             
             // Disallow the builder tool from being used in base pieces.
             if (entity.Category.IsBasePiece() && primaryIngredient.TechType.Equals(TechType.Builder))
@@ -146,7 +146,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private (LogicEntity ingredient, int number) ChooseSecondaryIngredient(LogicEntity entity, int currentValue,
             int totalSize)
         {
-            LogicEntity ingredient = GetRandom(_reachableMaterials, _blacklist);
+            LogicEntity ingredient = GetRandom(_validIngredients, _blacklist);
 
             // Prevent duplicates.
             if (_ingredients.Exists(x => x.techType == ingredient.TechType))
@@ -216,18 +216,20 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // but stop before it gets out of hand.
             while (betterOptions.Count == 0 && range < 1.0)
             {
+                double maxValue = undesirable.Value + (undesirable.Value * range);
+                double minValue = undesirable.Value - (undesirable.Value * range);
                 // Add all items of the same category with value +- range%
-                betterOptions.AddRange(_reachableMaterials.FindAll(x => x.Category.Equals(undesirable.Category)
-                                                                     && x.Value < undesirable.Value + (undesirable.Value * range)
-                                                                     && x.Value > undesirable.Value - (undesirable.Value * range)
-                                                                     ));
+                betterOptions.AddRange(_validIngredients.Where(x => x.Category.Equals(undesirable.Category)
+                                                                    && minValue < x.Value
+                                                                    && x.Value < maxValue
+                ));
                 range += 0.2;
             }
 
             // If the loop above exited due to the range getting too large, just
             // use any unlocked raw material instead.
             if (betterOptions.Count == 0)
-                betterOptions.AddRange(_reachableMaterials.FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials)));
+                betterOptions.AddRange(_validIngredients.Where(x => x.Category.Equals(ETechTypeCategory.RawMaterials)));
 
             return _random.Choice(betterOptions);
         }

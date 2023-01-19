@@ -23,11 +23,12 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
         private RandomiserConfig _config;
         private ILogHandler _log;
-        private Materials _materials => _coreLogic._Materials;
+        private EntityHandler _entityHandler;
         private Mode _mode;
 
         public Dictionary<TechType, int> BasicOutpostPieces { get; private set; }
         public Dictionary<TechType, TechType> UpgradeChains { get; private set; }
+        public HashSet<LogicEntity> ValidIngredients { get; private set; }
         
 
         private void Awake()
@@ -35,7 +36,9 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
             _config = _coreLogic._Config;
+            _entityHandler = _coreLogic._EntityHandler;
             _log = _coreLogic._Log;
+            ValidIngredients = new HashSet<LogicEntity>(new LogicEntityEqualityComparer());
             
             // Decide which recipe mode will be used.
             switch (_config.iRandomiserMode)
@@ -83,10 +86,10 @@ namespace SubnauticaRandomiser.Logic.Recipes
             entity = _mode.RandomiseIngredients(entity);
             ApplyRandomisedRecipe(entity.Recipe);
 
-            // Only add this entity to the materials list if it can be an ingredient.
+            // Only add this entity to the ingredients list if it can actually be an ingredient.
             // TODO: Move to event, out of this class
             if (entity.CanFunctionAsIngredient())
-                _materials.AddReachable(entity);
+                ValidIngredients.Add(entity);
 
             entity.InLogic = true;
             _log.Debug($"[R][+] Randomised recipe for [{entity}].");
@@ -103,7 +106,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// </summary>
         private void OnCollectRandomisableEntities(object sender, CollectEntitiesEventArgs args)
         {
-            args.ToBeRandomised.AddRange(_materials.GetAllCraftables());
+            args.ToBeRandomised.AddRange(_entityHandler.GetAllCraftables());
         }
 
         /// <summary>
@@ -114,16 +117,16 @@ namespace SubnauticaRandomiser.Logic.Recipes
             int depth = _manager.ReachableDepth;
             
             if (IsAnyKnifeRandomised())
-                _materials.AddReachable(ETechTypeCategory.RawMaterials, depth);
+                _entityHandler.AddToLogic(ETechTypeCategory.RawMaterials, depth);
             else
-                _materials.AddReachableWithPrereqs(ETechTypeCategory.RawMaterials, depth, TechType.Knife, true);
+                _entityHandler.AddToLogic(ETechTypeCategory.RawMaterials, depth, TechType.Knife, true);
 
             if (_config.bUseFish)
-                _materials.AddReachable(ETechTypeCategory.Fish, depth);
+                _entityHandler.AddToLogic(ETechTypeCategory.Fish, depth);
             if (_config.bUseEggs && _coreLogic.HasRandomised(TechType.BaseWaterPark))
-                _materials.AddReachable(ETechTypeCategory.Eggs, depth);
+                _entityHandler.AddToLogic(ETechTypeCategory.Eggs, depth);
             if (_config.bUseSeeds && IsAnyKnifeRandomised())
-                _materials.AddReachable(ETechTypeCategory.Seeds, depth);
+                _entityHandler.AddToLogic(ETechTypeCategory.Seeds, depth);
         }
 
         private void OnSetup(object sender, EventArgs args)
@@ -158,7 +161,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                     { TechType.PlasteelTank, TechType.DoubleTank },
                     { TechType.HighCapacityTank, TechType.DoubleTank },
                 };
-                ApplyUpgradeChainPrerequisites(_materials, UpgradeChains);
+                ApplyUpgradeChainPrerequisites(_entityHandler, UpgradeChains);
             }
         }
 
@@ -221,15 +224,15 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// Add early elements of an upgrade chain as prerequisites of the later pieces to ensure that they are always
         /// randomised in order, and no Knife can require a Heatblade as ingredient.
         /// </summary>
-        private void ApplyUpgradeChainPrerequisites(Materials materials, Dictionary<TechType, TechType> upgradeChains)
+        private void ApplyUpgradeChainPrerequisites(EntityHandler entityHandler, Dictionary<TechType, TechType> upgradeChains)
         {
-            if (materials is null || upgradeChains is null || upgradeChains.Count == 0)
+            if (entityHandler is null || upgradeChains is null || upgradeChains.Count == 0)
                 return;
             
             foreach (TechType upgrade in upgradeChains.Keys)
             {
                 TechType ingredient = upgradeChains[upgrade];
-                LogicEntity entity = materials.Find(upgrade);
+                LogicEntity entity = entityHandler.GetEntity(upgrade);
 
                 if (!entity.HasPrerequisites)
                     entity.Prerequisites = new List<TechType>();
@@ -256,16 +259,16 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <example>Returns the basic Knife when given HeatBlade.</example>
         /// </summary>
         /// <param name="upgrade">The upgrade to check for a base.</param>
-        /// <param name="materials">The list of all materials.</param>
+        /// <param name="entityHandler">The list of all materials.</param>
         /// <returns>A LogicEntity if the given upgrade has a base it upgrades from, null otherwise.</returns>
         [CanBeNull]
-        public LogicEntity GetBaseOfUpgrade(TechType upgrade, Materials materials)
+        public LogicEntity GetBaseOfUpgrade(TechType upgrade, EntityHandler entityHandler)
         {
             TechType basicEntity = GetBaseOfUpgrade(upgrade);
             if (basicEntity.Equals(TechType.None))
                 return null;
 
-            return materials.Find(basicEntity);
+            return entityHandler.GetEntity(basicEntity);
         }
 
         /// <summary>
