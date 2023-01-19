@@ -1,6 +1,6 @@
 ﻿namespace SubnauticaRandomiser.Objects.Enums
 {
-    public enum EWreckage
+    public enum Wreckage
     {
         None,
         Wreck1,

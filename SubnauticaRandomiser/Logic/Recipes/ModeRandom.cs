@@ -74,13 +74,13 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             // Tools and upgrades do not stack, but if the recipe would require several and you have more than one in
             // inventory, it will consume all of them.
-            if (entity.Category.Equals(ETechTypeCategory.Tools) 
-                || entity.Category.Equals(ETechTypeCategory.VehicleUpgrades) 
-                || entity.Category.Equals(ETechTypeCategory.WorkBenchUpgrades))
+            if (entity.Category.Equals(TechTypeCategory.Tools) 
+                || entity.Category.Equals(TechTypeCategory.VehicleUpgrades) 
+                || entity.Category.Equals(TechTypeCategory.WorkBenchUpgrades))
                 max = 1;
 
             // Never require more than one (default) egg. That's tedious.
-            if (entity.Category.Equals(ETechTypeCategory.Eggs))
+            if (entity.Category.Equals(TechTypeCategory.Eggs))
                 max = _config.iMaxEggsAsSingleIngredient;
 
             return max;

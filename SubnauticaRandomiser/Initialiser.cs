@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using BepInEx;
 using HarmonyLib;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Patches;

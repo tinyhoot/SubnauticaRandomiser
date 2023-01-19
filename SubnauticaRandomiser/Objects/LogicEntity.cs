@@ -14,7 +14,7 @@ namespace SubnauticaRandomiser.Objects
     {
         public readonly EntityType EntityType;
         public readonly TechType TechType;
-        public readonly ETechTypeCategory Category;
+        public readonly TechTypeCategory Category;
         public Blueprint Blueprint;             // For making it show up in the PDA
         public Recipe Recipe;                   // For actually crafting it
         public List<SpawnData> SpawnData;       // For spawning it naturally in the world
@@ -29,7 +29,7 @@ namespace SubnauticaRandomiser.Objects
         public bool HasRecipe => !(Recipe is null);
         public bool HasSpawnData => !(SpawnData is null);
 
-        public LogicEntity(EntityType entityType, TechType techType, ETechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null,
+        public LogicEntity(EntityType entityType, TechType techType, TechTypeCategory category, Blueprint blueprint = null, Recipe recipe = null,
             List<SpawnData> spawnData = null, List<TechType> prerequisites = null, bool inLogic = false, int value = 0)
         {
             EntityType = entityType;
@@ -77,9 +77,9 @@ namespace SubnauticaRandomiser.Objects
                 // fruitlessly searches for a bladderfish which never enters its algorithm.
                 // Eggs and seeds are never problematic in vanilla, but are covered in case users add their own
                 // modded items with those.
-                if ((!logic._Config.bUseFish && conditionEntity.Category.Equals(ETechTypeCategory.Fish))
-                    || (!logic._Config.bUseEggs && conditionEntity.Category.Equals(ETechTypeCategory.Eggs))
-                    || (!logic._Config.bUseSeeds && conditionEntity.Category.Equals(ETechTypeCategory.Seeds)))
+                if ((!logic._Config.bUseFish && conditionEntity.Category.Equals(TechTypeCategory.Fish))
+                    || (!logic._Config.bUseEggs && conditionEntity.Category.Equals(TechTypeCategory.Eggs))
+                    || (!logic._Config.bUseSeeds && conditionEntity.Category.Equals(TechTypeCategory.Seeds)))
                     continue;
 
                 if (logic._EntityHandler.IsInLogic(conditionEntity))

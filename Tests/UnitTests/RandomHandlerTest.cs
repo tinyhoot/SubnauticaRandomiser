@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using SubnauticaRandomiser;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects;
 
 namespace Tests.UnitTests

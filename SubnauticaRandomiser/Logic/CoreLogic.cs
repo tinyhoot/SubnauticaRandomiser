@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using HarmonyLib;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects;

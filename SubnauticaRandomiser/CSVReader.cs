@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Exceptions;
@@ -52,19 +53,19 @@ namespace SubnauticaRandomiser
         /// </summary>
         /// <param name="fileName">The .csv file to parse.</param>
         /// <returns>The parsed Dictionary if successful, or null otherwise.</returns>
-        public static async Task<Dictionary<EBiomeType, List<float[]>>> ParseAlternateStartAsync(string fileName)
+        public static async Task<Dictionary<Objects.Enums.BiomeType, List<float[]>>> ParseAlternateStartAsync(string fileName)
         {
             List<string[]> lines = await ReadCsvAsync(fileName);
             if (lines is null)
                 throw new ParsingException();
 
-            Dictionary<EBiomeType, List<float[]>> parsedStarts = new Dictionary<EBiomeType, List<float[]>>();
+            Dictionary<Objects.Enums.BiomeType, List<float[]>> parsedStarts = new Dictionary<Objects.Enums.BiomeType, List<float[]>>();
             for (int i = 1; i < lines.Count; i++)
             {
                 string[] cells = lines[i];
                 try
                 {
-                    EBiomeType biome = EnumHandler.Parse<EBiomeType>(cells[0]);
+                    Objects.Enums.BiomeType biome = EnumHandler.Parse<Objects.Enums.BiomeType>(cells[0]);
                     var starts = ParseAlternateStartLine(cells);
                     parsedStarts.Add(biome, starts);
                     _log.Debug($"Registered alternate starts for biome {biome}");
@@ -148,7 +149,7 @@ namespace SubnauticaRandomiser
         {
             EntityType entityType;
             TechType techType;
-            ETechTypeCategory category;
+            TechTypeCategory category;
             int depth = 0;
             Recipe recipe = null;
             List<TechType> prereqList = new List<TechType>();
@@ -181,8 +182,8 @@ namespace SubnauticaRandomiser
             // Column 2: Category
             if (string.IsNullOrEmpty(cellsCategory))
                 throw new ArgumentException("Category is null or empty, but is a required field.");
-            category = EnumHandler.Parse<ETechTypeCategory>(cellsCategory);
-            entityType = category.Equals(ETechTypeCategory.Fragments) ? EntityType.Fragment : EntityType.Recipe;
+            category = EnumHandler.Parse<TechTypeCategory>(cellsCategory);
+            entityType = category.Equals(TechTypeCategory.Fragments) ? EntityType.Fragment : EntityType.Recipe;
 
             // Column 3: Depth Difficulty
             if (!string.IsNullOrEmpty(cellsDepth))
@@ -272,7 +273,7 @@ namespace SubnauticaRandomiser
             // processed at all, the string itself is good enough.
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("BiomeType is null or empty, but is a required field.");
-            EBiomeType biomeType = EnumHandler.Parse<EBiomeType>(name);
+            Objects.Enums.BiomeType biomeType = EnumHandler.Parse<Objects.Enums.BiomeType>(name);
 
             // Column 2: The number of small slots.
             if (string.IsNullOrEmpty(cellsSmallCount))
@@ -312,7 +313,7 @@ namespace SubnauticaRandomiser
         {
             TechType type;
             Vector3 coordinates;
-            EWreckage wreck = EWreckage.None;
+            Wreckage wreck = Wreckage.None;
             bool isDatabox;
             bool laserCutter = false;
             bool propulsionCannon = false;
@@ -351,7 +352,7 @@ namespace SubnauticaRandomiser
 
             // Column 3: General location
             if (!string.IsNullOrEmpty(cellsEWreckage))
-                wreck = EnumHandler.Parse<EWreckage>(cellsEWreckage);
+                wreck = EnumHandler.Parse<Wreckage>(cellsEWreckage);
 
             // Column 4: Is it a databox?
             // Redundant until fragments are implemented, so this does nothing.

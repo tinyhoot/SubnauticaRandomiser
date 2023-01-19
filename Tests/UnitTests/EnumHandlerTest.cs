@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using SubnauticaRandomiser;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects.Enums;
 
 namespace Tests.UnitTests
@@ -14,11 +15,11 @@ namespace Tests.UnitTests
             return EnumHandler.Parse<BiomeType>(value);
         }
         
-        [TestCase("RawMaterials", ExpectedResult = ETechTypeCategory.RawMaterials)]
-        [TestCase("SomethingNonexistant", ExpectedResult = ETechTypeCategory.None)]
-        public ETechTypeCategory TestParse_ProgressionNode(string value)
+        [TestCase("RawMaterials", ExpectedResult = TechTypeCategory.RawMaterials)]
+        [TestCase("SomethingNonexistant", ExpectedResult = TechTypeCategory.None)]
+        public TechTypeCategory TestParse_ProgressionNode(string value)
         {
-            return EnumHandler.Parse<ETechTypeCategory>(value);
+            return EnumHandler.Parse<TechTypeCategory>(value);
         }
     }
 }

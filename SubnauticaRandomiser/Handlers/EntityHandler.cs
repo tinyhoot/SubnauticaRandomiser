@@ -8,7 +8,7 @@ using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
 
-namespace SubnauticaRandomiser.Logic.Recipes
+namespace SubnauticaRandomiser.Handlers
 {
     /// <summary>
     /// Handles anything related to entities, including whether they are considered accessible in logic.
@@ -68,7 +68,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="category">The category to consider.</param>
         /// <param name="maxDepth">The maximum depth at which the entity is allowed to be available.</param>
         /// <returns>True if any new entities were added into logic, false otherwise.</returns>
-        public bool AddToLogic(ETechTypeCategory category, int maxDepth)
+        public bool AddToLogic(TechTypeCategory category, int maxDepth)
         {
             return AddToLogic(new[] { category }, maxDepth);
         }
@@ -79,7 +79,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="categories">The categories to consider.</param>
         /// <param name="maxDepth">The maximum depth at which the entity is allowed to be available.</param>
         /// <returns>True if any new entities were added into logic, false otherwise.</returns>
-        public bool AddToLogic(ETechTypeCategory[] categories, int maxDepth)
+        public bool AddToLogic(TechTypeCategory[] categories, int maxDepth)
         {
             var additions = _allEntities.FindAll(x => categories.Contains(x.Category) && x.AccessibleDepth <= maxDepth);
             return AddToLogic(additions);
@@ -95,7 +95,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="invert">If true, invert the behaviour of the prerequisite to consider exclusively entities
         /// which do <i>not</i> require that TechType.</param>
         /// <returns>True if any new entities were added into logic, false otherwise.</returns>
-        public bool AddToLogic(ETechTypeCategory category, int maxDepth, TechType prerequisite, bool invert = false)
+        public bool AddToLogic(TechTypeCategory category, int maxDepth, TechType prerequisite, bool invert = false)
         {
             return AddToLogic(new[] { category }, maxDepth, prerequisite, invert);
         }
@@ -110,7 +110,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="invert">If true, invert the behaviour of the prerequisite to consider exclusively entities
         /// which do <i>not</i> require that TechType.</param>
         /// <returns>True if any new entities were added into logic, false otherwise.</returns>
-        public bool AddToLogic(ETechTypeCategory[] categories, int maxDepth, TechType prerequisite, bool invert = false)
+        public bool AddToLogic(TechTypeCategory[] categories, int maxDepth, TechType prerequisite, bool invert = false)
         {
             List<LogicEntity> additions;
 
@@ -177,7 +177,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         public List<LogicEntity> GetAllFragments()
         {
             var fragments = _allEntities.FindAll(x =>
-                x.Category.Equals(ETechTypeCategory.Fragments));
+                x.Category.Equals(TechTypeCategory.Fragments));
 
             return fragments;
         }
@@ -189,7 +189,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         public List<LogicEntity> GetAllRawMaterials(int maxDepth = 2000)
         {
             var rawMaterials = _allEntities.FindAll(x =>
-                x.Category.Equals(ETechTypeCategory.RawMaterials) && x.AccessibleDepth <= maxDepth
+                x.Category.Equals(TechTypeCategory.RawMaterials) && x.AccessibleDepth <= maxDepth
                                                                   && !x.HasPrerequisites);
 
             return rawMaterials;

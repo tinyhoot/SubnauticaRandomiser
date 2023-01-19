@@ -35,10 +35,13 @@ mkdir $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles
 cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CommandHandler.cs" />
     <Compile Include="ConfigDefaults.cs" />
     <Compile Include="DataDumper.cs" />
-    <Compile Include="EnumHandler.cs" />
+    <Compile Include="Handlers\CommandHandler.cs" />
+    <Compile Include="Handlers\EntityHandler.cs" />
+    <Compile Include="Handlers\EnumHandler.cs" />
+    <Compile Include="Handlers\LogHandler.cs" />
+    <Compile Include="Handlers\RandomHandler.cs" />
     <Compile Include="Interfaces\ILogHandler.cs" />
     <Compile Include="Interfaces\ILogicModule.cs" />
     <Compile Include="Interfaces\IRandomHandler.cs" />
@@ -60,21 +63,17 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Patches\FragmentPatcher.cs" />
     <Compile Include="Initialiser.cs" />
     <Compile Include="Logic\DataboxLogic.cs" />
-    <Compile Include="Logic\Recipes\EntityHandler.cs" />
     <Compile Include="Logic\Recipes\Mode.cs" />
     <Compile Include="Logic\Recipes\ModeBalanced.cs" />
     <Compile Include="Logic\Recipes\ModeRandom.cs" />
     <Compile Include="Logic\Recipes\RecipeLogic.cs" />
     <Compile Include="Patches\AlternateStart.cs" />
-    <Compile Include="RandomHandler.cs" />
     <Compile Include="RandomiserConfig.cs" />
     <Compile Include="CSVReader.cs" />
-    <Compile Include="LogHandler.cs" />
     <Compile Include="Objects\Blueprint.cs" />
-    <Compile Include="Objects\Enums\EBiomeType.cs" />
-    <Compile Include="Objects\Enums\EProgressionNode.cs" />
-    <Compile Include="Objects\Enums\ETechTypeCategory.cs" />
-    <Compile Include="Objects\Enums\EWreckage.cs" />
+    <Compile Include="Objects\Enums\BiomeType.cs" />
+    <Compile Include="Objects\Enums\TechTypeCategory.cs" />
+    <Compile Include="Objects\Enums\Wreckage.cs" />
     <Compile Include="Objects\Exceptions\ParsingException.cs" />
     <Compile Include="Objects\Exceptions\RandomisationException.cs" />
     <Compile Include="Objects\RandomiserIngredient.cs" />

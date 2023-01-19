@@ -1,6 +1,6 @@
 ﻿namespace SubnauticaRandomiser.Objects.Enums
 {
-    public enum EBiomeType
+    public enum BiomeType
     {
         None,
         ActiveLavaZone,
@@ -42,65 +42,65 @@
         /// accessible, i.e. comfortably explorable.
         /// </summary>
         /// <returns>The accessible depth.</returns>
-        public static int GetAccessibleDepth(this EBiomeType biomeType)
+        public static int GetAccessibleDepth(this BiomeType biomeType)
         {
             switch (biomeType)
             {
-                case (EBiomeType.ActiveLavaZone):
+                case (BiomeType.ActiveLavaZone):
                     return 1400;
-                case (EBiomeType.BloodKelp):
+                case (BiomeType.BloodKelp):
                     return 250;
-                case (EBiomeType.BonesField):
+                case (BiomeType.BonesField):
                     return 650;
-                case (EBiomeType.Canyon):
+                case (BiomeType.Canyon):
                     return 600;
-                case (EBiomeType.CragField):
+                case (BiomeType.CragField):
                     return 200;
-                case (EBiomeType.CrashZone):
+                case (BiomeType.CrashZone):
                     return 50;
-                case (EBiomeType.DeepGrandReef):
+                case (BiomeType.DeepGrandReef):
                     return 500;
-                case (EBiomeType.Dunes):
+                case (BiomeType.Dunes):
                     return 200;
-                case (EBiomeType.FloatingIsland):
+                case (BiomeType.FloatingIsland):
                     return 0;
-                case (EBiomeType.GhostTree):
+                case (BiomeType.GhostTree):
                     return 900;
-                case (EBiomeType.GrandReef):
+                case (BiomeType.GrandReef):
                     return 300;
-                case (EBiomeType.GrassyPlateaus):
+                case (BiomeType.GrassyPlateaus):
                     return 100;
-                case (EBiomeType.InactiveLavaZone):
+                case (BiomeType.InactiveLavaZone):
                     return 1000;
-                case (EBiomeType.JellyshroomCaves):
+                case (BiomeType.JellyshroomCaves):
                     return 220;
-                case (EBiomeType.Kelp):
+                case (BiomeType.Kelp):
                     return 50;
-                case (EBiomeType.KooshZone):
+                case (BiomeType.KooshZone):
                     return 250;
-                case (EBiomeType.LostRiverCorridor):
+                case (BiomeType.LostRiverCorridor):
                     return 600;
-                case (EBiomeType.LostRiverJunction):
+                case (BiomeType.LostRiverJunction):
                     return 800;
-                case (EBiomeType.Mesas):
+                case (BiomeType.Mesas):
                     return 300;
-                case (EBiomeType.Mountains):
+                case (BiomeType.Mountains):
                     return 200;
-                case (EBiomeType.MushroomForest):
+                case (BiomeType.MushroomForest):
                     return 150;
-                case (EBiomeType.PrisonAquarium):
+                case (BiomeType.PrisonAquarium):
                     return 1700;
-                case (EBiomeType.SafeShallows):
+                case (BiomeType.SafeShallows):
                     return 0;
-                case (EBiomeType.SeaTreaderPath):
+                case (BiomeType.SeaTreaderPath):
                     return 200;
-                case (EBiomeType.SkeletonCave):
+                case (BiomeType.SkeletonCave):
                     return 650;
-                case (EBiomeType.SparseReef):
+                case (BiomeType.SparseReef):
                     return 100;
-                case (EBiomeType.TreeCove):
+                case (BiomeType.TreeCove):
                     return 900;
-                case (EBiomeType.UnderwaterIslands):
+                case (BiomeType.UnderwaterIslands):
                     return 150;
                 default:
                     return 0;

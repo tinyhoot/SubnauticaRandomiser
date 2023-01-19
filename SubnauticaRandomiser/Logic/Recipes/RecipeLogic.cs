@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HarmonyLib;
 using JetBrains.Annotations;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
@@ -128,16 +129,16 @@ namespace SubnauticaRandomiser.Logic.Recipes
             int depth = _manager.ReachableDepth;
             
             if (IsAnyKnifeRandomised())
-                _entityHandler.AddToLogic(ETechTypeCategory.RawMaterials, depth);
+                _entityHandler.AddToLogic(TechTypeCategory.RawMaterials, depth);
             else
-                _entityHandler.AddToLogic(ETechTypeCategory.RawMaterials, depth, TechType.Knife, true);
+                _entityHandler.AddToLogic(TechTypeCategory.RawMaterials, depth, TechType.Knife, true);
 
             if (_config.bUseFish)
-                _entityHandler.AddToLogic(ETechTypeCategory.Fish, depth);
+                _entityHandler.AddToLogic(TechTypeCategory.Fish, depth);
             if (_config.bUseEggs && _coreLogic.HasRandomised(TechType.BaseWaterPark))
-                _entityHandler.AddToLogic(ETechTypeCategory.Eggs, depth);
+                _entityHandler.AddToLogic(TechTypeCategory.Eggs, depth);
             if (_config.bUseSeeds && IsAnyKnifeRandomised())
-                _entityHandler.AddToLogic(ETechTypeCategory.Seeds, depth);
+                _entityHandler.AddToLogic(TechTypeCategory.Seeds, depth);
         }
 
         private void OnSetup(object sender, EventArgs args)

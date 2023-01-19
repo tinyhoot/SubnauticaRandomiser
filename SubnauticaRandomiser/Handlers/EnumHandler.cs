@@ -1,6 +1,6 @@
 using System;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.Handlers
 {
     /// <summary>
     /// Handle anything related to dealing with Enums.

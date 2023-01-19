@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
@@ -30,7 +31,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>A random LogicEntity from the Raw Materials or (if enabled) Fish categories.</returns>
         public LogicEntity ChooseBaseTheme(int depth, bool useFish = false)
         {
-            var options = _entityHandler.GetAll().FindAll(x => x.Category.Equals(ETechTypeCategory.RawMaterials)
+            var options = _entityHandler.GetAll().FindAll(x => x.Category.Equals(TechTypeCategory.RawMaterials)
                                                                && x.AccessibleDepth < depth
                                                                && !x.HasPrerequisites
                                                                && x.MaxUsesPerGame == 0
@@ -38,7 +39,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             if (useFish)
             {
-                options.AddRange(_entityHandler.GetAll().FindAll(x => x.Category.Equals(ETechTypeCategory.Fish)
+                options.AddRange(_entityHandler.GetAll().FindAll(x => x.Category.Equals(TechTypeCategory.Fish)
                                                                       && x.AccessibleDepth < depth
                                                                       && !x.HasPrerequisites
                                                                       && x.MaxUsesPerGame == 0
@@ -62,7 +63,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             if (_baseTheme is null)
                 throw new InvalidOperationException("Base theme must be chosen before it can be retrieved!");
-            if (entity.Category.Equals(ETechTypeCategory.BaseBasePieces))
+            if (entity.Category.Equals(TechTypeCategory.BaseBasePieces))
                 return _baseTheme;
 
             return null;

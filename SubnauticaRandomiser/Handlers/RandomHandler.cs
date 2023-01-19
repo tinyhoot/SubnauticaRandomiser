@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using SubnauticaRandomiser.Interfaces;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.Handlers
 {
     internal class RandomHandler : IRandomHandler
     {

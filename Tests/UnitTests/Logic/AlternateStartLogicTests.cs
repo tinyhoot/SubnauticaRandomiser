@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using SubnauticaRandomiser;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
@@ -15,16 +16,16 @@ namespace Tests.UnitTests.Logic
         private RandomiserConfig _config;
         private FakeLogger _log;
         private AlternateStartLogic _logic;
-        private Dictionary<EBiomeType, List<float[]>> _starts;
+        private Dictionary<SubnauticaRandomiser.Objects.Enums.BiomeType, List<float[]>> _starts;
         
         [SetUp]
         public void Init()
         {
-            _starts = new Dictionary<EBiomeType, List<float[]>>
+            _starts = new Dictionary<SubnauticaRandomiser.Objects.Enums.BiomeType, List<float[]>>
             {
-                { EBiomeType.GrassyPlateaus, new List<float[]> { new float[] { 0, 200, 200, 0 } } },
-                { EBiomeType.Kelp, new List<float[]> { new float[] { -200, 0, 0, -200 } } },
-                { EBiomeType.SafeShallows, new List<float[]> { new float[] { -100, 100, 100, -100 } } }
+                { SubnauticaRandomiser.Objects.Enums.BiomeType.GrassyPlateaus, new List<float[]> { new float[] { 0, 200, 200, 0 } } },
+                { SubnauticaRandomiser.Objects.Enums.BiomeType.Kelp, new List<float[]> { new float[] { -200, 0, 0, -200 } } },
+                { SubnauticaRandomiser.Objects.Enums.BiomeType.SafeShallows, new List<float[]> { new float[] { -100, 100, 100, -100 } } }
             };
             _log = new FakeLogger();
             _config = new RandomiserConfig(_log);
@@ -35,10 +36,10 @@ namespace Tests.UnitTests.Logic
         public void TestGetRandomStart()
         {
             RandomiserVector result = _logic.GetRandomStart("Kelp");
-            Assert.GreaterOrEqual(result.x, _starts[EBiomeType.Kelp][0][0]);
-            Assert.GreaterOrEqual(result.z, _starts[EBiomeType.Kelp][0][3]);
-            Assert.LessOrEqual(result.x, _starts[EBiomeType.Kelp][0][2]);
-            Assert.LessOrEqual(result.z, _starts[EBiomeType.Kelp][0][1]);
+            Assert.GreaterOrEqual(result.x, _starts[SubnauticaRandomiser.Objects.Enums.BiomeType.Kelp][0][0]);
+            Assert.GreaterOrEqual(result.z, _starts[SubnauticaRandomiser.Objects.Enums.BiomeType.Kelp][0][3]);
+            Assert.LessOrEqual(result.x, _starts[SubnauticaRandomiser.Objects.Enums.BiomeType.Kelp][0][2]);
+            Assert.LessOrEqual(result.z, _starts[SubnauticaRandomiser.Objects.Enums.BiomeType.Kelp][0][1]);
             Assert.Zero(result.y);
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
@@ -19,7 +20,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         protected ILogHandler _log => _coreLogic._Log;
         
         protected List<RandomiserIngredient> _ingredients = new List<RandomiserIngredient>();
-        protected List<ETechTypeCategory> _blacklist = new List<ETechTypeCategory>();
+        protected List<TechTypeCategory> _blacklist = new List<TechTypeCategory>();
         protected BaseTheme _baseTheme;
 
         protected Mode(CoreLogic coreLogic, RecipeLogic recipeLogic)
@@ -78,7 +79,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>A random, non-blacklisted element from the list.</returns>
         /// <exception cref="InvalidOperationException">Raised if the list is null or empty.</exception>
         [NotNull]
-        protected LogicEntity GetRandom(ICollection<LogicEntity> list, List<ETechTypeCategory> blacklist = null)
+        protected LogicEntity GetRandom(ICollection<LogicEntity> list, List<TechTypeCategory> blacklist = null)
         {
             if (list == null || list.Count == 0)
                 throw new InvalidOperationException("Failed to get valid entity from materials list: "
@@ -148,17 +149,17 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="entity">The entity to build a blacklist against.</param>
         protected void UpdateBlacklist(LogicEntity entity)
         {
-            _blacklist = new List<ETechTypeCategory>();
+            _blacklist = new List<TechTypeCategory>();
 
             if (_config.iEquipmentAsIngredients == 0 || (_config.iEquipmentAsIngredients == 1 && entity.CanFunctionAsIngredient()))
-                _blacklist.Add(ETechTypeCategory.Equipment);
+                _blacklist.Add(TechTypeCategory.Equipment);
             if (_config.iToolsAsIngredients == 0 || (_config.iToolsAsIngredients == 1 && entity.CanFunctionAsIngredient()))
-                _blacklist.Add(ETechTypeCategory.Tools);
+                _blacklist.Add(TechTypeCategory.Tools);
             if (_config.iUpgradesAsIngredients == 0 || (_config.iUpgradesAsIngredients == 1 && entity.CanFunctionAsIngredient()))
             {
-                _blacklist.Add(ETechTypeCategory.ScannerRoom);
-                _blacklist.Add(ETechTypeCategory.VehicleUpgrades);
-                _blacklist.Add(ETechTypeCategory.WorkBenchUpgrades);
+                _blacklist.Add(TechTypeCategory.ScannerRoom);
+                _blacklist.Add(TechTypeCategory.VehicleUpgrades);
+                _blacklist.Add(TechTypeCategory.WorkBenchUpgrades);
             }
         }
     }

@@ -12,11 +12,11 @@ namespace SubnauticaRandomiser.Objects
     {
         public List<Biome> BiomeList = new List<Biome>();
         public int AverageDepth;
-        public readonly EBiomeType BiomeType;
+        public readonly Enums.BiomeType BiomeType;
 
         public bool HasBiomes => BiomeList.Count > 0;
 
-        public BiomeCollection(EBiomeType biomeType)
+        public BiomeCollection(Enums.BiomeType biomeType)
         {
             BiomeType = biomeType;
             AverageDepth = biomeType.GetAccessibleDepth();

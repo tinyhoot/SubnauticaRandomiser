@@ -1,7 +1,7 @@
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.Handlers
 {
     /// <summary>
     /// Listen to and execute custom console commands.

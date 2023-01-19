@@ -185,13 +185,13 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             // Tools and upgrades do not stack, but if the recipe would require several and you have more than one in
             // inventory, it will consume all of them.
-            if (ingredient.Category.Equals(ETechTypeCategory.Tools) 
-                || ingredient.Category.Equals(ETechTypeCategory.VehicleUpgrades) 
-                || ingredient.Category.Equals(ETechTypeCategory.WorkBenchUpgrades))
+            if (ingredient.Category.Equals(TechTypeCategory.Tools) 
+                || ingredient.Category.Equals(TechTypeCategory.VehicleUpgrades) 
+                || ingredient.Category.Equals(TechTypeCategory.WorkBenchUpgrades))
                 max = 1;
 
             // Never require more than one (default) egg. That's tedious.
-            if (ingredient.Category.Equals(ETechTypeCategory.Eggs))
+            if (ingredient.Category.Equals(TechTypeCategory.Eggs))
                 max = _config.iMaxEggsAsSingleIngredient;
 
             return max;
@@ -229,7 +229,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // If the loop above exited due to the range getting too large, just
             // use any unlocked raw material instead.
             if (betterOptions.Count == 0)
-                betterOptions.AddRange(_validIngredients.Where(x => x.Category.Equals(ETechTypeCategory.RawMaterials)));
+                betterOptions.AddRange(_validIngredients.Where(x => x.Category.Equals(TechTypeCategory.RawMaterials)));
 
             return _random.Choice(betterOptions);
         }
