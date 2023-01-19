@@ -22,8 +22,7 @@ namespace SubnauticaRandomiser.Logic
         internal EntitySerializer _Serializer { get; private set; }
         internal Materials _Materials { get; private set; }
         internal IRandomHandler _Random { get; private set; }
-        internal readonly ProgressionTree _Tree;
-        
+
         private ProgressionManager _manager;
         private SpoilerLog _spoilerLog;
 
@@ -46,6 +45,12 @@ namespace SubnauticaRandomiser.Logic
         /// Invoked during the setup stage. Use this event to add LogicEntities to the main loop.
         /// </summary>
         public event EventHandler<CollectEntitiesEventArgs> OnCollectRandomisableEntities;
+
+        /// <summary>
+        /// Invoked just before every logic module is called up to randomise everything which does not require
+        /// access to the main loop.
+        /// </summary>
+        public event EventHandler OnOutOfLoopRandomisationBegin;
         
         /// <summary>
         /// Invoked once the next entity to be randomised has been determined.
@@ -124,7 +129,7 @@ namespace SubnauticaRandomiser.Logic
             
             // Init the progression tree.
             _Tree.SetupVanillaTree();
-            _altStartLogic?.Randomise(_Serializer);
+            _altStartLogic?.RandomiseOutOfLoop(_Serializer);
             if (_Config.bRandomiseDoorCodes)
                 _auroraLogic.RandomiseDoorCodes();
             if (_Config.bRandomiseSupplyBoxes)
@@ -179,7 +184,7 @@ namespace SubnauticaRandomiser.Logic
             _Log.Info("[Core] Randomising: Pre-loop content");
             foreach (ILogicModule module in _modules)
             {
-                module.Randomise(_Serializer);
+                module.RandomiseOutOfLoop(_Serializer);
             }
         }
         

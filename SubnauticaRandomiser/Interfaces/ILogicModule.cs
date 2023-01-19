@@ -10,7 +10,7 @@ namespace SubnauticaRandomiser.Interfaces
         /// is run.
         /// </summary>
         /// <param name="serializer">The serialisation instance used for this seed.</param>
-        public void Randomise(EntitySerializer serializer);
+        public void RandomiseOutOfLoop(EntitySerializer serializer);
         
         /// <summary>
         /// Attempt to randomise the given entity. The implementing class will only receive entities of the type(s)

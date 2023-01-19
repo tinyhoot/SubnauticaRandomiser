@@ -33,7 +33,7 @@ namespace SubnauticaRandomiser.Logic
             ParseDataFileAsync().Start();
         }
 
-        public void Randomise(EntitySerializer serializer)
+        public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             serializer.StartPoint = GetRandomStart(_config.sSpawnPoint);
         }

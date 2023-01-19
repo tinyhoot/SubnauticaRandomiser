@@ -36,7 +36,7 @@ namespace SubnauticaRandomiser.Logic
             ParseDataFileAsync().Start();
         }
 
-        public void Randomise(EntitySerializer serializer)
+        public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             RandomiseDataboxes(serializer);
             UpdateBlueprints(_coreLogic._Materials.GetAll());

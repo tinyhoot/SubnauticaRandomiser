@@ -9,12 +9,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
     internal class ModeBalanced : Mode
     {
         private int _basicOutpostSize;
-        private List<LogicEntity> _reachableMaterials;
+        private List<LogicEntity> _reachableMaterials => _materials.GetReachable();
 
-        public ModeBalanced(CoreLogic logic) : base(logic)
+        public ModeBalanced(CoreLogic coreLogic, RecipeLogic recipeLogic) : base(coreLogic, recipeLogic)
         {
             _basicOutpostSize = 0;
-            _reachableMaterials = _materials.GetReachable();
         }
         
         /// <summary>
@@ -58,8 +57,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
 
             // Update the total size of everything needed to build a basic outpost.
-            if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType))
-                _basicOutpostSize += (totalSize * _tree.BasicOutpostPieces[entity.TechType]);
+            if (_recipeLogic.BasicOutpostPieces.ContainsKey(entity.TechType))
+                _basicOutpostSize += (totalSize * _recipeLogic.BasicOutpostPieces[entity.TechType]);
             
             _log.Debug($"[R] > Recipe is now valued {currentValue} out of {entity.Value}");
             entity.Value = currentValue;
@@ -91,7 +90,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
             
             // For special case of outpost base parts, be conservative with ingredients.
-            if (_tree.BasicOutpostPieces.ContainsKey(entity.TechType) && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.7)
+            if (_recipeLogic.BasicOutpostPieces.ContainsKey(entity.TechType)
+                && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.7)
             {
                 _log.Debug("[R] ! Basic outpost size is getting too large, stopping.");
                 return true;
@@ -127,7 +127,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             // If vanilla upgrade chains are set to be preserved, replace
             // the primary ingredient with the base item.
-            primaryIngredient = _tree.GetBaseOfUpgrade(entity.TechType, _materials) ?? primaryIngredient;
+            primaryIngredient = _recipeLogic.GetBaseOfUpgrade(entity.TechType, _materials) ?? primaryIngredient;
             
             // Disallow the builder tool from being used in base pieces.
             if (entity.Category.IsBasePiece() && primaryIngredient.TechType.Equals(TechType.Builder))

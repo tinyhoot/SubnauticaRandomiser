@@ -41,7 +41,7 @@ namespace SubnauticaRandomiser
             [_ExpectedSaveVersion] = "v" + VERSION
         };
 
-        // Everything the mod every modifies is stored in here.
+        // Everything the mod ever modifies is stored in here.
         internal static EntitySerializer _Serializer;
         internal static ILogHandler _Log;
         internal static GameObject _Logic;

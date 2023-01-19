@@ -11,29 +11,35 @@ namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal abstract class Mode
     {
-        protected readonly CoreLogic _logic;
-        protected RandomiserConfig _config => _logic._Config;
-        protected Materials _materials => _logic._Materials;
-        protected ProgressionTree _tree => _logic._Tree;
-        protected IRandomHandler _random => _logic._Random;
-        protected ILogHandler _log => _logic._Log;
+        protected readonly CoreLogic _coreLogic;
+        protected readonly RecipeLogic _recipeLogic;
+        protected RandomiserConfig _config => _coreLogic._Config;
+        protected Materials _materials => _coreLogic._Materials;
+        protected IRandomHandler _random => _coreLogic._Random;
+        protected ILogHandler _log => _coreLogic._Log;
         
         protected List<RandomiserIngredient> _ingredients = new List<RandomiserIngredient>();
         protected List<ETechTypeCategory> _blacklist = new List<ETechTypeCategory>();
         protected BaseTheme _baseTheme;
 
-        protected Mode(CoreLogic logic)
+        protected Mode(CoreLogic coreLogic, RecipeLogic recipeLogic)
         {
-            _logic = logic;
+            _coreLogic = coreLogic;
+            _recipeLogic = recipeLogic;
 
             if (_config.bDoBaseTheming)
-            {
                 _baseTheme = new BaseTheme(_materials, _log, _random);
-                _baseTheme.ChooseBaseTheme(100, _config.bUseFish);
-            }
-            
+
             //InitMod.s_masterDict.DictionaryInstance.Add(TechType.Titanium, _baseTheme.GetSerializableRecipe());
             //ChangeScrapMetalResult(_baseTheme);
+        }
+
+        /// <summary>
+        /// Choose a base theme once off-loop randomisation begins.
+        /// </summary>
+        public void ChooseBaseTheme(int depth, bool useFish)
+        {
+            _baseTheme?.ChooseBaseTheme(depth, useFish);
         }
 
         public abstract LogicEntity RandomiseIngredients(LogicEntity entity);

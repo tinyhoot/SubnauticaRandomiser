@@ -150,14 +150,6 @@ namespace SubnauticaRandomiser
             SpawnDataDict.Add(type, data);
             return true;
         }
-        
-        /// <summary>
-        /// Check whether the recipe dictionary contains any kind of knife. Used for progression checks.
-        /// </summary>
-        public bool ContainsKnife()
-        {
-            return RecipeDict.ContainsKey(TechType.Knife) || RecipeDict.ContainsKey(TechType.HeatBlade);
-        }
 
         [OnDeserialized]
         private void OnDeserialized()

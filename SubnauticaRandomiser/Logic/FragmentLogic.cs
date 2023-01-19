@@ -94,7 +94,7 @@ namespace SubnauticaRandomiser.Logic
             ParseDataFileAsync().Start();
         }
 
-        public void Randomise(EntitySerializer serializer)
+        public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             if (_config.bRandomiseNumFragments)
                 RandomiseNumFragments(_coreLogic._Materials.GetAllFragments());

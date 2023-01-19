@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
-using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 
@@ -8,11 +7,10 @@ namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal class ModeRandom : Mode
     {
-        private List<LogicEntity> _reachableMaterials;
+        private List<LogicEntity> _reachableMaterials => _materials.GetReachable();
 
-        internal ModeRandom(CoreLogic logic) : base(logic)
+        internal ModeRandom(CoreLogic coreLogic, RecipeLogic recipeLogic) : base(coreLogic, recipeLogic)
         {
-            _reachableMaterials = _materials.GetReachable();
         }
         
         /// <summary>
