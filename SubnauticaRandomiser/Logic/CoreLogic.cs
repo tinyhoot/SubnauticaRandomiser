@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 using HarmonyLib;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.Handlers;
@@ -8,6 +11,7 @@ using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
+using SubnauticaRandomiser.Patches;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
@@ -20,76 +24,68 @@ namespace SubnauticaRandomiser.Logic
     {
         internal RandomiserConfig _Config { get; private set; }
         internal ILogHandler _Log { get; private set; }
-        internal EntitySerializer _Serializer { get; private set; }
-        internal EntityHandler _EntityHandler { get; private set; }
-        internal IRandomHandler _Random { get; private set; }
+        public EntitySerializer Serializer { get; private set; }
+        public EntityHandler EntityHandler { get; private set; }
+        public IRandomHandler Random { get; private set; }
 
         private ProgressionManager _manager;
         private SpoilerLog _spoilerLog;
 
-        private readonly AlternateStartLogic _altStartLogic;
-        private readonly AuroraLogic _auroraLogic;
-        private readonly DataboxLogic _databoxLogic;
-        internal readonly FragmentLogic _fragmentLogic;
-        private RecipeLogic _recipeLogic;
-
-        private Dictionary<EntityType, ILogicModule> _entityHandlers;
+        private Dictionary<EntityType, ILogicModule> _handlingModules;
         private List<ILogicModule> _modules;
         private List<LogicEntity> _priorityEntities;
+        private Task _task;
         
         /// <summary>
         /// Invoked during the setup stage, before the main loop begins.
         /// </summary>
-        public event EventHandler OnSetup;
+        public event EventHandler SetupBeginning;
 
         /// <summary>
         /// Invoked during the setup stage. Use this event to add LogicEntities to the main loop.
         /// </summary>
-        public event EventHandler<CollectEntitiesEventArgs> OnCollectRandomisableEntities;
+        public event EventHandler<CollectEntitiesEventArgs> CollectingEntities;
 
         /// <summary>
         /// Invoked just before every logic module is called up to randomise everything which does not require
         /// access to the main loop.
         /// </summary>
-        public event EventHandler OnOutOfLoopRandomisationBegin;
+        public event EventHandler OutOfLoopRandomisationBegin;
         
         /// <summary>
         /// Invoked once the next entity to be randomised has been determined.
         /// </summary>
-        public event EventHandler<EntityEventArgs> OnEntityChosen;
+        public event EventHandler<EntityEventArgs> EntityChosen;
 
         /// <summary>
         /// Invoked whenever an entity has been successfully randomised and added to the logic.
         /// </summary>
-        public event EventHandler<EntityEventArgs> OnEntityRandomised;
+        public event EventHandler<EntityEventArgs> EntityRandomised;
 
         /// <summary>
         /// Invoked once the main loop has successfully completed.
         /// </summary>
-        public event EventHandler OnMainLoopComplete;
+        public event EventHandler MainLoopCompleted;
 
         /// <summary>
         /// Invoked once all randomisation has taken place and completed.
         /// </summary>
-        public event EventHandler OnPostRandomisation;
+        public event EventHandler RandomisationCompleted;
         
         public void Awake()
         {
-            _entityHandlers = new Dictionary<EntityType, ILogicModule>();
+            _handlingModules = new Dictionary<EntityType, ILogicModule>();
             _modules = new List<ILogicModule>();
             _priorityEntities = new List<LogicEntity>();
             
             _Config = Initialiser._Config;
             _Log = Initialiser._Log;
-            // This makes the async function run sync, but in this specific case that's necessary for more setup.
-            List<LogicEntity> allMaterials = CSVReader.ParseDataFileAsync(Initialiser._RecipeFile, CSVReader.ParseRecipeLine).Result;
-            _EntityHandler = new EntityHandler(allMaterials, _Log);
-            _Serializer = new EntitySerializer(_Log);
-            _Random = new RandomHandler(_Config.iSeed);
+            EntityHandler = new EntityHandler(_Log);
+            _task = EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile);
+            Random = new RandomHandler(_Config.iSeed);
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
             _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
-            EnableModules();
         }
 
         private void EnableModules()
@@ -104,77 +100,42 @@ namespace SubnauticaRandomiser.Logic
                 RegisterModule<RecipeLogic>();
         }
 
-        public void StartRandomisation()
+        /// <summary>
+        /// Run the randomiser and start randomising!
+        /// </summary>
+        public void Run()
+        {
+            Serializer = new EntitySerializer(_Log);
+            EnableModules();
+            // Wait and periodically check whether all file loading has completed. Only continue once that is done.
+            StartCoroutine(WaitUntilFilesLoaded());
+        }
+
+        /// <summary>
+        /// Once all datafiles have completed loading, start up the logic.
+        /// </summary>
+        private void Randomise()
         {
             List<LogicEntity> mainEntities = Setup();
             RandomisePreLoop();
             RandomiseMainEntities(mainEntities);
-            EnableHarmony();
+            ApplyAllChanges();
+            Serializer.Serialize(_Config);
         }
 
         /// <summary>
-        /// Set up all the necessary structures for later.
+        /// Trigger setup events and prepare all data for starting the randomisation process.
         /// </summary>
         private List<LogicEntity> Setup()
         {
             _Log.Info("[Core] Setting up...");
-            OnSetup(this, EventArgs.Empty);
+            SetupBeginning?.Invoke(this, EventArgs.Empty);
             _manager.TriggerSetupEvents();
             
             // Set up the list of entities that need to be randomised in the main loop.
             CollectEntitiesEventArgs args = new CollectEntitiesEventArgs();
-            OnCollectRandomisableEntities(this, args);
-            //return args.ToBeRandomised;
-            
-            // ----- OLD STUFF BELOW -----
-            
-            // Init the progression tree.
-            _Tree.SetupVanillaTree();
-            _altStartLogic?.RandomiseOutOfLoop(_Serializer);
-            if (_Config.bRandomiseDoorCodes)
-                _auroraLogic.RandomiseDoorCodes();
-            if (_Config.bRandomiseSupplyBoxes)
-                _auroraLogic.RandomiseSupplyBoxes();
-
-            if (_databoxLogic != null)
-            {
-                // Just randomise those flat out for now, instead of including them in the core loop.
-                _databoxLogic.RandomiseDataboxes();
-                _databoxLogic.UpdateBlueprints(_EntityHandler.GetAll());
-                _databoxLogic.LinkCyclopsHullModules(_EntityHandler);
-            }
-
-            if (_fragmentLogic != null)
-            {
-                if (_Config.bRandomiseFragments)
-                {
-                    _Tree.SetupFragments();
-                    // Initialise the fragment cache and remove vanilla spawns.
-                    FragmentLogic.Init();
-                    // Queue up all fragments to be randomised.
-                    notRandomised.AddRange(_EntityHandler.GetAllFragments());
-                }
-                
-                // Randomise the number of fragment scans required per blueprint.
-                if (_Config.bRandomiseNumFragments)
-                    _fragmentLogic.RandomiseNumFragments(_EntityHandler.GetAllFragments());
-                
-                // Randomise duplicate scan rewards.
-                if (_Config.bRandomiseDuplicateScans)
-                    _fragmentLogic.CreateDuplicateScanYieldDict();
-            }
-            
-            if (_recipeLogic != null)
-            {
-                _recipeLogic.UpdateReachableMaterials(0);
-                // Queue up all craftables to be randomised.
-                notRandomised.AddRange(_EntityHandler.GetAllCraftables());
-                
-                // Update the progression tree with recipes.
-                _Tree.SetupRecipes(_Config.bVanillaUpgradeChains);
-                if (_Config.bVanillaUpgradeChains)
-                    _Tree.ApplyUpgradeChainToPrerequisites(_EntityHandler.GetAll());
-            }
+            CollectingEntities?.Invoke(this, args);
+            return args.ToBeRandomised;
         }
 
         /// <summary>
@@ -185,7 +146,7 @@ namespace SubnauticaRandomiser.Logic
             _Log.Info("[Core] Randomising: Pre-loop content");
             foreach (ILogicModule module in _modules)
             {
-                module.RandomiseOutOfLoop(_Serializer);
+                module.RandomiseOutOfLoop(Serializer);
             }
         }
         
@@ -211,8 +172,8 @@ namespace SubnauticaRandomiser.Logic
                 }
 
                 LogicEntity nextEntity = ChooseNextEntity(notRandomised);
-                // Choose a logic appropriate to the entity.
-                ILogicModule handler = _entityHandlers.GetOrDefault(nextEntity.EntityType, null);
+                // Try to get a handler for this type of entity.
+                ILogicModule handler = _handlingModules.GetOrDefault(nextEntity.EntityType, null);
                 if (handler is null)
                 {
                     _Log.Warn($"[Core] Unsupported entity in main loop: {nextEntity.EntityType} {nextEntity}");
@@ -220,20 +181,21 @@ namespace SubnauticaRandomiser.Logic
                     continue;
                 }
 
+                // Let the module handle randomisation and report back.
                 bool success = handler.RandomiseEntity(ref nextEntity);
                 if (success)
                 {
                     notRandomised.Remove(nextEntity);
-                    _EntityHandler.AddToLogic(nextEntity);
-                    OnEntityRandomised(this, new EntityEventArgs(nextEntity));
+                    EntityHandler.AddToLogic(nextEntity);
+                    EntityRandomised?.Invoke(this, new EntityEventArgs(nextEntity));
                     _manager.TriggerProgressionEvents(nextEntity);
                 }
             }
             
             _Log.Info($"[Core] Finished randomising within {circuitbreaker} cycles!");
-            OnMainLoopComplete(this, EventArgs.Empty);
+            MainLoopCompleted?.Invoke(this, EventArgs.Empty);
 
-            return _Serializer;
+            return Serializer;
         }
 
         /// <summary>
@@ -242,6 +204,26 @@ namespace SubnauticaRandomiser.Logic
         public void AddPriorityEntities(IEnumerable<LogicEntity> entities)
         {
             _priorityEntities.AddRange(entities);
+        }
+
+        internal void ApplyAllChanges()
+        {
+            if (Serializer is null)
+                throw new InvalidDataException("Cannot apply randomisation changes: Serializer is null!");
+            
+            // Load recipe changes.
+            if (Serializer.RecipeDict?.Count > 0)
+                RecipeLogic.ApplyMasterDict(Serializer);
+                
+            // Load fragment changes.
+            if (Serializer.SpawnDataDict?.Count > 0 || Serializer.NumFragmentsToUnlock?.Count > 0)
+            {
+                FragmentLogic.ApplyMasterDict(Serializer);
+                _Log.Info("Loaded fragment state.");
+            }
+
+            // Load any changes that rely on harmony patches.
+            EnableHarmony();
         }
 
         /// <summary>
@@ -259,14 +241,17 @@ namespace SubnauticaRandomiser.Logic
                 next = _priorityEntities[0];
                 _priorityEntities.RemoveAt(0);
             }
-            next ??= _Random.Choice(notRandomised);
+            next ??= Random.Choice(notRandomised);
 
             // Invoke the associated event.
-            OnEntityChosen(this, new EntityEventArgs(next));
+            EntityChosen?.Invoke(this, new EntityEventArgs(next));
 
             return next;
         }
 
+        /// <summary>
+        /// Enables all necessary harmony patches based on the randomisation state in the serialiser.
+        /// </summary>
         private void EnableHarmony()
         {
             Harmony harmony = new Harmony(Initialiser.GUID);
@@ -274,6 +259,8 @@ namespace SubnauticaRandomiser.Logic
             {
                 module.SetupHarmonyPatches(harmony);
             }
+            // Always apply bugfixes.
+            harmony.PatchAll(typeof(VanillaBugfixes));
         }
 
         /// <summary>
@@ -291,7 +278,7 @@ namespace SubnauticaRandomiser.Logic
         /// <exception cref="ArgumentNullException">If the TechType does not have an associated LogicEntity.</exception>
         public bool HasRandomised(TechType techType)
         {
-            LogicEntity entity = _EntityHandler.GetEntity(techType);
+            LogicEntity entity = EntityHandler.GetEntity(techType);
             if (entity is null)
                 throw new ArgumentNullException(nameof(techType), $"There is no LogicEntity corresponding to {techType}!");
             return entity.InLogic;
@@ -305,11 +292,11 @@ namespace SubnauticaRandomiser.Logic
         /// exists. There can be only one per type.</exception>
         public void RegisterEntityHandler(EntityType type, ILogicModule module)
         {
-            if (_entityHandlers.ContainsKey(type))
+            if (_handlingModules.ContainsKey(type))
                 throw new ArgumentException($"A handler for entity type '{type}' already exists: "
-                                            + $"{_entityHandlers[type].GetType()}");
+                                            + $"{_handlingModules[type].GetType()}");
             
-            _entityHandlers.Add(type, module);
+            _handlingModules.Add(type, module);
         }
 
         /// <summary>
@@ -321,6 +308,36 @@ namespace SubnauticaRandomiser.Logic
             TLogicModule component = gameObject.EnsureComponent<TLogicModule>();
             _modules.Add(component);
             return component;
+        }
+
+        /// <summary>
+        /// Try to restore a game state from disk.
+        /// </summary>
+        public bool TryRestoreSave()
+        {
+            if (string.IsNullOrEmpty(_Config.sBase64Seed))
+            {
+                _Log.Debug("[Core] base64 seed is empty.");
+                return false;
+            }
+
+            _Log.Debug("[Core] Trying to decode base64 string...");
+            EntitySerializer serializer = EntitySerializer.FromBase64String(_Config.sBase64Seed);
+
+            if (serializer?.SpawnDataDict is null || serializer.RecipeDict is null)
+            {
+                _Log.Error("[Core] base64 seed is invalid; could not deserialize.");
+                return false;
+            }
+
+            Serializer = serializer;
+            return true;
+        }
+        
+        private IEnumerator WaitUntilFilesLoaded()
+        {
+            yield return new WaitUntil(() => _task.IsCompleted);
+            Randomise();
         }
     }
 }

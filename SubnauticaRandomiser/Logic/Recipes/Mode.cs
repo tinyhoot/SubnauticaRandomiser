@@ -15,8 +15,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
         protected readonly CoreLogic _coreLogic;
         protected readonly RecipeLogic _recipeLogic;
         protected RandomiserConfig _config => _coreLogic._Config;
-        protected EntityHandler _entityHandler => _coreLogic._EntityHandler;
-        protected IRandomHandler _random => _coreLogic._Random;
+        protected EntityHandler _entityHandler => _coreLogic.EntityHandler;
+        protected IRandomHandler _random => _coreLogic.Random;
         protected ILogHandler _log => _coreLogic._Log;
         
         protected List<RandomiserIngredient> _ingredients = new List<RandomiserIngredient>();

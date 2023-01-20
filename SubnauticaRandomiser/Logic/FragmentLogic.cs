@@ -75,29 +75,29 @@ namespace SubnauticaRandomiser.Logic
             _manager = GetComponent<ProgressionManager>();
             _config = _coreLogic._Config;
             _log = _coreLogic._Log;
-            _random = _coreLogic._Random;
-            _serializer = _coreLogic._Serializer;
+            _random = _coreLogic.Random;
+            _serializer = _coreLogic.Serializer;
 
             // Register events.
-            _manager.OnSetupPriority += OnSetupPriorityEntities;
-            _manager.OnSetupProgression += OnSetupProgression;
+            _manager.SetupPriority += OnSetupPriorityEntities;
+            _manager.SetupProgression += OnSetupProgression;
             
             if (_config.bRandomiseFragments)
             {
                 // Handle any fragment entities using this component.
-                _coreLogic.OnCollectRandomisableEntities += OnCollectRandomisableEntities;
+                _coreLogic.CollectingEntities += CollectingEntities;
                 _coreLogic.RegisterEntityHandler(EntityType.Fragment, this);
                 // Reset all existing fragment spawns.
                 Init();
             }
             
-            ParseDataFileAsync().Start();
+            ParseDataFileAsync();
         }
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             if (_config.bRandomiseNumFragments)
-                RandomiseNumFragments(_coreLogic._EntityHandler.GetAllFragments());
+                RandomiseNumFragments(_coreLogic.EntityHandler.GetAllFragments());
             // Randomise duplicate scan rewards.
             if (_config.bRandomiseDuplicateScans)
                 CreateDuplicateScanYieldDict();
@@ -156,16 +156,16 @@ namespace SubnauticaRandomiser.Logic
 
         public void SetupHarmonyPatches(Harmony harmony)
         {
-            if (_coreLogic._Serializer?.FragmentMaterialYield?.Count > 0)
+            if (_coreLogic.Serializer?.FragmentMaterialYield?.Count > 0)
                 harmony.PatchAll(typeof(FragmentPatcher));
         }
 
         /// <summary>
         /// Queue up all fragments to be randomised.
         /// </summary>
-        private void OnCollectRandomisableEntities(object sender, CollectEntitiesEventArgs args)
+        private void CollectingEntities(object sender, CollectEntitiesEventArgs args)
         {
-            args.ToBeRandomised.AddRange(_coreLogic._EntityHandler.GetAllFragments());
+            args.ToBeRandomised.AddRange(_coreLogic.EntityHandler.GetAllFragments());
         }
 
         /// <summary>
@@ -277,9 +277,9 @@ namespace SubnauticaRandomiser.Logic
         private void CreateDuplicateScanYieldDict()
         {
             _serializer.FragmentMaterialYield = new Dictionary<TechType, float>();
-            var materials = _coreLogic._EntityHandler.GetAllRawMaterials(50);
+            var materials = _coreLogic.EntityHandler.GetAllRawMaterials(50);
             // Gaining seeds from fragments is not great for balance. Remove that.
-            materials.Remove(_coreLogic._EntityHandler.GetEntity(TechType.CreepvineSeedCluster));
+            materials.Remove(_coreLogic.EntityHandler.GetEntity(TechType.CreepvineSeedCluster));
 
             foreach (LogicEntity entity in materials)
             {
@@ -439,11 +439,11 @@ namespace SubnauticaRandomiser.Logic
         {
             // Find the recipe that needs the given fragment as a prerequisite, i.e. the recipe that is unlocked
             // by the fragment.
-            LogicEntity recipe = _coreLogic._EntityHandler.GetAll()
+            LogicEntity recipe = _coreLogic.EntityHandler.GetAll()
                 .Find(e => e.Blueprint?.Fragments?.Contains(entity.TechType) ?? false);
-            if (recipe is null || !_coreLogic._Tree.IsProgressionItem(recipe)
-                               || unlockedProgressionItems.ContainsKey(recipe.TechType))
-                return false;
+            // if (recipe is null || !_coreLogic._Tree.IsProgressionItem(recipe)
+            //                    || unlockedProgressionItems.ContainsKey(recipe.TechType))
+            //     return false;
 
             switch (recipe.TechType)
             {

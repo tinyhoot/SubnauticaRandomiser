@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
@@ -27,21 +26,21 @@ namespace SubnauticaRandomiser.Logic
         {
             _coreLogic = GetComponent<CoreLogic>();
             _log = _coreLogic._Log;
-            _random = _coreLogic._Random;
+            _random = _coreLogic.Random;
             
             // Register this module as a handler for databox entities.
             _coreLogic.RegisterEntityHandler(EntityType.Databox, this);
             // Register events.
-            _coreLogic.OnCollectRandomisableEntities += OnCollectDataboxes;
+            _coreLogic.CollectingEntities += OnCollectDataboxes;
 
-            ParseDataFileAsync().Start();
+            ParseDataFileAsync();
         }
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             RandomiseDataboxes(serializer);
-            UpdateBlueprints(_coreLogic._EntityHandler.GetAll());
-            LinkCyclopsHullModules(_coreLogic._EntityHandler);
+            UpdateBlueprints(_coreLogic.EntityHandler.GetAll());
+            LinkCyclopsHullModules(_coreLogic.EntityHandler);
         }
 
         public bool RandomiseEntity(ref LogicEntity entity)

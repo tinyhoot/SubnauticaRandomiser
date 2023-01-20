@@ -19,16 +19,16 @@ namespace Tests.UnitTests.Logic.Recipes
         {
             _allMaterials = new List<LogicEntity>
             {
-                new LogicEntity(TechType.Titanium, TechTypeCategory.RawMaterials) { AccessibleDepth = 0 },
-                new LogicEntity(TechType.Gold, TechTypeCategory.RawMaterials) { AccessibleDepth = 70 },
-                new LogicEntity(TechType.Peeper, TechTypeCategory.Fish){ AccessibleDepth = 0},
-                new LogicEntity(TechType.Battery, TechTypeCategory.Electronics){ AccessibleDepth = 100 },
-                new LogicEntity(TechType.Aquarium, TechTypeCategory.BaseInternalPieces){ AccessibleDepth = 100 },
-                new LogicEntity(TechType.BluePalmSeed, TechTypeCategory.Seeds, prerequisites: new List<TechType>(){TechType.Knife}),
-                new LogicEntity(TechType.SeaCrownSeed, TechTypeCategory.Seeds, prerequisites: new List<TechType>(){TechType.Knife}){ AccessibleDepth = 100},
-                new LogicEntity(TechType.BeaconFragment, TechTypeCategory.Fragments)
+                new LogicEntity(EntityType.Recipe, TechType.Titanium, TechTypeCategory.RawMaterials) { AccessibleDepth = 0 },
+                new LogicEntity(EntityType.Recipe, TechType.Gold, TechTypeCategory.RawMaterials) { AccessibleDepth = 70 },
+                new LogicEntity(EntityType.Recipe, TechType.Peeper, TechTypeCategory.Fish){ AccessibleDepth = 0},
+                new LogicEntity(EntityType.Recipe, TechType.Battery, TechTypeCategory.Electronics){ AccessibleDepth = 100 },
+                new LogicEntity(EntityType.Recipe, TechType.Aquarium, TechTypeCategory.BaseInternalPieces){ AccessibleDepth = 100 },
+                new LogicEntity(EntityType.Recipe, TechType.BluePalmSeed, TechTypeCategory.Seeds, prerequisites: new List<TechType>(){TechType.Knife}),
+                new LogicEntity(EntityType.Recipe, TechType.SeaCrownSeed, TechTypeCategory.Seeds, prerequisites: new List<TechType>(){TechType.Knife}){ AccessibleDepth = 100},
+                new LogicEntity(EntityType.Recipe, TechType.BeaconFragment, TechTypeCategory.Fragments)
             };
-            _mat = new EntityHandler(_allMaterials, new FakeLogger());
+            _mat = new EntityHandler(new FakeLogger());
         }
 
         [TestCase(TechTypeCategory.RawMaterials, 0, ExpectedResult = true)]
@@ -67,16 +67,16 @@ namespace Tests.UnitTests.Logic.Recipes
         [TestCase(TechType.JeweledDiskPiece, TechTypeCategory.Eggs, ExpectedResult = true)]
         public bool TestAddReachable(TechType techType, TechTypeCategory category)
         {
-            LogicEntity entity = new LogicEntity(techType, category);
-            return _mat.AddReachable(entity);
+            LogicEntity entity = new LogicEntity(EntityType.Recipe, techType, category);
+            return _mat.AddToLogic(entity);
         }
 
         [Test]
         public void TestAddReachable_Twice()
         {
-            LogicEntity entity = new LogicEntity(TechType.Titanium, TechTypeCategory.RawMaterials);
-            Assert.True(_mat.AddReachable(entity));
-            Assert.False(_mat.AddReachable(entity));
+            LogicEntity entity = new LogicEntity(EntityType.Recipe, TechType.Titanium, TechTypeCategory.RawMaterials);
+            Assert.True(_mat.AddToLogic(entity));
+            Assert.False(_mat.AddToLogic(entity));
         }
         
         [TestCase(TechTypeCategory.RawMaterials, 100, TechType.Knife, ExpectedResult = false)]

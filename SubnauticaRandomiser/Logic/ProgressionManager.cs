@@ -27,24 +27,24 @@ namespace SubnauticaRandomiser.Logic
         /// Invoked when entities are marked as mandatory or elective for randomisation by certain depths. Use this
         /// to add your own.
         /// </summary>
-        public event EventHandler<SetupPriorityEventArgs> OnSetupPriority;
+        public event EventHandler<SetupPriorityEventArgs> SetupPriority;
 
         /// <summary>
         /// Invoked when entities are marked as progression items. Use this to add your own.
         /// </summary>
-        public event EventHandler<SetupProgressionEventArgs> OnSetupProgression;
+        public event EventHandler<SetupProgressionEventArgs> SetupProgression;
 
         /// <summary>
         /// Invoked when an entity that was previously marked as a progression item is successfully randomised. Always
         /// executes <em>after</em> the generic event for a successful randomisation.
         /// </summary>
-        public event EventHandler<EntityEventArgs> OnProgression;
+        public event EventHandler<EntityEventArgs> HasProgressed;
 
         /// <summary>
         /// Invoked when the successful randomisation of a progression item caused the maximum reachable depth to
         /// increase. Always executes <em>after</em> the event for a progression item.
         /// </summary>
-        public event EventHandler<EntityEventArgs> OnDepthIncrease;
+        public event EventHandler<EntityEventArgs> DepthIncreased;
 
         private void Awake()
         {
@@ -202,7 +202,7 @@ namespace SubnauticaRandomiser.Logic
                     // Only ever prioritise one of the electives. If one is already in logic, skip all others.
                     if (techTypes.Length > 0 && techTypes.All(t => !_coreLogic.HasRandomised(t)))
                     {
-                        TechType choice = _coreLogic._Random.Choice(techTypes);
+                        TechType choice = _coreLogic.Random.Choice(techTypes);
                         yield return choice;
                     }
                 }
@@ -308,7 +308,7 @@ namespace SubnauticaRandomiser.Logic
 
             _unlockedProgressionEntities.Add(entity.TechType);
             _log.Debug($"[PM] Unlocked new progression item {entity}");
-            OnProgression(this, new EntityEventArgs(entity));
+            HasProgressed?.Invoke(this, new EntityEventArgs(entity));
 
             // A new progression item also necessitates new depth calculations.
             int newDepth = CalculateReachableDepth(_unlockedProgressionEntities, _config.iDepthSearchTime);
@@ -316,21 +316,24 @@ namespace SubnauticaRandomiser.Logic
             {
                 ReachableDepth = newDepth;
                 UpdatePriorityEntities(ReachableDepth);
-                OnDepthIncrease(this, new EntityEventArgs(entity));
+                DepthIncreased?.Invoke(this, new EntityEventArgs(entity));
             }
         }
 
+        /// <summary>
+        /// Trigger events to let other modules add their own priority and progression items.
+        /// </summary>
         internal void TriggerSetupEvents()
         {
             // Let other modules add their own priority items.
             SetupPriorityEventArgs priorityArgs = new SetupPriorityEventArgs(_essentialEntities, _electiveEntities);
-            OnSetupPriority(this, priorityArgs);
+            SetupPriority?.Invoke(this, priorityArgs);
             _essentialEntities = priorityArgs.EssentialEntities;
             _electiveEntities = priorityArgs.ElectiveEntities;
             
             // Let other modules add their own progression items.
             SetupProgressionEventArgs progressionArgs = new SetupProgressionEventArgs(_progressionEntities);
-            OnSetupProgression(this, progressionArgs);
+            SetupProgression?.Invoke(this, progressionArgs);
             _progressionEntities = progressionArgs.ProgressionEntities;
         }
 
@@ -343,7 +346,7 @@ namespace SubnauticaRandomiser.Logic
             List<LogicEntity> additions = new List<LogicEntity>();
             foreach (TechType techType in GetUnusedPriorityEntities(depth))
             {
-                LogicEntity entity = _coreLogic._EntityHandler.GetEntity(techType);
+                LogicEntity entity = _coreLogic.EntityHandler.GetEntity(techType);
                 additions.Add(entity);
                 _log.Debug($"[PM] Adding priority entity {entity} to priority queue for depth {depth}");
             }

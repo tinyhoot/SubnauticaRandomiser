@@ -14,7 +14,7 @@ namespace SubnauticaRandomiser.Handlers
         /// <returns>The parsed Enum if successful, or the Enum's default value if not.</returns>
         public static TEnum Parse<TEnum>(string value) where TEnum : struct
         {
-            if (!Enum.TryParse(value, out TEnum result))
+            if (!Enum.TryParse(value, true, out TEnum result))
             {
                 return default;
             }

@@ -20,7 +20,6 @@ namespace SubnauticaRandomiser.Logic
         private ProgressionManager _manager;
         private RandomiserConfig _config;
         private ILogHandler _log;
-        private EntitySerializer _serializer;
         private readonly List<Tuple<TechType, int>> _progression = new List<Tuple<TechType, int>>();
 
         private List<string> _basicOptions;
@@ -38,12 +37,11 @@ namespace SubnauticaRandomiser.Logic
             _manager = GetComponent<ProgressionManager>();
             _config = _coreLogic._Config;
             _log = _coreLogic._Log;
-            _serializer = _coreLogic._Serializer;
-            
+
             // Register events.
-            _coreLogic.OnMainLoopComplete += OnMainLoopComplete;
-            _manager.OnDepthIncrease += OnDepthIncrease;
-            _manager.OnProgression += OnProgression;
+            _coreLogic.MainLoopCompleted += OnMainLoopCompleted;
+            _manager.DepthIncreased += OnDepthIncrease;
+            _manager.HasProgressed += OnProgression;
         }
 
         /// <summary>
@@ -57,9 +55,9 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Once the main loop completes, all randomising is over. Write the spoiler log to disk.
         /// </summary>
-        private void OnMainLoopComplete(object sender, EventArgs args)
+        private void OnMainLoopCompleted(object sender, EventArgs args)
         {
-            WriteLogAsync().Start();
+            WriteLogAsync(_coreLogic.Serializer);
         }
 
         /// <summary>
@@ -182,13 +180,13 @@ namespace SubnauticaRandomiser.Logic
         /// Grab the randomised boxes from the serializer, and sort them alphabetically.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
-        private string[] PrepareDataboxes()
+        private string[] PrepareDataboxes(EntitySerializer serializer)
         {
-            if (_serializer.Databoxes is null)
+            if (serializer.Databoxes is null)
                 return new [] { "Not randomised, all in vanilla locations." };
 
             List<string> preparedDataboxes = new List<string>();
-            foreach (KeyValuePair<RandomiserVector, TechType> entry in _serializer.Databoxes) 
+            foreach (KeyValuePair<RandomiserVector, TechType> entry in serializer.Databoxes) 
             {
                 preparedDataboxes.Add(entry.Value.AsString() + " can be found at " + entry.Key);
             }
@@ -201,14 +199,14 @@ namespace SubnauticaRandomiser.Logic
         /// Grab the randomise fragments from the serializer, and sort them alphabetically.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
-        private string[] PrepareFragments()
+        private string[] PrepareFragments(EntitySerializer serializer)
         {
-            if (_serializer.SpawnDataDict is null || _serializer.SpawnDataDict.Count == 0)
+            if (serializer.SpawnDataDict is null || serializer.SpawnDataDict.Count == 0)
                 return new[] { "Not randomised, all in vanilla locations." };
 
             List<string> preparedFragments = new List<string>();
             // Iterate through every TechType representing each fragment.
-            foreach (var kv in _serializer.SpawnDataDict)
+            foreach (var kv in serializer.SpawnDataDict)
             {
                 string line = kv.Key.AsString() + ": ";
                 // Fragments are split up into their respective prefabs, but those all have the same spawn biomes
@@ -280,7 +278,7 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Write the log to disk.
         /// </summary>
-        public async Task WriteLogAsync()
+        public async Task WriteLogAsync(EntitySerializer serializer)
         {
             List<string> lines = new List<string>();
             PrepareStrings();
@@ -294,10 +292,10 @@ namespace SubnauticaRandomiser.Logic
             
             lines.AddRange(PrepareProgressionPath());
             lines.AddRange(_contentDataboxes);
-            lines.AddRange(PrepareDataboxes());
+            lines.AddRange(PrepareDataboxes(serializer));
             
             lines.AddRange(_contentFragments);
-            lines.AddRange(PrepareFragments());
+            lines.AddRange(PrepareFragments(serializer));
 
             using (StreamWriter file = new StreamWriter(Path.Combine(Initialiser._ModDirectory, _FileName)))
             {

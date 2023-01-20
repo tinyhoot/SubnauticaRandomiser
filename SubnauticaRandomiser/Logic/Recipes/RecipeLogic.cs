@@ -37,7 +37,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
             _config = _coreLogic._Config;
-            _entityHandler = _coreLogic._EntityHandler;
+            _entityHandler = _coreLogic.EntityHandler;
             _log = _coreLogic._Log;
             ValidIngredients = new HashSet<LogicEntity>(new LogicEntityEqualityComparer());
             
@@ -56,12 +56,12 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
             
             // Register events.
-            _coreLogic.OnCollectRandomisableEntities += OnCollectRandomisableEntities;
-            _coreLogic.OnSetup += OnSetup;
-            _entityHandler.OnEnterLogic += OnEntityEnterLogic;
-            _manager.OnProgression += OnProgression;
-            _manager.OnSetupPriority += OnSetupPriorityEntities;
-            _manager.OnSetupProgression += OnSetupProgressionEntitites;
+            _coreLogic.CollectingEntities += OnCollectingEntities;
+            _coreLogic.SetupBeginning += OnSetupBeginning;
+            _entityHandler.EntityEnteredLogic += OnEntityEnteredLogic;
+            _manager.HasProgressed += OnProgression;
+            _manager.SetupPriority += OnSetupPriorityEntities;
+            _manager.SetupProgression += OnSetupProgressionEntitites;
             // Register this module as handler for recipe type entities.
             _coreLogic.RegisterEntityHandler(EntityType.Recipe, this);
         }
@@ -106,7 +106,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <summary>
         /// Add all recipes to the main loop.
         /// </summary>
-        private void OnCollectRandomisableEntities(object sender, CollectEntitiesEventArgs args)
+        private void OnCollectingEntities(object sender, CollectEntitiesEventArgs args)
         {
             args.ToBeRandomised.AddRange(_entityHandler.GetAllCraftables());
         }
@@ -114,7 +114,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <summary>
         /// When an entity enters the logic, add it is an ingredient if possible.
         /// </summary>
-        private void OnEntityEnterLogic(object sender, EntityEventArgs args)
+        private void OnEntityEnteredLogic(object sender, EntityEventArgs args)
         {
             LogicEntity entity = args.LogicEntity;
             if (entity.CanFunctionAsIngredient() && entity.HasUsesLeft())
@@ -126,22 +126,10 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// </summary>
         private void OnProgression(object sender, EntityEventArgs args)
         {
-            int depth = _manager.ReachableDepth;
-            
-            if (IsAnyKnifeRandomised())
-                _entityHandler.AddToLogic(TechTypeCategory.RawMaterials, depth);
-            else
-                _entityHandler.AddToLogic(TechTypeCategory.RawMaterials, depth, TechType.Knife, true);
-
-            if (_config.bUseFish)
-                _entityHandler.AddToLogic(TechTypeCategory.Fish, depth);
-            if (_config.bUseEggs && _coreLogic.HasRandomised(TechType.BaseWaterPark))
-                _entityHandler.AddToLogic(TechTypeCategory.Eggs, depth);
-            if (_config.bUseSeeds && IsAnyKnifeRandomised())
-                _entityHandler.AddToLogic(TechTypeCategory.Seeds, depth);
+            UpdateValidIngredients(_manager.ReachableDepth);
         }
 
-        private void OnSetup(object sender, EventArgs args)
+        private void OnSetupBeginning(object sender, EventArgs args)
         {
             // Assemble a dictionary of what is considered basic outpost pieces which together should not exceed
             // the total cost defined in the config.
@@ -175,6 +163,13 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 };
                 ApplyUpgradeChainPrerequisites(_entityHandler, UpgradeChains);
             }
+            else
+            {
+                UpgradeChains = new Dictionary<TechType, TechType>();
+            }
+            
+            // Add basic raw materials into the logic.
+            UpdateValidIngredients(0);
         }
 
         /// <summary>
@@ -292,12 +287,31 @@ namespace SubnauticaRandomiser.Logic.Recipes
         }
 
         /// <summary>
+        /// Add non-craftable ingredients into the logic up to the given depth.
+        /// This triggers an event, which this class listens to for registering new ingredients.
+        /// </summary>
+        private void UpdateValidIngredients(int depth)
+        {
+            if (IsAnyKnifeRandomised())
+                _entityHandler.AddToLogic(TechTypeCategory.RawMaterials, depth);
+            else
+                _entityHandler.AddToLogic(TechTypeCategory.RawMaterials, depth, TechType.Knife, true);
+
+            if (_config.bUseFish)
+                _entityHandler.AddToLogic(TechTypeCategory.Fish, depth);
+            if (_config.bUseEggs && _coreLogic.HasRandomised(TechType.BaseWaterPark))
+                _entityHandler.AddToLogic(TechTypeCategory.Eggs, depth);
+            if (_config.bUseSeeds && IsAnyKnifeRandomised())
+                _entityHandler.AddToLogic(TechTypeCategory.Seeds, depth);
+        }
+
+        /// <summary>
         /// Apply a randomised recipe to the in-game craft data, and store a copy in the master dictionary.
         /// </summary>
         /// <param name="recipe">The recipe to change.</param>
         private void ApplyRandomisedRecipe(Recipe recipe)
         {
-            _coreLogic._Serializer.AddRecipe(recipe.TechType, recipe);
+            _coreLogic.Serializer.AddRecipe(recipe.TechType, recipe);
         }
 
         /// <summary>

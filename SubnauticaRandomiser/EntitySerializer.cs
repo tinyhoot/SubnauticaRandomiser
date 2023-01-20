@@ -55,33 +55,11 @@ namespace SubnauticaRandomiser
             SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
             _log = logger;
         }
-
-        /// <summary>
-        /// Convert this class to a string for saving.
-        /// </summary>
-        public string ToBase64String()
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                new BinaryFormatter().Serialize(ms, this);
-                return Convert.ToBase64String(ms.ToArray());
-            }
-        }
         
-        /// <summary>
-        /// Convert a previously saved string back into an instance of this class.
-        /// </summary>
-        /// <param name="base64String"></param>
-        /// <returns>A typecast EntitySerializer, which may or may not be valid.</returns>
-        public static EntitySerializer FromBase64String(string base64String)
+        [OnDeserialized]
+        private void OnDeserialized()
         {
-            byte[] bytes = Convert.FromBase64String(base64String);
-            using (MemoryStream ms = new MemoryStream(bytes, 0, bytes.Length))
-            {
-                ms.Write(bytes, 0, bytes.Length);
-                ms.Position = 0;
-                return (EntitySerializer)(new BinaryFormatter().Deserialize(ms));
-            }
+            _log = Initialiser._Log;
         }
 
         /// <summary>
@@ -151,10 +129,38 @@ namespace SubnauticaRandomiser
             return true;
         }
 
-        [OnDeserialized]
-        private void OnDeserialized()
+        /// <summary>
+        /// Convert a previously saved string back into an instance of this class.
+        /// </summary>
+        /// <returns>A typecast EntitySerializer, which may or may not be valid.</returns>
+        public static EntitySerializer FromBase64String(string base64String)
         {
-            _log = Initialiser._Log;
+            byte[] bytes = Convert.FromBase64String(base64String);
+            using MemoryStream ms = new MemoryStream(bytes, 0, bytes.Length);
+            ms.Write(bytes, 0, bytes.Length);
+            ms.Position = 0;
+            return (EntitySerializer)(new BinaryFormatter().Deserialize(ms));
+        }
+
+        /// <summary>
+        /// Serialise the current randomisation state to disk.
+        /// </summary>
+        public void Serialize(RandomiserConfig config)
+        {
+            string base64 = ToBase64String();
+            config.sBase64Seed = base64;
+            config.Save();
+            _log.Debug("Saved game state to disk!");
+        }
+        
+        /// <summary>
+        /// Convert this class to a string for saving.
+        /// </summary>
+        public string ToBase64String()
+        {
+            using MemoryStream ms = new MemoryStream();
+            new BinaryFormatter().Serialize(ms, this);
+            return Convert.ToBase64String(ms.ToArray());
         }
     }
 }

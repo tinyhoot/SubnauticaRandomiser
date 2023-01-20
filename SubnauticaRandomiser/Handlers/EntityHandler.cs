@@ -29,7 +29,7 @@ namespace SubnauticaRandomiser.Handlers
             _log = logger;
         }
 
-        public event EventHandler<EntityEventArgs> OnEnterLogic;
+        public event EventHandler<EntityEventArgs> EntityEnteredLogic;
 
         /// <summary>
         /// Mark a single entity as accessible in logic.
@@ -43,7 +43,7 @@ namespace SubnauticaRandomiser.Handlers
             _log.Debug($"Added entity to logic: {entity}");
             entity.InLogic = true;
             _inLogic.Add(entity);
-            OnEnterLogic(this, new EntityEventArgs(entity));
+            EntityEnteredLogic?.Invoke(this, new EntityEventArgs(entity));
             return true;
         }
 

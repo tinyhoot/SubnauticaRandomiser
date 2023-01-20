@@ -28,7 +28,7 @@ namespace SubnauticaRandomiser.Logic
             _coreLogic = GetComponent<CoreLogic>();
             _config = _coreLogic._Config;
             _log = _coreLogic._Log;
-            _random = _coreLogic._Random;
+            _random = _coreLogic.Random;
             
             // Parse the list of valid alternate starts from a file.
             ParseDataFileAsync().Start();

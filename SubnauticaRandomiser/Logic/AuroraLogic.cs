@@ -10,8 +10,8 @@ namespace SubnauticaRandomiser.Logic
         private readonly CoreLogic _logic;
 
         private ILogHandler _log => _logic._Log;
-        private IRandomHandler _random => _logic._Random;
-        private EntitySerializer _serializer => _logic._Serializer;
+        private IRandomHandler _random => _logic.Random;
+        private EntitySerializer _serializer => _logic.Serializer;
 
         public static readonly Dictionary<string, string> KeypadPrefabClassIds = new Dictionary<string, string>
         {
