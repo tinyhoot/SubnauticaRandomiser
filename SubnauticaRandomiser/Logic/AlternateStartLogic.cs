@@ -31,7 +31,7 @@ namespace SubnauticaRandomiser.Logic
             _random = _coreLogic.Random;
             
             // Parse the list of valid alternate starts from a file.
-            ParseDataFileAsync().Start();
+            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
         }
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)

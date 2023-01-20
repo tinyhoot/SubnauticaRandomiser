@@ -31,11 +31,11 @@ namespace SubnauticaRandomiser.Logic
         private ProgressionManager _manager;
         private SpoilerLog _spoilerLog;
 
+        private List<Task> _fileTasks;
         private Dictionary<EntityType, ILogicModule> _handlingModules;
         private List<ILogicModule> _modules;
         private List<LogicEntity> _priorityEntities;
-        private Task _task;
-        
+
         /// <summary>
         /// Invoked during the setup stage, before the main loop begins.
         /// </summary>
@@ -74,6 +74,7 @@ namespace SubnauticaRandomiser.Logic
         
         public void Awake()
         {
+            _fileTasks = new List<Task>();
             _handlingModules = new Dictionary<EntityType, ILogicModule>();
             _modules = new List<ILogicModule>();
             _priorityEntities = new List<LogicEntity>();
@@ -81,7 +82,6 @@ namespace SubnauticaRandomiser.Logic
             _Config = Initialiser._Config;
             _Log = Initialiser._Log;
             EntityHandler = new EntityHandler(_Log);
-            _task = EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile);
             Random = new RandomHandler(_Config.iSeed);
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
@@ -103,9 +103,10 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Run the randomiser and start randomising!
         /// </summary>
-        public void Run()
+        internal void Run()
         {
             Serializer = new EntitySerializer(_Log);
+            RegisterFileLoadTask(EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
             EnableModules();
             // Wait and periodically check whether all file loading has completed. Only continue once that is done.
             StartCoroutine(WaitUntilFilesLoaded());
@@ -176,7 +177,7 @@ namespace SubnauticaRandomiser.Logic
                 ILogicModule handler = _handlingModules.GetOrDefault(nextEntity.EntityType, null);
                 if (handler is null)
                 {
-                    _Log.Warn($"[Core] Unsupported entity in main loop: {nextEntity.EntityType} {nextEntity}");
+                    _Log.Warn($"[Core] Unhandled entity in main loop: {nextEntity.EntityType} {nextEntity}");
                     notRandomised.Remove(nextEntity);
                     continue;
                 }
@@ -268,20 +269,26 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         public bool HasRandomised(LogicEntity entity)
         {
-            return entity.InLogic;
+            return EntityHandler.IsInLogic(entity);
         }
 
         /// <summary>
         /// Check whether the given TechType has already been randomised.
-        /// TODO: Improve to not look up entity every single time.
         /// </summary>
         /// <exception cref="ArgumentNullException">If the TechType does not have an associated LogicEntity.</exception>
         public bool HasRandomised(TechType techType)
         {
-            LogicEntity entity = EntityHandler.GetEntity(techType);
-            if (entity is null)
-                throw new ArgumentNullException(nameof(techType), $"There is no LogicEntity corresponding to {techType}!");
-            return entity.InLogic;
+            return EntityHandler.IsInLogic(techType);
+        }
+
+        /// <summary>
+        /// Register a task responsible for loading critical data. Randomising will only begin once all of these tasks
+        /// have completed. Use this to ensure your module finishes loading data from disk before randomisation begins.
+        /// </summary>
+        /// <param name="task">The Task object from an async method for loading data files.</param>
+        public void RegisterFileLoadTask(Task task)
+        {
+            _fileTasks.Add(task);
         }
 
         /// <summary>
@@ -313,7 +320,7 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Try to restore a game state from disk.
         /// </summary>
-        public bool TryRestoreSave()
+        internal bool TryRestoreSave()
         {
             if (string.IsNullOrEmpty(_Config.sBase64Seed))
             {
@@ -336,7 +343,7 @@ namespace SubnauticaRandomiser.Logic
         
         private IEnumerator WaitUntilFilesLoaded()
         {
-            yield return new WaitUntil(() => _task.IsCompleted);
+            yield return new WaitUntil(() => _fileTasks.TrueForAll(task => task.IsCompleted));
             Randomise();
         }
     }

@@ -57,7 +57,8 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void OnMainLoopCompleted(object sender, EventArgs args)
         {
-            WriteLogAsync(_coreLogic.Serializer);
+            // Start writing and discard the Task. Gets rid of a compiler warning.
+            _ = WriteLogAsync(_coreLogic.Serializer);
         }
 
         /// <summary>

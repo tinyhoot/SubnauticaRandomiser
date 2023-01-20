@@ -73,6 +73,7 @@ namespace SubnauticaRandomiser
 
         private void Start()
         {
+            // Randomise, but only if no existing state was loaded from disk.
             if (_Serializer is null)
                 Randomise();
         }

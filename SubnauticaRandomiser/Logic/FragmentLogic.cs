@@ -91,7 +91,7 @@ namespace SubnauticaRandomiser.Logic
                 Init();
             }
             
-            ParseDataFileAsync();
+            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
         }
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)

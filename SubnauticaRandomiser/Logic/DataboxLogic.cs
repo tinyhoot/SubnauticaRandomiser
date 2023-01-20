@@ -33,7 +33,7 @@ namespace SubnauticaRandomiser.Logic
             // Register events.
             _coreLogic.CollectingEntities += OnCollectDataboxes;
 
-            ParseDataFileAsync();
+            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
         }
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)
