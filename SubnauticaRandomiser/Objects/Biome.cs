@@ -15,16 +15,16 @@ namespace SubnauticaRandomiser.Objects
         public readonly int SmallSlots;
         public readonly float? FragmentRate;
         public readonly string Name;
-        public readonly Enums.BiomeType Region;
+        public readonly Enums.BiomeRegion Region;
         public readonly BiomeType Variant;
 
         public int AverageDepth => Region.GetAccessibleDepth();
         public int Used = 0;
 
-        public Biome(string name, Enums.BiomeType biomeType, int creatureSlots, int mediumSlots, int smallSlots = -1, float? fragmentRate = null)
+        public Biome(string name, Enums.BiomeRegion biomeRegion, int creatureSlots, int mediumSlots, int smallSlots = -1, float? fragmentRate = null)
         {
             Name = name;
-            Region = biomeType;
+            Region = biomeRegion;
             Variant = EnumHandler.Parse<BiomeType>(name);
 
             CreatureSlots = creatureSlots;

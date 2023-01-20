@@ -21,7 +21,7 @@ namespace SubnauticaRandomiser.Logic
         private ILogHandler _log;
         private IRandomHandler _random;
         
-        private Dictionary<Objects.Enums.BiomeType, List<float[]>> _alternateStarts;
+        private Dictionary<Objects.Enums.BiomeRegion, List<float[]>> _alternateStarts;
 
         public void Awake()
         {
@@ -29,7 +29,7 @@ namespace SubnauticaRandomiser.Logic
             _config = _coreLogic._Config;
             _log = _coreLogic._Log;
             _random = _coreLogic.Random;
-            
+
             // Parse the list of valid alternate starts from a file.
             _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
         }
@@ -53,25 +53,25 @@ namespace SubnauticaRandomiser.Logic
         /// Convert the config value to a usable biome.
         /// </summary>
         /// <returns>The biome.</returns>
-        private Objects.Enums.BiomeType GetBiome(string startBiome)
+        private Objects.Enums.BiomeRegion GetBiome(string startBiome)
         {
             switch (startBiome)
             {
                 case "Random":
                     // Only use starts where you can actually reach the ground.
                     return _random.Choice(_alternateStarts.Keys.ToList()
-                        .FindAll(biome => !biome.Equals(Objects.Enums.BiomeType.None) && biome.GetAccessibleDepth() <= 100));
+                        .FindAll(biome => !biome.Equals(Objects.Enums.BiomeRegion.None) && biome.GetAccessibleDepth() <= 100));
                 case "Chaotic Random":
                     return _random.Choice(_alternateStarts.Keys);
                 case "BulbZone":
-                    return Objects.Enums.BiomeType.KooshZone;
+                    return Objects.Enums.BiomeRegion.KooshZone;
                 case "Floating Island":
-                    return Objects.Enums.BiomeType.FloatingIsland;
+                    return Objects.Enums.BiomeRegion.FloatingIsland;
                 case "Void":
-                    return Objects.Enums.BiomeType.None;
+                    return Objects.Enums.BiomeRegion.None;
             }
 
-            return EnumHandler.Parse<Objects.Enums.BiomeType>(startBiome);
+            return EnumHandler.Parse<Objects.Enums.BiomeRegion>(startBiome);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace SubnauticaRandomiser.Logic
             if (startBiome.StartsWith("Vanilla"))
                 return null;
             
-            Objects.Enums.BiomeType biome = GetBiome(startBiome);
+            Objects.Enums.BiomeRegion biome = GetBiome(startBiome);
             if (!_alternateStarts.ContainsKey(biome))
             {
                 _log.Error("[AS] No information found on chosen starting biome " + biome);

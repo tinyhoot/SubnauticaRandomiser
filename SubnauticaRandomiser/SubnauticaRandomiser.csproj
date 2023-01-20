@@ -71,7 +71,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="RandomiserConfig.cs" />
     <Compile Include="CSVReader.cs" />
     <Compile Include="Objects\Blueprint.cs" />
-    <Compile Include="Objects\Enums\BiomeType.cs" />
+    <Compile Include="Objects\Enums\BiomeRegion.cs" />
     <Compile Include="Objects\Enums\TechTypeCategory.cs" />
     <Compile Include="Objects\Enums\Wreckage.cs" />
     <Compile Include="Objects\Exceptions\ParsingException.cs" />

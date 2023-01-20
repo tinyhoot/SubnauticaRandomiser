@@ -1,6 +1,6 @@
 ﻿namespace SubnauticaRandomiser.Objects.Enums
 {
-    public enum BiomeType
+    public enum BiomeRegion
     {
         None,
         ActiveLavaZone,
@@ -35,72 +35,72 @@
         UnderwaterIslands
     }
 
-    public static class BiomeTypeExtensions
+    public static class BiomeRegionExtensions
     {
         /// <summary>
         /// Returns a hardcoded, rough approximation of the depth at which the biome in general becomes broadly
         /// accessible, i.e. comfortably explorable.
         /// </summary>
         /// <returns>The accessible depth.</returns>
-        public static int GetAccessibleDepth(this BiomeType biomeType)
+        public static int GetAccessibleDepth(this BiomeRegion biomeRegion)
         {
-            switch (biomeType)
+            switch (biomeRegion)
             {
-                case (BiomeType.ActiveLavaZone):
+                case (BiomeRegion.ActiveLavaZone):
                     return 1400;
-                case (BiomeType.BloodKelp):
+                case (BiomeRegion.BloodKelp):
                     return 250;
-                case (BiomeType.BonesField):
+                case (BiomeRegion.BonesField):
                     return 650;
-                case (BiomeType.Canyon):
+                case (BiomeRegion.Canyon):
                     return 600;
-                case (BiomeType.CragField):
+                case (BiomeRegion.CragField):
                     return 200;
-                case (BiomeType.CrashZone):
+                case (BiomeRegion.CrashZone):
                     return 50;
-                case (BiomeType.DeepGrandReef):
+                case (BiomeRegion.DeepGrandReef):
                     return 500;
-                case (BiomeType.Dunes):
+                case (BiomeRegion.Dunes):
                     return 200;
-                case (BiomeType.FloatingIsland):
+                case (BiomeRegion.FloatingIsland):
                     return 0;
-                case (BiomeType.GhostTree):
+                case (BiomeRegion.GhostTree):
                     return 900;
-                case (BiomeType.GrandReef):
+                case (BiomeRegion.GrandReef):
                     return 300;
-                case (BiomeType.GrassyPlateaus):
+                case (BiomeRegion.GrassyPlateaus):
                     return 100;
-                case (BiomeType.InactiveLavaZone):
+                case (BiomeRegion.InactiveLavaZone):
                     return 1000;
-                case (BiomeType.JellyshroomCaves):
+                case (BiomeRegion.JellyshroomCaves):
                     return 220;
-                case (BiomeType.Kelp):
+                case (BiomeRegion.Kelp):
                     return 50;
-                case (BiomeType.KooshZone):
+                case (BiomeRegion.KooshZone):
                     return 250;
-                case (BiomeType.LostRiverCorridor):
+                case (BiomeRegion.LostRiverCorridor):
                     return 600;
-                case (BiomeType.LostRiverJunction):
+                case (BiomeRegion.LostRiverJunction):
                     return 800;
-                case (BiomeType.Mesas):
+                case (BiomeRegion.Mesas):
                     return 300;
-                case (BiomeType.Mountains):
+                case (BiomeRegion.Mountains):
                     return 200;
-                case (BiomeType.MushroomForest):
+                case (BiomeRegion.MushroomForest):
                     return 150;
-                case (BiomeType.PrisonAquarium):
+                case (BiomeRegion.PrisonAquarium):
                     return 1700;
-                case (BiomeType.SafeShallows):
+                case (BiomeRegion.SafeShallows):
                     return 0;
-                case (BiomeType.SeaTreaderPath):
+                case (BiomeRegion.SeaTreaderPath):
                     return 200;
-                case (BiomeType.SkeletonCave):
+                case (BiomeRegion.SkeletonCave):
                     return 650;
-                case (BiomeType.SparseReef):
+                case (BiomeRegion.SparseReef):
                     return 100;
-                case (BiomeType.TreeCove):
+                case (BiomeRegion.TreeCove):
                     return 900;
-                case (BiomeType.UnderwaterIslands):
+                case (BiomeRegion.UnderwaterIslands):
                     return 150;
                 default:
                     return 0;
