@@ -336,8 +336,8 @@ namespace SubnauticaRandomiser.Logic
                 _Log.Error("[Core] base64 seed is invalid; could not deserialize.");
                 return false;
             }
-
             _Serializer = serializer;
+            _Log.Debug("[Core] Save data restored.");
             return true;
         }
         

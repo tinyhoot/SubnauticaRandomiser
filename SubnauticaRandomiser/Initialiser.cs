@@ -43,11 +43,13 @@ namespace SubnauticaRandomiser
         // Everything the mod ever modifies is stored in here.
         internal static EntitySerializer _Serializer;
         internal static ILogHandler _Log;
-        internal static GameObject _LogicObject;
-        private static CoreLogic _coreLogic;
+        internal GameObject _LogicObject;
+        private CoreLogic _coreLogic;
+        internal static Initialiser _Main;
 
         private void Awake()
         {
+            _Main = this;
             _Log = new LogHandler();
             _Log.Info($"{NAME} v{VERSION} starting up!");
 
@@ -80,9 +82,28 @@ namespace SubnauticaRandomiser
         }
 
         /// <summary>
+        /// Ensure the user did not update into a save incompatibility.
+        /// </summary>
+        private bool CheckSaveCompatibility()
+        {
+            if (_Config.iSaveVersion == _ExpectedSaveVersion)
+                return true;
+            
+            s_versionDict.TryGetValue(_Config.iSaveVersion, out string version);
+            if (string.IsNullOrEmpty(version))
+                version = "unknown or corrupted.";
+
+            _Log.InGameMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.", true);
+            _Log.InGameMessage("The last supported version for your savegame is " + version, true);
+            _Log.InGameMessage("To protect your previous savegame, no changes to the game have been made.", true);
+            _Log.InGameMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json", true);
+            return false;
+        }
+        
+        /// <summary>
         /// Randomise the game, discarding any earlier randomisation data.
         /// </summary>
-        public static void Randomise()
+        private void Randomise()
         {
             _Serializer = null;
             _Config.SanitiseConfigValues();
@@ -99,37 +120,23 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                _Log.InGameMessage("ERROR: Something went wrong. Please report this error with the config.json"
-                                           + " from your mod folder on NexusMods.", true);
+                _Log.InGameMessage($"{ex.GetType()}: Something went wrong. Please report this error with the"
+                                   + "config.json from your mod folder on Github or NexusMods.", true);
                 _Log.Fatal($"{ex.GetType()}: {ex.Message}");
                 
                 // Ensure that the randomiser crashes completely if things go wrong this badly.
                 throw;
             }
-            
-            // ApplyAllChanges();
-            // _Log.Info("Randomisation successful!");
-            //
-            // SaveGameStateToDisk();
         }
 
-        /// <summary>
-        /// Ensure the user did not update into a save incompatibility.
-        /// </summary>
-        private static bool CheckSaveCompatibility()
+        internal void RandomiseFromConfig()
         {
-            if (_Config.iSaveVersion == _ExpectedSaveVersion)
-                return true;
+            // Delete whatever previous state there was.
+            if (_LogicObject != null)
+                Destroy(_LogicObject);
             
-            s_versionDict.TryGetValue(_Config.iSaveVersion, out string version);
-            if (string.IsNullOrEmpty(version))
-                version = "unknown or corrupted.";
-
-            _Log.InGameMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.", true);
-            _Log.InGameMessage("The last supported version for your savegame is " + version, true);
-            _Log.InGameMessage("To protect your previous savegame, no changes to the game have been made.", true);
-            _Log.InGameMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json", true);
-            return false;
+            SetupGameObject();
+            Randomise();
         }
         
         /// <summary>

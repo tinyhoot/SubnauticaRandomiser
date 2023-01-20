@@ -38,7 +38,7 @@ namespace SubnauticaRandomiser
             iSeed = random.Next();
             _log.InGameMessage("Changed seed to " + iSeed);
             _log.InGameMessage("Randomising...");
-            Initialiser.Randomise();
+            Initialiser._Main.RandomiseFromConfig();
             _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
@@ -52,7 +52,7 @@ namespace SubnauticaRandomiser
             _log.InGameMessage("Randomising...");
             // Ensure all manual changes to the config file are loaded.
             Load();
-            Initialiser.Randomise();
+            Initialiser._Main.RandomiseFromConfig();
             _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
