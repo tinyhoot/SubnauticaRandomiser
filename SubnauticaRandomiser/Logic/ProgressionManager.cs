@@ -35,6 +35,11 @@ namespace SubnauticaRandomiser.Logic
         public event EventHandler<SetupProgressionEventArgs> SetupProgression;
 
         /// <summary>
+        /// Invoked when entities are assigned the depths they make available, e.g. Seamoth 200m. 
+        /// </summary>
+        public event EventHandler<SetupVehiclesEventArgs> SetupVehicles;
+
+        /// <summary>
         /// Invoked when an entity that was previously marked as a progression item is successfully randomised. Always
         /// executes <em>after</em> the generic event for a successful randomisation.
         /// </summary>
@@ -340,6 +345,11 @@ namespace SubnauticaRandomiser.Logic
             SetupProgressionEventArgs progressionArgs = new SetupProgressionEventArgs(_progressionEntities);
             SetupProgression?.Invoke(this, progressionArgs);
             _progressionEntities = progressionArgs.ProgressionEntities;
+            
+            // Let other modules add their own vehicle depths.
+            SetupVehiclesEventArgs vehicleArgs = new SetupVehiclesEventArgs(_vehicleDepths);
+            SetupVehicles?.Invoke(this, vehicleArgs);
+            _vehicleDepths = vehicleArgs.VehicleDepths;
         }
 
         /// <summary>

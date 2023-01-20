@@ -53,8 +53,10 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Objects\Enums\EntityType.cs" />
     <Compile Include="Objects\Events\CollectEntitiesEventArgs.cs" />
     <Compile Include="Objects\Events\EntityEventArgs.cs" />
+    <Compile Include="Objects\Events\EntityListEventArgs.cs" />
     <Compile Include="Objects\Events\SetupPriorityEventArgs.cs" />
     <Compile Include="Objects\Events\SetupProgressionEventArgs.cs" />
+    <Compile Include="Objects\Events\SetupVehiclesEventArgs.cs" />
     <Compile Include="Objects\LogicEntityEqualityComparer.cs" />
     <Compile Include="Patches\AuroraPatcher.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
