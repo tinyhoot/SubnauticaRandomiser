@@ -31,7 +31,7 @@ namespace SubnauticaRandomiser.Logic
             // Register this module as a handler for databox entities.
             _coreLogic.RegisterEntityHandler(EntityType.Databox, this);
             // Register events.
-            _coreLogic.CollectingEntities += OnCollectDataboxes;
+            _coreLogic.EntityCollecting += OnCollectDataboxes;
 
             _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
         }

@@ -308,15 +308,20 @@ namespace SubnauticaRandomiser.Logic
 
             _unlockedProgressionEntities.Add(entity.TechType);
             _log.Debug($"[PM] Unlocked new progression item {entity}");
-            HasProgressed?.Invoke(this, new EntityEventArgs(entity));
 
             // A new progression item also necessitates new depth calculations.
             int newDepth = CalculateReachableDepth(_unlockedProgressionEntities, _config.iDepthSearchTime);
             if (newDepth > ReachableDepth)
             {
                 ReachableDepth = newDepth;
+                // Trigger this down here, slightly delayed, to avoid invoking the event with outdated depth info.
+                HasProgressed?.Invoke(this, new EntityEventArgs(entity));
                 UpdatePriorityEntities(ReachableDepth);
                 DepthIncreased?.Invoke(this, new EntityEventArgs(entity));
+            }
+            else
+            {
+                HasProgressed?.Invoke(this, new EntityEventArgs(entity));
             }
         }
 

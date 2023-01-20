@@ -85,7 +85,7 @@ namespace SubnauticaRandomiser.Logic
             if (_config.bRandomiseFragments)
             {
                 // Handle any fragment entities using this component.
-                _coreLogic.CollectingEntities += CollectingEntities;
+                _coreLogic.EntityCollecting += OnCollectFragments;
                 _coreLogic.RegisterEntityHandler(EntityType.Fragment, this);
                 // Reset all existing fragment spawns.
                 Init();
@@ -163,7 +163,7 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Queue up all fragments to be randomised.
         /// </summary>
-        private void CollectingEntities(object sender, CollectEntitiesEventArgs args)
+        private void OnCollectFragments(object sender, CollectEntitiesEventArgs args)
         {
             args.ToBeRandomised.AddRange(_coreLogic.EntityHandler.GetAllFragments());
         }

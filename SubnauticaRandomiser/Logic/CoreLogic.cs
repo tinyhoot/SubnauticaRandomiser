@@ -44,13 +44,13 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Invoked during the setup stage. Use this event to add LogicEntities to the main loop.
         /// </summary>
-        public event EventHandler<CollectEntitiesEventArgs> CollectingEntities;
+        public event EventHandler<CollectEntitiesEventArgs> EntityCollecting;
 
         /// <summary>
         /// Invoked just before every logic module is called up to randomise everything which does not require
         /// access to the main loop.
         /// </summary>
-        public event EventHandler OutOfLoopRandomisationBegin;
+        public event EventHandler PreLoopRandomising;
         
         /// <summary>
         /// Invoked once the next entity to be randomised has been determined.
@@ -63,15 +63,15 @@ namespace SubnauticaRandomiser.Logic
         public event EventHandler<EntityEventArgs> EntityRandomised;
 
         /// <summary>
+        /// Invoked at the beginning of the main loop.
+        /// </summary>
+        public event EventHandler MainLoopRandomising;
+
+        /// <summary>
         /// Invoked once the main loop has successfully completed.
         /// </summary>
         public event EventHandler MainLoopCompleted;
 
-        /// <summary>
-        /// Invoked once all randomisation has taken place and completed.
-        /// </summary>
-        public event EventHandler RandomisationCompleted;
-        
         private void Awake()
         {
             _fileTasks = new List<Task>();
@@ -135,7 +135,7 @@ namespace SubnauticaRandomiser.Logic
             
             // Set up the list of entities that need to be randomised in the main loop.
             CollectEntitiesEventArgs args = new CollectEntitiesEventArgs();
-            CollectingEntities?.Invoke(this, args);
+            EntityCollecting?.Invoke(this, args);
             return args.ToBeRandomised;
         }
 
@@ -145,6 +145,7 @@ namespace SubnauticaRandomiser.Logic
         private void RandomisePreLoop()
         {
             _Log.Info("[Core] Randomising: Pre-loop content");
+            PreLoopRandomising?.Invoke(this, EventArgs.Empty);
             foreach (ILogicModule module in _modules)
             {
                 module.RandomiseOutOfLoop(_Serializer);
@@ -157,9 +158,10 @@ namespace SubnauticaRandomiser.Logic
         /// <returns>A serialisation instance containing all changes made.</returns>
         /// <exception cref="TimeoutException">Raised to prevent infinite loops if the core loop takes too long to find
         /// a valid solution.</exception>
-        private EntitySerializer RandomiseMainEntities(List<LogicEntity> notRandomised)
+        private void RandomiseMainEntities(List<LogicEntity> notRandomised)
         {
             _Log.Info("[Core] Randomising: Entering main loop");
+            MainLoopRandomising?.Invoke(this, EventArgs.Empty);
 
             int circuitbreaker = 0;
             while (notRandomised.Count > 0)
@@ -195,8 +197,6 @@ namespace SubnauticaRandomiser.Logic
             
             _Log.Info($"[Core] Finished randomising within {circuitbreaker} cycles!");
             MainLoopCompleted?.Invoke(this, EventArgs.Empty);
-
-            return _Serializer;
         }
 
         /// <summary>

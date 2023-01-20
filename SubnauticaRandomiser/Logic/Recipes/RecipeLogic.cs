@@ -56,7 +56,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
             
             // Register events.
-            _coreLogic.CollectingEntities += OnCollectingEntities;
+            _coreLogic.EntityCollecting += OnEntityCollecting;
             _coreLogic.SetupBeginning += OnSetupBeginning;
             _entityHandler.EntityEnteredLogic += OnEntityEnteredLogic;
             _manager.HasProgressed += OnProgression;
@@ -106,7 +106,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <summary>
         /// Add all recipes to the main loop.
         /// </summary>
-        private void OnCollectingEntities(object sender, CollectEntitiesEventArgs args)
+        private void OnEntityCollecting(object sender, CollectEntitiesEventArgs args)
         {
             args.ToBeRandomised.AddRange(_entityHandler.GetAllCraftables());
         }
