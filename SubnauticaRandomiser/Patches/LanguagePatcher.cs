@@ -14,7 +14,7 @@ namespace SubnauticaRandomiser.Patches
         [HarmonyPatch(typeof(Language), nameof(Language.Start))]
         public static void PatchAccessCodeEntries()
         {
-            foreach (var kv in Initialiser._Serializer.DoorKeyCodes)
+            foreach (var kv in CoreLogic._Serializer.DoorKeyCodes)
             {
                 string descId = AuroraLogic.KeypadPrefabClassIds[kv.Key];
                 string originalDesc = Language.main.Get(descId);

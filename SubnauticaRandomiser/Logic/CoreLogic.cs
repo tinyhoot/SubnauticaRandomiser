@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
 using JetBrains.Annotations;
@@ -24,7 +25,7 @@ namespace SubnauticaRandomiser.Logic
     {
         internal RandomiserConfig _Config { get; private set; }
         internal ILogHandler _Log { get; private set; }
-        internal EntitySerializer _Serializer { get; private set; }
+        internal static EntitySerializer _Serializer { get; private set; }
         public EntityHandler EntityHandler { get; private set; }
         public IRandomHandler Random { get; private set; }
 
@@ -107,7 +108,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         internal void Run()
         {
-            _Serializer = new EntitySerializer(_Log);
+            _Serializer = null;
             RegisterFileLoadTask(EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
             EnableModules();
             // Wait and periodically check whether all file loading has completed. Only continue once that is done.
@@ -119,12 +120,14 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void Randomise()
         {
+            _Serializer = new EntitySerializer(_Log);
             List<LogicEntity> mainEntities = Setup();
             RandomisePreLoop();
             RandomiseMainEntities(mainEntities);
             ApplyAllChanges();
+            
+            _Serializer.EnabledModules = _modules.Select(module => module.GetType()).ToList();
             _Serializer.Serialize(_Config);
-            Initialiser._Serializer = _Serializer;
         }
 
         /// <summary>
@@ -340,6 +343,14 @@ namespace SubnauticaRandomiser.Logic
                 return false;
             }
             _Serializer = serializer;
+
+            // Re-enable all modules that were active when the save data was generated.
+            foreach (Type module in _Serializer.EnabledModules ?? Enumerable.Empty<Type>())
+            {
+                Component component = gameObject.EnsureComponent(module);
+                _modules.Add(component as ILogicModule);
+            }
+            
             _Log.Debug("[Core] Save data restored.");
             return true;
         }

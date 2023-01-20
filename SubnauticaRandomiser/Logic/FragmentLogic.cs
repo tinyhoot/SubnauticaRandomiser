@@ -27,7 +27,7 @@ namespace SubnauticaRandomiser.Logic
         private ProgressionManager _manager;
         private RandomiserConfig _config;
         private ILogHandler _log;
-        private EntitySerializer _serializer;
+        private EntitySerializer _serializer => CoreLogic._Serializer;
         private IRandomHandler _random;
         
         private static Dictionary<TechType, List<string>> _classIdDatabase;
@@ -76,7 +76,6 @@ namespace SubnauticaRandomiser.Logic
             _config = _coreLogic._Config;
             _log = _coreLogic._Log;
             _random = _coreLogic.Random;
-            _serializer = _coreLogic._Serializer;
 
             // Register events.
             _manager.SetupPriority += OnSetupPriorityEntities;
@@ -158,7 +157,7 @@ namespace SubnauticaRandomiser.Logic
 
         public void SetupHarmonyPatches(Harmony harmony)
         {
-            if (_coreLogic._Serializer?.FragmentMaterialYield?.Count > 0)
+            if (CoreLogic._Serializer?.FragmentMaterialYield?.Count > 0)
                 harmony.PatchAll(typeof(FragmentPatcher));
         }
 

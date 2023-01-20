@@ -1,5 +1,6 @@
 using System;
 using HarmonyLib;
+using SubnauticaRandomiser.Logic;
 using UnityEngine;
 
 namespace SubnauticaRandomiser.Patches
@@ -18,12 +19,12 @@ namespace SubnauticaRandomiser.Patches
             if (__result.y > 50f)
                 // User is likely using Lifepod Unleashed, skip randomising in that case.
                 return;
-            if (Initialiser._Serializer?.StartPoint is null)
+            if (CoreLogic._Serializer?.StartPoint is null)
                 // Has not been randomised, don't do anything.
                 return;
 
-            Initialiser._Log.Debug("[AS] Replacing lifepod spawnpoint with " + Initialiser._Serializer.StartPoint);
-            __result = Initialiser._Serializer.StartPoint.ToUnityVector();
+            Initialiser._Log.Debug("[AS] Replacing lifepod spawnpoint with " + CoreLogic._Serializer.StartPoint);
+            __result = CoreLogic._Serializer.StartPoint.ToUnityVector();
         }
 
         /// <summary>

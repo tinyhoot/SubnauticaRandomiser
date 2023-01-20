@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using HarmonyLib;
+using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Objects;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace SubnauticaRandomiser.Patches
         [HarmonyPatch(typeof(BlueprintHandTarget), nameof(BlueprintHandTarget.Start))]
         internal static bool PatchDatabox(ref BlueprintHandTarget __instance)
         {
-            Dictionary<RandomiserVector, TechType> boxDict = Initialiser._Serializer.Databoxes;
+            Dictionary<RandomiserVector, TechType> boxDict = CoreLogic._Serializer.Databoxes;
             Vector3 position = __instance.gameObject.transform.position;
 
             foreach (RandomiserVector vector in boxDict.Keys)

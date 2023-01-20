@@ -17,7 +17,7 @@ namespace SubnauticaRandomiser.Logic
         private RandomiserConfig _config => _coreLogic._Config;
         private ILogHandler _log => _coreLogic._Log;
         private IRandomHandler _random => _coreLogic.Random;
-        private EntitySerializer _serializer => _coreLogic._Serializer;
+        private EntitySerializer _serializer => CoreLogic._Serializer;
 
         public static readonly Dictionary<string, string> KeypadPrefabClassIds = new Dictionary<string, string>
         {
@@ -48,12 +48,12 @@ namespace SubnauticaRandomiser.Logic
 
         public void SetupHarmonyPatches(Harmony harmony)
         {
-            if (Initialiser._Serializer.DoorKeyCodes?.Count > 0)
+            if (CoreLogic._Serializer?.DoorKeyCodes?.Count > 0)
             {
                 harmony.PatchAll(typeof(AuroraPatcher_KeyCodes)); 
                 harmony.PatchAll(typeof(LanguagePatcher));
             }
-            if (Initialiser._Serializer.SupplyBoxContents?.Count > 0)
+            if (CoreLogic._Serializer?.SupplyBoxContents?.Count > 0)
                 harmony.PatchAll(typeof(AuroraPatcher_SupplyBoxes));
         }
 

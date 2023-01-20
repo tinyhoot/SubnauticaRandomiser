@@ -40,8 +40,6 @@ namespace SubnauticaRandomiser
             [_ExpectedSaveVersion] = "v" + VERSION
         };
 
-        // Everything the mod ever modifies is stored in here.
-        internal static EntitySerializer _Serializer;
         internal static ILogHandler _Log;
         internal GameObject _LogicObject;
         private CoreLogic _coreLogic;
@@ -77,7 +75,7 @@ namespace SubnauticaRandomiser
         private void Start()
         {
             // Randomise, but only if no existing state was loaded from disk.
-            if (_Serializer is null)
+            if (_coreLogic != null && CoreLogic._Serializer is null)
                 Randomise();
         }
 
@@ -105,7 +103,6 @@ namespace SubnauticaRandomiser
         /// </summary>
         private void Randomise()
         {
-            _Serializer = null;
             _Config.SanitiseConfigValues();
             _Config.iSaveVersion = _ExpectedSaveVersion;
 
@@ -153,7 +150,6 @@ namespace SubnauticaRandomiser
             }
             else
             {
-                _Serializer = _coreLogic._Serializer;
                 _coreLogic.ApplyAllChanges();
                 _Log.Info("Successfully loaded game state from disk.");
             }
