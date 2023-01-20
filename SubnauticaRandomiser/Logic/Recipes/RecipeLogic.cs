@@ -311,7 +311,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="recipe">The recipe to change.</param>
         private void ApplyRandomisedRecipe(Recipe recipe)
         {
-            _coreLogic.Serializer.AddRecipe(recipe.TechType, recipe);
+            _coreLogic._Serializer.AddRecipe(recipe.TechType, recipe);
         }
 
         /// <summary>

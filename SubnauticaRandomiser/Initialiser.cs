@@ -66,7 +66,8 @@ namespace SubnauticaRandomiser
             cmd.RegisterCommands();
 
             // Setup the logic and restore from disk if possible.
-            SetupGameState();
+            SetupGameObject();
+            RestoreSavedState();
 
             _Log.Info("Finished loading.");
         }
@@ -130,6 +131,26 @@ namespace SubnauticaRandomiser
             _Log.InGameMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json", true);
             return false;
         }
+        
+        /// <summary>
+        /// Try to restore the game state from a previous session. If that fails, start fresh and randomise.
+        /// </summary>
+        private void RestoreSavedState()
+        {
+            // Try and restore a game state from disk.
+            if (_Config.debug_forceRandomise || !_coreLogic.TryRestoreSave())
+            {
+                if (_Config.debug_forceRandomise)
+                    _Log.Warn("Ignoring previous game state: Config forces fresh randomisation.");
+                _Log.Warn("Could not load game state from disk.");
+            }
+            else
+            {
+                _Serializer = _coreLogic._Serializer;
+                _coreLogic.ApplyAllChanges();
+                _Log.Info("Successfully loaded game state from disk.");
+            }
+        }
 
         /// <summary>
         /// Initialise the GameObject that holds the randomisation logic components.
@@ -141,27 +162,6 @@ namespace SubnauticaRandomiser
             // Set this plugin (or BepInEx) as the parent of the logic GameObject.
             _LogicObject.transform.parent = transform;
             _coreLogic = _LogicObject.GetComponent<CoreLogic>();
-        }
-
-        /// <summary>
-        /// Try to restore the game state from a previous session. If that fails, start fresh and randomise.
-        /// </summary>
-        private void SetupGameState()
-        {
-            SetupGameObject();
-            // Try and restore a game state from disk.
-            if (_Config.debug_forceRandomise || !_coreLogic.TryRestoreSave())
-            {
-                if (_Config.debug_forceRandomise)
-                    _Log.Warn("Ignoring previous game state: Config forces fresh randomisation.");
-                _Log.Warn("Could not load game state from disk.");
-            }
-            else
-            {
-                _Serializer = _coreLogic.Serializer;
-                _coreLogic.ApplyAllChanges();
-                _Log.Info("Successfully loaded game state from disk.");
-            }
         }
 
         /// <summary>

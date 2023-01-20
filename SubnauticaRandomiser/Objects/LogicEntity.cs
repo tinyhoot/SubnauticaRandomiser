@@ -93,7 +93,7 @@ namespace SubnauticaRandomiser.Objects
             {
                 foreach (TechType fragment in Blueprint.Fragments)
                 {
-                    if (!logic.Serializer.SpawnDataDict.ContainsKey(fragment))
+                    if (!logic._Serializer.SpawnDataDict.ContainsKey(fragment))
                     {
                         //LogHandler.Debug($"[B] Entity {this} missing fragment {fragment.AsString()}");
                         return false;
@@ -114,13 +114,13 @@ namespace SubnauticaRandomiser.Objects
          public bool CheckPrerequisitesFulfilled(CoreLogic logic)
          {
              // The builder tool must always be randomised before any base pieces ever become accessible.
-             if (Category.IsBasePiece() && !logic.Serializer.RecipeDict.ContainsKey(TechType.Builder))
+             if (Category.IsBasePiece() && !logic._Serializer.RecipeDict.ContainsKey(TechType.Builder))
                  return false;
 
              if (Prerequisites is null || Prerequisites.Count == 0)
                  return true;
 
-             return Prerequisites.All(type => logic.Serializer.RecipeDict.ContainsKey(type));
+             return Prerequisites.All(type => logic._Serializer.RecipeDict.ContainsKey(type));
          }
 
         /// <summary>

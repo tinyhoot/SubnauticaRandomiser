@@ -24,7 +24,7 @@ namespace SubnauticaRandomiser.Logic
     {
         internal RandomiserConfig _Config { get; private set; }
         internal ILogHandler _Log { get; private set; }
-        public EntitySerializer Serializer { get; private set; }
+        internal EntitySerializer _Serializer { get; private set; }
         public EntityHandler EntityHandler { get; private set; }
         public IRandomHandler Random { get; private set; }
 
@@ -72,7 +72,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         public event EventHandler RandomisationCompleted;
         
-        public void Awake()
+        private void Awake()
         {
             _fileTasks = new List<Task>();
             _handlingModules = new Dictionary<EntityType, ILogicModule>();
@@ -105,7 +105,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         internal void Run()
         {
-            Serializer = new EntitySerializer(_Log);
+            _Serializer = new EntitySerializer(_Log);
             RegisterFileLoadTask(EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
             EnableModules();
             // Wait and periodically check whether all file loading has completed. Only continue once that is done.
@@ -121,7 +121,7 @@ namespace SubnauticaRandomiser.Logic
             RandomisePreLoop();
             RandomiseMainEntities(mainEntities);
             ApplyAllChanges();
-            Serializer.Serialize(_Config);
+            _Serializer.Serialize(_Config);
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace SubnauticaRandomiser.Logic
             _Log.Info("[Core] Randomising: Pre-loop content");
             foreach (ILogicModule module in _modules)
             {
-                module.RandomiseOutOfLoop(Serializer);
+                module.RandomiseOutOfLoop(_Serializer);
             }
         }
         
@@ -196,7 +196,7 @@ namespace SubnauticaRandomiser.Logic
             _Log.Info($"[Core] Finished randomising within {circuitbreaker} cycles!");
             MainLoopCompleted?.Invoke(this, EventArgs.Empty);
 
-            return Serializer;
+            return _Serializer;
         }
 
         /// <summary>
@@ -209,17 +209,17 @@ namespace SubnauticaRandomiser.Logic
 
         internal void ApplyAllChanges()
         {
-            if (Serializer is null)
+            if (_Serializer is null)
                 throw new InvalidDataException("Cannot apply randomisation changes: Serializer is null!");
             
             // Load recipe changes.
-            if (Serializer.RecipeDict?.Count > 0)
-                RecipeLogic.ApplyMasterDict(Serializer);
+            if (_Serializer.RecipeDict?.Count > 0)
+                RecipeLogic.ApplyMasterDict(_Serializer);
                 
             // Load fragment changes.
-            if (Serializer.SpawnDataDict?.Count > 0 || Serializer.NumFragmentsToUnlock?.Count > 0)
+            if (_Serializer.SpawnDataDict?.Count > 0 || _Serializer.NumFragmentsToUnlock?.Count > 0)
             {
-                FragmentLogic.ApplyMasterDict(Serializer);
+                FragmentLogic.ApplyMasterDict(_Serializer);
                 _Log.Info("Loaded fragment state.");
             }
 
@@ -337,7 +337,7 @@ namespace SubnauticaRandomiser.Logic
                 return false;
             }
 
-            Serializer = serializer;
+            _Serializer = serializer;
             return true;
         }
         
