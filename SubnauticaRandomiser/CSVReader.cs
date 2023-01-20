@@ -126,6 +126,8 @@ namespace SubnauticaRandomiser
                 {
                     // Parse each line using the provided callback method.
                     T parsedLine = lineParser(cells);
+                    if (parsedLine is null)
+                        continue;
                     parsedLines.Add(parsedLine);
                 }
                 catch (Exception ex)
