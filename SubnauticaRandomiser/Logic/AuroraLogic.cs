@@ -1,17 +1,23 @@
+using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using SMLHelper.V2.Handlers;
+using HarmonyLib;
 using SubnauticaRandomiser.Interfaces;
+using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Patches;
+using UnityEngine;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
-    internal class AuroraLogic
+    [RequireComponent(typeof(CoreLogic))]
+    internal class AuroraLogic : MonoBehaviour, ILogicModule
     {
-        private readonly CoreLogic _logic;
+        private CoreLogic _coreLogic;
 
-        private ILogHandler _log => _logic._Log;
-        private IRandomHandler _random => _logic.Random;
-        private EntitySerializer _serializer => _logic._Serializer;
+        private RandomiserConfig _config => _coreLogic._Config;
+        private ILogHandler _log => _coreLogic._Log;
+        private IRandomHandler _random => _coreLogic.Random;
+        private EntitySerializer _serializer => _coreLogic._Serializer;
 
         public static readonly Dictionary<string, string> KeypadPrefabClassIds = new Dictionary<string, string>
         {
@@ -21,9 +27,34 @@ namespace SubnauticaRandomiser.Logic
             { "19feccc5-36a0-431c-ae97-16f87c21d5af", "EncyDesc_CaptainCode" }, // CaptainsQuarters
         };
 
-        public AuroraLogic(CoreLogic logic)
+        private void Awake()
         {
-            _logic = logic;
+            _coreLogic = GetComponent<CoreLogic>();
+        }
+
+        public void RandomiseOutOfLoop(EntitySerializer serializer)
+        {
+            if (_config.bRandomiseDoorCodes)
+                RandomiseDoorCodes();
+            if (_config.bRandomiseSupplyBoxes)
+                RandomiseSupplyBoxes();
+        }
+
+        public bool RandomiseEntity(ref LogicEntity entity)
+        {
+            // This module randomises no entities.
+            throw new NotImplementedException();
+        }
+
+        public void SetupHarmonyPatches(Harmony harmony)
+        {
+            if (Initialiser._Serializer.DoorKeyCodes?.Count > 0)
+            {
+                harmony.PatchAll(typeof(AuroraPatcher_KeyCodes)); 
+                harmony.PatchAll(typeof(LanguagePatcher));
+            }
+            if (Initialiser._Serializer.SupplyBoxContents?.Count > 0)
+                harmony.PatchAll(typeof(AuroraPatcher_SupplyBoxes));
         }
 
         /// <summary>

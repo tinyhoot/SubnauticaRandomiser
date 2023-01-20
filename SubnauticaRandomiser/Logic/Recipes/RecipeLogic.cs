@@ -87,13 +87,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
             
             entity = _mode.RandomiseIngredients(entity);
             ApplyRandomisedRecipe(entity.Recipe);
-
-            // Only add this entity to the ingredients list if it can actually be an ingredient.
-            // TODO: Move to event, out of this class
-            if (entity.CanFunctionAsIngredient())
-                ValidIngredients.Add(entity);
-
-            entity.InLogic = true;
             _log.Debug($"[R][+] Randomised recipe for [{entity}].");
 
             return true;
@@ -240,7 +233,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
             {
                 TechType ingredient = upgradeChains[upgrade];
                 LogicEntity entity = entityHandler.GetEntity(upgrade);
-
+                if (entity is null)
+                    continue;
                 if (!entity.HasPrerequisites)
                     entity.Prerequisites = new List<TechType>();
                 entity.Prerequisites.Add(ingredient);

@@ -92,6 +92,8 @@ namespace SubnauticaRandomiser.Logic
         {
             if (!_Config.sSpawnPoint.Equals("Vanilla"))
                 RegisterModule<AlternateStartLogic>();
+            if (_Config.bRandomiseDoorCodes || _Config.bRandomiseSupplyBoxes)
+                RegisterModule<AuroraLogic>();
             if (_Config.bRandomiseDataboxes)
                 RegisterModule<DataboxLogic>();
             if (_Config.bRandomiseFragments || _Config.bRandomiseNumFragments || _Config.bRandomiseDuplicateScans)
@@ -122,6 +124,7 @@ namespace SubnauticaRandomiser.Logic
             RandomiseMainEntities(mainEntities);
             ApplyAllChanges();
             _Serializer.Serialize(_Config);
+            Initialiser._Serializer = _Serializer;
         }
 
         /// <summary>

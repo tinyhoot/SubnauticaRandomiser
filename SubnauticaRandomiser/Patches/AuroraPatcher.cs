@@ -5,7 +5,7 @@ using SubnauticaRandomiser.Handlers;
 namespace SubnauticaRandomiser.Patches
 {
     [HarmonyPatch]
-    internal class AuroraPatcher
+    internal class AuroraPatcher_KeyCodes
     {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(KeypadDoorConsole), nameof(KeypadDoorConsole.Start))]
@@ -16,7 +16,8 @@ namespace SubnauticaRandomiser.Patches
             // that structure here.
             id ??= __instance.transform.parent.GetComponent<PrefabIdentifier>();
             Initialiser._Log.Debug($"Found door with code {__instance.accessCode} and identifier {id}");
-            Initialiser._Log.Debug($"Code: {__instance.accessCode} key: {id.prefabKey}, id: {id.id}, classId: {id.classId}");
+            Initialiser._Log.Debug($"Code: {__instance.accessCode} key: {id.prefabKey}, id: {id.id}, "
+                                   + $"classId: {id.classId}");
             if (!Initialiser._Serializer.DoorKeyCodes.ContainsKey(id.classId))
             {
                 Initialiser._Log.Warn($"Found keypad for door which is not in logic: {id}");
@@ -25,14 +26,18 @@ namespace SubnauticaRandomiser.Patches
 
             __instance.accessCode = Initialiser._Serializer.DoorKeyCodes[id.classId];
         }
+    }
 
+    [HarmonyPatch]
+    internal class AuroraPatcher_SupplyBoxes
+    {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HandTarget), nameof(HandTarget.Awake))]
         public static void ChangeSupplyBoxContents(ref HandTarget __instance)
         {
             if (__instance.GetType() != typeof(SupplyCrate))
                 return;
-            
+
             RandomHandler rand = new RandomHandler();
             TechType content = rand.Choice(Initialiser._Serializer.SupplyBoxContents);
             // It is not enough to change a techtype, the box must load and spawn the correct prefab for its contents.

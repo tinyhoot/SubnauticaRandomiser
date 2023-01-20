@@ -81,11 +81,13 @@ namespace SubnauticaRandomiser.Logic
             // Register events.
             _manager.SetupPriority += OnSetupPriorityEntities;
             _manager.SetupProgression += OnSetupProgression;
+            _manager.SetupVehicles += OnSetupVehicles;
             
             if (_config.bRandomiseFragments)
             {
-                // Handle any fragment entities using this component.
                 _coreLogic.EntityCollecting += OnCollectFragments;
+                _manager.HasProgressed += OnProgression;
+                // Handle any fragment entities using this component.
                 _coreLogic.RegisterEntityHandler(EntityType.Fragment, this);
                 // Reset all existing fragment spawns.
                 Init();
@@ -169,6 +171,16 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
+        /// Once lasercutter and propulsion cannon are randomised, add their locked biomes.
+        /// </summary>
+        private void OnProgression(object sender, EntityEventArgs args)
+        {
+            TechType techType = args.LogicEntity.TechType;
+            if (techType.Equals(TechType.LaserCutter) || techType.Equals(TechType.LaserCutterFragment))
+                AddLaserCutterBiomes();
+        }
+
+        /// <summary>
         /// Ensure that certain fragments are always randomised by a certain depth.
         /// </summary>
         private void OnSetupPriorityEntities(object sender, SetupPriorityEventArgs args)
@@ -197,7 +209,45 @@ namespace SubnauticaRandomiser.Logic
             args.ProgressionEntities.AddRange(additions);
             // Limit this to only if fragment entities are part of the logic, else this will make the main loop hang.
             if (_config.bRandomiseFragments)
+            {
                 args.ProgressionEntities.Add(TechType.LaserCutterFragment);
+                args.ProgressionEntities.Add(TechType.PropulsionCannonFragment);
+            }
+            // If fragments are randomised but recipes are not, force more depth calculations for fragments.
+            if (_config.bRandomiseFragments && !_config.bRandomiseRecipes)
+            {
+                var fragmentAdditions = new[]
+                {
+                    TechType.SeaglideFragment,
+                    TechType.SeamothFragment,
+                    TechType.ExosuitFragment,
+                    TechType.CyclopsBridgeFragment,
+                    TechType.CyclopsEngineFragment,
+                    TechType.CyclopsHullFragment
+                };
+                args.ProgressionEntities.AddRange(fragmentAdditions);
+            }
+        }
+
+        /// <summary>
+        /// Change vehicle depths if recipes are not randomised.
+        /// </summary>
+        private void OnSetupVehicles(object sender, SetupVehiclesEventArgs args)
+        {
+            // If fragments are randomised but recipes are not, there is no way of achieving lower depths.
+            // Define new vehicle depths to counteract that.
+            if (_config.bRandomiseFragments && !_config.bRandomiseRecipes)
+            {
+                args.VehicleDepths.Add(new[] { TechType.SeaglideFragment }, 50);
+                args.VehicleDepths.Add(new[] { TechType.SeamothFragment }, 100);
+                args.VehicleDepths.Add(new[] { TechType.ExosuitFragment }, 1700);
+                args.VehicleDepths.Add(new[]
+                {
+                    TechType.CyclopsBridgeFragment,
+                    TechType.CyclopsEngineFragment,
+                    TechType.CyclopsHullFragment
+                }, 1700);
+            }
         }
 
         /// <summary>
@@ -427,64 +477,6 @@ namespace SubnauticaRandomiser.Logic
             return result;
         }
 
-        /// <summary>
-        /// When randomising a fragment while recipe randomisation is disabled, ensure that the item previously locked
-        /// by the fragment is added to the collection of progression items, if necessary.
-        /// TODO: Convert to using events
-        /// </summary>
-        /// <param name="entity">The fragment being randomised.</param>
-        /// <param name="unlockedProgressionItems">The progression items.</param>
-        /// <returns>True if a new entry was added to the progression items, false if not.</returns>
-        private bool UpdateProgressionItems(LogicEntity entity, Dictionary<TechType, bool> unlockedProgressionItems)
-        {
-            // Find the recipe that needs the given fragment as a prerequisite, i.e. the recipe that is unlocked
-            // by the fragment.
-            LogicEntity recipe = _coreLogic.EntityHandler.GetAll()
-                .Find(e => e.Blueprint?.Fragments?.Contains(entity.TechType) ?? false);
-            // if (recipe is null || !_coreLogic._Tree.IsProgressionItem(recipe)
-            //                    || unlockedProgressionItems.ContainsKey(recipe.TechType))
-            //     return false;
-
-            switch (recipe.TechType)
-            {
-                // On a laser cutter, add all the biomes behind barriers.
-                case TechType.LaserCutter:
-                    AddLaserCutterBiomes();
-                    break;
-                // If the recipe is a vehicle, also immediately add its upgrades.
-                case TechType.Seamoth:
-                    unlockedProgressionItems.Add(TechType.VehicleHullModule1, true);
-                    unlockedProgressionItems.Add(TechType.VehicleHullModule2, true);
-                    unlockedProgressionItems.Add(TechType.VehicleHullModule3, true);
-                    break;
-                case TechType.Exosuit:
-                    unlockedProgressionItems.Add(TechType.ExoHullModule1, true);
-                    unlockedProgressionItems.Add(TechType.ExoHullModule2, true);
-                    break;
-                // The cyclops is a special case, since it needs three different fragments to unlock. Associate each
-                // fragment with one upgrade, and only add the cyclops once all three upgrades are unlocked.
-                case TechType.Cyclops:
-                {
-                    if (entity.TechType.Equals(TechType.CyclopsBridgeFragment))
-                        unlockedProgressionItems.Add(TechType.CyclopsHullModule1, true);
-                    if (entity.TechType.Equals(TechType.CyclopsEngineFragment))
-                        unlockedProgressionItems.Add(TechType.CyclopsHullModule2, true);
-                    if (entity.TechType.Equals(TechType.CyclopsHullFragment))
-                        unlockedProgressionItems.Add(TechType.CyclopsHullModule3, true);
-                
-                    if (!unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule1)
-                        || !unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule2)
-                        || !unlockedProgressionItems.ContainsKey(TechType.CyclopsHullModule3))
-                        return false;
-                    break;
-                }
-            }
-
-            unlockedProgressionItems.Add(recipe.TechType, true);
-            _log.Debug($"[F][+] Added {recipe} to progression items.");
-            return true;
-        }
-        
         /// <summary>
         /// Re-apply spawnList from a saved game. This will fail to catch all existing fragment spawns if called in a
         /// previously randomised game.

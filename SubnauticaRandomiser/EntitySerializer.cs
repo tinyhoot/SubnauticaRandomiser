@@ -150,7 +150,7 @@ namespace SubnauticaRandomiser
             string base64 = ToBase64String();
             config.sBase64Seed = base64;
             config.Save();
-            _log.Debug("Saved game state to disk!");
+            _log.Debug("[ES] Saved game state to disk!");
         }
         
         /// <summary>

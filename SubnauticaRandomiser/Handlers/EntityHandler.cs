@@ -142,7 +142,10 @@ namespace SubnauticaRandomiser.Handlers
         [CanBeNull]
         public LogicEntity GetEntity(TechType techType)
         {
-            return _allEntities.Find(e => e.TechType.Equals(techType));
+            LogicEntity entity = _allEntities.Find(e => e.TechType.Equals(techType));
+            if (entity is null)
+                _log.Warn($"Tried to get nonexistent entity for TechType {techType}!");
+            return entity;
         }
         
         /// <summary>
@@ -152,7 +155,10 @@ namespace SubnauticaRandomiser.Handlers
         [CanBeNull]
         public LogicEntity GetEntity(TechType techType, EntityType entityType)
         {
-            return _allEntities.Find(e => e.TechType.Equals(techType) && e.EntityType.Equals(entityType));
+            LogicEntity entity = _allEntities.Find(e => e.TechType.Equals(techType) && e.EntityType.Equals(entityType));
+            if (entity is null)
+                _log.Warn($"Tried to get nonexistent entity for TechType {techType}!");
+            return entity;
         }
 
         /// <summary>
