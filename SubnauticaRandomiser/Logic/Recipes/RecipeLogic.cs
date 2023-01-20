@@ -31,7 +31,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
         public Dictionary<TechType, TechType> UpgradeChains { get; private set; }
         public HashSet<LogicEntity> ValidIngredients { get; private set; }
         
-
         private void Awake()
         {
             _coreLogic = GetComponent<CoreLogic>();

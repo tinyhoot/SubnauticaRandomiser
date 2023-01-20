@@ -53,19 +53,19 @@ namespace SubnauticaRandomiser
         /// </summary>
         /// <param name="fileName">The .csv file to parse.</param>
         /// <returns>The parsed Dictionary if successful, or null otherwise.</returns>
-        public static async Task<Dictionary<Objects.Enums.BiomeRegion, List<float[]>>> ParseAlternateStartAsync(string fileName)
+        public static async Task<Dictionary<BiomeRegion, List<float[]>>> ParseAlternateStartAsync(string fileName)
         {
             List<string[]> lines = await ReadCsvAsync(fileName);
             if (lines is null)
                 throw new ParsingException();
 
-            Dictionary<Objects.Enums.BiomeRegion, List<float[]>> parsedStarts = new Dictionary<Objects.Enums.BiomeRegion, List<float[]>>();
+            Dictionary<BiomeRegion, List<float[]>> parsedStarts = new Dictionary<BiomeRegion, List<float[]>>();
             for (int i = 1; i < lines.Count; i++)
             {
                 string[] cells = lines[i];
                 try
                 {
-                    Objects.Enums.BiomeRegion biome = EnumHandler.Parse<Objects.Enums.BiomeRegion>(cells[0]);
+                    BiomeRegion biome = EnumHandler.Parse<BiomeRegion>(cells[0]);
                     var starts = ParseAlternateStartLine(cells);
                     parsedStarts.Add(biome, starts);
                     _log.Debug($"Registered alternate starts for biome {biome}");
@@ -79,8 +79,7 @@ namespace SubnauticaRandomiser
 
             return parsedStarts;
         }
-
-
+        
         /// <summary>
         /// Attempt to parse one content line of the alternate starts csv.
         /// </summary>
@@ -250,7 +249,6 @@ namespace SubnauticaRandomiser
             return entity;
         }
 
-
         /// <summary>
         /// Parse one line of a CSV file and attempt to create a single Biome.
         /// </summary>
@@ -275,7 +273,7 @@ namespace SubnauticaRandomiser
             // processed at all, the string itself is good enough.
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("BiomeType is null or empty, but is a required field.");
-            Objects.Enums.BiomeRegion biomeRegion = EnumHandler.Parse<Objects.Enums.BiomeRegion>(name);
+            BiomeRegion biomeRegion = EnumHandler.Parse<BiomeRegion>(name);
 
             // Column 2: The number of small slots.
             if (string.IsNullOrEmpty(cellsSmallCount))

@@ -7,7 +7,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
 {
     internal class ModeRandom : Mode
     {
-
         internal ModeRandom(CoreLogic coreLogic, RecipeLogic recipeLogic) : base(coreLogic, recipeLogic)
         {
         }
