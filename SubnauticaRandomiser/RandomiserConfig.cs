@@ -39,7 +39,6 @@ namespace SubnauticaRandomiser
             _log.InGameMessage("Changed seed to " + iSeed);
             _log.InGameMessage("Randomising...");
             Initialiser._Main.RandomiseFromConfig();
-            _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
         [Button("Apply config from disk", Order = 0,
@@ -53,7 +52,6 @@ namespace SubnauticaRandomiser
             // Ensure all manual changes to the config file are loaded.
             Load();
             Initialiser._Main.RandomiseFromConfig();
-            _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
         }
 
         // Every public variable listed here will end up in the config file.

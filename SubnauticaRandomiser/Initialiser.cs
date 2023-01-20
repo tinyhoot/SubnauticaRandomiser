@@ -97,6 +97,21 @@ namespace SubnauticaRandomiser
             _Log.InGameMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json", true);
             return false;
         }
+
+        /// <summary>
+        /// Coroutines make it impossible (or at least very annoying) to catch exceptions with a traditional try-catch
+        /// block. Instead, use this as a central callback function for any part of the code that needs it.
+        /// </summary>
+        /// <param name="exception"></param>
+        /// <exception cref="Exception"></exception>
+        internal static void FatalError(Exception exception)
+        {
+            _Log.InGameMessage($"{exception.GetType().Name.ToUpper()}: Something went wrong. Please report this error"
+                               + "with the config.json from your mod folder on Github or NexusMods.", true);
+            _Log.Fatal($"{exception.GetType()}: {exception.Message}");
+            // Ensure that the randomiser crashes completely if things go wrong this badly.
+            throw exception;
+        }
         
         /// <summary>
         /// Randomise the game, discarding any earlier randomisation data.
@@ -117,12 +132,7 @@ namespace SubnauticaRandomiser
             }
             catch (Exception ex)
             {
-                _Log.InGameMessage($"{ex.GetType()}: Something went wrong. Please report this error with the"
-                                   + "config.json from your mod folder on Github or NexusMods.", true);
-                _Log.Fatal($"{ex.GetType()}: {ex.Message}");
-                
-                // Ensure that the randomiser crashes completely if things go wrong this badly.
-                throw;
+                FatalError(ex);
             }
         }
 

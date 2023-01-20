@@ -90,6 +90,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Objects\Biome.cs" />
     <Compile Include="Objects\BiomeCollection.cs" />
     <Compile Include="Objects\RandomiserBiomeData.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">

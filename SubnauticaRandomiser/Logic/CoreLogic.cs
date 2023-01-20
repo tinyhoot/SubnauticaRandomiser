@@ -117,17 +117,25 @@ namespace SubnauticaRandomiser.Logic
 
         /// <summary>
         /// Once all datafiles have completed loading, start up the logic.
+        /// Running this as a coroutine spaces the logic out over several frames, which prevents the game from
+        /// locking up / freezing.
         /// </summary>
-        private void Randomise()
+        private IEnumerator Randomise()
         {
             _Serializer = new EntitySerializer(_Log);
             List<LogicEntity> mainEntities = Setup();
             RandomisePreLoop();
-            RandomiseMainEntities(mainEntities);
+            
+            // Force a new frame before the main loop.
+            yield return null;
+            yield return RandomiseMainEntities(mainEntities);
+            yield return null;
             ApplyAllChanges();
             
             _Serializer.EnabledModules = _modules.Select(module => module.GetType()).ToList();
             _Serializer.Serialize(_Config);
+            
+            _Log.InGameMessage("Finished randomising! Please restart your game for all changes to take effect.");
         }
 
         /// <summary>
@@ -164,7 +172,7 @@ namespace SubnauticaRandomiser.Logic
         /// <returns>A serialisation instance containing all changes made.</returns>
         /// <exception cref="TimeoutException">Raised to prevent infinite loops if the core loop takes too long to find
         /// a valid solution.</exception>
-        private void RandomiseMainEntities(List<LogicEntity> notRandomised)
+        private IEnumerator RandomiseMainEntities(List<LogicEntity> notRandomised)
         {
             _Log.Info("[Core] Randomising: Entering main loop");
             MainLoopRandomising?.Invoke(this, EventArgs.Empty);
@@ -173,6 +181,9 @@ namespace SubnauticaRandomiser.Logic
             while (notRandomised.Count > 0)
             {
                 circuitbreaker++;
+                // Stop calculating and wait for the next frame every so often. Slower, but doesn't block the game.
+                if (circuitbreaker % 50 == 0)
+                    yield return null;
                 if (circuitbreaker > 3000)
                 {
                     _Log.InGameMessage("[Core] Failed to randomise items: stuck in infinite loop!");
@@ -358,7 +369,7 @@ namespace SubnauticaRandomiser.Logic
         private IEnumerator WaitUntilFilesLoaded()
         {
             yield return new WaitUntil(() => _fileTasks.TrueForAll(task => task.IsCompleted));
-            Randomise();
+            StartCoroutine(Utils.WrapCoroutine(Randomise(), Initialiser.FatalError));
         }
     }
 }
