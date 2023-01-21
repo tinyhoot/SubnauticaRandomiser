@@ -1,5 +1,8 @@
 ﻿namespace SubnauticaRandomiser.Objects.Enums
 {
+    /// <summary>
+    /// Defines each wreck, base, and lifepod in the game.
+    /// </summary>
     public enum Wreckage
     {
         None,

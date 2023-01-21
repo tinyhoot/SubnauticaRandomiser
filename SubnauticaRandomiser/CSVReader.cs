@@ -15,6 +15,9 @@ using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser
 {
+    /// <summary>
+    /// Utilities and parsers for reading crucial data files from disk.
+    /// </summary>
     internal static class CSVReader
     {
         private static readonly CultureInfo _culture = CultureInfo.InvariantCulture;

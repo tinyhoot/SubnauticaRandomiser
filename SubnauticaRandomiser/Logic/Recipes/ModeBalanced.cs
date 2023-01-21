@@ -7,6 +7,10 @@ using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
+    /// <summary>
+    /// Aims to provide a balanced, curated, sane approach to recipe randomisation. Has many checks and balances in
+    /// place to prevent recipes from becoming grindy or unfun.
+    /// </summary>
     internal class ModeBalanced : Mode
     {
         private int _basicOutpostSize;

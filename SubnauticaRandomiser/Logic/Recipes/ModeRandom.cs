@@ -5,6 +5,9 @@ using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
+    /// <summary>
+    /// A mode for recipe randomisation with few to no checks in place. Unpredictable.
+    /// </summary>
     internal class ModeRandom : Mode
     {
         internal ModeRandom(CoreLogic coreLogic, RecipeLogic recipeLogic) : base(coreLogic, recipeLogic)

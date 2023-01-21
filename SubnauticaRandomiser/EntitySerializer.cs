@@ -12,13 +12,11 @@ namespace SubnauticaRandomiser
     /// This class does three things.
     /// <list type="bullet">
     ///     <item><description>
-    ///         First, it provides an easy way to store a large amount of recipes or spawnables by
-    ///         putting them in a dictionary.
+    ///         First, it provides an easy way to store any changes the randomiser makes.
     ///     </description></item>
     ///     <item><description>
     ///         Second, it provides a way to save itself to and restore from disk.
-    ///         Because this dictionary eventually contains all randomised entities,
-    ///         this makes restoring to a previous state trivial.
+    ///         Because this class contains all changes ever made, this makes restoring to a previous state trivial.
     ///     </description></item>
     ///     <item><description>
     ///         Third, the base64 string representing this class also doubles as a seed.

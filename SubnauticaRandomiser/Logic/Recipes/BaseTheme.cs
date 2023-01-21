@@ -8,6 +8,9 @@ using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
+    /// <summary>
+    /// Responsible for choosing and providing a primary ingredient to base all base pieces on.
+    /// </summary>
     internal class BaseTheme
     {
         private EntityHandler _entityHandler;

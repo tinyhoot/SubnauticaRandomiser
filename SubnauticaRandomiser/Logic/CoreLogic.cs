@@ -19,7 +19,8 @@ using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
-    /// Acts as the core for handling all randomising logic in the mod, and turning modules on/off as needed.
+    /// Acts as the core for handling all randomising logic in the mod, registering or enabling modules, and invoking
+    /// the most important events.
     /// </summary>
     internal class CoreLogic : MonoBehaviour
     {

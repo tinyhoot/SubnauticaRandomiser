@@ -13,6 +13,9 @@ using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
+    /// <summary>
+    /// Provides a random starting location for the lifepod.
+    /// </summary>
     [RequireComponent(typeof(CoreLogic))]
     internal class AlternateStartLogic : MonoBehaviour, ILogicModule
     {

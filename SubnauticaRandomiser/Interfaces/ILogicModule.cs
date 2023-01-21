@@ -3,6 +3,9 @@ using SubnauticaRandomiser.Objects;
 
 namespace SubnauticaRandomiser.Interfaces
 {
+    /// <summary>
+    /// The baseline which every module besides the core must implement. 
+    /// </summary>
     internal interface ILogicModule
     {
         /// <summary>

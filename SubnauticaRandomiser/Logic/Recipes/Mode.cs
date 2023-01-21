@@ -10,6 +10,9 @@ using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
+    /// <summary>
+    /// The base class for deciding how or which ingredients are chosen in recipe randomisation.
+    /// </summary>
     internal abstract class Mode
     {
         protected readonly CoreLogic _coreLogic;

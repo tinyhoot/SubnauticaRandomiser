@@ -3,7 +3,7 @@ using System;
 namespace SubnauticaRandomiser
 {
     /// <summary>
-    /// One class capable of dumping internal data to log files for an easy overview of what's happening.
+    /// Capable of dumping internal data to log files for an easy overview of what's happening.
     /// </summary>
     internal static class DataDumper
     {

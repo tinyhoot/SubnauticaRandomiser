@@ -14,6 +14,9 @@ using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
+    /// <summary>
+    /// Handles everything related to randomising databoxes.
+    /// </summary>
     [RequireComponent(typeof(CoreLogic))]
     internal class DataboxLogic : MonoBehaviour, ILogicModule
     {

@@ -1,5 +1,9 @@
 ﻿namespace SubnauticaRandomiser.Objects.Enums
 {
+    /// <summary>
+    /// Defines the rough regions in the game as any player might recognise them. Only loosely related to how the game
+    /// handles biomes.
+    /// </summary>
     public enum BiomeRegion
     {
         None,

@@ -9,6 +9,9 @@ using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
+    /// <summary>
+    /// Handles randomising everything in and around the Aurora.
+    /// </summary>
     [RequireComponent(typeof(CoreLogic))]
     internal class AuroraLogic : MonoBehaviour, ILogicModule
     {

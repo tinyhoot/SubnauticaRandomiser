@@ -11,7 +11,7 @@ using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
-    /// Handles everything related to the spoiler log generated during randomisation.
+    /// Keeps track of events and progress during randomisation and writes a spoilerlog to disk at the end.
     /// </summary>
     [RequireComponent(typeof(CoreLogic), typeof(ProgressionManager))]
     internal class SpoilerLog : MonoBehaviour

@@ -2,6 +2,9 @@
 
 namespace SubnauticaRandomiser.Objects.Enums
 {
+    /// <summary>
+    /// Defines categories for TechTypes which roughly correspond to their in-game PDA entries.
+    /// </summary>
     public enum TechTypeCategory
     {
         None,

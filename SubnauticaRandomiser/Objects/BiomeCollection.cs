@@ -12,11 +12,11 @@ namespace SubnauticaRandomiser.Objects
     {
         public List<Biome> BiomeList = new List<Biome>();
         public int AverageDepth;
-        public readonly Enums.BiomeRegion BiomeRegion;
+        public readonly BiomeRegion BiomeRegion;
 
         public bool HasBiomes => BiomeList.Count > 0;
 
-        public BiomeCollection(Enums.BiomeRegion biomeRegion)
+        public BiomeCollection(BiomeRegion biomeRegion)
         {
             BiomeRegion = biomeRegion;
             AverageDepth = biomeRegion.GetAccessibleDepth();
@@ -24,7 +24,7 @@ namespace SubnauticaRandomiser.Objects
         
         /// <summary>
         /// Calculate the average depth of the biomes contained in this collection. Intended as a more fine-tuneable
-        /// way of depth control, but largely unused due to the hardcoded depths of EBiomeType.
+        /// way of depth control, but largely unused due to the hardcoded depths of BiomeRegion.
         /// </summary>
         /// <returns>The average depth.</returns>
         public int CalculateAverageDepth()

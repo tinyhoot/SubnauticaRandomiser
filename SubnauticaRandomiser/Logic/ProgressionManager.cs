@@ -8,6 +8,10 @@ using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
+    /// <summary>
+    /// Responsible for keeping track of what is considered accessible by which point. Provides events for whenever
+    /// the logic progresses, and defines what progression <em>is</em>.
+    /// </summary>
     [RequireComponent(typeof(CoreLogic))]
     internal class ProgressionManager : MonoBehaviour
     {
