@@ -350,6 +350,9 @@ namespace SubnauticaRandomiser.Logic
             SetupVehiclesEventArgs vehicleArgs = new SetupVehiclesEventArgs(_vehicleDepths);
             SetupVehicles?.Invoke(this, vehicleArgs);
             _vehicleDepths = vehicleArgs.VehicleDepths;
+            
+            // With all that set up, relay this to the core.
+            UpdatePriorityEntities(0);
         }
 
         /// <summary>

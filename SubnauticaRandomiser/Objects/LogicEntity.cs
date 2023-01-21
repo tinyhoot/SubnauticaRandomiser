@@ -45,6 +45,16 @@ namespace SubnauticaRandomiser.Objects
             UsedInRecipes = 0;
             Value = value;
         }
+
+        /// <summary>
+        /// Add the given TechType as a prerequisite for this entity.
+        /// </summary>
+        public void AddPrerequisite(TechType techType)
+        {
+            Prerequisites ??= new List<TechType>();
+            if (!Prerequisites.Contains(techType))
+                Prerequisites.Add(techType);
+        }
         
         /// <summary>
         /// Check whether this entity can act as an ingredient in crafting. Base pieces and vehicles are obviously
@@ -113,10 +123,6 @@ namespace SubnauticaRandomiser.Objects
          /// <returns>True if all conditions are fulfilled, false otherwise.</returns>
          public bool CheckPrerequisitesFulfilled(CoreLogic logic)
          {
-             // The builder tool must always be randomised before any base pieces ever become accessible.
-             if (Category.IsBasePiece() && !logic.EntityHandler.IsInLogic(TechType.Builder))
-                 return false;
-
              if (Prerequisites is null || Prerequisites.Count == 0)
                  return true;
 

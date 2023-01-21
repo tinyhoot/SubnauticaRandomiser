@@ -215,13 +215,30 @@ namespace SubnauticaRandomiser.Logic
             _Log.Info($"[Core] Finished randomising within {circuitbreaker} cycles!");
             MainLoopCompleted?.Invoke(this, EventArgs.Empty);
         }
+        
+        /// <summary>
+        /// Add the prerequisites of the given entity to the priority queue.
+        /// </summary>
+        public void AddPrerequisitesAsPriority(LogicEntity entity)
+        {
+            foreach (TechType techType in entity.Prerequisites ?? Enumerable.Empty<TechType>())
+            {
+                LogicEntity prereq = EntityHandler.GetEntity(techType);
+                if (!HasRandomised(prereq))
+                    _priorityEntities.Insert(0, prereq);
+            }
+        }
 
         /// <summary>
         /// Add one or more entities to prioritise on the next main loop cycle.
         /// </summary>
         public void AddPriorityEntities(IEnumerable<LogicEntity> entities)
         {
-            _priorityEntities.AddRange(entities);
+            foreach (LogicEntity entity in entities ?? Enumerable.Empty<LogicEntity>())
+            {
+                if (!_priorityEntities.Contains(entity))
+                    _priorityEntities.Add(entity);
+            }
         }
 
         internal void ApplyAllChanges()
@@ -251,12 +268,19 @@ namespace SubnauticaRandomiser.Logic
         [NotNull]
         private LogicEntity ChooseNextEntity(List<LogicEntity> notRandomised)
         {
-            // Make sure the list of absolutely essential items is done first, for each depth level. This guarantees
-            // certain recipes are done by a certain depth, e.g. waterparks by 500m.
+            // Make sure the list of absolutely essential entities is exhausted first.
             LogicEntity next = null;
             if (_priorityEntities.Count > 0)
             {
                 next = _priorityEntities[0];
+                // Ensure that any priority entity's prerequisites are always done first.
+                while (!next.CheckPrerequisitesFulfilled(this))
+                {
+                    _Log.Debug($"Adding prereqs for {next}");
+                    AddPrerequisitesAsPriority(next);
+                    next = _priorityEntities[0];
+                    _Log.Debug($"New next: {next}");
+                }
                 _priorityEntities.RemoveAt(0);
             }
             next ??= Random.Choice(notRandomised);
@@ -296,6 +320,18 @@ namespace SubnauticaRandomiser.Logic
         public bool HasRandomised(TechType techType)
         {
             return EntityHandler.IsInLogic(techType);
+        }
+
+        /// <summary>
+        /// Add one or more entities to prioritise on the next main loop cycle at a specific list index. Low values
+        /// are processed first.
+        /// </summary>
+        public void InsertPriorityEntities(int index, IEnumerable<LogicEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                _priorityEntities.Insert(index, entity);
+            }
         }
 
         /// <summary>

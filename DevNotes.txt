@@ -60,7 +60,6 @@ Other:
   something useful in the first place.
 
 - ensure easy radiation suit
-- for priority items, first force their prerequisites.
 
 
 UNITTEST REFACTOR:

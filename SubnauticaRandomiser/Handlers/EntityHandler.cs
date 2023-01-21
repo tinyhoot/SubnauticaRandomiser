@@ -32,6 +32,35 @@ namespace SubnauticaRandomiser.Handlers
         public event EventHandler<EntityEventArgs> EntityEnteredLogic;
 
         /// <summary>
+        /// Add the given TechTypes as prerequisites for all entities in the given category.
+        /// </summary>
+        /// <param name="category">The category to add prerequisites to.</param>
+        /// <param name="techTypes">The new prerequisites to add.</param>
+        public void AddCategoryPrerequisites(TechTypeCategory category, List<TechType> techTypes)
+        {
+            foreach (var categoryEntity in _allEntities.FindAll(e => e.Category.Equals(category)))
+            {
+                foreach (var techType in techTypes)
+                {
+                    categoryEntity.AddPrerequisite(techType);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Add the builder tool as a prerequisite to all base pieces.
+        /// </summary>
+        private void AddBaseBuilderPrerequisite()
+        {
+            List<TechType> builder = new List<TechType> { TechType.Builder };
+            AddCategoryPrerequisites(TechTypeCategory.BaseBasePieces, builder);
+            AddCategoryPrerequisites(TechTypeCategory.BaseGenerators, builder);
+            AddCategoryPrerequisites(TechTypeCategory.BaseExternalModules, builder);
+            AddCategoryPrerequisites(TechTypeCategory.BaseInternalModules, builder);
+            AddCategoryPrerequisites(TechTypeCategory.BaseInternalPieces, builder);
+        }
+
+        /// <summary>
         /// Mark a single entity as accessible in logic.
         /// </summary>
         /// <returns>True if successful, false otherwise.</returns>
@@ -232,6 +261,7 @@ namespace SubnauticaRandomiser.Handlers
         public async Task ParseDataFileAsync(string fileName)
         {
             _allEntities = await CSVReader.ParseDataFileAsync(fileName, CSVReader.ParseRecipeLine);
+            AddBaseBuilderPrerequisite();
         }
     }
 }
