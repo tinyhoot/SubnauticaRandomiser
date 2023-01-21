@@ -198,6 +198,9 @@ namespace SubnauticaRandomiser.Logic
                 {
                     _Log.Warn($"[Core] Unhandled entity in main loop: {nextEntity.EntityType} {nextEntity}");
                     notRandomised.Remove(nextEntity);
+                    // Add the unhandled entity into logic as a stopgap solution, for cases where a prerequisite check
+                    // would fail because it expects unhandled entities to be in logic first.
+                    EntityHandler.AddToLogic(nextEntity);
                     continue;
                 }
 
@@ -221,7 +224,13 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         public void AddPrerequisitesAsPriority(LogicEntity entity)
         {
-            foreach (TechType techType in entity.Prerequisites ?? Enumerable.Empty<TechType>())
+            List<TechType> newPriorities = new List<TechType>();
+            newPriorities.AddRange(entity.Prerequisites ?? Enumerable.Empty<TechType>());
+            newPriorities.AddRange(entity.Blueprint?.Fragments ?? Enumerable.Empty<TechType>());
+            newPriorities.AddRange(entity.Blueprint?.UnlockConditions ?? Enumerable.Empty<TechType>());
+            
+            // Insert any prerequisites at the front of the queue.
+            foreach (TechType techType in newPriorities)
             {
                 LogicEntity prereq = EntityHandler.GetEntity(techType);
                 if (!HasRandomised(prereq))
@@ -276,10 +285,9 @@ namespace SubnauticaRandomiser.Logic
                 // Ensure that any priority entity's prerequisites are always done first.
                 while (!next.CheckPrerequisitesFulfilled(this))
                 {
-                    _Log.Debug($"Adding prereqs for {next}");
+                    _Log.Debug($"[Core] Adding prerequisites for {next} to priority queue.");
                     AddPrerequisitesAsPriority(next);
                     next = _priorityEntities[0];
-                    _Log.Debug($"New next: {next}");
                 }
                 _priorityEntities.RemoveAt(0);
             }
