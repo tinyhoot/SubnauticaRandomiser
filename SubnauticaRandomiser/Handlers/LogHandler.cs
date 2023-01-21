@@ -54,6 +54,7 @@ namespace SubnauticaRandomiser.Handlers
         /// Send an in-game message to the player.
         public void InGameMessage(string message, bool error = false)
         {
+            message = "[Randomiser] " + message;
             _log.LogMessage("Main Menu Message: " + message);
             if (!_isReady)
                 _ingameMessages.Add(message);
