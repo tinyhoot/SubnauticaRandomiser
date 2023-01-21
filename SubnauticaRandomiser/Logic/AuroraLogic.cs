@@ -35,6 +35,8 @@ namespace SubnauticaRandomiser.Logic
             _coreLogic = GetComponent<CoreLogic>();
         }
 
+        public void ApplySerializedChanges(EntitySerializer serializer) { }
+
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             if (_config.bRandomiseDoorCodes)

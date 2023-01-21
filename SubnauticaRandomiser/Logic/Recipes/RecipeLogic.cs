@@ -64,6 +64,20 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // Register this module as handler for recipe type entities.
             _coreLogic.RegisterEntityHandler(EntityType.Recipe, this);
         }
+        
+        /// <summary>
+        /// Apply all recipe changes stored in the serializer to the game.
+        /// </summary>
+        public void ApplySerializedChanges(EntitySerializer serializer)
+        {
+            if (serializer.RecipeDict is null || serializer.RecipeDict.Count == 0)
+                return;
+            
+            foreach (TechType key in serializer.RecipeDict.Keys)
+            {
+                CraftDataHandler.SetTechData(key, serializer.RecipeDict[key]);
+            }
+        }
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
@@ -85,12 +99,13 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
             
             entity = _mode.RandomiseIngredients(entity);
-            ApplyRandomisedRecipe(entity.Recipe);
+            CoreLogic._Serializer.AddRecipe(entity.Recipe.TechType, entity.Recipe);
             _log.Debug($"[R][+] Randomised recipe for [{entity}].");
 
             return true;
         }
-
+        
+        // Unused.
         public void SetupHarmonyPatches(Harmony harmony)
         {
         }
@@ -296,32 +311,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 _entityHandler.AddToLogic(TechTypeCategory.Eggs, depth);
             if (_config.bUseSeeds && IsAnyKnifeRandomised())
                 _entityHandler.AddToLogic(TechTypeCategory.Seeds, depth);
-        }
-
-        /// <summary>
-        /// Apply a randomised recipe to the in-game craft data, and store a copy in the master dictionary.
-        /// </summary>
-        /// <param name="recipe">The recipe to change.</param>
-        private void ApplyRandomisedRecipe(Recipe recipe)
-        {
-            CoreLogic._Serializer.AddRecipe(recipe.TechType, recipe);
-        }
-
-        /// <summary>
-        /// Apply all recipe changes stored in the masterDict to the game.
-        /// </summary>
-        /// <param name="serializer">The master dictionary.</param>
-        internal static void ApplyMasterDict(EntitySerializer serializer)
-        {
-            Dictionary<TechType, Recipe>.KeyCollection keys = serializer.RecipeDict.Keys;
-
-            foreach (TechType key in keys)
-            {
-                CraftDataHandler.SetTechData(key, serializer.RecipeDict[key]);
-            }
-
-            // TODO Once scrap metal is working, un-commenting this will apply the change on every startup.
-            //ChangeScrapMetalResult(masterDict.DictionaryInstance[TechType.Titanium]);
         }
     }
 }

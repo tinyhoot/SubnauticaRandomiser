@@ -94,6 +94,33 @@ namespace SubnauticaRandomiser.Logic
             
             _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
         }
+        
+        /// <summary>
+        /// Re-apply spawnList from a saved game. This will fail to catch all existing fragment spawns if called in a
+        /// previously randomised game.
+        /// </summary>
+        public void ApplySerializedChanges(EntitySerializer serializer)
+        {
+            if (serializer.SpawnDataDict?.Count > 0)
+            {
+                Init();
+                foreach (TechType key in serializer.SpawnDataDict.Keys)
+                {
+                    foreach (SpawnData spawnData in serializer.SpawnDataDict[key])
+                    {
+                        LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
+                    }
+                }
+            }
+
+            if (serializer.NumFragmentsToUnlock?.Count > 0)
+            {
+                foreach (TechType key in serializer.NumFragmentsToUnlock.Keys)
+                {
+                    PDAHandler.EditFragmentsToScan(key, serializer.NumFragmentsToUnlock[key]);
+                }
+            }
+        }
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
@@ -338,6 +365,20 @@ namespace SubnauticaRandomiser.Logic
             }
         }
         
+        /// <summary>
+        /// Force Subnautica and SMLHelper to index and cache the classIds, setup the databases, and prepare a blank
+        /// slate by removing all existing fragment spawns from the game.
+        /// </summary>
+        private static void Init()
+        {
+            // This forces SMLHelper (and the game) to cache the classIds.
+            // Without this, anything below will fail.
+            _ = CraftData.GetClassIdForTechType(TechType.Titanium);
+
+            PrepareClassIdDatabase();
+            ResetFragmentSpawns();
+        }
+        
         private async Task ParseDataFileAsync()
         {
             List<Biome> biomes = await CSVReader.ParseDataFileAsync(Initialiser._BiomeFile, CSVReader.ParseBiomeLine);
@@ -477,61 +518,14 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Re-apply spawnList from a saved game. This will fail to catch all existing fragment spawns if called in a
-        /// previously randomised game.
-        /// </summary>
-        internal static void ApplyMasterDict(EntitySerializer serializer)
-        {
-            if (serializer.SpawnDataDict?.Count > 0)
-            {
-                Init();
-                            
-                foreach (TechType key in serializer.SpawnDataDict.Keys)
-                {
-                    foreach (SpawnData spawnData in serializer.SpawnDataDict[key])
-                    {
-                        LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
-                    }
-                }
-            }
-            
-            foreach (TechType key in serializer.NumFragmentsToUnlock.Keys)
-            {
-                PDAHandler.EditFragmentsToScan(key, serializer.NumFragmentsToUnlock[key]);
-            }
-        }
-        
-        /// <summary>
         /// Add modified SpawnData to the game and any place it needs to go to be stored for later use.
         /// </summary>
         /// <param name="entity">The entity to modify spawn rates for.</param>
         /// <param name="spawnList">The list of modified SpawnData to use.</param>
-        internal void ApplyRandomisedFragment(LogicEntity entity, List<SpawnData> spawnList)
+        private void ApplyRandomisedFragment(LogicEntity entity, List<SpawnData> spawnList)
         {
             entity.SpawnData = spawnList;
             _serializer.AddSpawnData(entity.TechType, spawnList);
-        }
-
-        /// <summary>
-        /// Get the classId for the given TechType.
-        /// </summary>
-        private static string GetClassId(TechType type)
-        {
-            return CraftData.GetClassIdForTechType(type);
-        }
-
-        /// <summary>
-        /// Force Subnautica and SMLHelper to index and cache the classIds, setup the databases, and prepare a blank
-        /// slate by removing all existing fragment spawns from the game.
-        /// </summary>
-        public static void Init()
-        {
-            // This forces SMLHelper (and the game) to cache the classIds.
-            // Without this, anything below will fail.
-            _ = GetClassId(TechType.Titanium);
-
-            PrepareClassIdDatabase();
-            ResetFragmentSpawns();
         }
     }
 }

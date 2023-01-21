@@ -251,20 +251,19 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
+        /// <summary>
+        /// Apply any changes the randomiser has decided on to the game. Also used for re-applying a saved state.
+        /// </summary>
+        /// <exception cref="InvalidDataException">Raised if the serializer is null.</exception>
         internal void ApplyAllChanges()
         {
             if (_Serializer is null)
                 throw new InvalidDataException("Cannot apply randomisation changes: Serializer is null!");
             
-            // Load recipe changes.
-            if (_Serializer.RecipeDict?.Count > 0)
-                RecipeLogic.ApplyMasterDict(_Serializer);
-                
-            // Load fragment changes.
-            if (_Serializer.SpawnDataDict?.Count > 0 || _Serializer.NumFragmentsToUnlock?.Count > 0)
+            // Load changes stored in the serializer.
+            foreach (ILogicModule module in _modules)
             {
-                FragmentLogic.ApplyMasterDict(_Serializer);
-                _Log.Info("Loaded fragment state.");
+                module.ApplySerializedChanges(_Serializer);
             }
 
             // Load any changes that rely on harmony patches.

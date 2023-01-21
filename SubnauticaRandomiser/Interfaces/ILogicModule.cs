@@ -9,6 +9,13 @@ namespace SubnauticaRandomiser.Interfaces
     internal interface ILogicModule
     {
         /// <summary>
+        /// If the module makes changes to the game which do <em>not</em> rely on Harmony but still require storing
+        /// in the serializer (like recipe changes), do it here. Executed after either running through the main logic
+        /// or loading a saved state.
+        /// </summary>
+        public void ApplySerializedChanges(EntitySerializer serializer);
+        
+        /// <summary>
         /// Randomise anything which does not require use of the main loop. This method is called before the main loop
         /// is run.
         /// </summary>

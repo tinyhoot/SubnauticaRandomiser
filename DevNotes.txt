@@ -60,4 +60,3 @@ Other:
   something useful in the first place.
 
 - ensure easy radiation suit
-- Extract re-application of saved logic into its own class
