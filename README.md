@@ -16,6 +16,7 @@ The randomisation persists between play sessions and save games. This means you 
 * Blueprints found in databoxes
 * Fragment spawn rates and locations
 * Lifepod spawn location
+* Door codes and supply box contents
 
 ## Features
 - ✔️ No softlocks
@@ -34,7 +35,7 @@ The randomisation persists between play sessions and save games. This means you 
 2. Install [SMLHelper](https://www.nexusmods.com/subnautica/mods/113)
 3. Extract this mod into your Subnautica/BepInEx/plugins folder
    * (Optional) Edit the config in the in-game options menu to your liking
-   * Press the "Randomise with new seed" button
+   * Press the "Randomise!" button
    * Restart the game to apply your changes
 4. Enjoy!
 
@@ -48,3 +49,12 @@ The randomisation persists between play sessions and save games. This means you 
   * Several Unity assemblies from the game folder
   * Publicised versions of Subnautica's `Assembly-CSharp.dll`. Start the game once using [the BepinEx publiciser](https://github.com/MrPurple6411/Bepinex-Tools/releases/) to generate them.
 * Building in the Release configuration should leave you with a `SubnauticaRandomiser.dll` in `SubnauticaRandomiser/bin/Release/` and automatically update the installed version in `$SUBNAUTICA_DIR/BepInEx/plugins`
+
+## How Does It Work?
+Under the hood, the randomiser creates a new Unity GameObject for storing all randomisation logic. It then attaches Components as needed, depending on which config options are set. Only those Components which are actually needed are attached to the GameObject. Components primarily communicate via events, which means they do not rely on each other and can be individually turned on/off with no repercussions.
+
+There are some basic Components that are responsible for steering the overall logic and are always attached. These are the Core Logic module and the Progression Manager. The core logic is what actually runs the main loop where game entities are randomised one by one, while the manager keeps track of overall game progression and ensures no softlocks. Events are invoked between the two of them as certain milestones are reached.
+
+Here's a rough diagram of the overall structure and execution flow:
+
+![Structure Diagram](https://github.com/tinyhoot/SubnauticaRandomiser/blob/master/StructureDiagram.png)
