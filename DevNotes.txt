@@ -60,10 +60,4 @@ Other:
   something useful in the first place.
 
 - ensure easy radiation suit
-
-
-UNITTEST REFACTOR:
 - Extract re-application of saved logic into its own class
-- Classes that cannot get full coverage:
-    - ModeBalanced. Too much reliance on random outcomes to test.
-    - Moderandom. Same as above.
