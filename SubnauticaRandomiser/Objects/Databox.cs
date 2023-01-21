@@ -12,11 +12,11 @@ namespace SubnauticaRandomiser.Objects
     {
         public TechType TechType;
         public Vector3 Coordinates;
-        public EWreckage Wreck;
+        public Wreckage Wreck;
         public bool RequiresLaserCutter;
         public bool RequiresPropulsionCannon;
 
-        public Databox(TechType techType, Vector3 coordinates, EWreckage wreck = EWreckage.None, bool laserCutter = false, bool propulsionCannon = false)
+        public Databox(TechType techType, Vector3 coordinates, Wreckage wreck = Wreckage.None, bool laserCutter = false, bool propulsionCannon = false)
         {
             TechType = techType;
             Coordinates = coordinates;

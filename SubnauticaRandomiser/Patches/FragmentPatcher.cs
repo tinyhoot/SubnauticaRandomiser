@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
+using SubnauticaRandomiser.Logic;
 
 namespace SubnauticaRandomiser.Patches
 {
@@ -77,7 +78,7 @@ namespace SubnauticaRandomiser.Patches
         public static void YieldMaterial(TechType target)
         {
             // If the options for yields were not randomised, just go with the game's default behaviour.
-            if (!(Initialiser._Serializer?.FragmentMaterialYield?.Count > 0))
+            if (!(CoreLogic._Serializer?.FragmentMaterialYield?.Count > 0))
             {
                 CraftData.AddToInventory(TechType.Titanium, 2, false, true);
                 return;
@@ -97,15 +98,15 @@ namespace SubnauticaRandomiser.Patches
         /// <returns>The TechType of the chosen material, or Titanium if an error occurred.</returns>
         private static TechType GetRandomMaterial(Random rand)
         {
-            if (!(Initialiser._Serializer?.FragmentMaterialYield?.Count > 0))
+            if (!(CoreLogic._Serializer?.FragmentMaterialYield?.Count > 0))
                 return TechType.Titanium;
 
-            double sumOfWeights = Initialiser._Serializer.FragmentMaterialYield.Sum(x => x.Value);
+            double sumOfWeights = CoreLogic._Serializer.FragmentMaterialYield.Sum(x => x.Value);
             double choice = sumOfWeights * rand.NextDouble();
 
             // Add up the weights of the material options until the value of 'choice' is exceeded, and choose that one.
             double sum = 0.0;
-            foreach (var kv in Initialiser._Serializer.FragmentMaterialYield)
+            foreach (var kv in CoreLogic._Serializer.FragmentMaterialYield)
             {
                 sum += kv.Value;
                 if (sum >= choice)

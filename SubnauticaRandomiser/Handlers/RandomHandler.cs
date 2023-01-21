@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using SubnauticaRandomiser.Interfaces;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.Handlers
 {
+    /// <summary>
+    /// Handle anything related to random events and provide some convenience functions not present in System.Random.
+    /// </summary>
     internal class RandomHandler : IRandomHandler
     {
         private readonly Random _random;

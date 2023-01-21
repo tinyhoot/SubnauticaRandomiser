@@ -13,20 +13,20 @@ namespace Tests.UnitTests.Objects
         [SetUp]
         public void Init()
         {
-            _bc = new BiomeCollection(EBiomeType.Kelp);
+            _bc = new BiomeCollection(SubnauticaRandomiser.Objects.Enums.BiomeRegion.Kelp);
         }
         
         [Test]
         public void TestAdd()
         {
-            Biome biome = new Biome("test", EBiomeType.Kelp, 0, 0);
+            Biome biome = new Biome("test", SubnauticaRandomiser.Objects.Enums.BiomeRegion.Kelp, 0, 0);
             Assert.True(_bc.Add(biome));
         }
         
         [Test]
         public void TestAdd_Duplicate()
         {
-            Biome biome = new Biome("test", EBiomeType.Kelp, 0, 0);
+            Biome biome = new Biome("test", SubnauticaRandomiser.Objects.Enums.BiomeRegion.Kelp, 0, 0);
             _bc.Add(biome);
             Assert.False(_bc.Add(biome));
         }
@@ -34,8 +34,8 @@ namespace Tests.UnitTests.Objects
         [Test]
         public void TestAdd_Duplicate_Name()
         {
-            Biome biome1 = new Biome("test", EBiomeType.Kelp, 0, 0);
-            Biome biome2 = new Biome("test", EBiomeType.Kelp, 0, 0);
+            Biome biome1 = new Biome("test", SubnauticaRandomiser.Objects.Enums.BiomeRegion.Kelp, 0, 0);
+            Biome biome2 = new Biome("test", SubnauticaRandomiser.Objects.Enums.BiomeRegion.Kelp, 0, 0);
             _bc.Add(biome1);
             Assert.False(_bc.Add(biome2));
         }

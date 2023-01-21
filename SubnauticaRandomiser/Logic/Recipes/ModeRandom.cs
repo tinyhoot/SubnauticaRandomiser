@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
 using SMLHelper.V2.Handlers;
-using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
+    /// <summary>
+    /// A mode for recipe randomisation with few to no checks in place. Unpredictable.
+    /// </summary>
     internal class ModeRandom : Mode
     {
-        private List<LogicEntity> _reachableMaterials;
-
-        internal ModeRandom(CoreLogic logic) : base(logic)
+        internal ModeRandom(CoreLogic coreLogic, RecipeLogic recipeLogic) : base(coreLogic, recipeLogic)
         {
-            _reachableMaterials = _materials.GetReachable();
         }
         
         /// <summary>
@@ -29,7 +28,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             for (int i = 1; i <= number; i++)
             {
-                LogicEntity ingredientEntity = GetRandom(_reachableMaterials, _blacklist);
+                LogicEntity ingredientEntity = GetRandom(_recipeLogic.ValidIngredients, _blacklist);
 
                 // Prevent duplicates.
                 if (_ingredients.Exists(x => x.techType == ingredientEntity.TechType))
@@ -77,13 +76,13 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             // Tools and upgrades do not stack, but if the recipe would require several and you have more than one in
             // inventory, it will consume all of them.
-            if (entity.Category.Equals(ETechTypeCategory.Tools) 
-                || entity.Category.Equals(ETechTypeCategory.VehicleUpgrades) 
-                || entity.Category.Equals(ETechTypeCategory.WorkBenchUpgrades))
+            if (entity.Category.Equals(TechTypeCategory.Tools) 
+                || entity.Category.Equals(TechTypeCategory.VehicleUpgrades) 
+                || entity.Category.Equals(TechTypeCategory.WorkBenchUpgrades))
                 max = 1;
 
             // Never require more than one (default) egg. That's tedious.
-            if (entity.Category.Equals(ETechTypeCategory.Eggs))
+            if (entity.Category.Equals(TechTypeCategory.Eggs))
                 max = _config.iMaxEggsAsSingleIngredient;
 
             return max;

@@ -12,13 +12,11 @@ namespace SubnauticaRandomiser
     /// This class does three things.
     /// <list type="bullet">
     ///     <item><description>
-    ///         First, it provides an easy way to store a large amount of recipes or spawnables by
-    ///         putting them in a dictionary.
+    ///         First, it provides an easy way to store any changes the randomiser makes.
     ///     </description></item>
     ///     <item><description>
     ///         Second, it provides a way to save itself to and restore from disk.
-    ///         Because this dictionary eventually contains all randomised entities,
-    ///         this makes restoring to a previous state trivial.
+    ///         Because this class contains all changes ever made, this makes restoring to a previous state trivial.
     ///     </description></item>
     ///     <item><description>
     ///         Third, the base64 string representing this class also doubles as a seed.
@@ -28,6 +26,8 @@ namespace SubnauticaRandomiser
     [Serializable]
     internal class EntitySerializer
     {
+        public List<Type> EnabledModules;
+        
         public RandomiserVector StartPoint;
         // All databoxes and their new locations.
         public Dictionary<RandomiserVector, TechType> Databoxes;
@@ -55,33 +55,11 @@ namespace SubnauticaRandomiser
             SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
             _log = logger;
         }
-
-        /// <summary>
-        /// Convert this class to a string for saving.
-        /// </summary>
-        public string ToBase64String()
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                new BinaryFormatter().Serialize(ms, this);
-                return Convert.ToBase64String(ms.ToArray());
-            }
-        }
         
-        /// <summary>
-        /// Convert a previously saved string back into an instance of this class.
-        /// </summary>
-        /// <param name="base64String"></param>
-        /// <returns>A typecast EntitySerializer, which may or may not be valid.</returns>
-        public static EntitySerializer FromBase64String(string base64String)
+        [OnDeserialized]
+        private void OnDeserialized()
         {
-            byte[] bytes = Convert.FromBase64String(base64String);
-            using (MemoryStream ms = new MemoryStream(bytes, 0, bytes.Length))
-            {
-                ms.Write(bytes, 0, bytes.Length);
-                ms.Position = 0;
-                return (EntitySerializer)(new BinaryFormatter().Deserialize(ms));
-            }
+            _log = Initialiser._Log;
         }
 
         /// <summary>
@@ -150,19 +128,39 @@ namespace SubnauticaRandomiser
             SpawnDataDict.Add(type, data);
             return true;
         }
-        
+
         /// <summary>
-        /// Check whether the recipe dictionary contains any kind of knife. Used for progression checks.
+        /// Convert a previously saved string back into an instance of this class.
         /// </summary>
-        public bool ContainsKnife()
+        /// <returns>A typecast EntitySerializer, which may or may not be valid.</returns>
+        public static EntitySerializer FromBase64String(string base64String)
         {
-            return RecipeDict.ContainsKey(TechType.Knife) || RecipeDict.ContainsKey(TechType.HeatBlade);
+            byte[] bytes = Convert.FromBase64String(base64String);
+            using MemoryStream ms = new MemoryStream(bytes, 0, bytes.Length);
+            ms.Write(bytes, 0, bytes.Length);
+            ms.Position = 0;
+            return (EntitySerializer)(new BinaryFormatter().Deserialize(ms));
         }
 
-        [OnDeserialized]
-        private void OnDeserialized()
+        /// <summary>
+        /// Serialise the current randomisation state to disk.
+        /// </summary>
+        public void Serialize(RandomiserConfig config)
         {
-            _log = Initialiser._Log;
+            string base64 = ToBase64String();
+            config.sBase64Seed = base64;
+            config.Save();
+            _log.Debug("[ES] Saved game state to disk!");
+        }
+        
+        /// <summary>
+        /// Convert this class to a string for saving.
+        /// </summary>
+        public string ToBase64String()
+        {
+            using MemoryStream ms = new MemoryStream();
+            new BinaryFormatter().Serialize(ms, this);
+            return Convert.ToBase64String(ms.ToArray());
         }
     }
 }

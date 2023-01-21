@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 using Logger = BepInEx.Logging.Logger;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.Handlers
 {
     /// A class for handling all the logging that the main program might ever want to do.
     /// Also includes main menu messages for relaying information to the user directly.
@@ -54,6 +54,7 @@ namespace SubnauticaRandomiser
         /// Send an in-game message to the player.
         public void InGameMessage(string message, bool error = false)
         {
+            message = "[Randomiser] " + message;
             _log.LogMessage("Main Menu Message: " + message);
             if (!_isReady)
                 _ingameMessages.Add(message);

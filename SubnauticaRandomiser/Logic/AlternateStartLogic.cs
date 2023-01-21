@@ -1,56 +1,83 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using HarmonyLib;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Patches;
+using UnityEngine;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
-    internal class AlternateStartLogic
+    /// <summary>
+    /// Provides a random starting location for the lifepod.
+    /// </summary>
+    [RequireComponent(typeof(CoreLogic))]
+    internal class AlternateStartLogic : MonoBehaviour, ILogicModule
     {
-        private readonly Dictionary<EBiomeType, List<float[]>> _alternateStarts;
-        private readonly RandomiserConfig _config;
-        private readonly ILogHandler _log;
-        private readonly IRandomHandler _random;
+        private CoreLogic _coreLogic;
+        private RandomiserConfig _config;
+        private ILogHandler _log;
+        private IRandomHandler _random;
+        
+        private Dictionary<BiomeRegion, List<float[]>> _alternateStarts;
 
-        public AlternateStartLogic(Dictionary<EBiomeType, List<float[]>> alternateStarts, RandomiserConfig config,
-            ILogHandler log, IRandomHandler random)
+        public void Awake()
         {
-            _alternateStarts = alternateStarts;
-            _config = config;
-            _log = log;
-            _random = random;
-        }
+            _coreLogic = GetComponent<CoreLogic>();
+            _config = _coreLogic._Config;
+            _log = _coreLogic._Log;
+            _random = _coreLogic.Random;
 
-        public void Randomise(EntitySerializer serializer)
+            // Parse the list of valid alternate starts from a file.
+            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
+        }
+        
+        public void ApplySerializedChanges(EntitySerializer serializer) { }
+
+        public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             serializer.StartPoint = GetRandomStart(_config.sSpawnPoint);
+        }
+
+        public bool RandomiseEntity(ref LogicEntity entity)
+        {
+            // This module does not handle any entity types in the main loop.
+            throw new NotImplementedException();
+        }
+
+        public void SetupHarmonyPatches(Harmony harmony)
+        {
+            harmony.PatchAll(typeof(AlternateStart));
         }
 
         /// <summary>
         /// Convert the config value to a usable biome.
         /// </summary>
         /// <returns>The biome.</returns>
-        private EBiomeType GetBiome(string startBiome)
+        private BiomeRegion GetBiome(string startBiome)
         {
             switch (startBiome)
             {
                 case "Random":
                     // Only use starts where you can actually reach the ground.
                     return _random.Choice(_alternateStarts.Keys.ToList()
-                        .FindAll(biome => !biome.Equals(EBiomeType.None) && biome.GetAccessibleDepth() <= 100));
+                        .FindAll(biome => !biome.Equals(BiomeRegion.None) && biome.GetAccessibleDepth() <= 100));
                 case "Chaotic Random":
                     return _random.Choice(_alternateStarts.Keys);
                 case "BulbZone":
-                    return EBiomeType.KooshZone;
+                    return BiomeRegion.KooshZone;
                 case "Floating Island":
-                    return EBiomeType.FloatingIsland;
+                    return BiomeRegion.FloatingIsland;
                 case "Void":
-                    return EBiomeType.None;
+                    return BiomeRegion.None;
             }
 
-            return EnumHandler.Parse<EBiomeType>(startBiome);
+            return EnumHandler.Parse<BiomeRegion>(startBiome);
         }
 
         /// <summary>
@@ -63,7 +90,7 @@ namespace SubnauticaRandomiser.Logic
             if (startBiome.StartsWith("Vanilla"))
                 return null;
             
-            EBiomeType biome = GetBiome(startBiome);
+            BiomeRegion biome = GetBiome(startBiome);
             if (!_alternateStarts.ContainsKey(biome))
             {
                 _log.Error("[AS] No information found on chosen starting biome " + biome);
@@ -78,6 +105,11 @@ namespace SubnauticaRandomiser.Logic
 
             _log.Debug("[AS] Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
             return new RandomiserVector(x, 0, z);
+        }
+
+        private async Task ParseDataFileAsync()
+        {
+            _alternateStarts = await CSVReader.ParseAlternateStartAsync(Initialiser._AlternateStartFile);
         }
     }
 }

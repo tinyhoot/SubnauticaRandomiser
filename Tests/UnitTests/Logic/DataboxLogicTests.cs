@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using SubnauticaRandomiser;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects;
@@ -109,17 +110,17 @@ namespace Tests.UnitTests.Logic
         [Test]
         public void TestLinkCyclopsHullModules()
         {
-            LogicEntity mod1 = new LogicEntity(TechType.CyclopsHullModule1, ETechTypeCategory.VehicleUpgrades,
+            LogicEntity mod1 = new LogicEntity(TechType.CyclopsHullModule1, TechTypeCategory.VehicleUpgrades,
                 new Blueprint(TechType.CyclopsHullModule1, new List<TechType> { TechType.LaserCutter }, null, true,
                     248));
-            LogicEntity mod2 = new LogicEntity(TechType.CyclopsHullModule2, ETechTypeCategory.VehicleUpgrades,
+            LogicEntity mod2 = new LogicEntity(TechType.CyclopsHullModule2, TechTypeCategory.VehicleUpgrades,
                 new Blueprint(TechType.CyclopsHullModule2, null, null, true, 30));
-            LogicEntity mod3 = new LogicEntity(TechType.CyclopsHullModule3, ETechTypeCategory.VehicleUpgrades,
+            LogicEntity mod3 = new LogicEntity(TechType.CyclopsHullModule3, TechTypeCategory.VehicleUpgrades,
                 new Blueprint(TechType.CyclopsHullModule3, null, null, true, 20));
             List<LogicEntity> modules = new List<LogicEntity> { mod1, mod2, mod3 };
-            Materials materials = new Materials(modules, new FakeLogger());
+            EntityHandler entityHandler = new EntityHandler(modules, new FakeLogger());
 
-            _databoxLogic.LinkCyclopsHullModules(materials);
+            _databoxLogic.LinkCyclopsHullModules(entityHandler);
             Assert.AreEqual(mod1.Blueprint.UnlockDepth, mod2.Blueprint.UnlockDepth);
             Assert.AreEqual(mod1.Blueprint.UnlockConditions, mod2.Blueprint.UnlockConditions);
             Assert.AreEqual(mod1.Blueprint.UnlockDepth, mod3.Blueprint.UnlockDepth);
@@ -129,15 +130,15 @@ namespace Tests.UnitTests.Logic
         [Test]
         public void TestLinkCyclopsHullModules_Incomplete()
         {
-            LogicEntity mod1 = new LogicEntity(TechType.CyclopsHullModule1, ETechTypeCategory.VehicleUpgrades,
+            LogicEntity mod1 = new LogicEntity(TechType.CyclopsHullModule1, TechTypeCategory.VehicleUpgrades,
                 new Blueprint(TechType.CyclopsHullModule1, new List<TechType> { TechType.LaserCutter }, null, true,
                     248));
-            LogicEntity mod2 = new LogicEntity(TechType.CyclopsHullModule2, ETechTypeCategory.VehicleUpgrades,
+            LogicEntity mod2 = new LogicEntity(TechType.CyclopsHullModule2, TechTypeCategory.VehicleUpgrades,
                 new Blueprint(TechType.CyclopsHullModule2, null, null, true, 30));
             List<LogicEntity> modules = new List<LogicEntity> { mod1, mod2 };
-            Materials materials = new Materials(modules, new FakeLogger());
+            EntityHandler entityHandler = new EntityHandler(modules, new FakeLogger());
 
-            Assert.Throws<ArgumentException>(() => _databoxLogic.LinkCyclopsHullModules(materials));
+            Assert.Throws<ArgumentException>(() => _databoxLogic.LinkCyclopsHullModules(entityHandler));
         }
 
         [Test]
@@ -151,9 +152,9 @@ namespace Tests.UnitTests.Logic
         [Test]
         public void TestUpdateBlueprints()
         {
-            LogicEntity e1 = new LogicEntity(TechType.SeamothElectricalDefense, ETechTypeCategory.VehicleUpgrades);
-            LogicEntity e2 = new LogicEntity(TechType.CyclopsDecoyModule, ETechTypeCategory.VehicleUpgrades);
-            LogicEntity e3 = new LogicEntity(TechType.CyclopsHullModule1, ETechTypeCategory.VehicleUpgrades,
+            LogicEntity e1 = new LogicEntity(TechType.SeamothElectricalDefense, TechTypeCategory.VehicleUpgrades);
+            LogicEntity e2 = new LogicEntity(TechType.CyclopsDecoyModule, TechTypeCategory.VehicleUpgrades);
+            LogicEntity e3 = new LogicEntity(TechType.CyclopsHullModule1, TechTypeCategory.VehicleUpgrades,
                 new Blueprint(TechType.CyclopsHullModule1));
 
             List<LogicEntity> entities = new List<LogicEntity>
@@ -189,8 +190,8 @@ namespace Tests.UnitTests.Logic
         [Test]
         public void TestUpdateBlueprints_EntityNull()
         {
-            LogicEntity e1 = new LogicEntity(TechType.SeamothElectricalDefense, ETechTypeCategory.VehicleUpgrades);
-            LogicEntity e2 = new LogicEntity(TechType.CyclopsDecoyModule, ETechTypeCategory.VehicleUpgrades);
+            LogicEntity e1 = new LogicEntity(TechType.SeamothElectricalDefense, TechTypeCategory.VehicleUpgrades);
+            LogicEntity e2 = new LogicEntity(TechType.CyclopsDecoyModule, TechTypeCategory.VehicleUpgrades);
 
             List<LogicEntity> entities = new List<LogicEntity>
             {

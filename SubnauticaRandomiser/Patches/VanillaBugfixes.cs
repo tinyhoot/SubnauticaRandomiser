@@ -9,8 +9,8 @@ namespace SubnauticaRandomiser.Patches
     {
         /// <summary>
         /// Bugfix patch: Fish that hatch from eggs lack the Pickupable component when they are created from "nothing",
-        /// such as when deconstructing base pieces. This causes the fish to either spawn at the player's feet or nothing
-        /// to happen at all, which makes base pieces undeconstructable.
+        /// such as when deconstructing base pieces. This causes the fish to either spawn at the player's feet or
+        /// nothing to happen at all, which makes base pieces undeconstructable.
         /// Method uses a pass-through postfix.
         /// </summary>
         [HarmonyPostfix]

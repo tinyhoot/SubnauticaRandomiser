@@ -3,37 +3,47 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Logic.Recipes
 {
+    /// <summary>
+    /// The base class for deciding how or which ingredients are chosen in recipe randomisation.
+    /// </summary>
     internal abstract class Mode
     {
-        protected readonly CoreLogic _logic;
-        protected RandomiserConfig _config => _logic._Config;
-        protected Materials _materials => _logic._Materials;
-        protected ProgressionTree _tree => _logic._Tree;
-        protected IRandomHandler _random => _logic._Random;
-        protected ILogHandler _log => _logic._Log;
+        protected readonly CoreLogic _coreLogic;
+        protected readonly RecipeLogic _recipeLogic;
+        protected RandomiserConfig _config => _coreLogic._Config;
+        protected EntityHandler _entityHandler => _coreLogic.EntityHandler;
+        protected IRandomHandler _random => _coreLogic.Random;
+        protected ILogHandler _log => _coreLogic._Log;
         
         protected List<RandomiserIngredient> _ingredients = new List<RandomiserIngredient>();
-        protected List<ETechTypeCategory> _blacklist = new List<ETechTypeCategory>();
+        protected List<TechTypeCategory> _blacklist = new List<TechTypeCategory>();
         protected BaseTheme _baseTheme;
 
-        protected Mode(CoreLogic logic)
+        protected Mode(CoreLogic coreLogic, RecipeLogic recipeLogic)
         {
-            _logic = logic;
+            _coreLogic = coreLogic;
+            _recipeLogic = recipeLogic;
 
             if (_config.bDoBaseTheming)
-            {
-                _baseTheme = new BaseTheme(_materials, _log, _random);
-                _baseTheme.ChooseBaseTheme(100, _config.bUseFish);
-            }
-            
+                _baseTheme = new BaseTheme(_entityHandler, _log, _random);
+
             //InitMod.s_masterDict.DictionaryInstance.Add(TechType.Titanium, _baseTheme.GetSerializableRecipe());
             //ChangeScrapMetalResult(_baseTheme);
+        }
+
+        /// <summary>
+        /// Choose a base theme once off-loop randomisation begins.
+        /// </summary>
+        public void ChooseBaseTheme(int depth, bool useFish)
+        {
+            _baseTheme?.ChooseBaseTheme(depth, useFish);
         }
 
         public abstract LogicEntity RandomiseIngredients(LogicEntity entity);
@@ -48,18 +58,18 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             // Ensure that limited ingredients are not overused. Particularly
             // intended for cuddlefish.
-            int remainder = entity.MaxUsesPerGame - entity._usedInRecipes;
+            int remainder = entity.MaxUsesPerGame - entity.UsedInRecipes;
             if (entity.MaxUsesPerGame != 0 && remainder > 0 && remainder < amount)
                 amount = remainder;
 
             _ingredients.Add(new RandomiserIngredient(entity.TechType, amount));
-            entity._usedInRecipes++;
+            entity.UsedInRecipes++;
 
             if (!entity.HasUsesLeft())
             {
-                _materials.GetReachable().Remove(entity);
-                _log.Debug($"[R] ! Removing {entity} from materials list due to " + 
-                           $"max uses reached: {entity._usedInRecipes}");
+                _recipeLogic.ValidIngredients.Remove(entity);
+                _log.Debug($"[R] ! Removing {entity} ingredients list due to " + 
+                           $"max uses reached: {entity.UsedInRecipes}");
             }
         }
 
@@ -72,7 +82,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>A random, non-blacklisted element from the list.</returns>
         /// <exception cref="InvalidOperationException">Raised if the list is null or empty.</exception>
         [NotNull]
-        protected LogicEntity GetRandom(List<LogicEntity> list, List<ETechTypeCategory> blacklist = null)
+        protected LogicEntity GetRandom(ICollection<LogicEntity> list, List<TechTypeCategory> blacklist = null)
         {
             if (list == null || list.Count == 0)
                 throw new InvalidOperationException("Failed to get valid entity from materials list: "
@@ -83,7 +93,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             {
                 randomEntity = _random.Choice(list);
 
-                if (blacklist != null && blacklist.Count > 0)
+                if (blacklist?.Count > 0)
                 {
                     if (blacklist.Contains(randomEntity.Category))
                         continue;
@@ -142,17 +152,17 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="entity">The entity to build a blacklist against.</param>
         protected void UpdateBlacklist(LogicEntity entity)
         {
-            _blacklist = new List<ETechTypeCategory>();
+            _blacklist = new List<TechTypeCategory>();
 
             if (_config.iEquipmentAsIngredients == 0 || (_config.iEquipmentAsIngredients == 1 && entity.CanFunctionAsIngredient()))
-                _blacklist.Add(ETechTypeCategory.Equipment);
+                _blacklist.Add(TechTypeCategory.Equipment);
             if (_config.iToolsAsIngredients == 0 || (_config.iToolsAsIngredients == 1 && entity.CanFunctionAsIngredient()))
-                _blacklist.Add(ETechTypeCategory.Tools);
+                _blacklist.Add(TechTypeCategory.Tools);
             if (_config.iUpgradesAsIngredients == 0 || (_config.iUpgradesAsIngredients == 1 && entity.CanFunctionAsIngredient()))
             {
-                _blacklist.Add(ETechTypeCategory.ScannerRoom);
-                _blacklist.Add(ETechTypeCategory.VehicleUpgrades);
-                _blacklist.Add(ETechTypeCategory.WorkBenchUpgrades);
+                _blacklist.Add(TechTypeCategory.ScannerRoom);
+                _blacklist.Add(TechTypeCategory.VehicleUpgrades);
+                _blacklist.Add(TechTypeCategory.WorkBenchUpgrades);
             }
         }
     }

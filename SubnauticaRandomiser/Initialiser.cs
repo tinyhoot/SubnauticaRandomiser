@@ -4,15 +4,12 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using BepInEx;
-using HarmonyLib;
 using SMLHelper.V2.Handlers;
-using SubnauticaRandomiser.Interfaces;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
-using SubnauticaRandomiser.Logic.Recipes;
-using SubnauticaRandomiser.Patches;
-using SubnauticaRandomiser.Objects;
-using SubnauticaRandomiser.Objects.Enums;
-using SubnauticaRandomiser.Objects.Exceptions;
+using UnityEngine;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
+using Random = UnityEngine.Random;
 
 [assembly:InternalsVisibleTo("Tests")]
 namespace SubnauticaRandomiser
@@ -21,17 +18,17 @@ namespace SubnauticaRandomiser
     [BepInDependency("com.ahk1221.smlhelper", "2.15")]
     internal class Initialiser : BaseUnityPlugin
     {
-        private const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
+        public const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
         public const string NAME = "Subnautica Randomiser";
         public const string VERSION = "0.9.2";
         
         // Files and structure.
         internal static string _ModDirectory;
         internal static RandomiserConfig _Config;
-        private const string _AlternateStartFile = "alternateStarts.csv";
-        private const string _BiomeFile = "biomeSlots.csv";
-        private const string _RecipeFile = "recipeInformation.csv";
-        private const string _WreckageFile = "wreckInformation.csv";
+        public const string _AlternateStartFile = "alternateStarts.csv";
+        public const string _BiomeFile = "biomeSlots.csv";
+        public const string _RecipeFile = "recipeInformation.csv";
+        public const string _WreckageFile = "wreckInformation.csv";
         internal const string _ExpectedRecipeMD5 = "11cc2c8e44db4473c6e0d196b869d582";
         internal const int _ExpectedSaveVersion = 5;
         private static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
@@ -43,12 +40,14 @@ namespace SubnauticaRandomiser
             [_ExpectedSaveVersion] = "v" + VERSION
         };
 
-        // Everything the mod every modifies is stored in here.
-        internal static EntitySerializer _Serializer;
         internal static ILogHandler _Log;
+        internal GameObject _LogicObject;
+        private CoreLogic _coreLogic;
+        internal static Initialiser _Main;
 
         private void Awake()
         {
+            _Main = this;
             _Log = new LogHandler();
             _Log.Info($"{NAME} v{VERSION} starting up!");
 
@@ -66,83 +65,24 @@ namespace SubnauticaRandomiser
             CommandHandler cmd = gameObject.AddComponent<CommandHandler>();
             cmd.RegisterCommands();
 
-            // Apply randomisation.
-            SetupGameState();
+            // Setup the logic and restore from disk if possible.
+            SetupGameObject();
+            RestoreSavedState();
 
             _Log.Info("Finished loading.");
         }
 
-        /// <summary>
-        /// Randomise the game, discarding any earlier randomisation data.
-        /// </summary>
-        public static void Randomise()
+        private void Start()
         {
-            _Serializer = null;
-            _Config.SanitiseConfigValues();
-            _Config.iSaveVersion = _ExpectedSaveVersion;
-
-            // Parse all the necessary input files.
-            var (alternateStarts, biomes, databoxes, materials) = ParseInputFiles();
-
-            // Create a new seed if the current one is just a default
-            RandomHandler random;
-            if (_Config.iSeed == 0)
-            {
-                random = new RandomHandler();
-                _Config.iSeed = random.Next();
-            }
-            random = new RandomHandler(_Config.iSeed);
-
-            // Randomise!
-            CoreLogic logic = new CoreLogic(random, _Config, _Log, materials, alternateStarts, biomes, databoxes);
-            try
-            {
-                _Serializer = logic.Randomise();
-            }
-            catch (Exception ex)
-            {
-                _Log.InGameMessage("ERROR: Something went wrong. Please report this error with the config.json"
-                                           + " from your mod folder on NexusMods.", true);
-                _Log.Fatal($"{ex.GetType()}: {ex.Message}");
-                
-                // Ensure that the randomiser crashes completely if things go wrong this badly.
-                throw;
-            }
-            
-            ApplyAllChanges();
-            _Log.Info("Randomisation successful!");
-
-            SaveGameStateToDisk();
-        }
-
-        /// <summary>
-        /// Apply all changes contained within the serialiser.
-        /// </summary>
-        /// <exception cref="InvalidDataException">If the serialiser is null or invalid.</exception>
-        private static void ApplyAllChanges()
-        {
-            if (_Serializer is null)
-                throw new InvalidDataException("Cannot apply randomisation changes: Serializer is null!");
-            
-            // Load recipe changes.
-            if (_Serializer.RecipeDict?.Count > 0)
-                RecipeLogic.ApplyMasterDict(_Serializer);
-                
-            // Load fragment changes.
-            if (_Serializer.SpawnDataDict?.Count > 0 || _Serializer.NumFragmentsToUnlock?.Count > 0)
-            {
-                FragmentLogic.ApplyMasterDict(_Serializer);
-                _Log.Info("Loaded fragment state.");
-            }
-
-            // Load any changes that rely on harmony patches.
-            EnableHarmonyPatching();
+            // Randomise, but only if no existing state was loaded from disk.
+            if (_coreLogic != null && CoreLogic._Serializer is null)
+                Randomise();
         }
 
         /// <summary>
         /// Ensure the user did not update into a save incompatibility.
         /// </summary>
-        private static bool CheckSaveCompatibility()
+        private bool CheckSaveCompatibility()
         {
             if (_Config.iSaveVersion == _ExpectedSaveVersion)
                 return true;
@@ -157,149 +97,84 @@ namespace SubnauticaRandomiser
             _Log.InGameMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json", true);
             return false;
         }
-        
-        /// <summary>
-        /// Enables all necessary harmony patches based on the randomisation state in the serialiser.
-        /// </summary>
-        private static void EnableHarmonyPatching()
-        {
-            Harmony harmony = new Harmony(GUID);
-            
-            // Alternate starting location.
-            harmony.PatchAll(typeof(AlternateStart));
-            
-            // Patching key codes.
-            if (_Serializer?.DoorKeyCodes?.Count > 0)
-            {
-                harmony.PatchAll(typeof(AuroraPatcher));
-                harmony.PatchAll(typeof(LanguagePatcher));
-            }
-
-            // Swapping databoxes.
-            if (_Serializer?.Databoxes?.Count > 0)
-                harmony.PatchAll(typeof(DataboxPatcher));
-
-            // Changing duplicate scan rewards.
-            if (_Serializer?.FragmentMaterialYield?.Count > 0)
-                harmony.PatchAll(typeof(FragmentPatcher));
-
-            // Always apply bugfixes.
-            harmony.PatchAll(typeof(VanillaBugfixes));
-        }
 
         /// <summary>
-        /// Parse all CSV files needed for randomisation.
+        /// Coroutines make it impossible (or at least very annoying) to catch exceptions with a traditional try-catch
+        /// block. Instead, use this as a central callback function for any part of the code that needs it.
         /// </summary>
-        /// <returns>The parsed objects.</returns>
-        /// <exception cref="ParsingException">Raised if a file could not be parsed.</exception>
-        private static (Dictionary<EBiomeType, List<float[]>> starts, List<BiomeCollection> biomes, List<Databox>
-            databoxes, List<LogicEntity> materials) ParseInputFiles()
+        /// <param name="exception"></param>
+        /// <exception cref="Exception"></exception>
+        internal static void FatalError(Exception exception)
         {
-            var csvReader = new CSVReader(_Log);
-
-            // Attempt to read and parse the CSV with all alternate starts.
-            var alternateStarts = csvReader.ParseAlternateStartFile(_AlternateStartFile);
-            if (alternateStarts is null)
-            {
-                _Log.Error("Failed to extract alternate start information from CSV.");
-                throw new ParsingException("Failed to extract alternate start information: null.");
-            }
-            
-            // Attempt to read and parse the CSV with all biome information.
-            var biomes = csvReader.ParseBiomeFile(_BiomeFile);
-            if (biomes is null)
-            {
-                _Log.Error("Failed to extract biome information from CSV.");
-                throw new ParsingException("Failed to extract biome information: null");
-            }
-
-            // Attempt to read and parse the CSV with all recipe information.
-            var materials = csvReader.ParseRecipeFile(_RecipeFile);
-            if (materials is null)
-            {
-                _Log.Error("Failed to extract recipe information from CSV.");
-                throw new ParsingException("Failed to extract recipe information: null");
-            }
-
-            // Attempt to read and parse the CSV with wreckages and databox info.
-            var databoxes = csvReader.ParseWreckageFile(_WreckageFile);
-            if (databoxes is null || databoxes.Count == 0)
-            {
-                _Log.Error("Failed to extract databox information from CSV.");
-                throw new ParsingException("Failed to extract databox information: null");
-            }
-
-            return (alternateStarts, biomes, databoxes, materials);
-        }
-
-        /// <summary>
-        /// Attempt to deserialise a randomisation state from disk.
-        /// </summary>
-        /// <returns>The EntitySerializer as previously written to disk.</returns>
-        /// <exception cref="InvalidDataException">Raised if the game state is corrupted in some way.</exception>
-        private static EntitySerializer RestoreGameStateFromDisk()
-        {
-            if (string.IsNullOrEmpty(_Config.sBase64Seed))
-            {
-                throw new InvalidDataException("base64 seed is empty.");
-            }
-
-            _Log.Debug("Trying to decode base64 string...");
-            EntitySerializer dictionary = EntitySerializer.FromBase64String(_Config.sBase64Seed);
-
-            if (dictionary?.SpawnDataDict is null || dictionary.RecipeDict is null)
-            {
-                throw new InvalidDataException("base64 seed is invalid; could not deserialize Dictionary.");
-            }
-
-            return dictionary;
+            _Log.InGameMessage($"{exception.GetType().Name.ToUpper()}: Something went wrong. Please report this error"
+                               + "with the config.json from your mod folder on Github or NexusMods.", true);
+            _Log.Fatal($"{exception.GetType()}: {exception.Message}");
+            // Ensure that the randomiser crashes completely if things go wrong this badly.
+            throw exception;
         }
         
         /// <summary>
-        /// Serialise the current randomisation state to disk.
+        /// Randomise the game, discarding any earlier randomisation data.
         /// </summary>
-        private static void SaveGameStateToDisk()
+        private void Randomise()
         {
-            if (_Serializer != null)
-            {
-                string base64 = _Serializer.ToBase64String();
-                _Config.sBase64Seed = base64;
-                _Config.Save();
-                _Log.Debug("Saved game state to disk!");
-            }
-            else
-            {
-                _Log.Error("Could not save game state to disk: invalid data.");
-            }
-        }
+            _Config.SanitiseConfigValues();
+            _Config.iSaveVersion = _ExpectedSaveVersion;
 
-        /// <summary>
-        /// Try to restore the game state from a previous session. If that fails, start fresh and randomise.
-        /// </summary>
-        private static void SetupGameState()
-        {
-            // Try and restore a game state from disk.
+            // Create a new seed if the current one is just a default
+            if (_Config.iSeed == 0)
+                _Config.iSeed = Random.Range(1, int.MaxValue);
+
+            // Randomise!
             try
             {
-                _Serializer = RestoreGameStateFromDisk();
+                _coreLogic.Run();
             }
             catch (Exception ex)
             {
-                _Log.Warn("Could not load game state from disk.");
-                _Log.Warn(ex.Message);
+                FatalError(ex);
             }
+        }
+
+        internal void RandomiseFromConfig()
+        {
+            // Delete whatever previous state there was.
+            if (_LogicObject != null)
+                Destroy(_LogicObject);
             
-            if (_Config.debug_forceRandomise || _Serializer is null)
+            SetupGameObject();
+            Randomise();
+        }
+        
+        /// <summary>
+        /// Try to restore the game state from a previous session. If that fails, start fresh and randomise.
+        /// </summary>
+        private void RestoreSavedState()
+        {
+            // Try and restore a game state from disk.
+            if (_Config.debug_forceRandomise || !_coreLogic.TryRestoreSave())
             {
                 if (_Config.debug_forceRandomise)
                     _Log.Warn("Ignoring previous game state: Config forces fresh randomisation.");
-                Randomise();
+                _Log.Warn("Could not load game state from disk.");
             }
             else
             {
-                ApplyAllChanges();
+                _coreLogic.ApplyAllChanges();
                 _Log.Info("Successfully loaded game state from disk.");
             }
+        }
+
+        /// <summary>
+        /// Initialise the GameObject that holds the randomisation logic components.
+        /// </summary>
+        private void SetupGameObject()
+        {
+            // Instantiating this automatically starts running the Awake() methods of all components.
+            _LogicObject = new GameObject("Randomiser Logic", typeof(CoreLogic), typeof(ProgressionManager));
+            // Set this plugin (or BepInEx) as the parent of the logic GameObject.
+            _LogicObject.transform.parent = transform;
+            _coreLogic = _LogicObject.GetComponent<CoreLogic>();
         }
 
         /// <summary>

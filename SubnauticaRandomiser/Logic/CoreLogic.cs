@@ -1,166 +1,273 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using HarmonyLib;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Objects.Events;
+using SubnauticaRandomiser.Patches;
+using UnityEngine;
+using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
-    /// Acts as the core for handling all randomising logic in the mod, and turning modules on/off as needed.
+    /// Acts as the core for handling all randomising logic in the mod, registering or enabling modules, and invoking
+    /// the most important events.
     /// </summary>
-    internal class CoreLogic
+    internal class CoreLogic : MonoBehaviour
     {
-        internal readonly RandomiserConfig _Config;
-        internal readonly ILogHandler _Log;
-        internal readonly EntitySerializer _Serializer;
-        internal readonly Materials _Materials;
-        internal readonly IRandomHandler _Random;
-        internal readonly SpoilerLog _SpoilerLog;
-        internal readonly ProgressionTree _Tree;
+        internal RandomiserConfig _Config { get; private set; }
+        internal ILogHandler _Log { get; private set; }
+        internal static EntitySerializer _Serializer { get; private set; }
+        public EntityHandler EntityHandler { get; private set; }
+        public IRandomHandler Random { get; private set; }
 
-        private readonly AlternateStartLogic _altStartLogic;
-        private readonly AuroraLogic _auroraLogic;
-        private readonly DataboxLogic _databoxLogic;
-        internal readonly FragmentLogic _fragmentLogic;
-        private readonly RecipeLogic _recipeLogic;
+        private ProgressionManager _manager;
+        private SpoilerLog _spoilerLog;
 
-        public CoreLogic(IRandomHandler random, RandomiserConfig config, ILogHandler logger, List<LogicEntity> allMaterials,
-            Dictionary<EBiomeType, List<float[]>> alternateStarts, List<BiomeCollection> biomes = null,
-            List<Databox> databoxes = null)
+        private List<Task> _fileTasks;
+        private Dictionary<EntityType, ILogicModule> _handlingModules;
+        private List<ILogicModule> _modules;
+        private List<LogicEntity> _priorityEntities;
+
+        /// <summary>
+        /// Invoked during the setup stage, before the main loop begins.
+        /// </summary>
+        public event EventHandler SetupBeginning;
+
+        /// <summary>
+        /// Invoked during the setup stage. Use this event to add LogicEntities to the main loop.
+        /// </summary>
+        public event EventHandler<CollectEntitiesEventArgs> EntityCollecting;
+
+        /// <summary>
+        /// Invoked just before every logic module is called up to randomise everything which does not require
+        /// access to the main loop.
+        /// </summary>
+        public event EventHandler PreLoopRandomising;
+        
+        /// <summary>
+        /// Invoked once the next entity to be randomised has been determined.
+        /// </summary>
+        public event EventHandler<EntityEventArgs> EntityChosen;
+
+        /// <summary>
+        /// Invoked whenever an entity has been successfully randomised and added to the logic.
+        /// </summary>
+        public event EventHandler<EntityEventArgs> EntityRandomised;
+
+        /// <summary>
+        /// Invoked at the beginning of the main loop.
+        /// </summary>
+        public event EventHandler MainLoopRandomising;
+
+        /// <summary>
+        /// Invoked once the main loop has successfully completed.
+        /// </summary>
+        public event EventHandler MainLoopCompleted;
+
+        private void Awake()
         {
-            _Config = config;
-            _Log = logger;
-            _Serializer = new EntitySerializer(logger);
-            _Materials = new Materials(allMaterials, logger);
-            _Random = random;
-            _SpoilerLog = new SpoilerLog(config, logger, _Serializer);
+            _fileTasks = new List<Task>();
+            _handlingModules = new Dictionary<EntityType, ILogicModule>();
+            _modules = new List<ILogicModule>();
+            _priorityEntities = new List<LogicEntity>();
             
-            if (!_Config.sSpawnPoint.StartsWith("Vanilla"))
-                _altStartLogic = new AlternateStartLogic(alternateStarts, config, logger, random);
-            _auroraLogic = new AuroraLogic(this);
+            _Config = Initialiser._Config;
+            _Log = Initialiser._Log;
+            EntityHandler = new EntityHandler(_Log);
+            Random = new RandomHandler(_Config.iSeed);
+            
+            _manager = gameObject.EnsureComponent<ProgressionManager>();
+            _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
+        }
+
+        private void EnableModules()
+        {
+            if (!_Config.sSpawnPoint.Equals("Vanilla"))
+                RegisterModule<AlternateStartLogic>();
+            if (_Config.bRandomiseDoorCodes || _Config.bRandomiseSupplyBoxes)
+                RegisterModule<AuroraLogic>();
             if (_Config.bRandomiseDataboxes)
-                _databoxLogic = new DataboxLogic(this, databoxes);
+                RegisterModule<DataboxLogic>();
             if (_Config.bRandomiseFragments || _Config.bRandomiseNumFragments || _Config.bRandomiseDuplicateScans)
-                _fragmentLogic = new FragmentLogic(this, biomes);
+                RegisterModule<FragmentLogic>();
             if (_Config.bRandomiseRecipes)
-                _recipeLogic = new RecipeLogic(this);
-            _Tree = new ProgressionTree();
+                RegisterModule<RecipeLogic>();
         }
 
         /// <summary>
-        /// Set up all the necessary structures for later.
+        /// Run the randomiser and start randomising!
         /// </summary>
-        private void Setup(List<LogicEntity> notRandomised)
+        internal void Run()
         {
-            // Init the progression tree.
-            _Tree.SetupVanillaTree();
-            _altStartLogic?.Randomise(_Serializer);
-            if (_Config.bRandomiseDoorCodes)
-                _auroraLogic.RandomiseDoorCodes();
-            if (_Config.bRandomiseSupplyBoxes)
-                _auroraLogic.RandomiseSupplyBoxes();
+            _Serializer = null;
+            RegisterFileLoadTask(EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
+            EnableModules();
+            // Wait and periodically check whether all file loading has completed. Only continue once that is done.
+            StartCoroutine(WaitUntilFilesLoaded());
+        }
 
-            if (_databoxLogic != null)
-            {
-                // Just randomise those flat out for now, instead of including them in the core loop.
-                _databoxLogic.RandomiseDataboxes();
-                _databoxLogic.UpdateBlueprints(_Materials.GetAll());
-                _databoxLogic.LinkCyclopsHullModules(_Materials);
-            }
-
-            if (_fragmentLogic != null)
-            {
-                if (_Config.bRandomiseFragments)
-                {
-                    _Tree.SetupFragments();
-                    // Initialise the fragment cache and remove vanilla spawns.
-                    FragmentLogic.Init();
-                    // Queue up all fragments to be randomised.
-                    notRandomised.AddRange(_Materials.GetAllFragments());
-                }
-                
-                // Randomise the number of fragment scans required per blueprint.
-                if (_Config.bRandomiseNumFragments)
-                    _fragmentLogic.RandomiseNumFragments(_Materials.GetAllFragments());
-                
-                // Randomise duplicate scan rewards.
-                if (_Config.bRandomiseDuplicateScans)
-                    _fragmentLogic.CreateDuplicateScanYieldDict();
-            }
+        /// <summary>
+        /// Once all datafiles have completed loading, start up the logic.
+        /// Running this as a coroutine spaces the logic out over several frames, which prevents the game from
+        /// locking up / freezing.
+        /// </summary>
+        private IEnumerator Randomise()
+        {
+            _Serializer = new EntitySerializer(_Log);
+            List<LogicEntity> mainEntities = Setup();
+            RandomisePreLoop();
             
-            if (_recipeLogic != null)
+            // Force a new frame before the main loop.
+            yield return null;
+            yield return RandomiseMainEntities(mainEntities);
+            yield return null;
+            ApplyAllChanges();
+            
+            _Serializer.EnabledModules = _modules.Select(module => module.GetType()).ToList();
+            _Serializer.Serialize(_Config);
+            
+            _Log.InGameMessage("Finished randomising! Please restart your game for all changes to take effect.");
+        }
+
+        /// <summary>
+        /// Trigger setup events and prepare all data for starting the randomisation process.
+        /// </summary>
+        private List<LogicEntity> Setup()
+        {
+            _Log.Info("[Core] Setting up...");
+            SetupBeginning?.Invoke(this, EventArgs.Empty);
+            _manager.TriggerSetupEvents();
+            
+            // Set up the list of entities that need to be randomised in the main loop.
+            CollectEntitiesEventArgs args = new CollectEntitiesEventArgs();
+            EntityCollecting?.Invoke(this, args);
+            return args.ToBeRandomised;
+        }
+
+        /// <summary>
+        /// Call the generic randomisation method of each registered module.
+        /// </summary>
+        private void RandomisePreLoop()
+        {
+            _Log.Info("[Core] Randomising: Pre-loop content");
+            PreLoopRandomising?.Invoke(this, EventArgs.Empty);
+            foreach (ILogicModule module in _modules)
             {
-                _recipeLogic.UpdateReachableMaterials(0);
-                // Queue up all craftables to be randomised.
-                notRandomised.AddRange(_Materials.GetAllCraftables());
-                
-                // Update the progression tree with recipes.
-                _Tree.SetupRecipes(_Config.bVanillaUpgradeChains);
-                if (_Config.bVanillaUpgradeChains)
-                    _Tree.ApplyUpgradeChainToPrerequisites(_Materials.GetAll());
+                module.RandomiseOutOfLoop(_Serializer);
             }
         }
         
         /// <summary>
-        /// Start the randomisation process.
+        /// Start the main loop of the randomisation process.
         /// </summary>
         /// <returns>A serialisation instance containing all changes made.</returns>
         /// <exception cref="TimeoutException">Raised to prevent infinite loops if the core loop takes too long to find
         /// a valid solution.</exception>
-        internal EntitySerializer Randomise()
+        private IEnumerator RandomiseMainEntities(List<LogicEntity> notRandomised)
         {
-            _Log.Info("Randomising using logic-based system...");
-            
-            List<LogicEntity> notRandomised = new List<LogicEntity>();
-            Dictionary<TechType, bool> unlockedProgressionItems = new Dictionary<TechType, bool>();
-
-            // Set up basic structures.
-            Setup(notRandomised);
+            _Log.Info("[Core] Randomising: Entering main loop");
+            MainLoopRandomising?.Invoke(this, EventArgs.Empty);
 
             int circuitbreaker = 0;
-            int currentDepth = 0;
-            int numProgressionItems = -1; // This forces a depth calculation on the first loop.
             while (notRandomised.Count > 0)
             {
                 circuitbreaker++;
+                // Stop calculating and wait for the next frame every so often. Slower, but doesn't block the game.
+                if (circuitbreaker % 50 == 0)
+                    yield return null;
                 if (circuitbreaker > 3000)
                 {
-                    _Log.InGameMessage("Failed to randomise items: stuck in infinite loop!");
-                    _Log.Fatal("Encountered infinite loop, aborting!");
+                    _Log.InGameMessage("[Core] Failed to randomise items: stuck in infinite loop!");
+                    _Log.Fatal("[Core] Encountered infinite loop, aborting!");
                     throw new TimeoutException("Encountered infinite loop while randomising!");
                 }
-                
-                // Update depth and reachable materials.
-                currentDepth = UpdateReachableDepth(currentDepth, unlockedProgressionItems, numProgressionItems);
-                numProgressionItems = unlockedProgressionItems.Count;
 
-                LogicEntity nextEntity = ChooseNextEntity(notRandomised, currentDepth);
-
-                // Choose a logic appropriate to the entity.
-                bool? success = null;
-                if (nextEntity.IsFragment)
-                    success = _fragmentLogic.RandomiseFragment(nextEntity, unlockedProgressionItems, currentDepth);
-                else if (nextEntity.HasRecipe)
-                    success = _recipeLogic.RandomiseRecipe(nextEntity, unlockedProgressionItems, currentDepth);
-                
-                if (success == true)
+                LogicEntity nextEntity = ChooseNextEntity(notRandomised);
+                // Try to get a handler for this type of entity.
+                ILogicModule handler = _handlingModules.GetOrDefault(nextEntity.EntityType, null);
+                if (handler is null)
                 {
+                    _Log.Warn($"[Core] Unhandled entity in main loop: {nextEntity.EntityType} {nextEntity}");
                     notRandomised.Remove(nextEntity);
-                    nextEntity.InLogic = true;
+                    // Add the unhandled entity into logic as a stopgap solution, for cases where a prerequisite check
+                    // would fail because it expects unhandled entities to be in logic first.
+                    EntityHandler.AddToLogic(nextEntity);
+                    continue;
                 }
 
-                if (success is null)
-                    _Log.Warn("Unsupported entity in loop: " + nextEntity);
+                // Let the module handle randomisation and report back.
+                bool success = handler.RandomiseEntity(ref nextEntity);
+                if (success)
+                {
+                    notRandomised.Remove(nextEntity);
+                    EntityHandler.AddToLogic(nextEntity);
+                    EntityRandomised?.Invoke(this, new EntityEventArgs(nextEntity));
+                    _manager.TriggerProgressionEvents(nextEntity);
+                }
+            }
+            
+            _Log.Info($"[Core] Finished randomising within {circuitbreaker} cycles!");
+            MainLoopCompleted?.Invoke(this, EventArgs.Empty);
+        }
+        
+        /// <summary>
+        /// Add the prerequisites of the given entity to the priority queue.
+        /// </summary>
+        public void AddPrerequisitesAsPriority(LogicEntity entity)
+        {
+            List<TechType> newPriorities = new List<TechType>();
+            newPriorities.AddRange(entity.Prerequisites ?? Enumerable.Empty<TechType>());
+            newPriorities.AddRange(entity.Blueprint?.Fragments ?? Enumerable.Empty<TechType>());
+            newPriorities.AddRange(entity.Blueprint?.UnlockConditions ?? Enumerable.Empty<TechType>());
+            
+            // Insert any prerequisites at the front of the queue.
+            foreach (TechType techType in newPriorities)
+            {
+                LogicEntity prereq = EntityHandler.GetEntity(techType);
+                if (!HasRandomised(prereq))
+                    _priorityEntities.Insert(0, prereq);
+            }
+        }
+
+        /// <summary>
+        /// Add one or more entities to prioritise on the next main loop cycle.
+        /// </summary>
+        public void AddPriorityEntities(IEnumerable<LogicEntity> entities)
+        {
+            foreach (LogicEntity entity in entities ?? Enumerable.Empty<LogicEntity>())
+            {
+                if (!_priorityEntities.Contains(entity))
+                    _priorityEntities.Add(entity);
+            }
+        }
+
+        /// <summary>
+        /// Apply any changes the randomiser has decided on to the game. Also used for re-applying a saved state.
+        /// </summary>
+        /// <exception cref="InvalidDataException">Raised if the serializer is null.</exception>
+        internal void ApplyAllChanges()
+        {
+            if (_Serializer is null)
+                throw new InvalidDataException("Cannot apply randomisation changes: Serializer is null!");
+            
+            // Load changes stored in the serializer.
+            foreach (ILogicModule module in _modules)
+            {
+                module.ApplySerializedChanges(_Serializer);
             }
 
-            _Log.Info($"Finished randomising within {circuitbreaker} cycles!");
-            _SpoilerLog.WriteLog();
-
-            return _Serializer;
+            // Load any changes that rely on harmony patches.
+            EnableHarmony();
         }
 
         /// <summary>
@@ -168,218 +275,145 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         /// <returns>The next entity.</returns>
         [NotNull]
-        private LogicEntity ChooseNextEntity(List<LogicEntity> notRandomised, int depth)
+        private LogicEntity ChooseNextEntity(List<LogicEntity> notRandomised)
         {
-            // Make sure the list of absolutely essential items is done first, for each depth level. This guarantees
-            // certain recipes are done by a certain depth, e.g. waterparks by 500m.
-            // Automatically fails if recipes do not get randomised.
-            LogicEntity next = GetPriorityEntity(depth);
-            next ??= _Random.Choice(notRandomised);
+            // Make sure the list of absolutely essential entities is exhausted first.
+            LogicEntity next = null;
+            if (_priorityEntities.Count > 0)
+            {
+                next = _priorityEntities[0];
+                // Ensure that any priority entity's prerequisites are always done first.
+                while (!next.CheckPrerequisitesFulfilled(this))
+                {
+                    _Log.Debug($"[Core] Adding prerequisites for {next} to priority queue.");
+                    AddPrerequisitesAsPriority(next);
+                    next = _priorityEntities[0];
+                }
+                _priorityEntities.RemoveAt(0);
+            }
+            next ??= Random.Choice(notRandomised);
+
+            // Invoke the associated event.
+            EntityChosen?.Invoke(this, new EntityEventArgs(next));
 
             return next;
         }
 
         /// <summary>
-        /// This function calculates the maximum reachable depth based on what vehicles the player has attained, as well
-        /// as how much further they can go "on foot"
+        /// Enables all necessary harmony patches based on the randomisation state in the serialiser.
         /// </summary>
-        /// <param name="progressionItems">A list of all currently reachable items relevant for progression.</param>
-        /// <param name="depthTime">The minimum time that it must be possible to spend at the reachable depth before
-        /// resurfacing.</param>
-        /// <returns>The reachable depth.</returns>
-        internal int CalculateReachableDepth(Dictionary<TechType, bool> progressionItems, int depthTime = 15)
+        private void EnableHarmony()
         {
-            const double swimmingSpeed = 4.7;  // Always assume that the player is holding a tool.
-            const double seaglideSpeed = 11.0;
-            bool seaglide = progressionItems.ContainsKey(TechType.Seaglide);
-            double finSpeed = 0.0;
-            int vehicleDepth = 0;
-            Dictionary<TechType, double[]> tanks = new Dictionary<TechType, double[]>
+            Harmony harmony = new Harmony(Initialiser.GUID);
+            foreach (ILogicModule module in _modules)
             {
-                { TechType.Tank, new[] { 75, 0.4 } },  // Tank type, oxygen, weight factor.
-                { TechType.DoubleTank, new[] { 135, 0.47 } },
-                { TechType.HighCapacityTank, new[] { 225, 0.6 } },
-                { TechType.PlasteelTank, new[] { 135, 0.1 } }
-            };
-
-            _Log.Debug("===== Recalculating reachable depth =====");
-
-            // Get the deepest depth that can be reached by vehicle.
-            foreach (EProgressionNode node in EProgressionNodeExtensions.AllDepthNodes)
-            {
-                foreach (TechType[] path in _Tree?.GetProgressionPath(node)?.Pathways ?? Enumerable.Empty<TechType[]>())
-                {
-                    if (CheckDictForAllTechTypes(progressionItems, path))
-                        vehicleDepth = Math.Max(vehicleDepth, (int)node);
-                }
+                module.SetupHarmonyPatches(harmony);
             }
+            // Always apply bugfixes.
+            harmony.PatchAll(typeof(VanillaBugfixes));
+        }
 
-            if (progressionItems.ContainsKey(TechType.Fins))
-                finSpeed = 1.41;
-            if (progressionItems.ContainsKey(TechType.UltraGlideFins))
-                finSpeed = 1.88;
+        /// <summary>
+        /// Check whether the given LogicEntity has already been randomised.
+        /// </summary>
+        public bool HasRandomised(LogicEntity entity)
+        {
+            return EntityHandler.IsInLogic(entity);
+        }
 
-            // How deep can the player go without any tanks?
-            double soloDepthRaw = (45 - depthTime) * (seaglide ? seaglideSpeed : swimmingSpeed + finSpeed) / 2;
+        /// <summary>
+        /// Check whether the given TechType has already been randomised.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">If the TechType does not have an associated LogicEntity.</exception>
+        public bool HasRandomised(TechType techType)
+        {
+            return EntityHandler.IsInLogic(techType);
+        }
 
-            // How deep can they go with tanks?
-            foreach (var kv in tanks)
+        /// <summary>
+        /// Add one or more entities to prioritise on the next main loop cycle at a specific list index. Low values
+        /// are processed first.
+        /// </summary>
+        public void InsertPriorityEntities(int index, IEnumerable<LogicEntity> entities)
+        {
+            foreach (var entity in entities)
             {
-                if (progressionItems.ContainsKey(kv.Key))
-                {
-                    // Value[0] is the oxygen granted by the tank, Value[1] its weight factor.
-                    double depth = (kv.Value[0] - depthTime)
-                        * (seaglide ? seaglideSpeed : swimmingSpeed + finSpeed - kv.Value[1]) / 2;
-                    soloDepthRaw = Math.Max(soloDepthRaw, depth);
-                }
+                _priorityEntities.Insert(index, entity);
             }
+        }
 
-            // Given everything above, calculate the total.
-            int totalDepth = CalculateTotalDepth(progressionItems, vehicleDepth, (int)soloDepthRaw);
+        /// <summary>
+        /// Register a task responsible for loading critical data. Randomising will only begin once all of these tasks
+        /// have completed. Use this to ensure your module finishes loading data from disk before randomisation begins.
+        /// </summary>
+        /// <param name="task">The Task object from an async method for loading data files.</param>
+        public void RegisterFileLoadTask(Task task)
+        {
+            _fileTasks.Add(task);
+        }
+
+        /// <summary>
+        /// Register a logic module as a handler for a specific entity type. This will cause that handler's
+        /// RandomiseEntity() method to be called whenever an entity of that type needs to be randomised.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if a handler for the given type of entity already
+        /// exists. There can be only one per type.</exception>
+        public void RegisterEntityHandler(EntityType type, ILogicModule module)
+        {
+            if (_handlingModules.ContainsKey(type))
+                throw new ArgumentException($"A handler for entity type '{type}' already exists: "
+                                            + $"{_handlingModules[type].GetType()}");
             
-            _Log.Debug("===== New reachable depth: " + totalDepth + " =====");
-
-            return totalDepth;
+            _handlingModules.Add(type, module);
         }
 
         /// <summary>
-        /// Calculate the depth that can be comfortably reached on foot.
+        /// Register a component module for use with the randomiser.
         /// </summary>
-        /// <param name="vehicleDepth">The depth reachable by vehicle.</param>
-        /// <param name="soloDepthRaw">The raw depth reachable on foot given no depth restrictions.</param>
-        /// <returns>The depth that can be covered on foot in addition to the depth reachable by vehicle.</returns>
-        private int CalculateSoloDepth(int vehicleDepth, int soloDepthRaw)
+        /// <returns>The instantiated component.</returns>
+        public TLogicModule RegisterModule<TLogicModule>() where TLogicModule : MonoBehaviour, ILogicModule
         {
-            // Ensure that a number stays between a lower and upper bound. (e.g. 0 < x < 100)
-            double limit(double x, double upperBound) => Math.Max(0, Math.Min(x, upperBound));
-            // Calculate how much of the 0-100m and 100-200m range is already covered by vehicles.
-            double[] vehicleDepths = { limit(vehicleDepth, 100), limit(vehicleDepth - 100, 100) };
-            double[] soloDepths =
+            TLogicModule component = gameObject.EnsureComponent<TLogicModule>();
+            _modules.Add(component);
+            return component;
+        }
+
+        /// <summary>
+        /// Try to restore a game state from disk.
+        /// </summary>
+        internal bool TryRestoreSave()
+        {
+            if (string.IsNullOrEmpty(_Config.sBase64Seed))
             {
-                limit(soloDepthRaw, 100 - vehicleDepths[0]),
-                limit(soloDepthRaw + vehicleDepths[0] - 100, 100 - vehicleDepths[1]),
-                limit(soloDepthRaw + vehicleDepths[1] - 200, 10000)
-            };
+                _Log.Debug("[Core] base64 seed is empty.");
+                return false;
+            }
+
+            _Log.Debug("[Core] Trying to decode base64 string...");
+            EntitySerializer serializer = EntitySerializer.FromBase64String(_Config.sBase64Seed);
+
+            if (serializer?.SpawnDataDict is null || serializer.RecipeDict is null)
+            {
+                _Log.Error("[Core] base64 seed is invalid; could not deserialize.");
+                return false;
+            }
+            _Serializer = serializer;
+
+            // Re-enable all modules that were active when the save data was generated.
+            foreach (Type module in _Serializer.EnabledModules ?? Enumerable.Empty<Type>())
+            {
+                Component component = gameObject.EnsureComponent(module);
+                _modules.Add(component as ILogicModule);
+            }
             
-            // Below 100 meters, air is consumed three times as fast.
-            // Below 200 meters, it is consumed five times as fast.
-            return (int)(soloDepths[0] + (soloDepths[1] / 3) + (soloDepths[2] / 5));
+            _Log.Debug("[Core] Save data restored.");
+            return true;
         }
-
-        /// <summary>
-        /// Calculate the total depth that can be reached given the available equipment.
-        /// </summary>
-        /// <param name="progressionItems">The unlocked progression items.</param>
-        /// <param name="vehicleDepth">The depth reachable by vehicle.</param>
-        /// <param name="soloDepthRaw">The raw depth reachable on foot given no oxygen restrictions.</param>
-        /// <returns>The total depth coverable by extending vehicle depth with a solo journey.</returns>
-        private int CalculateTotalDepth(Dictionary<TechType, bool> progressionItems, int vehicleDepth, int soloDepthRaw)
+        
+        private IEnumerator WaitUntilFilesLoaded()
         {
-            // If there is a rebreather, all the funky calculations are redundant.
-            if (progressionItems.ContainsKey(TechType.Rebreather))
-                return vehicleDepth + Math.Min(soloDepthRaw, _Config.iMaxDepthWithoutVehicle);
-
-            return vehicleDepth + Math.Min(CalculateSoloDepth(vehicleDepth, soloDepthRaw), _Config.iMaxDepthWithoutVehicle);
-        }
-
-        /// <summary>
-        /// Update the depth that can be reached and trigger any changes that need to happen if a new significant
-        /// threshold has been passed.
-        /// </summary>
-        /// <param name="currentDepth">The previously reachable depth.</param>
-        /// <param name="progressionItems">The unlocked progression items.</param>
-        /// <param name="numItems">The number of progression items on the previous cycle.</param>
-        /// <returns>The new maximum depth.</returns>
-        private int UpdateReachableDepth(int currentDepth, Dictionary<TechType, bool> progressionItems, int numItems)
-        {
-            if (progressionItems.Count <= numItems)
-                return currentDepth;
-            
-            int newDepth = CalculateReachableDepth(progressionItems, _Config.iDepthSearchTime);
-            _SpoilerLog.UpdateLastProgressionEntry(newDepth);
-            currentDepth = Math.Max(currentDepth, newDepth);
-            _recipeLogic?.UpdateReachableMaterials(currentDepth);
-
-            return currentDepth;
-        }
-
-        /// <summary>
-        /// Get an essential or elective entity for the currently reachable depth, prioritising essential ones.
-        /// </summary>
-        /// <param name="depth">The maximum depth to consider.</param>
-        /// <returns>A LogicEntity, or null if all have been processed already.</returns>
-        [CanBeNull]
-        private LogicEntity GetPriorityEntity(int depth)
-        {
-            List<TechType> essentialItems = _Tree.GetEssentialItems(depth);
-            List<TechType[]> electiveItems = _Tree.GetElectiveItems(depth);
-            LogicEntity entity = null;
-
-            // Always get one of the essential items first, if available.
-            if (essentialItems.Count > 0)
-            {
-                TechType type = essentialItems.Find(x =>
-                    !_Serializer.RecipeDict.ContainsKey(x) && !_Serializer.SpawnDataDict.ContainsKey(x));
-                
-                if (!type.Equals(TechType.None))
-                {
-                    entity = _Materials.Find(type);
-                    _Log.Debug($"Prioritising essential entity {entity} for depth {depth}");
-                }
-            }
-
-            // Similarly, if all essential items are done, grab one from among the elective items and leave the rest
-            // up to chance.
-            if (entity is null && electiveItems.Count > 0)
-            {
-                TechType[] types = electiveItems.Find(arr => arr.All(x =>
-                    !_Serializer.RecipeDict.ContainsKey(x) && !_Serializer.SpawnDataDict.ContainsKey(x)));
-                
-                if (types?.Length > 0)
-                {
-                    TechType nextType = _Random.Choice(types);
-                    entity = _Materials.Find(nextType);
-                    _Log.Debug($"Prioritising elective entity {entity} for depth {depth}");
-                }
-            }
-
-            return entity;
-        }
-
-        /// <summary>
-        /// Check whether all TechTypes given in the array are present in the given dictionary.
-        /// </summary>
-        /// <param name="dict">The dictionary to check.</param>
-        /// <param name="types">The array of TechTypes.</param>
-        /// <returns>True if all TechTypes are present in the dictionary, false otherwise.</returns>
-        private static bool CheckDictForAllTechTypes(Dictionary<TechType, bool> dict, TechType[] types)
-        {
-            bool allItemsPresent = true;
-
-            foreach (TechType t in types)
-            {
-                allItemsPresent &= dict.ContainsKey(t);
-                if (!allItemsPresent)
-                    break;
-            }
-
-            return allItemsPresent;
-        }
-
-        /// <summary>
-        /// Check wether any of the given TechTypes have already been randomised.
-        /// </summary>
-        /// <param name="serializer">The master dictionary.</param>
-        /// <param name="types">The TechTypes.</param>
-        /// <returns>True if any TechType in the array has been randomised, false otherwise.</returns>
-        public bool ContainsAny(EntitySerializer serializer, TechType[] types)
-        {
-            foreach (TechType type in types)
-            {
-                if (serializer.RecipeDict.ContainsKey(type))
-                    return true;
-            }
-            return false;
+            yield return new WaitUntil(() => _fileTasks.TrueForAll(task => task.IsCompleted));
+            StartCoroutine(Utils.WrapCoroutine(Randomise(), Initialiser.FatalError));
         }
     }
 }

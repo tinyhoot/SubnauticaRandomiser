@@ -1,6 +1,7 @@
 ﻿using System;
 using SMLHelper.V2.Json;
 using SMLHelper.V2.Options.Attributes;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 
 namespace SubnauticaRandomiser
@@ -37,8 +38,7 @@ namespace SubnauticaRandomiser
             iSeed = random.Next();
             _log.InGameMessage("Changed seed to " + iSeed);
             _log.InGameMessage("Randomising...");
-            Initialiser.Randomise();
-            _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
+            Initialiser._Main.RandomiseFromConfig();
         }
 
         [Button("Apply config from disk", Order = 0,
@@ -51,8 +51,7 @@ namespace SubnauticaRandomiser
             _log.InGameMessage("Randomising...");
             // Ensure all manual changes to the config file are loaded.
             Load();
-            Initialiser.Randomise();
-            _log.InGameMessage("Finished randomising! Please restart the game for changes to take effect.");
+            Initialiser._Main.RandomiseFromConfig();
         }
 
         // Every public variable listed here will end up in the config file.

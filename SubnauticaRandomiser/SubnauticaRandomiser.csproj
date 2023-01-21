@@ -35,16 +35,29 @@ mkdir $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles
 cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles</PostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CommandHandler.cs" />
     <Compile Include="ConfigDefaults.cs" />
     <Compile Include="DataDumper.cs" />
-    <Compile Include="EnumHandler.cs" />
+    <Compile Include="Handlers\CommandHandler.cs" />
+    <Compile Include="Handlers\EntityHandler.cs" />
+    <Compile Include="Handlers\EnumHandler.cs" />
+    <Compile Include="Handlers\LogHandler.cs" />
+    <Compile Include="Handlers\RandomHandler.cs" />
     <Compile Include="Interfaces\ILogHandler.cs" />
+    <Compile Include="Interfaces\ILogicModule.cs" />
     <Compile Include="Interfaces\IRandomHandler.cs" />
     <Compile Include="Logic\AlternateStartLogic.cs" />
     <Compile Include="Logic\AuroraLogic.cs" />
+    <Compile Include="Logic\ProgressionManager.cs" />
     <Compile Include="Logic\Recipes\BaseTheme.cs" />
     <Compile Include="Logic\SpoilerLog.cs" />
+    <Compile Include="Objects\Enums\EntityType.cs" />
+    <Compile Include="Objects\Events\CollectEntitiesEventArgs.cs" />
+    <Compile Include="Objects\Events\EntityEventArgs.cs" />
+    <Compile Include="Objects\Events\EntityListEventArgs.cs" />
+    <Compile Include="Objects\Events\SetupPriorityEventArgs.cs" />
+    <Compile Include="Objects\Events\SetupProgressionEventArgs.cs" />
+    <Compile Include="Objects\Events\SetupVehiclesEventArgs.cs" />
+    <Compile Include="Objects\LogicEntityEqualityComparer.cs" />
     <Compile Include="Patches\AuroraPatcher.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
     <Compile Include="Patches\LanguagePatcher.cs" />
@@ -52,30 +65,24 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Patches\FragmentPatcher.cs" />
     <Compile Include="Initialiser.cs" />
     <Compile Include="Logic\DataboxLogic.cs" />
-    <Compile Include="Logic\Recipes\Materials.cs" />
     <Compile Include="Logic\Recipes\Mode.cs" />
     <Compile Include="Logic\Recipes\ModeBalanced.cs" />
     <Compile Include="Logic\Recipes\ModeRandom.cs" />
     <Compile Include="Logic\Recipes\RecipeLogic.cs" />
     <Compile Include="Patches\AlternateStart.cs" />
-    <Compile Include="RandomHandler.cs" />
     <Compile Include="RandomiserConfig.cs" />
     <Compile Include="CSVReader.cs" />
-    <Compile Include="LogHandler.cs" />
     <Compile Include="Objects\Blueprint.cs" />
-    <Compile Include="Objects\Enums\EBiomeType.cs" />
-    <Compile Include="Objects\Enums\EProgressionNode.cs" />
-    <Compile Include="Objects\Enums\ETechTypeCategory.cs" />
-    <Compile Include="Objects\Enums\EWreckage.cs" />
+    <Compile Include="Objects\Enums\BiomeRegion.cs" />
+    <Compile Include="Objects\Enums\TechTypeCategory.cs" />
+    <Compile Include="Objects\Enums\Wreckage.cs" />
     <Compile Include="Objects\Exceptions\ParsingException.cs" />
     <Compile Include="Objects\Exceptions\RandomisationException.cs" />
     <Compile Include="Objects\RandomiserIngredient.cs" />
     <Compile Include="Objects\Recipe.cs" />
     <Compile Include="Objects\Databox.cs" />
     <Compile Include="Objects\RandomiserVector.cs" />
-    <Compile Include="Objects\ProgressionPath.cs" />
     <Compile Include="Logic\CoreLogic.cs" />
-    <Compile Include="Logic\ProgressionTree.cs" />
     <Compile Include="Objects\LogicEntity.cs" />
     <Compile Include="Objects\SpawnData.cs" />
     <Compile Include="Logic\FragmentLogic.cs" />
@@ -83,6 +90,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Objects\Biome.cs" />
     <Compile Include="Objects\BiomeCollection.cs" />
     <Compile Include="Objects\RandomiserBiomeData.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="0Harmony">

@@ -70,7 +70,6 @@
         <Compile Include="UnitTests\EnumHandlerTest.cs" />
         <Compile Include="UnitTests\Logic\AlternateStartLogicTests.cs" />
         <Compile Include="UnitTests\Logic\DataboxLogicTests.cs" />
-        <Compile Include="UnitTests\Logic\ProgressionTreeTest.cs" />
         <Compile Include="UnitTests\Logic\Recipes\MaterialsTest.cs" />
         <Compile Include="UnitTests\Objects\BiomeCollectionTest.cs" />
         <Compile Include="UnitTests\RandomHandlerTest.cs" />

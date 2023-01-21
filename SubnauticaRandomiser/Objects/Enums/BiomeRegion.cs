@@ -1,6 +1,10 @@
 ﻿namespace SubnauticaRandomiser.Objects.Enums
 {
-    public enum EBiomeType
+    /// <summary>
+    /// Defines the rough regions in the game as any player might recognise them. Only loosely related to how the game
+    /// handles biomes.
+    /// </summary>
+    public enum BiomeRegion
     {
         None,
         ActiveLavaZone,
@@ -35,72 +39,72 @@
         UnderwaterIslands
     }
 
-    public static class BiomeTypeExtensions
+    public static class BiomeRegionExtensions
     {
         /// <summary>
         /// Returns a hardcoded, rough approximation of the depth at which the biome in general becomes broadly
         /// accessible, i.e. comfortably explorable.
         /// </summary>
         /// <returns>The accessible depth.</returns>
-        public static int GetAccessibleDepth(this EBiomeType biomeType)
+        public static int GetAccessibleDepth(this BiomeRegion biomeRegion)
         {
-            switch (biomeType)
+            switch (biomeRegion)
             {
-                case (EBiomeType.ActiveLavaZone):
+                case (BiomeRegion.ActiveLavaZone):
                     return 1400;
-                case (EBiomeType.BloodKelp):
+                case (BiomeRegion.BloodKelp):
                     return 250;
-                case (EBiomeType.BonesField):
+                case (BiomeRegion.BonesField):
                     return 650;
-                case (EBiomeType.Canyon):
+                case (BiomeRegion.Canyon):
                     return 600;
-                case (EBiomeType.CragField):
+                case (BiomeRegion.CragField):
                     return 200;
-                case (EBiomeType.CrashZone):
+                case (BiomeRegion.CrashZone):
                     return 50;
-                case (EBiomeType.DeepGrandReef):
+                case (BiomeRegion.DeepGrandReef):
                     return 500;
-                case (EBiomeType.Dunes):
+                case (BiomeRegion.Dunes):
                     return 200;
-                case (EBiomeType.FloatingIsland):
+                case (BiomeRegion.FloatingIsland):
                     return 0;
-                case (EBiomeType.GhostTree):
+                case (BiomeRegion.GhostTree):
                     return 900;
-                case (EBiomeType.GrandReef):
+                case (BiomeRegion.GrandReef):
                     return 300;
-                case (EBiomeType.GrassyPlateaus):
+                case (BiomeRegion.GrassyPlateaus):
                     return 100;
-                case (EBiomeType.InactiveLavaZone):
+                case (BiomeRegion.InactiveLavaZone):
                     return 1000;
-                case (EBiomeType.JellyshroomCaves):
+                case (BiomeRegion.JellyshroomCaves):
                     return 220;
-                case (EBiomeType.Kelp):
+                case (BiomeRegion.Kelp):
                     return 50;
-                case (EBiomeType.KooshZone):
+                case (BiomeRegion.KooshZone):
                     return 250;
-                case (EBiomeType.LostRiverCorridor):
+                case (BiomeRegion.LostRiverCorridor):
                     return 600;
-                case (EBiomeType.LostRiverJunction):
+                case (BiomeRegion.LostRiverJunction):
                     return 800;
-                case (EBiomeType.Mesas):
+                case (BiomeRegion.Mesas):
                     return 300;
-                case (EBiomeType.Mountains):
+                case (BiomeRegion.Mountains):
                     return 200;
-                case (EBiomeType.MushroomForest):
+                case (BiomeRegion.MushroomForest):
                     return 150;
-                case (EBiomeType.PrisonAquarium):
+                case (BiomeRegion.PrisonAquarium):
                     return 1700;
-                case (EBiomeType.SafeShallows):
+                case (BiomeRegion.SafeShallows):
                     return 0;
-                case (EBiomeType.SeaTreaderPath):
+                case (BiomeRegion.SeaTreaderPath):
                     return 200;
-                case (EBiomeType.SkeletonCave):
+                case (BiomeRegion.SkeletonCave):
                     return 650;
-                case (EBiomeType.SparseReef):
+                case (BiomeRegion.SparseReef):
                     return 100;
-                case (EBiomeType.TreeCove):
+                case (BiomeRegion.TreeCove):
                     return 900;
-                case (EBiomeType.UnderwaterIslands):
+                case (BiomeRegion.UnderwaterIslands):
                     return 150;
                 default:
                     return 0;

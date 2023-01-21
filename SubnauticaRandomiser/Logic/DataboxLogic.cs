@@ -1,28 +1,70 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
+using System.Threading.Tasks;
+using HarmonyLib;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Objects.Events;
+using SubnauticaRandomiser.Patches;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
-    internal class DataboxLogic
+    /// <summary>
+    /// Handles everything related to randomising databoxes.
+    /// </summary>
+    [RequireComponent(typeof(CoreLogic))]
+    internal class DataboxLogic : MonoBehaviour, ILogicModule
     {
+        private CoreLogic _coreLogic;
         private List<Databox> _databoxes;
-        private readonly CoreLogic _logic;
-        
-        private ILogHandler _log => _logic._Log;
-        private EntitySerializer _serializer => _logic._Serializer;
-        private IRandomHandler _random => _logic._Random;
+        private ILogHandler _log;
+        private IRandomHandler _random;
 
-        public DataboxLogic(CoreLogic logic, List<Databox> databoxes)
+        public void Awake()
         {
-            _databoxes = databoxes;
-            _logic = logic;
+            _coreLogic = GetComponent<CoreLogic>();
+            _log = _coreLogic._Log;
+            _random = _coreLogic.Random;
+            
+            // Register this module as a handler for databox entities.
+            _coreLogic.RegisterEntityHandler(EntityType.Databox, this);
+            // Register events.
+            _coreLogic.EntityCollecting += OnCollectDataboxes;
+
+            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
+        }
+
+        public void ApplySerializedChanges(EntitySerializer serializer) { }
+
+        public void RandomiseOutOfLoop(EntitySerializer serializer)
+        {
+            RandomiseDataboxes(serializer);
+            UpdateBlueprints(_coreLogic.EntityHandler.GetAll());
+            LinkCyclopsHullModules(_coreLogic.EntityHandler);
+        }
+
+        public bool RandomiseEntity(ref LogicEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetupHarmonyPatches(Harmony harmony)
+        {
+            harmony.PatchAll(typeof(DataboxPatcher));
+        }
+
+        /// <summary>
+        /// Add databox entities into the main loop.
+        /// </summary>
+        private void OnCollectDataboxes(object sender, CollectEntitiesEventArgs args)
+        {
+            // TODO: convert databoxes to proper logicEntities on parse.
+            // args.ToBeRandomised.AddRange();
         }
 
         /// <summary>
@@ -87,11 +129,11 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         /// <exception cref="ArgumentException">If the LogicEntity or databox for one of the hull modules cannot be
         /// found.</exception>
-        public void LinkCyclopsHullModules(Materials materials)
+        public void LinkCyclopsHullModules(EntityHandler entityHandler)
         {
-            LogicEntity mod1 = materials.Find(TechType.CyclopsHullModule1);
-            LogicEntity mod2 = materials.Find(TechType.CyclopsHullModule2);
-            LogicEntity mod3 = materials.Find(TechType.CyclopsHullModule3);
+            LogicEntity mod1 = entityHandler.GetEntity(TechType.CyclopsHullModule1);
+            LogicEntity mod2 = entityHandler.GetEntity(TechType.CyclopsHullModule2);
+            LogicEntity mod3 = entityHandler.GetEntity(TechType.CyclopsHullModule3);
 
             if (mod1 is null || mod2 is null || mod3 is null)
                 throw new ArgumentException("Tried to link Cyclops Hull Modules, but found null for entities.");
@@ -116,15 +158,19 @@ namespace SubnauticaRandomiser.Logic
 
             _log.Debug("Linked Cyclops Hull Modules.");
         }
+        
+        private async Task ParseDataFileAsync()
+        {
+            _databoxes = await CSVReader.ParseDataFileAsync(Initialiser._WreckageFile, CSVReader.ParseWreckageLine);
+        }
 
         /// <summary>
         /// Randomise (shuffle) the blueprints found inside databoxes.
         /// </summary>
         /// <returns>The list of newly randomised databoxes.</returns>
-        [NotNull]
-        public List<Databox> RandomiseDataboxes()
+        public List<Databox> RandomiseDataboxes(EntitySerializer serializer)
         {
-            _serializer.Databoxes = new Dictionary<RandomiserVector, TechType>();
+            serializer.Databoxes = new Dictionary<RandomiserVector, TechType>();
             List<Databox> randomDataboxes = new List<Databox>();
             List<Vector3> toBeRandomised = new List<Vector3>();
 
@@ -140,7 +186,7 @@ namespace SubnauticaRandomiser.Logic
 
                 randomDataboxes.Add(new Databox(originalBox.TechType, next, replacementBox.Wreck, 
                     replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
-                _serializer.Databoxes.Add(new RandomiserVector(next), originalBox.TechType);
+                serializer.Databoxes.Add(new RandomiserVector(next), originalBox.TechType);
                 _log.Debug($"[D] Databox {next.ToString()} with {replacementBox}"
                            + " now contains " + originalBox);
                 toBeRandomised.Remove(next);

@@ -1,7 +1,6 @@
 using UnityEngine;
-using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.Handlers
 {
     /// <summary>
     /// Listen to and execute custom console commands.
@@ -18,6 +17,7 @@ namespace SubnauticaRandomiser
             DevConsole.RegisterConsoleCommand(this, "dumpKnownTech");
             DevConsole.RegisterConsoleCommand(this, "dumpEncyclopedia");
             DevConsole.RegisterConsoleCommand(this, "dumpPrefabs");
+            DevConsole.RegisterConsoleCommand(this, "rando");
 #endif
         }
 
@@ -48,6 +48,14 @@ namespace SubnauticaRandomiser
         {
             Initialiser._Log.InGameMessage("Dumping prefabs");
             DataDumper.LogPrefabs();
+        }
+
+        private void OnConsoleCommand_rando(NotificationCenter.Notification n)
+        {
+            DevConsole.SendConsoleCommand("oxygen");
+            DevConsole.SendConsoleCommand("nodamage");
+            DevConsole.SendConsoleCommand("item seaglide");
+            DevConsole.SendConsoleCommand("item scanner");
         }
     }
 }
