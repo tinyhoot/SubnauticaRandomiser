@@ -7,7 +7,7 @@ using SubnauticaRandomiser.Interfaces;
 namespace SubnauticaRandomiser.Objects
 {
     /// <summary>
-    /// Represents a loot drop table with odds for each possible drop.
+    /// Represents a loot drop table with odds for each possible drop. Each item can only appear in the table once.<br/>
     /// Odds do not necessarily have to sum up to 1.0, but are still relational to one another.
     /// </summary>
     [Serializable]
@@ -33,17 +33,24 @@ namespace SubnauticaRandomiser.Objects
         }
 
         /// <summary>
-        /// Adds an entry to the loot table.
+        /// Adds an entry to the loot table. Has no effect if an entry with the same item already exists.
         /// </summary>
         /// <param name="item">The item to add.</param>
         /// <param name="odds">The odds with which to drop the item.</param>
         public void Add(T item, double odds)
         {
+            if (Contains(item))
+                return;
             _entries.Add(new LootTableEntry<T>(item, odds));
         }
 
+        /// <summary>
+        /// Adds an entry to the loot table. Has no effect if an entry with the same item already exists.
+        /// </summary>
         public void Add(LootTableEntry<T> item)
         {
+            if (Contains(item))
+                return;
             _entries.Add(item);
         }
 
@@ -77,9 +84,10 @@ namespace SubnauticaRandomiser.Objects
             if (_entries.Count == 0)
                 throw new IndexOutOfRangeException("Cannot drop from a table with no entries!");
             
-            double total = TotalOdds();
+            double total = TotalWeights();
             double chosenWeight = total * random.NextDouble();
             double currentWeight = 0;
+            // Add up the weights of the entries until the random value is exceeded, and then choose the last one.
             foreach (var entry in _entries)
             {
                 currentWeight += entry.DropRate;
@@ -108,7 +116,7 @@ namespace SubnauticaRandomiser.Objects
         /// <summary>
         /// Calculates the total of all drop rates summed together.
         /// </summary>
-        public double TotalOdds()
+        public double TotalWeights()
         {
             double total = 0;
             foreach (var entry in _entries)
@@ -128,6 +136,8 @@ namespace SubnauticaRandomiser.Objects
 
         public LootTableEntry(T item, double odds)
         {
+            if (odds < 0)
+                throw new ArgumentOutOfRangeException(nameof(odds), "DropRate cannot be negative!");
             Item = item;
             DropRate = odds;
         }

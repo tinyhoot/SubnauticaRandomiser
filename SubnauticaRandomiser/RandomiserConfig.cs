@@ -160,6 +160,7 @@ namespace SubnauticaRandomiser
         public int iMinFragmentsToUnlock = (int)ConfigDefaults.GetDefault("iMinFragmentsToUnlock");
         public double dPrimaryIngredientValue = (double)ConfigDefaults.GetDefault("dPrimaryIngredientValue");
         public double dRecipeValueVariance = (double)ConfigDefaults.GetDefault("dRecipeValueVariance");
+        public double dRareDropChance = (double)ConfigDefaults.GetDefault("dRareDropChance");
         public float fFragmentSpawnChanceMin = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMin");
         public float fFragmentSpawnChanceMax = (float)ConfigDefaults.GetDefault("fFragmentSpawnChanceMax");
         public bool debug_forceRandomise = false;

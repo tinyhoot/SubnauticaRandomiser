@@ -364,7 +364,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void CreateDuplicateScanYieldDict()
         {
-            _serializer.FragmentMaterialYield = new Dictionary<TechType, float>();
+            LootTable<TechType> loot = new LootTable<TechType>();
             var materials = _coreLogic.EntityHandler.GetAllRawMaterials(50);
             // Gaining seeds from fragments is not great for balance. Remove that.
             materials.Remove(_coreLogic.EntityHandler.GetEntity(TechType.CreepvineSeedCluster));
@@ -373,8 +373,17 @@ namespace SubnauticaRandomiser.Logic
             {
                 // Two random calls will tend to produce less extreme and more evenly distributed values.
                 double weight = _random.NextDouble() + _random.NextDouble();
-                _serializer.AddDuplicateFragmentMaterial(entity.TechType, (float)weight);
+                loot.Add(entity.TechType, weight);
             }
+            
+            // Additionally, add some spicy rare rewards.
+            double rareWeight = Math.Max(loot.TotalWeights() * _config.dRareDropChance, 0.01);
+            loot.Add(TechType.SeamothTorpedoModule, rareWeight);
+            loot.Add(TechType.VehicleStorageModule, rareWeight);
+            loot.Add(TechType.ExosuitJetUpgradeModule, rareWeight);
+            loot.Add(TechType.PrecursorIonCrystal, rareWeight * 2);
+
+            _serializer.FragmentMaterialYield = loot;
         }
         
         /// <summary>

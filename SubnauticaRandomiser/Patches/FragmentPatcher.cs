@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 
 namespace SubnauticaRandomiser.Patches
@@ -84,7 +84,7 @@ namespace SubnauticaRandomiser.Patches
                 return;
             }
 
-            Random rand = new Random();
+            RandomHandler rand = new RandomHandler();
             TechType type = GetRandomMaterial(rand);
             int number = rand.Next(1, Initialiser._Config?.iMaxDuplicateScanYield + 1 ?? 4);
             Initialiser._Log.Debug($"[F] Replacing duplicate fragment scan yield of target {target} with {type}");
@@ -96,25 +96,12 @@ namespace SubnauticaRandomiser.Patches
         /// </summary>
         /// <param name="rand">An instance of Random.</param>
         /// <returns>The TechType of the chosen material, or Titanium if an error occurred.</returns>
-        private static TechType GetRandomMaterial(Random rand)
+        private static TechType GetRandomMaterial(RandomHandler rand)
         {
             if (!(CoreLogic._Serializer?.FragmentMaterialYield?.Count > 0))
                 return TechType.Titanium;
 
-            double sumOfWeights = CoreLogic._Serializer.FragmentMaterialYield.Sum(x => x.Value);
-            double choice = sumOfWeights * rand.NextDouble();
-
-            // Add up the weights of the material options until the value of 'choice' is exceeded, and choose that one.
-            double sum = 0.0;
-            foreach (var kv in CoreLogic._Serializer.FragmentMaterialYield)
-            {
-                sum += kv.Value;
-                if (sum >= choice)
-                    return kv.Key;
-            }
-
-            Initialiser._Log.Error("[F] Failed to choose random material for duplicate fragment scan.");
-            return TechType.Titanium;
+            return CoreLogic._Serializer.FragmentMaterialYield.Drop(rand);
         }
     }
 }
