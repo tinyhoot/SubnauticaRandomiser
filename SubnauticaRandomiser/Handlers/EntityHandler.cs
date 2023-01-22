@@ -19,8 +19,6 @@ namespace SubnauticaRandomiser.Handlers
         private List<LogicEntity> _allEntities;
         private readonly HashSet<LogicEntity> _inLogic;
         private readonly ILogHandler _log;
-        
-        public List<LogicEntity> GetAll() => _allEntities.ShallowCopy();
 
         public EntityHandler(ILogHandler logger)
         {
@@ -241,6 +239,14 @@ namespace SubnauticaRandomiser.Handlers
                                                                   && !x.HasPrerequisites);
 
             return rawMaterials;
+        }
+
+        /// <summary>
+        /// Get all entities belonging to the given category.
+        /// </summary>
+        public List<LogicEntity> GetByCategory(TechTypeCategory category)
+        {
+            return _allEntities.FindAll(entity => entity.Category.Equals(category));
         }
 
         /// <summary>

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
@@ -34,19 +33,19 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>A random LogicEntity from the Raw Materials or (if enabled) Fish categories.</returns>
         public LogicEntity ChooseBaseTheme(int depth, bool useFish = false)
         {
-            var options = _entityHandler.GetAll().FindAll(x => x.Category.Equals(TechTypeCategory.RawMaterials)
-                                                               && x.AccessibleDepth < depth
-                                                               && !x.HasPrerequisites
-                                                               && x.MaxUsesPerGame == 0
-                                                               && x.GetItemSize() == 1);
+            var options = _entityHandler.GetAllEntities().FindAll(x => x.Category.Equals(TechTypeCategory.RawMaterials)
+                                                                       && x.AccessibleDepth < depth
+                                                                       && !x.HasPrerequisites
+                                                                       && x.MaxUsesPerGame == 0
+                                                                       && x.GetItemSize() == 1);
 
             if (useFish)
             {
-                options.AddRange(_entityHandler.GetAll().FindAll(x => x.Category.Equals(TechTypeCategory.Fish)
-                                                                      && x.AccessibleDepth < depth
-                                                                      && !x.HasPrerequisites
-                                                                      && x.MaxUsesPerGame == 0
-                                                                      && x.GetItemSize() == 1));
+                options.AddRange(_entityHandler.GetAllEntities().FindAll(x => x.Category.Equals(TechTypeCategory.Fish)
+                                                                              && x.AccessibleDepth < depth
+                                                                              && !x.HasPrerequisites
+                                                                              && x.MaxUsesPerGame == 0
+                                                                              && x.GetItemSize() == 1));
             }
 
             _baseTheme = _random.Choice(options);

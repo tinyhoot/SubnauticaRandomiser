@@ -9,6 +9,7 @@ namespace SubnauticaRandomiser.Objects.Enums
     {
         None,
         Eggs,
+        EggsHatched,
         Fish,
         Seeds,
         RawMaterials,
@@ -49,6 +50,7 @@ namespace SubnauticaRandomiser.Objects.Enums
         {
             TechTypeCategory.None,
             TechTypeCategory.Eggs,
+            TechTypeCategory.EggsHatched,
             TechTypeCategory.Fish,
             TechTypeCategory.Seeds,
             TechTypeCategory.RawMaterials,

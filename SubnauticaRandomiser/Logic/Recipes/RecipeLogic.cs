@@ -117,8 +117,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             args.ToBeRandomised.AddRange(_entityHandler.GetAllCraftables());
             if (_config.bUseEggs)
-                args.ToBeRandomised.AddRange(_entityHandler.GetAll()
-                    .FindAll(e => e.Category.Equals(TechTypeCategory.Eggs)));
+                args.ToBeRandomised.AddRange(_entityHandler.GetByCategory(TechTypeCategory.Eggs));
         }
 
         /// <summary>
@@ -177,8 +176,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             {
                 UpgradeChains = new Dictionary<TechType, TechType>();
             }
-            if (!_config.bDiscoverEggs)
-                AddEggWaterParkPrerequisite();
+            AddEggWaterParkPrerequisite();
             
             // Add basic raw materials into the logic.
             UpdateValidIngredients(0);
@@ -245,7 +243,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// </summary>
         private void AddEggWaterParkPrerequisite()
         {
-            _entityHandler.AddCategoryPrerequisite(TechTypeCategory.Eggs, TechType.BaseWaterPark);
+            CoreLogic._Serializer.DiscoverEggs = _config.bDiscoverEggs;
+            if (!_config.bDiscoverEggs)
+                _entityHandler.AddCategoryPrerequisite(TechTypeCategory.Eggs, TechType.BaseWaterPark);
+            // Always add this requirement to fish hatched in containment.
+            _entityHandler.AddCategoryPrerequisite(TechTypeCategory.EggsHatched, TechType.BaseWaterPark);
         }
 
         /// <summary>
@@ -321,8 +323,6 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             if (_config.bUseFish)
                 _entityHandler.AddToLogic(TechTypeCategory.Fish, depth);
-            //if (_config.bUseEggs && _coreLogic.HasRandomised(TechType.BaseWaterPark))
-            //    _entityHandler.AddToLogic(TechTypeCategory.Eggs, depth);
             if (_config.bUseSeeds && IsAnyKnifeRandomised())
                 _entityHandler.AddToLogic(TechTypeCategory.Seeds, depth);
         }
