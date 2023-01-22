@@ -282,7 +282,7 @@ SeaTreaderPath_TechSite,15,10,0,0.7
 SeaTreaderPath_TechSite_Barrier,8,3,0,1.5
 SeaTreaderPath_TechSite_Scatter,34,34,0,0.26
 ShipInterior_AuxPowerRoom2,2,2,0,
-ShipInterior_Cargo,6,6,0,
+ShipInterior_Cargo,6,6,0,0.85
 ShipInterior_Cargo_Crate,1,0,0,
 ShipInterior_Corridor,12,12,0,
 ShipInterior_ExoRoom,4,4,0,

@@ -232,6 +232,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             args.ProgressionEntities.Add(TechType.BaseWaterPark);
             args.ProgressionEntities.Add(TechType.HeatBlade);
             args.ProgressionEntities.Add(TechType.Knife);
+            args.ProgressionEntities.Add(TechType.RadiationSuit);
         }
 
         /// <summary>

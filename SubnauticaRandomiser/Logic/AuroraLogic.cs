@@ -70,7 +70,12 @@ namespace SubnauticaRandomiser.Logic
             Dictionary<string, string> keyCodes = new Dictionary<string, string>();
             foreach (string classId in KeypadPrefabClassIds.Keys)
             {
-                string code = _random.Next(0, 9999).ToString().PadLeft(4, '0');
+                string code = "0";
+                // Keypads only have numbers 1-9, zeroes cannot be entered at all.
+                while (code.Contains("0"))
+                {
+                    code = _random.Next(1111, 9999).ToString().PadLeft(4, '3');
+                }
                 _log.Debug($"[AR] Assigning accessCode {code} to {classId}");
                 keyCodes.Add(classId, code);
             }
@@ -79,28 +84,29 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Prepare a new list of possible contents for supply boxes.
-        /// TODO: Do not use a hardcoded list, instead dynamically choose things from available recipes at X depth.
+        /// Prepare a new table of possible contents for supply boxes.
         /// </summary>
         public void RandomiseSupplyBoxes()
         {
-            List<TechType> options = new List<TechType>
+            LootTable<TechType> table = new LootTable<TechType>
             {
-                TechType.Battery,
-                TechType.PowerCell,
-                TechType.Bleach,
-                TechType.Glass,
-                TechType.Lubricant,
-                TechType.TitaniumIngot,
-                TechType.FireExtinguisher,
-                TechType.FirstAidKit,
-                TechType.Pipe,
-                TechType.PipeSurfaceFloater,
-                TechType.NutrientBlock,
-                TechType.DisinfectedWater,
-                TechType.FilteredWater
+                { TechType.Battery, 2 },
+                { TechType.PowerCell, 1 },
+                { TechType.Bleach, 3 },
+                { TechType.Glass, 3 },
+                { TechType.Lubricant, 3 },
+                { TechType.TitaniumIngot, 1 },
+                { TechType.FireExtinguisher, 1 },
+                { TechType.FirstAidKit, 2 },
+                { TechType.Pipe, 3 },
+                { TechType.NutrientBlock, 3 },
+                { TechType.DisinfectedWater, 3 },
+                { TechType.FilteredWater, 2 },
+                { TechType.SeamothSonarModule, 0.1 },
+                { TechType.VehicleStorageModule, 0.1 },
+                { TechType.CyclopsThermalReactorModule, 0.1 },
             };
-            _serializer.SupplyBoxContents = options;
+            _serializer.SupplyBoxContents = table;
         }
     }
 }

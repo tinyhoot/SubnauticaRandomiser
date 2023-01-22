@@ -59,4 +59,8 @@ Other:
   poop and shale into something useful on the fly, or make shale always contain
   something useful in the first place.
 
-- ensure easy radiation suit
+Aurora Notes:
+- Fragments do spawn in LivingArea and CargoRoom, but not very often. Require very
+  high rates to do anything.
+- Upgrade spawns are set in the editor and hard to get a hold of without modifying
+  every dropped upgrade in the game.

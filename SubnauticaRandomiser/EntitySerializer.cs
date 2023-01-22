@@ -34,7 +34,7 @@ namespace SubnauticaRandomiser
         // The prefab classIds and access codes for doors in the Aurora.
         public Dictionary<string, string> DoorKeyCodes;
         // The options to choose from for spawning materials when scanning a fragment which is already unlocked.
-        public Dictionary<TechType, float> FragmentMaterialYield;
+        public LootTable<TechType> FragmentMaterialYield;
         // The number of scans required to unlock the fragment item.
         public Dictionary<TechType, int> NumFragmentsToUnlock;
         // All modified recipes.
@@ -42,7 +42,7 @@ namespace SubnauticaRandomiser
         // All modified fragment spawn rates.
         public Dictionary<TechType, List<SpawnData>> SpawnDataDict;
         // All possible supply box contents.
-        public List<TechType> SupplyBoxContents;
+        public LootTable<TechType> SupplyBoxContents;
 
         public const int SaveVersion = Initialiser._ExpectedSaveVersion;
         [NonSerialized]
@@ -60,22 +60,6 @@ namespace SubnauticaRandomiser
         private void OnDeserialized()
         {
             _log = Initialiser._Log;
-        }
-
-        /// <summary>
-        /// Try to add an entry to the duplicate fragment scan material dictionary.
-        /// </summary>
-        /// <param name="type">The TechType to spawn.</param>
-        /// <param name="weight">The weighting for the spawn rate.</param>
-        /// <returns>True if successful, false if the key already exists in the dictionary.</returns>
-        public bool AddDuplicateFragmentMaterial(TechType type, float weight)
-        {
-            FragmentMaterialYield ??= new Dictionary<TechType, float>();
-            if (FragmentMaterialYield.ContainsKey(type))
-                return false;
-            
-            FragmentMaterialYield.Add(type, weight);
-            return true;
         }
 
         /// <summary>

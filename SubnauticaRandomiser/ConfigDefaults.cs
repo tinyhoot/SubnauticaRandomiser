@@ -45,6 +45,7 @@ namespace SubnauticaRandomiser
             { "iMinFragmentsToUnlock", new[] { 2, 1, 30 } },
             { "dPrimaryIngredientValue", new[] { 0.45, 0.0, 1.0 } },
             { "dRecipeValueVariance", new[] { 0.2, 0.0, 1.0 } },
+            { "dRareDropChance", new[] { 0.05, 0.0, 1.0 } },
             { "fFragmentSpawnChanceMin", new[] { 0.3f, 0.01f, 10.0f } },
             { "fFragmentSpawnChanceMax", new[] { 0.6f, 0.01f, 10.0f } },
         };
