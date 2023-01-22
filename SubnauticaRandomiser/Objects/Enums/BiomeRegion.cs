@@ -61,7 +61,7 @@
                 case (BiomeRegion.CragField):
                     return 200;
                 case (BiomeRegion.CrashZone):
-                    return 50;
+                    return 150;
                 case (BiomeRegion.DeepGrandReef):
                     return 500;
                 case (BiomeRegion.Dunes):
