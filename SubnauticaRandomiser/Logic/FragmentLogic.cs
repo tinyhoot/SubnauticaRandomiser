@@ -204,6 +204,8 @@ namespace SubnauticaRandomiser.Logic
             TechType techType = args.LogicEntity.TechType;
             if (techType.Equals(TechType.LaserCutter) || techType.Equals(TechType.LaserCutterFragment))
                 AddLaserCutterBiomes();
+            if (techType.Equals(TechType.RadiationSuit))
+                AddAuroraBiomes();
         }
 
         /// <summary>
@@ -229,6 +231,7 @@ namespace SubnauticaRandomiser.Logic
             {
                 TechType.LaserCutter,
                 TechType.PropulsionCannon,
+                TechType.RadiationSuit,
                 TechType.RepulsionCannon,
                 TechType.Welder
             };
@@ -274,6 +277,15 @@ namespace SubnauticaRandomiser.Logic
                     TechType.CyclopsHullFragment
                 }, 1700);
             }
+        }
+
+        /// <summary>
+        /// Add all biomes inside the Aurora to the list of available biomes.
+        /// </summary>
+        private void AddAuroraBiomes()
+        {
+            var additions = _allBiomes.FindAll(biome => biome.Name.Contains("Ship"));
+            _availableBiomes.AddRange(additions);
         }
 
         /// <summary>
@@ -384,7 +396,8 @@ namespace SubnauticaRandomiser.Logic
             List<Biome> biomes = await CSVReader.ParseDataFileAsync(Initialiser._BiomeFile, CSVReader.ParseBiomeLine);
             // Set up the lists of biomes.
             _allBiomes = biomes.Where(b => b.FragmentRate != null).ToList();
-            _availableBiomes = _allBiomes.Where(b => !b.Name.ToLower().Contains("barrier")).ToList();
+            _availableBiomes = _allBiomes.FindAll(b => !b.Name.ToLower().Contains("barrier")
+                                                       && !b.Name.Contains("Ship"));
         }
         
         /// <summary>
