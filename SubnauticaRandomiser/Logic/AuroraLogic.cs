@@ -84,27 +84,29 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Prepare a new list of possible contents for supply boxes.
-        /// TODO: Do not use a hardcoded list, instead dynamically choose things from available recipes at X depth.
+        /// Prepare a new table of possible contents for supply boxes.
         /// </summary>
         public void RandomiseSupplyBoxes()
         {
-            List<TechType> options = new List<TechType>
+            LootTable<TechType> table = new LootTable<TechType>
             {
-                TechType.Battery,
-                TechType.PowerCell,
-                TechType.Bleach,
-                TechType.Glass,
-                TechType.Lubricant,
-                TechType.TitaniumIngot,
-                TechType.FireExtinguisher,
-                TechType.FirstAidKit,
-                TechType.Pipe,
-                TechType.NutrientBlock,
-                TechType.DisinfectedWater,
-                TechType.FilteredWater
+                { TechType.Battery, 2 },
+                { TechType.PowerCell, 1 },
+                { TechType.Bleach, 3 },
+                { TechType.Glass, 3 },
+                { TechType.Lubricant, 3 },
+                { TechType.TitaniumIngot, 1 },
+                { TechType.FireExtinguisher, 1 },
+                { TechType.FirstAidKit, 2 },
+                { TechType.Pipe, 3 },
+                { TechType.NutrientBlock, 3 },
+                { TechType.DisinfectedWater, 3 },
+                { TechType.FilteredWater, 2 },
+                { TechType.SeamothSonarModule, 0.1 },
+                { TechType.VehicleStorageModule, 0.1 },
+                { TechType.CyclopsThermalReactorModule, 0.1 },
             };
-            _serializer.SupplyBoxContents = options;
+            _serializer.SupplyBoxContents = table;
         }
     }
 }

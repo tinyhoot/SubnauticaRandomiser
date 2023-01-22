@@ -1,4 +1,3 @@
-using System;
 using HarmonyLib;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
@@ -40,7 +39,7 @@ namespace SubnauticaRandomiser.Patches
                 return;
 
             RandomHandler rand = new RandomHandler();
-            TechType content = rand.Choice(CoreLogic._Serializer.SupplyBoxContents);
+            TechType content = CoreLogic._Serializer.SupplyBoxContents.Drop(rand);
             // It is not enough to change a techtype, the box must load and spawn the correct prefab for its contents.
             PrefabPlaceholdersGroup group = __instance.gameObject.EnsureComponent<PrefabPlaceholdersGroup>();
             group.prefabPlaceholders[0].prefabClassId = CraftData.GetClassIdForTechType(content);
