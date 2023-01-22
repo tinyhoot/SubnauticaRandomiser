@@ -65,13 +65,23 @@ namespace SubnauticaRandomiser.Objects
         {
             return Category.IsIngredient();
         }
-        
-         /// <summary>
-        /// Check if this recipe fulfills all conditions to have its blueprint be unlocked.
+
+        /// <summary>
+        /// Check whether this entity is ready for being randomised and entered into the logic.
         /// </summary>
         /// <param name="logic">An instance of the core logic.</param>
         /// <param name="depth">The maximum depth to consider.</param>
-        /// <returns>True if the recipe has no blueprint or fulfills all conditions, false otherwise.</returns>
+        public bool CheckReady(CoreLogic logic, int depth)
+        {
+            return CheckPrerequisitesFulfilled(logic) && CheckBlueprintFulfilled(logic, depth);
+        }
+        
+         /// <summary>
+        /// Check if this entity fulfills all conditions to have its blueprint be unlocked.
+        /// </summary>
+        /// <param name="logic">An instance of the core logic.</param>
+        /// <param name="depth">The maximum depth to consider.</param>
+        /// <returns>True if the entity has no blueprint or fulfills all conditions, false otherwise.</returns>
         public bool CheckBlueprintFulfilled(CoreLogic logic, int depth)
         {
             if (Blueprint is null || (Blueprint.UnlockConditions is null && Blueprint.UnlockDepth == 0))
@@ -117,7 +127,7 @@ namespace SubnauticaRandomiser.Objects
         }
          
          /// <summary>
-         /// Check whether all prerequisites for this recipe have already been randomised.
+         /// Check whether all prerequisites for this entity have already been randomised.
          /// </summary>
          /// <param name="logic">The core logic.</param>
          /// <returns>True if all conditions are fulfilled, false otherwise.</returns>

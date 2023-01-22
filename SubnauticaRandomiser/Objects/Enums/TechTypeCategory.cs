@@ -88,11 +88,35 @@ namespace SubnauticaRandomiser.Objects.Enums
         }
 
         /// <summary>
+        /// Check whether this category is a spawnable databox.
+        /// </summary>
+        public static bool IsDatabox(this TechTypeCategory category)
+        {
+            return category.Equals(TechTypeCategory.Databoxes);
+        }
+
+        /// <summary>
+        /// Check whether this category is a spawnable fragment..
+        /// </summary>
+        public static bool IsFragment(this TechTypeCategory category)
+        {
+            return category.Equals(TechTypeCategory.Fragments);
+        }
+
+        /// <summary>
         /// Check whether this category can function as an ingredient in recipes.
         /// </summary>
         public static bool IsIngredient(this TechTypeCategory category)
         {
             return !_notIngredients.Contains(category);
+        }
+
+        /// <summary>
+        /// Check whether this category can be used as an ingredient in recipes, but not itself have a recipe.
+        /// </summary>
+        public static bool IsRawMaterial(this TechTypeCategory category)
+        {
+            return category.IsIngredient() && !category.IsCraftable();
         }
     }
 }

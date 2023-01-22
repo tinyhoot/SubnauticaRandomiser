@@ -198,10 +198,15 @@ namespace SubnauticaRandomiser.Logic
                 if (handler is null)
                 {
                     _Log.Warn($"[Core] Unhandled entity in main loop: {nextEntity.EntityType} {nextEntity}");
-                    notRandomised.Remove(nextEntity);
                     // Add the unhandled entity into logic as a stopgap solution, for cases where a prerequisite check
                     // would fail because it expects unhandled entities to be in logic first.
-                    EntityHandler.AddToLogic(nextEntity);
+                    if (nextEntity.CheckReady(this, _manager.ReachableDepth))
+                    {
+                        foreach (var x in nextEntity.Prerequisites)
+                            _Log.Debug($"Prereqs: {x}");
+                        notRandomised.Remove(nextEntity);
+                        EntityHandler.AddToLogic(nextEntity);
+                    }
                     continue;
                 }
 

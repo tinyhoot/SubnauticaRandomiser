@@ -151,7 +151,7 @@ namespace SubnauticaRandomiser
         /// <exception cref="ArgumentException">If a required column is missing or invalid.</exception>
         public static LogicEntity ParseRecipeLine(string[] cells)
         {
-            EntityType entityType;
+            EntityType entityType = EntityType.None;
             TechType techType;
             TechTypeCategory category;
             int depth = 0;
@@ -187,7 +187,12 @@ namespace SubnauticaRandomiser
             if (string.IsNullOrEmpty(cellsCategory))
                 throw new ArgumentException("Category is null or empty, but is a required field.");
             category = EnumHandler.Parse<TechTypeCategory>(cellsCategory);
-            entityType = category.Equals(TechTypeCategory.Fragments) ? EntityType.Fragment : EntityType.Recipe;
+            if (category.IsFragment())
+                entityType = EntityType.Fragment;
+            if (category.IsCraftable())
+                entityType = EntityType.Craftable;
+            if (category.IsRawMaterial())
+                entityType = EntityType.RawMaterial;
 
             // Column 3: Depth Difficulty
             if (!string.IsNullOrEmpty(cellsDepth))

@@ -109,6 +109,9 @@ namespace SubnauticaRandomiser
         [Toggle("Use eggs as ingredients?")]
         public bool bUseEggs = (bool)ConfigDefaults.GetDefault("bUseEggs");
 
+        [Toggle("Auto-discover all eggs?", Tooltip = "This skips having to build an ACU before using eggs.")]
+        public bool bDiscoverEggs = (bool)ConfigDefaults.GetDefault("bDiscoverEggs");
+
         [Toggle("Use seeds as ingredients?")]
         public bool bUseSeeds = (bool)ConfigDefaults.GetDefault("bUseSeeds");
 

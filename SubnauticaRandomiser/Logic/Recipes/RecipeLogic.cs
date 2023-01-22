@@ -62,7 +62,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _manager.SetupPriority += OnSetupPriorityEntities;
             _manager.SetupProgression += OnSetupProgressionEntitites;
             // Register this module as handler for recipe type entities.
-            _coreLogic.RegisterEntityHandler(EntityType.Recipe, this);
+            _coreLogic.RegisterEntityHandler(EntityType.Craftable, this);
         }
         
         /// <summary>
@@ -116,6 +116,9 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private void OnEntityCollecting(object sender, CollectEntitiesEventArgs args)
         {
             args.ToBeRandomised.AddRange(_entityHandler.GetAllCraftables());
+            if (_config.bUseEggs)
+                args.ToBeRandomised.AddRange(_entityHandler.GetAll()
+                    .FindAll(e => e.Category.Equals(TechTypeCategory.Eggs)));
         }
 
         /// <summary>
@@ -174,6 +177,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
             {
                 UpgradeChains = new Dictionary<TechType, TechType>();
             }
+            if (!_config.bDiscoverEggs)
+                AddEggWaterParkPrerequisite();
             
             // Add basic raw materials into the logic.
             UpdateValidIngredients(0);
@@ -233,6 +238,14 @@ namespace SubnauticaRandomiser.Logic.Recipes
             args.ProgressionEntities.Add(TechType.HeatBlade);
             args.ProgressionEntities.Add(TechType.Knife);
             args.ProgressionEntities.Add(TechType.RadiationSuit);
+        }
+        
+        /// <summary>
+        /// Add the Alien Containment Unit as a prerequisite to all eggs.
+        /// </summary>
+        private void AddEggWaterParkPrerequisite()
+        {
+            _entityHandler.AddCategoryPrerequisite(TechTypeCategory.Eggs, TechType.BaseWaterPark);
         }
 
         /// <summary>
@@ -308,8 +321,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             if (_config.bUseFish)
                 _entityHandler.AddToLogic(TechTypeCategory.Fish, depth);
-            if (_config.bUseEggs && _coreLogic.HasRandomised(TechType.BaseWaterPark))
-                _entityHandler.AddToLogic(TechTypeCategory.Eggs, depth);
+            //if (_config.bUseEggs && _coreLogic.HasRandomised(TechType.BaseWaterPark))
+            //    _entityHandler.AddToLogic(TechTypeCategory.Eggs, depth);
             if (_config.bUseSeeds && IsAnyKnifeRandomised())
                 _entityHandler.AddToLogic(TechTypeCategory.Seeds, depth);
         }
