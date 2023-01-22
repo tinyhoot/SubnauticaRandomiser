@@ -17,8 +17,8 @@ namespace SubnauticaRandomiser.Patches
             // that structure here.
             id ??= __instance.transform.parent.GetComponent<PrefabIdentifier>();
             Initialiser._Log.Debug($"Found door with code {__instance.accessCode} and identifier {id}");
-            Initialiser._Log.Debug($"Code: {__instance.accessCode} key: {id.prefabKey}, id: {id.id}, "
-                                   + $"classId: {id.classId}");
+            // Initialiser._Log.Debug($"Code: {__instance.accessCode} key: {id.prefabKey}, id: {id.id}, "
+            //                        + $"classId: {id.classId}");
             if (!CoreLogic._Serializer.DoorKeyCodes.ContainsKey(id.classId))
             {
                 Initialiser._Log.Warn($"Found keypad for door which is not in logic: {id}");

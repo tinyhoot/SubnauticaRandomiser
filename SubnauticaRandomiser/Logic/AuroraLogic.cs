@@ -70,7 +70,12 @@ namespace SubnauticaRandomiser.Logic
             Dictionary<string, string> keyCodes = new Dictionary<string, string>();
             foreach (string classId in KeypadPrefabClassIds.Keys)
             {
-                string code = _random.Next(0, 9999).ToString().PadLeft(4, '0');
+                string code = "0";
+                // Keypads only have numbers 1-9, zeroes cannot be entered at all.
+                while (code.Contains("0"))
+                {
+                    code = _random.Next(1111, 9999).ToString().PadLeft(4, '3');
+                }
                 _log.Debug($"[AR] Assigning accessCode {code} to {classId}");
                 keyCodes.Add(classId, code);
             }
@@ -95,7 +100,6 @@ namespace SubnauticaRandomiser.Logic
                 TechType.FireExtinguisher,
                 TechType.FirstAidKit,
                 TechType.Pipe,
-                TechType.PipeSurfaceFloater,
                 TechType.NutrientBlock,
                 TechType.DisinfectedWater,
                 TechType.FilteredWater

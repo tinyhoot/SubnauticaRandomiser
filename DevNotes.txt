@@ -62,3 +62,5 @@ Other:
 Aurora Notes:
 - Fragments do spawn in LivingArea and CargoRoom, but not very often. Require very
   high rates to do anything.
+- Upgrade spawns are set in the editor and hard to get a hold of without modifying
+  every dropped upgrade in the game.
