@@ -28,7 +28,4 @@ Global
 		{04F771FE-CA90-4C9D-B633-6366DE6855E5}.Debug|x64.ActiveCfg = Debug|x64
 		{04F771FE-CA90-4C9D-B633-6366DE6855E5}.Release|x64.ActiveCfg = Release|x64
 	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		outputpath = "$SUBNAUTICA_DIR/QMods/SubnauticaRandomiser"
-	EndGlobalSection
 EndGlobal

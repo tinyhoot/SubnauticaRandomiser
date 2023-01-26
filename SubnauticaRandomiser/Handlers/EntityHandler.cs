@@ -19,8 +19,6 @@ namespace SubnauticaRandomiser.Handlers
         private List<LogicEntity> _allEntities;
         private readonly HashSet<LogicEntity> _inLogic;
         private readonly ILogHandler _log;
-        
-        public List<LogicEntity> GetAll() => _allEntities.ShallowCopy();
 
         public EntityHandler(ILogHandler logger)
         {
@@ -32,11 +30,24 @@ namespace SubnauticaRandomiser.Handlers
         public event EventHandler<EntityEventArgs> EntityEnteredLogic;
 
         /// <summary>
+        /// Add the given TechType as prerequisite for all entities in the given category.
+        /// </summary>
+        /// <param name="category">The category to add prerequisites to.</param>
+        /// <param name="techType">The new prerequisite to add.</param>
+        public void AddCategoryPrerequisite(TechTypeCategory category, TechType techType)
+        {
+            foreach (var categoryEntity in _allEntities.FindAll(e => e.Category.Equals(category)))
+            {
+                categoryEntity.AddPrerequisite(techType);
+            }
+        }
+        
+        /// <summary>
         /// Add the given TechTypes as prerequisites for all entities in the given category.
         /// </summary>
         /// <param name="category">The category to add prerequisites to.</param>
         /// <param name="techTypes">The new prerequisites to add.</param>
-        public void AddCategoryPrerequisites(TechTypeCategory category, List<TechType> techTypes)
+        public void AddCategoryPrerequisite(TechTypeCategory category, ICollection<TechType> techTypes)
         {
             foreach (var categoryEntity in _allEntities.FindAll(e => e.Category.Equals(category)))
             {
@@ -48,16 +59,16 @@ namespace SubnauticaRandomiser.Handlers
         }
 
         /// <summary>
-        /// Add the builder tool as a prerequisite to all base pieces.
+        /// Add the builder tool as a prerequisite to all base pieces. Adding it here because this is essential
+        /// and must be done every time, no matter the loaded modules.
         /// </summary>
         private void AddBaseBuilderPrerequisite()
         {
-            List<TechType> builder = new List<TechType> { TechType.Builder };
-            AddCategoryPrerequisites(TechTypeCategory.BaseBasePieces, builder);
-            AddCategoryPrerequisites(TechTypeCategory.BaseGenerators, builder);
-            AddCategoryPrerequisites(TechTypeCategory.BaseExternalModules, builder);
-            AddCategoryPrerequisites(TechTypeCategory.BaseInternalModules, builder);
-            AddCategoryPrerequisites(TechTypeCategory.BaseInternalPieces, builder);
+            AddCategoryPrerequisite(TechTypeCategory.BaseBasePieces, TechType.Builder);
+            AddCategoryPrerequisite(TechTypeCategory.BaseGenerators, TechType.Builder);
+            AddCategoryPrerequisite(TechTypeCategory.BaseExternalModules, TechType.Builder);
+            AddCategoryPrerequisite(TechTypeCategory.BaseInternalModules, TechType.Builder);
+            AddCategoryPrerequisite(TechTypeCategory.BaseInternalPieces, TechType.Builder);
         }
 
         /// <summary>
@@ -228,6 +239,14 @@ namespace SubnauticaRandomiser.Handlers
                                                                   && !x.HasPrerequisites);
 
             return rawMaterials;
+        }
+
+        /// <summary>
+        /// Get all entities belonging to the given category.
+        /// </summary>
+        public List<LogicEntity> GetByCategory(TechTypeCategory category)
+        {
+            return _allEntities.FindAll(entity => entity.Category.Equals(category));
         }
 
         /// <summary>

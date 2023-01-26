@@ -43,6 +43,7 @@ namespace SubnauticaRandomiser
         public Dictionary<TechType, List<SpawnData>> SpawnDataDict;
         // All possible supply box contents.
         public LootTable<TechType> SupplyBoxContents;
+        public bool DiscoverEggs;
 
         public const int SaveVersion = Initialiser._ExpectedSaveVersion;
         [NonSerialized]

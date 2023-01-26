@@ -27,13 +27,34 @@
     <Optimize>true</Optimize>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>mkdir $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
-cp $(OutDir)SubnauticaRandomiser.dll $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
-cp $(SolutionDir)ReadMe-Documentation.txt $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser
-mkdir $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles
-cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomiser/DataFiles</PostBuildEvent>
-  </PropertyGroup>
+
+  <!-- Define important extra files needed in the final distribution. -->
+  <ItemGroup>
+    <DataFiles Include="$(SolutionDir)\DataFiles\*" />
+  </ItemGroup>
+  
+  <!-- Copy newly built files to the game directory. -->
+  <Target Name="CopyToGameFolder" AfterTargets="Build">
+    <Message Importance="high" Text="Copying files to game directory." />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SUBNAUTICA_DIR)\BepInEx\plugins\$(AssemblyName)" />
+    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(SUBNAUTICA_DIR)\BepInEx\plugins\$(AssemblyName)\DataFiles" />
+  </Target>
+  
+  <!-- Automatically create the zip file, ready for distribution. -->
+  <Target Name="PrepareZip" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <Message Importance="normal" Text="Copying files to temporary directory." />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(OutputPath)\zipper\plugins\$(AssemblyName)" />
+    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(OutputPath)\zipper\plugins\$(AssemblyName)\DataFiles" />
+  </Target>
+  <Target Name="CreateZip" AfterTargets="PrepareZip" Condition="'$(Configuration)' == 'Release'">
+    <Message Importance="high" Text="Zipping project for distribution." />
+    <ZipDirectory DestinationFile="$(OutputPath)\$(AssemblyName).zip" SourceDirectory="$(OutputPath)\zipper" Overwrite="true" />
+  </Target>
+  <Target Name="Cleanup" AfterTargets="CreateZip" Condition="'$(Configuration)' == 'Release'">
+    <Message Importance="normal" Text="Cleaning up." />
+    <RemoveDir Directories="$(OutputPath)\zipper" />
+  </Target>
+  
   <ItemGroup>
     <Compile Include="ConfigDefaults.cs" />
     <Compile Include="DataDumper.cs" />
@@ -48,6 +69,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Logic\AlternateStartLogic.cs" />
     <Compile Include="Logic\AuroraLogic.cs" />
     <Compile Include="Logic\ProgressionManager.cs" />
+    <Compile Include="Logic\RawMaterialLogic.cs" />
     <Compile Include="Logic\Recipes\BaseTheme.cs" />
     <Compile Include="Logic\SpoilerLog.cs" />
     <Compile Include="Objects\Enums\EntityType.cs" />
@@ -61,6 +83,7 @@ cp $(SolutionDir)DataFiles/* $(SUBNAUTICA_DIR)/BepInEx/plugins/SubnauticaRandomi
     <Compile Include="Objects\LootTable.cs" />
     <Compile Include="Patches\AuroraPatcher.cs" />
     <Compile Include="Patches\DataboxPatcher.cs" />
+    <Compile Include="Patches\EggPatcher.cs" />
     <Compile Include="Patches\LanguagePatcher.cs" />
     <Compile Include="Patches\VanillaBugfixes.cs" />
     <Compile Include="Patches\FragmentPatcher.cs" />

@@ -44,7 +44,7 @@ namespace SubnauticaRandomiser.Logic
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             RandomiseDataboxes(serializer);
-            UpdateBlueprints(_coreLogic.EntityHandler.GetAll());
+            UpdateBlueprints(_coreLogic.EntityHandler.GetAllEntities());
             LinkCyclopsHullModules(_coreLogic.EntityHandler);
         }
 

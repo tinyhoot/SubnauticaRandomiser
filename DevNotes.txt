@@ -23,14 +23,6 @@
     for e.g. a laser cutter.
   - Table coral can be acquired with a Crashfish, or bumping into it with a vehicle.
     No knife required!
-    
-- Mod support.
-  - Out-of-the-box support is not happening.
-  - Perhaps expose the progression tree? This would allow for more customisation,
-    and enable modded items to act as progression items and road blocks.
-    
-- Internal improvements.
-  - Look into why the game locks up while the mod is busy randomising.
   
 - Scrap metal!
   - For some reason, the existing logic works on some recipes but not for others.
@@ -38,11 +30,12 @@
   - Randomising anew after the crafting tree has already been built once (i.e.,
     a fabricator has been interacted with) makes it impossible to change until
     next game restart. The scrap metal recipe could thus persist across seeds.
-  - Savedata idea which does not lead to a breaking update:
-    - Scrap metal is never crafted. Therefore, it does not have a recipe. Because
-      of this, it also does not have an entry in masterDict.
-    - Abuse this and file the new recipe for whatever scrap metal can be turned
-      *into* under scrap metal.
+
+Aurora Notes:
+- Fragments do spawn in LivingArea and CargoRoom, but not very often. Require very
+  high rates to do anything.
+- Upgrade spawns are set in the editor and hard to get a hold of without modifying
+  every dropped upgrade in the game.
 
 
 
@@ -52,15 +45,8 @@ Thoughts from a playthrough:
   - Alien Containment (covers both)
   - Water filter (covers water, get food from surrounding fish)
 - What about land seeds? If those get added, indoor growbeds are a necessity.
-- Add Aurora interior to logic. What parts need repair tool, laser cutter, cannon?
 
 Other:
 - Sea treaders are a potential anti softlock mechanism. You could change their
   poop and shale into something useful on the fly, or make shale always contain
   something useful in the first place.
-
-Aurora Notes:
-- Fragments do spawn in LivingArea and CargoRoom, but not very often. Require very
-  high rates to do anything.
-- Upgrade spawns are set in the editor and hard to get a hold of without modifying
-  every dropped upgrade in the game.

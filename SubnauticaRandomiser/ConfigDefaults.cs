@@ -16,6 +16,7 @@ namespace SubnauticaRandomiser
             { "iRandomiserMode", new[] { 0, 0, 1 } },
             { "bUseFish", new[] { true, true, true } },
             { "bUseEggs", new[] { false, false, false } },
+            { "bDiscoverEggs", new[] { false, false, false } },
             { "bUseSeeds", new[] { true, true, true } },
             { "bRandomiseDataboxes", new[] { true, true, true } },
             { "bRandomiseFragments", new[] { true, true, true } },

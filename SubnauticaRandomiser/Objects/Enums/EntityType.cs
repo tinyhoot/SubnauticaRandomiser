@@ -8,6 +8,7 @@ namespace SubnauticaRandomiser.Objects.Enums
         None,
         Databox,
         Fragment,
-        Recipe,
+        Craftable,
+        RawMaterial,
     }
 }

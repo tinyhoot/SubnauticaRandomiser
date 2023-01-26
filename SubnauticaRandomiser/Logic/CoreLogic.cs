@@ -24,6 +24,8 @@ namespace SubnauticaRandomiser.Logic
     /// </summary>
     internal class CoreLogic : MonoBehaviour
     {
+        public static CoreLogic Main;
+        
         internal RandomiserConfig _Config { get; private set; }
         internal ILogHandler _Log { get; private set; }
         internal static EntitySerializer _Serializer { get; private set; }
@@ -76,6 +78,8 @@ namespace SubnauticaRandomiser.Logic
 
         private void Awake()
         {
+            Main = this;
+            
             _fileTasks = new List<Task>();
             _handlingModules = new Dictionary<EntityType, ILogicModule>();
             _modules = new List<ILogicModule>();
@@ -101,7 +105,10 @@ namespace SubnauticaRandomiser.Logic
             if (_Config.bRandomiseFragments || _Config.bRandomiseNumFragments || _Config.bRandomiseDuplicateScans)
                 RegisterModule<FragmentLogic>();
             if (_Config.bRandomiseRecipes)
+            {
+                RegisterModule<RawMaterialLogic>();
                 RegisterModule<RecipeLogic>();
+            }
         }
 
         /// <summary>
@@ -198,9 +205,9 @@ namespace SubnauticaRandomiser.Logic
                 if (handler is null)
                 {
                     _Log.Warn($"[Core] Unhandled entity in main loop: {nextEntity.EntityType} {nextEntity}");
-                    notRandomised.Remove(nextEntity);
                     // Add the unhandled entity into logic as a stopgap solution, for cases where a prerequisite check
                     // would fail because it expects unhandled entities to be in logic first.
+                    notRandomised.Remove(nextEntity);
                     EntityHandler.AddToLogic(nextEntity);
                     continue;
                 }

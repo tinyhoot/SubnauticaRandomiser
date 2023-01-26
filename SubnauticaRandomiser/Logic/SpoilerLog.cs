@@ -141,7 +141,10 @@ namespace SubnauticaRandomiser.Logic
             {
                 "",
                 "",
-                "///// Fragment Locations /////"
+                "///// Fragment Locations /////",
+                "// Note: Biomes which end in _TechSite are the big, explorable wrecks.",
+                "//       Biomes which end in _TechSite_Barrier are inside the wrecks, behind laser cutter doors.",
+                "//       Biomes which end in _TechSite_Scatter are medium-sized Aurora debris out in the open."
             };
         }
         

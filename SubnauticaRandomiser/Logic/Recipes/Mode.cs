@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using SMLHelper.V2.Crafting;
 using SMLHelper.V2.Handlers;
@@ -70,6 +71,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 _recipeLogic.ValidIngredients.Remove(entity);
                 _log.Debug($"[R] ! Removing {entity} ingredients list due to " + 
                            $"max uses reached: {entity.UsedInRecipes}");
+                RemoveParentRecipes(entity);
             }
         }
 
@@ -102,6 +104,16 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
 
             return randomEntity;
+        }
+
+        /// <summary>
+        /// Remove all entities from the valid ingredients list which contain the given entity as an ingredient.
+        /// </summary>
+        private void RemoveParentRecipes(LogicEntity entity)
+        {
+            int count = _recipeLogic.ValidIngredients.RemoveWhere(e =>
+                e.Recipe?.Ingredients.Any(i => i.techType.Equals(entity.TechType)) ?? false);
+            _log.Debug($"[R]   Also removing {count} parent recipes.");
         }
 
         // This function changes the output of the metal salvage recipe by removing
