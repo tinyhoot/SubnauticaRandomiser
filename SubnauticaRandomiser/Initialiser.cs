@@ -20,7 +20,7 @@ namespace SubnauticaRandomiser
     {
         public const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
         public const string NAME = "Subnautica Randomiser";
-        public const string VERSION = "0.10.0";
+        public const string VERSION = "0.10.1";
         
         // Files and structure.
         internal static string _ModDirectory;
