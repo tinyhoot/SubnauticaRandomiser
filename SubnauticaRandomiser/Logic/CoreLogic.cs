@@ -194,12 +194,14 @@ namespace SubnauticaRandomiser.Logic
                     yield return null;
                 if (circuitbreaker > 3000)
                 {
-                    _Log.InGameMessage("[Core] Failed to randomise items: stuck in infinite loop!");
+                    _Log.InGameMessage("[Core] Failed to randomise entities: stuck in infinite loop!");
                     _Log.Fatal("[Core] Encountered infinite loop, aborting!");
                     throw new TimeoutException("Encountered infinite loop while randomising!");
                 }
 
                 LogicEntity nextEntity = ChooseNextEntity(notRandomised);
+                if (nextEntity is null)
+                    continue;
                 // Try to get a handler for this type of entity.
                 ILogicModule handler = _handlingModules.GetOrDefault(nextEntity.EntityType, null);
                 if (handler is null)
@@ -242,7 +244,11 @@ namespace SubnauticaRandomiser.Logic
             {
                 LogicEntity prereq = EntityHandler.GetEntity(techType);
                 if (!HasRandomised(prereq))
+                {
                     _priorityEntities.Insert(0, prereq);
+                    // Ensure that the prerequisites' requirements are also fulfilled.
+                    AddPrerequisitesAsPriority(prereq);
+                }
             }
         }
 
@@ -281,7 +287,6 @@ namespace SubnauticaRandomiser.Logic
         /// Get the next entity to be randomised, prioritising essential or elective ones.
         /// </summary>
         /// <returns>The next entity.</returns>
-        [NotNull]
         private LogicEntity ChooseNextEntity(List<LogicEntity> notRandomised)
         {
             // Make sure the list of absolutely essential entities is exhausted first.
@@ -299,6 +304,12 @@ namespace SubnauticaRandomiser.Logic
                 _priorityEntities.RemoveAt(0);
             }
             next ??= Random.Choice(notRandomised);
+            while (HasRandomised(next))
+            {
+                _Log.Debug($"[Core] Found duplicate entity in main loop, removing: {next}");
+                notRandomised.Remove(next);
+                next = Random.Choice(notRandomised);
+            }
 
             // Invoke the associated event.
             EntityChosen?.Invoke(this, new EntityEventArgs(next));
