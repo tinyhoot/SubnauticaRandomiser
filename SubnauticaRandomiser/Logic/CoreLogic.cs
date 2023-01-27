@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
-using JetBrains.Annotations;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
@@ -32,6 +31,7 @@ namespace SubnauticaRandomiser.Logic
         public EntityHandler EntityHandler { get; private set; }
         public IRandomHandler Random { get; private set; }
 
+        private Harmony _harmony;
         private ProgressionManager _manager;
         private SpoilerLog _spoilerLog;
 
@@ -92,6 +92,11 @@ namespace SubnauticaRandomiser.Logic
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
             _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
+        }
+
+        private void OnDestroy()
+        {
+            _harmony?.UnpatchSelf();
         }
 
         private void EnableModules()
@@ -322,13 +327,13 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void EnableHarmony()
         {
-            Harmony harmony = new Harmony(Initialiser.GUID);
+            _harmony = new Harmony(Initialiser.GUID);
             foreach (ILogicModule module in _modules)
             {
-                module.SetupHarmonyPatches(harmony);
+                module.SetupHarmonyPatches(_harmony);
             }
             // Always apply bugfixes.
-            harmony.PatchAll(typeof(VanillaBugfixes));
+            _harmony.PatchAll(typeof(VanillaBugfixes));
         }
 
         /// <summary>
