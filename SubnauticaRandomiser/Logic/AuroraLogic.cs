@@ -74,7 +74,7 @@ namespace SubnauticaRandomiser.Logic
                 // Keypads only have numbers 1-9, zeroes cannot be entered at all.
                 while (code.Contains("0"))
                 {
-                    code = _random.Next(1111, 9999).ToString().PadLeft(4, '3');
+                    code = _random.Next(1111, 9999).ToString();
                 }
                 _log.Debug($"[AR] Assigning accessCode {code} to {classId}");
                 keyCodes.Add(classId, code);
