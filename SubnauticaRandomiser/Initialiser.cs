@@ -124,7 +124,7 @@ namespace SubnauticaRandomiser
 
             // Create a new seed if the current one is just a default
             if (_Config.iSeed == 0)
-                _Config.iSeed = Random.Range(1, int.MaxValue);
+                _Config.iSeed = new RandomHandler().Next();
 
             // Randomise!
             try
