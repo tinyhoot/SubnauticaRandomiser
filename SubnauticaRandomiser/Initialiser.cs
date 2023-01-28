@@ -110,6 +110,7 @@ namespace SubnauticaRandomiser
             _Log.InGameMessage($"{exception.GetType().Name.ToUpper()}: Something went wrong. Please report this error "
                                + "with the config.json from your mod folder on Github or NexusMods.", true);
             _Log.Fatal($"{exception.GetType()}: {exception.Message}");
+            _Log.Fatal(exception.StackTrace);
             // Ensure that the randomiser crashes completely if things go wrong this badly.
             throw exception;
         }
