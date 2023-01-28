@@ -72,6 +72,15 @@ namespace SubnauticaRandomiser.Logic.Recipes
             return entity;
         }
 
+        public override TechType GetScrapMetalReplacement()
+        {
+            if (_baseTheme.GetBaseTheme() != null)
+                return _baseTheme.GetBaseTheme().TechType;
+
+            var options = _entityHandler.GetAllRawMaterials();
+            return _random.Choice(options).TechType;
+        }
+
         /// <summary>
         /// Check whether conditions have been reached that mandate an early stop as defined by config values.
         /// </summary>
@@ -127,7 +136,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             // If base theming is enabled and this is a base piece, replace
             // the primary ingredient with a theming ingredient.
-            primaryIngredient = _baseTheme?.GetBaseTheme(entity) ?? primaryIngredient;
+            primaryIngredient = _baseTheme?.GetThemeForEntity(entity) ?? primaryIngredient;
 
             // If vanilla upgrade chains are set to be preserved, replace
             // the primary ingredient with the base item.

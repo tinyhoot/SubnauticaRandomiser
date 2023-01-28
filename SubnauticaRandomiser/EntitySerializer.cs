@@ -44,6 +44,7 @@ namespace SubnauticaRandomiser
         // All possible supply box contents.
         public LootTable<TechType> SupplyBoxContents;
         public bool DiscoverEggs;
+        public TechType ScrapMetalResult;
 
         public const int SaveVersion = Initialiser._ExpectedSaveVersion;
         [NonSerialized]

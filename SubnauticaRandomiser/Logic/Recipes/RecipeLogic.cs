@@ -77,11 +77,14 @@ namespace SubnauticaRandomiser.Logic.Recipes
             {
                 CraftDataHandler.SetTechData(key, serializer.RecipeDict[key]);
             }
+            
+            ChangeScrapMetalResult(serializer.ScrapMetalResult);
         }
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
             _mode.ChooseBaseTheme(100, _config.bUseFish);
+            serializer.ScrapMetalResult = _mode.GetScrapMetalReplacement();
         }
 
         /// <summary>
@@ -269,6 +272,38 @@ namespace SubnauticaRandomiser.Logic.Recipes
                     entity.Prerequisites = new List<TechType>();
                 entity.Prerequisites.Add(ingredient);
             }
+        }
+        
+        /// <summary>
+        /// Changes what kind of material scrap metal can be turned into.
+        /// </summary>
+        /// <param name="techType">The new material to get from scrap metal.</param>
+        /// <returns>The resulting Recipe, or null if the given TechType wasn't usable.</returns>
+        private Recipe ChangeScrapMetalResult(TechType techType)
+        {
+            if (techType.Equals(TechType.Titanium) || techType.Equals(TechType.None))
+                return null;
+            
+            // Create the new recipe.
+            Recipe recipe = new Recipe(techType);
+            recipe.Ingredients = new List<RandomiserIngredient>();
+            recipe.Ingredients.Add(new RandomiserIngredient(TechType.ScrapMetal, 1));
+            // Always use just as many items as can fit in four slots in the inventory.
+            var itemDimensions = CraftData.GetItemSize(techType);
+            int size = itemDimensions.x * itemDimensions.y;
+            recipe.CraftAmount = Math.Max(1, (int)Math.Floor(4f / size));
+            CraftDataHandler.SetTechData(techType, recipe);
+
+            // Remove the vanilla recipe from the fabricator and PDA.
+            CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "BasicMaterials", "Titanium");
+            CraftDataHandler.RemoveFromGroup(TechGroup.Resources, TechCategory.BasicMaterials, TechType.Titanium);
+            // Add the replacement recipe in its stead.
+            CraftTreeHandler.AddCraftingNode(CraftTree.Type.Fabricator, techType, "Resources", "BasicMaterials");
+            CraftDataHandler.AddToGroup(TechGroup.Resources, TechCategory.BasicMaterials, techType);
+            // Ensure access at game start.
+            KnownTechHandler.UnlockOnStart(techType);
+
+            return recipe;
         }
         
         /// <summary>

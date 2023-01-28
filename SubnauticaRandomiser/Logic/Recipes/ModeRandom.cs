@@ -87,5 +87,11 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             return max;
         }
+        
+        public override TechType GetScrapMetalReplacement()
+        {
+            var options = _entityHandler.GetAllRawMaterials();
+            return _random.Choice(options).TechType;
+        }
     }
 }

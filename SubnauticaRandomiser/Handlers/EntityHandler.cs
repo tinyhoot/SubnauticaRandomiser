@@ -229,6 +229,14 @@ namespace SubnauticaRandomiser.Handlers
         }
 
         /// <summary>
+        /// Get all entities that can function as ingredients in recipes.
+        /// </summary>
+        public List<LogicEntity> GetAllIngredients()
+        {
+            return _allEntities.FindAll(e => e.Category.IsIngredient());
+        }
+
+        /// <summary>
         /// Get all entities that are considered raw materials without prerequisites and accessible by the given depth.
         /// </summary>
         /// <param name="maxDepth">The maximum depth at which the raw materials must be available.</param>
