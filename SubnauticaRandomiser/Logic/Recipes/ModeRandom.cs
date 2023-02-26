@@ -61,7 +61,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
 
             entity.Recipe.Ingredients = _ingredients;
-            entity.Recipe.CraftAmount = CraftDataHandler.GetTechData(entity.TechType).craftAmount;
+            entity.Recipe.CraftAmount = CraftDataHandler.GetTechData(entity.TechType)?.craftAmount ?? 1;
             return entity;
         }
 
