@@ -68,7 +68,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _log.Debug($"[R] > Recipe is now valued {currentValue} out of {entity.Value}");
             entity.Value = currentValue;
             entity.Recipe.Ingredients = _ingredients;
-            entity.Recipe.CraftAmount = CraftDataHandler.GetTechData(entity.TechType).craftAmount;
+            entity.Recipe.CraftAmount = CraftDataHandler.GetTechData(entity.TechType)?.craftAmount ?? 1;
             return entity;
         }
 
