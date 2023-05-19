@@ -29,22 +29,25 @@
   </PropertyGroup>
 
   <!-- Define important extra files needed in the final distribution. -->
+  <PropertyGroup>
+    <DataDir>DataFiles</DataDir>
+  </PropertyGroup>
   <ItemGroup>
-    <DataFiles Include="$(SolutionDir)\DataFiles\*" />
+    <DataFiles Include="$(SolutionDir)\$(DataDir)\*" />
   </ItemGroup>
   
   <!-- Copy newly built files to the game directory. -->
   <Target Name="CopyToGameFolder" AfterTargets="Build">
     <Message Importance="high" Text="Copying files to game directory." />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SUBNAUTICA_DIR)\BepInEx\plugins\$(AssemblyName)" />
-    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(SUBNAUTICA_DIR)\BepInEx\plugins\$(AssemblyName)\DataFiles" />
+    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(SUBNAUTICA_DIR)\BepInEx\plugins\$(AssemblyName)\$(DataDir)" />
   </Target>
   
   <!-- Automatically create the zip file, ready for distribution. -->
   <Target Name="PrepareZip" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
     <Message Importance="normal" Text="Copying files to temporary directory." />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(OutputPath)\zipper\plugins\$(AssemblyName)" />
-    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(OutputPath)\zipper\plugins\$(AssemblyName)\DataFiles" />
+    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(OutputPath)\zipper\plugins\$(AssemblyName)\$(DataDir)" />
   </Target>
   <Target Name="CreateZip" AfterTargets="PrepareZip" Condition="'$(Configuration)' == 'Release'">
     <Message Importance="high" Text="Zipping project for distribution." />
