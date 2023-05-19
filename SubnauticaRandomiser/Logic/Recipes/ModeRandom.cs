@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SMLHelper.V2.Handlers;
+using Nautilus.Handlers;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 
@@ -61,7 +61,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
 
             entity.Recipe.Ingredients = _ingredients;
-            entity.Recipe.CraftAmount = CraftDataHandler.GetTechData(entity.TechType)?.craftAmount ?? 1;
+            entity.Recipe.CraftAmount = CraftDataHandler.GetRecipeData(entity.TechType)?.craftAmount ?? 1;
             return entity;
         }
 

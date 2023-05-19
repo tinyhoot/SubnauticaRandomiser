@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using SMLHelper.V2.Crafting;
-using SMLHelper.V2.Handlers;
+using Nautilus.Crafting;
+using Nautilus.Handlers;
 
 namespace SubnauticaRandomiser.Objects
 {
@@ -30,12 +30,12 @@ namespace SubnauticaRandomiser.Objects
 
             // This part copies over information on linked items from the base
             // recipe already loaded by the game.
-            TechData techdata = CraftDataHandler.GetTechData(type);
+            RecipeData techdata = CraftDataHandler.GetRecipeData(type);
             if (techdata != null)
             {
                 if (techdata.Ingredients != null && techdata.ingredientCount > 0)
                 {
-                    foreach (Ingredient i in techdata.Ingredients)
+                    foreach (CraftData.Ingredient i in techdata.Ingredients)
                     {
                         Ingredients.Add(new RandomiserIngredient(i.techType, i.amount));
                     }

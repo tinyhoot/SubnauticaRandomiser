@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using JetBrains.Annotations;
-using SMLHelper.V2.Handlers;
+using Nautilus.Handlers;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
@@ -75,7 +75,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             
             foreach (TechType key in serializer.RecipeDict.Keys)
             {
-                CraftDataHandler.SetTechData(key, serializer.RecipeDict[key]);
+                CraftDataHandler.SetRecipeData(key, serializer.RecipeDict[key]);
             }
             
             ChangeScrapMetalResult(serializer.ScrapMetalResult);
@@ -292,7 +292,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             var itemDimensions = CraftData.GetItemSize(techType);
             int size = itemDimensions.x * itemDimensions.y;
             recipe.CraftAmount = Math.Max(1, (int)Math.Floor(4f / size));
-            CraftDataHandler.SetTechData(techType, recipe);
+            CraftDataHandler.SetRecipeData(techType, recipe);
 
             // Remove the vanilla recipe from the fabricator and PDA.
             CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "BasicMaterials", "Titanium");

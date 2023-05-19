@@ -4,12 +4,11 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using BepInEx;
-using SMLHelper.V2.Handlers;
+using Nautilus.Handlers;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
-using Random = UnityEngine.Random;
 
 [assembly:InternalsVisibleTo("Tests")]
 namespace SubnauticaRandomiser
@@ -54,7 +53,7 @@ namespace SubnauticaRandomiser
 
             // Register options menu.
             _ModDirectory = GetModDirectory();
-            _Config = OptionsPanelHandler.Main.RegisterModOptions<RandomiserConfig>();
+            _Config = OptionsPanelHandler.RegisterModOptions<RandomiserConfig>();
             _Log.Debug("Registered options menu.");
 
             // Ensure the user did not update into a save incompatibility, and abort if they did to preserve a prior

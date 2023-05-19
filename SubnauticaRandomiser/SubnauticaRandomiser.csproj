@@ -134,8 +134,8 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="SMLHelper">
-      <HintPath>..\Dependencies\SMLHelper.dll</HintPath>
+    <Reference Include="Nautilus">
+      <HintPath>..\Dependencies\Nautilus.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

@@ -1,6 +1,6 @@
 ﻿using System;
-using SMLHelper.V2.Json;
-using SMLHelper.V2.Options.Attributes;
+using Nautilus.Json;
+using Nautilus.Options.Attributes;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 
