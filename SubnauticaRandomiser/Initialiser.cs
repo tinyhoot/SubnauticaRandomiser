@@ -14,7 +14,7 @@ using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
 namespace SubnauticaRandomiser
 {
     [BepInPlugin(GUID, NAME, VERSION)]
-    [BepInDependency("com.ahk1221.smlhelper", "2.15")]
+    [BepInDependency("com.snmodding.nautilus", "1.0")]
     internal class Initialiser : BaseUnityPlugin
     {
         public const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
