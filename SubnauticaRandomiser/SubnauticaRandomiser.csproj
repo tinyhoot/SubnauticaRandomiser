@@ -59,7 +59,10 @@
   </Target>
   
   <ItemGroup>
-    <Compile Include="ConfigDefaults.cs" />
+    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\ConfigDefaults.cs" />
+    <Compile Include="Configuration\ConfigModOptions.cs" />
+    <Compile Include="Configuration\ConfigEntryWrapper.cs" />
     <Compile Include="DataDumper.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Handlers\EntityHandler.cs" />
@@ -76,6 +79,8 @@
     <Compile Include="Logic\Recipes\BaseTheme.cs" />
     <Compile Include="Logic\SpoilerLog.cs" />
     <Compile Include="Objects\Enums\EntityType.cs" />
+    <Compile Include="Objects\Enums\IngredientInclusionLevel.cs" />
+    <Compile Include="Objects\Enums\RecipeDifficultyMode.cs" />
     <Compile Include="Objects\Events\CollectEntitiesEventArgs.cs" />
     <Compile Include="Objects\Events\EntityEventArgs.cs" />
     <Compile Include="Objects\Events\EntityListEventArgs.cs" />
