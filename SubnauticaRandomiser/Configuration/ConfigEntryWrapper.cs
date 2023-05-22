@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using BepInEx.Configuration;
 using Nautilus.Options;
 
@@ -82,6 +84,23 @@ namespace SubnauticaRandomiser.Configuration
                 throw new ArgumentException("Could not get values from ConfigEntry");
 
             var modOption = ModChoiceOption<T>.Create(
+                id: wrapper.GetId(),
+                label: wrapper.GetLabel(),
+                options: options,
+                value: wrapper.Value,
+                tooltip: wrapper.GetTooltip()
+            );
+            modOption.OnChanged += (_, e) => wrapper.Entry.Value = e.Value;
+            return modOption;
+        }
+
+        public static ModChoiceOption<TE> ToModChoiceOption<TE>(this ConfigEntryWrapper<TE> wrapper, IEnumerable<TE> values = null) where TE : Enum
+        {
+            TE[] options = values?.ToArray() ?? (TE[])Enum.GetValues(typeof(TE));
+            if (options == null)
+                throw new ArgumentException("Could not get values from ConfigEntry");
+            
+            var modOption = ModChoiceOption<TE>.Create(
                 id: wrapper.GetId(),
                 label: wrapper.GetLabel(),
                 options: options,

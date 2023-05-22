@@ -56,6 +56,8 @@ namespace SubnauticaRandomiser
             _ModDirectory = GetModDirectory();
             _Config = new Config(Config);
             _Config.RegisterOptions();
+            var modOptions = new ConfigModOptions(NAME);
+            OptionsPanelHandler.RegisterModOptions(modOptions);
             _Log.Debug("Registered options menu.");
 
             // Ensure the user did not update into a save incompatibility, and abort if they did to preserve a prior

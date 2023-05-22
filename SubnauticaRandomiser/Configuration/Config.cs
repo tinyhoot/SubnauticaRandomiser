@@ -290,7 +290,7 @@ namespace SubnauticaRandomiser.Configuration
                 defaultValue: true,
                 description: "Randomise recipes if enabled."
             ).WithDescription(
-                "Randomise Recipes",
+                "Randomise recipes?",
                 null
             );
             RecipeMode = new ConfigEntryWrapper<RecipeDifficultyMode>(
