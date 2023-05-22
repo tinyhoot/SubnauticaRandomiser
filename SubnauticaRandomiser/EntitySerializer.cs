@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 
@@ -131,10 +132,10 @@ namespace SubnauticaRandomiser
         /// <summary>
         /// Serialise the current randomisation state to disk.
         /// </summary>
-        public void Serialize(RandomiserConfig config)
+        public void Serialize(Config config)
         {
             string base64 = ToBase64String();
-            config.sBase64Seed = base64;
+            config.Base64Save.Value = base64;
             config.Save();
             _log.Debug("[ES] Saved game state to disk!");
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
@@ -20,7 +21,7 @@ namespace SubnauticaRandomiser.Logic
     internal class AlternateStartLogic : MonoBehaviour, ILogicModule
     {
         private CoreLogic _coreLogic;
-        private RandomiserConfig _config;
+        private Config _config;
         private ILogHandler _log;
         private IRandomHandler _random;
         
@@ -41,7 +42,7 @@ namespace SubnauticaRandomiser.Logic
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
-            serializer.StartPoint = GetRandomStart(_config.sSpawnPoint);
+            serializer.StartPoint = GetRandomStart(_config.SpawnPoint.Value);
         }
 
         public bool RandomiseEntity(ref LogicEntity entity)

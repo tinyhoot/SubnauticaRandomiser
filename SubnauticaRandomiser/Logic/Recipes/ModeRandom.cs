@@ -21,7 +21,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>The modified entity.</returns>
         public override LogicEntity RandomiseIngredients(LogicEntity entity)
         {
-            int number = _random.Next(1, _config.iMaxIngredientsPerRecipe + 1);
+            int number = _random.Next(1, _config.MaxIngredientsPerRecipe.Value + 1);
             int totalInvSize = 0;
             _ingredients = new List<RandomiserIngredient>();
             UpdateBlacklist(entity);
@@ -53,7 +53,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
                 _log.Debug($"[R] > Adding ingredient: {ingredient.techType.AsString()}, {ingredient.amount}");
 
-                if (totalInvSize > _config.iMaxInventorySizePerRecipe)
+                if (totalInvSize > _config.MaxInventorySizePerRecipe.Value)
                 {
                     _log.Debug("[R] ! Recipe is getting too large, stopping.");
                     break;
@@ -72,7 +72,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>A positive integer.</returns>
         private int FindMaximum(LogicEntity entity)
         {
-            int max = _config.iMaxAmountPerIngredient;
+            int max = _config.MaxNumberPerIngredient.Value;
 
             // Tools and upgrades do not stack, but if the recipe would require several and you have more than one in
             // inventory, it will consume all of them.
@@ -83,7 +83,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             // Never require more than one (default) egg. That's tedious.
             if (entity.Category.Equals(TechTypeCategory.Eggs))
-                max = _config.iMaxEggsAsSingleIngredient;
+                max = _config.MaxEggsAsSingleIngredient.Value;
 
             return max;
         }

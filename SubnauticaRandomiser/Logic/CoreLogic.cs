@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
@@ -25,7 +26,7 @@ namespace SubnauticaRandomiser.Logic
     {
         public static CoreLogic Main;
         
-        internal RandomiserConfig _Config { get; private set; }
+        internal Config _Config { get; private set; }
         internal ILogHandler _Log { get; private set; }
         internal static EntitySerializer _Serializer { get; private set; }
         public EntityHandler EntityHandler { get; private set; }
@@ -88,7 +89,7 @@ namespace SubnauticaRandomiser.Logic
             _Config = Initialiser._Config;
             _Log = Initialiser._Log;
             EntityHandler = new EntityHandler(_Log);
-            Random = new RandomHandler(_Config.iSeed);
+            Random = new RandomHandler(_Config.Seed.Value);
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
             _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
@@ -101,15 +102,15 @@ namespace SubnauticaRandomiser.Logic
 
         private void EnableModules()
         {
-            if (!_Config.sSpawnPoint.Equals("Vanilla"))
+            if (!_Config.SpawnPoint.Value.Equals("Vanilla"))
                 RegisterModule<AlternateStartLogic>();
-            if (_Config.bRandomiseDoorCodes || _Config.bRandomiseSupplyBoxes)
+            if (_Config.RandomiseDoorCodes.Value || _Config.RandomiseSupplyBoxes.Value)
                 RegisterModule<AuroraLogic>();
-            if (_Config.bRandomiseDataboxes)
+            if (_Config.RandomiseDataboxes.Value)
                 RegisterModule<DataboxLogic>();
-            if (_Config.bRandomiseFragments || _Config.bRandomiseNumFragments || _Config.bRandomiseDuplicateScans)
+            if (_Config.RandomiseFragments.Value || _Config.RandomiseNumFragments.Value || _Config.RandomiseDuplicateScans.Value)
                 RegisterModule<FragmentLogic>();
-            if (_Config.bRandomiseRecipes)
+            if (_Config.RandomiseRecipes.Value)
             {
                 RegisterModule<RawMaterialLogic>();
                 RegisterModule<RecipeLogic>();
@@ -406,14 +407,14 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         internal bool TryRestoreSave()
         {
-            if (string.IsNullOrEmpty(_Config.sBase64Seed))
+            if (string.IsNullOrEmpty(_Config.Base64Save.Value))
             {
                 _Log.Debug("[Core] base64 seed is empty.");
                 return false;
             }
 
             _Log.Debug("[Core] Trying to decode base64 string...");
-            EntitySerializer serializer = EntitySerializer.FromBase64String(_Config.sBase64Seed);
+            EntitySerializer serializer = EntitySerializer.FromBase64String(_Config.Base64Save.Value);
 
             if (serializer?.SpawnDataDict is null || serializer.RecipeDict is null)
             {

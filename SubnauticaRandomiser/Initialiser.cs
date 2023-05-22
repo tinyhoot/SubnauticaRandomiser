@@ -24,7 +24,7 @@ namespace SubnauticaRandomiser
         
         // Files and structure.
         internal static string _ModDirectory;
-        internal static RandomiserConfig _Config;
+        internal static Config _Config;
         public const string _AlternateStartFile = "alternateStarts.csv";
         public const string _BiomeFile = "biomeSlots.csv";
         public const string _RecipeFile = "recipeInformation.csv";
@@ -54,9 +54,8 @@ namespace SubnauticaRandomiser
 
             // Register options menu.
             _ModDirectory = GetModDirectory();
-            _Config = OptionsPanelHandler.RegisterModOptions<RandomiserConfig>();
-            var config = new Config();
-            config.RegisterOptions(Config);
+            _Config = new Config(Config);
+            _Config.RegisterOptions();
             _Log.Debug("Registered options menu.");
 
             // Ensure the user did not update into a save incompatibility, and abort if they did to preserve a prior
@@ -87,10 +86,10 @@ namespace SubnauticaRandomiser
         /// </summary>
         private bool CheckSaveCompatibility()
         {
-            if (_Config.iSaveVersion == _ExpectedSaveVersion)
+            if (_Config.SaveVersion.Value == _ExpectedSaveVersion)
                 return true;
             
-            s_versionDict.TryGetValue(_Config.iSaveVersion, out string version);
+            s_versionDict.TryGetValue(_Config.SaveVersion.Value, out string version);
             if (string.IsNullOrEmpty(version))
                 version = "unknown or corrupted.";
 
@@ -122,12 +121,12 @@ namespace SubnauticaRandomiser
         /// </summary>
         private void Randomise()
         {
-            _Config.SanitiseConfigValues();
-            _Config.iSaveVersion = _ExpectedSaveVersion;
+            // _Config.SanitiseConfigValues();
+            _Config.SaveVersion.Value = _ExpectedSaveVersion;
 
             // Create a new seed if the current one is just a default
-            if (_Config.iSeed == 0)
-                _Config.iSeed = new RandomHandler().Next();
+            if (_Config.Seed.Value == 0)
+                _Config.Seed.Entry.Value = new RandomHandler().Next();
 
             // Randomise!
             try
@@ -156,9 +155,9 @@ namespace SubnauticaRandomiser
         private void RestoreSavedState()
         {
             // Try and restore a game state from disk.
-            if (_Config.debug_forceRandomise || !_coreLogic.TryRestoreSave())
+            if (_Config.DebugForceRandomise.Value || !_coreLogic.TryRestoreSave())
             {
-                if (_Config.debug_forceRandomise)
+                if (_Config.DebugForceRandomise.Value)
                     _Log.Warn("Ignoring previous game state: Config forces fresh randomisation.");
                 _Log.Warn("Could not load game state from disk.");
             }

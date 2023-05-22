@@ -97,9 +97,9 @@ namespace SubnauticaRandomiser.Objects
                 // fruitlessly searches for a bladderfish which never enters its algorithm.
                 // Eggs and seeds are never problematic in vanilla, but are covered in case users add their own
                 // modded items with those.
-                if ((!logic._Config.bUseFish && conditionEntity.Category.Equals(TechTypeCategory.Fish))
-                    || (!logic._Config.bUseEggs && conditionEntity.Category.Equals(TechTypeCategory.Eggs))
-                    || (!logic._Config.bUseSeeds && conditionEntity.Category.Equals(TechTypeCategory.Seeds)))
+                if ((!logic._Config.UseFish.Value && conditionEntity.Category.Equals(TechTypeCategory.Fish))
+                    || (!logic._Config.UseEggs.Value && conditionEntity.Category.Equals(TechTypeCategory.Eggs))
+                    || (!logic._Config.UseSeeds.Value && conditionEntity.Category.Equals(TechTypeCategory.Seeds)))
                     continue;
 
                 if (logic.EntityHandler.IsInLogic(conditionEntity))
@@ -109,7 +109,7 @@ namespace SubnauticaRandomiser.Objects
             }
 
             // Ensure that necessary fragments have already been randomised.
-            if (logic._Config.bRandomiseFragments && Blueprint.Fragments?.Count > 0)
+            if (logic._Config.RandomiseFragments.Value && Blueprint.Fragments?.Count > 0)
             {
                 foreach (TechType fragment in Blueprint.Fragments)
                 {

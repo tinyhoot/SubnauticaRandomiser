@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
 using Nautilus.Handlers;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
@@ -25,7 +26,7 @@ namespace SubnauticaRandomiser.Logic
     {
         private CoreLogic _coreLogic;
         private ProgressionManager _manager;
-        private RandomiserConfig _config;
+        private Config _config;
         private ILogHandler _log;
         private EntitySerializer _serializer => CoreLogic._Serializer;
         private IRandomHandler _random;
@@ -82,7 +83,7 @@ namespace SubnauticaRandomiser.Logic
             _manager.SetupProgression += OnSetupProgression;
             _manager.SetupVehicles += OnSetupVehicles;
             
-            if (_config.bRandomiseFragments)
+            if (_config.RandomiseFragments.Value)
             {
                 _coreLogic.EntityCollecting += OnCollectFragments;
                 _manager.HasProgressed += OnProgression;
@@ -124,10 +125,10 @@ namespace SubnauticaRandomiser.Logic
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
-            if (_config.bRandomiseNumFragments)
+            if (_config.RandomiseNumFragments.Value)
                 RandomiseNumFragments(_coreLogic.EntityHandler.GetAllFragments());
             // Randomise duplicate scan rewards.
-            if (_config.bRandomiseDuplicateScans)
+            if (_config.RandomiseDuplicateScans.Value)
                 CreateDuplicateScanYieldDict();
         }
 
@@ -147,7 +148,7 @@ namespace SubnauticaRandomiser.Logic
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
-            int biomeCount = _random.Next(3, _config.iMaxBiomesPerFragment + 1);
+            int biomeCount = _random.Next(3, _config.MaxBiomesPerFragment.Value + 1);
 
             for (int i = 0; i < biomeCount; i++)
             {
@@ -237,13 +238,13 @@ namespace SubnauticaRandomiser.Logic
             };
             args.ProgressionEntities.AddRange(additions);
             // Limit this to only if fragment entities are part of the logic, else this will make the main loop hang.
-            if (_config.bRandomiseFragments)
+            if (_config.RandomiseFragments.Value)
             {
                 args.ProgressionEntities.Add(TechType.LaserCutterFragment);
                 args.ProgressionEntities.Add(TechType.PropulsionCannonFragment);
             }
             // If fragments are randomised but recipes are not, force more depth calculations for fragments.
-            if (_config.bRandomiseFragments && !_config.bRandomiseRecipes)
+            if (_config.RandomiseFragments.Value && !_config.RandomiseRecipes.Value)
             {
                 var fragmentAdditions = new[]
                 {
@@ -265,7 +266,7 @@ namespace SubnauticaRandomiser.Logic
         {
             // If fragments are randomised but recipes are not, there is no way of achieving lower depths.
             // Define new vehicle depths to counteract that.
-            if (_config.bRandomiseFragments && !_config.bRandomiseRecipes)
+            if (_config.RandomiseFragments.Value && !_config.RandomiseRecipes.Value)
             {
                 args.VehicleDepths.Add(new[] { TechType.SeaglideFragment }, 50);
                 args.VehicleDepths.Add(new[] { TechType.SeamothFragment }, 100);
@@ -305,12 +306,12 @@ namespace SubnauticaRandomiser.Logic
         private float CalcFragmentSpawnRate(Biome biome)
         {
             // Set a percentage between Min and Max% of the biome's combined original spawn rates.
-            float percentage = (_config.fFragmentSpawnChanceMin + (float)_random.NextDouble())
-                * (_config.fFragmentSpawnChanceMax - _config.fFragmentSpawnChanceMin);
+            float percentage = (_config.FragmentSpawnChanceMin.Value + (float)_random.NextDouble())
+                * (_config.FragmentSpawnChanceMax.Value - _config.FragmentSpawnChanceMin.Value);
             // If the number of scans needed per fragment is very high, increase the spawn rate proportionally.
             int maxFragments = (int)ConfigDefaults.GetDefault("iMaxFragmentsToUnlock");
-            if (_config.iMaxFragmentsToUnlock > maxFragments)
-                percentage += 0.04f * (_config.iMaxFragmentsToUnlock - maxFragments);
+            if (_config.MaxFragmentsToUnlock.Value > maxFragments)
+                percentage += 0.04f * (_config.MaxFragmentsToUnlock.Value - maxFragments);
             
             return percentage * biome.FragmentRate ?? 0.0f;
         }
@@ -321,10 +322,10 @@ namespace SubnauticaRandomiser.Logic
         /// <param name="entity">The entity that is unlocked on scan completion.</param>
         private void ChangeNumFragmentsToUnlock(LogicEntity entity)
         {
-            if (!_config.bRandomiseNumFragments)
+            if (!_config.RandomiseNumFragments.Value)
                 return;
             
-            int numFragments = _random.Next(_config.iMinFragmentsToUnlock, _config.iMaxFragmentsToUnlock + 1);
+            int numFragments = _random.Next(_config.MinFragmentsToUnlock.Value, _config.MaxFragmentsToUnlock.Value + 1);
             _log.Debug($"[F] New number of fragments required for {entity}: {numFragments}");
             _serializer.AddFragmentUnlockNum(entity.TechType, numFragments);
         }
@@ -353,7 +354,7 @@ namespace SubnauticaRandomiser.Logic
             biome.Used++;
 
             // Remove the biome from the pool if it gets too populated.
-            if (biome.Used == _config.iMaxFragmentsPerBiome)
+            if (biome.Used == _config.MaxFragmentTypesPerBiome.Value)
                 _availableBiomes.Remove(biome);
 
             return biome;
@@ -377,7 +378,7 @@ namespace SubnauticaRandomiser.Logic
             }
             
             // Additionally, add some spicy rare rewards.
-            double rareWeight = Math.Max(loot.TotalWeights() * _config.dRareDropChance, 0.01);
+            double rareWeight = Math.Max(loot.TotalWeights() * _config.RareDropChance.Value, 0.01);
             loot.Add(TechType.SeamothTorpedoModule, rareWeight);
             loot.Add(TechType.VehicleStorageModule, rareWeight);
             loot.Add(TechType.ExosuitJetUpgradeModule, rareWeight);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
@@ -16,7 +17,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
     {
         protected readonly CoreLogic _coreLogic;
         protected readonly RecipeLogic _recipeLogic;
-        protected RandomiserConfig _config => _coreLogic._Config;
+        protected Config _config => _coreLogic._Config;
         protected EntityHandler _entityHandler => _coreLogic.EntityHandler;
         protected IRandomHandler _random => _coreLogic.Random;
         protected ILogHandler _log => _coreLogic._Log;
@@ -30,7 +31,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _coreLogic = coreLogic;
             _recipeLogic = recipeLogic;
 
-            if (_config.bDoBaseTheming)
+            if (_config.BaseTheming.Value)
                 _baseTheme = new BaseTheme(_entityHandler, _log, _random);
         }
 
@@ -124,11 +125,14 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             _blacklist = new List<TechTypeCategory>();
 
-            if (_config.iEquipmentAsIngredients == 0 || (_config.iEquipmentAsIngredients == 1 && entity.CanFunctionAsIngredient()))
+            if (_config.EquipmentAsIngredients.Value == IngredientInclusionLevel.Never
+                || (_config.EquipmentAsIngredients.Value == IngredientInclusionLevel.TopLevelOnly && entity.CanFunctionAsIngredient()))
                 _blacklist.Add(TechTypeCategory.Equipment);
-            if (_config.iToolsAsIngredients == 0 || (_config.iToolsAsIngredients == 1 && entity.CanFunctionAsIngredient()))
+            if (_config.ToolsAsIngredients.Value == IngredientInclusionLevel.Never
+                || (_config.ToolsAsIngredients.Value == IngredientInclusionLevel.TopLevelOnly && entity.CanFunctionAsIngredient()))
                 _blacklist.Add(TechTypeCategory.Tools);
-            if (_config.iUpgradesAsIngredients == 0 || (_config.iUpgradesAsIngredients == 1 && entity.CanFunctionAsIngredient()))
+            if (_config.UpgradesAsIngredients.Value == IngredientInclusionLevel.Never
+                || (_config.UpgradesAsIngredients.Value == IngredientInclusionLevel.TopLevelOnly && entity.CanFunctionAsIngredient()))
             {
                 _blacklist.Add(TechTypeCategory.ScannerRoom);
                 _blacklist.Add(TechTypeCategory.VehicleUpgrades);

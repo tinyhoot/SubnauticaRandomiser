@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Events;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace SubnauticaRandomiser.Logic
     internal class ProgressionManager : MonoBehaviour
     {
         private CoreLogic _coreLogic;
-        private RandomiserConfig _config;
+        private Config _config;
         private ILogHandler _log;
 
         private Dictionary<int, List<TechType>> _essentialEntities;
@@ -140,10 +141,10 @@ namespace SubnauticaRandomiser.Logic
             int totalDepth;
             // With a rebreather, no funky extra oxygen calculations are necessary.
             if (progressionItems.Contains(TechType.Rebreather))
-                totalDepth = vehicleDepth + Math.Min((int)soloDepthRaw, _config.iMaxDepthWithoutVehicle);
+                totalDepth = vehicleDepth + Math.Min((int)soloDepthRaw, _config.MaxDepthWithoutVehicle.Value);
             else
                 totalDepth = vehicleDepth + Math.Min(CalculateSoloDepth(vehicleDepth, (int)soloDepthRaw),
-                    _config.iMaxDepthWithoutVehicle);
+                    _config.MaxDepthWithoutVehicle.Value);
 
             _log.Debug("===== New reachable depth: " + totalDepth + " =====");
 
@@ -319,7 +320,7 @@ namespace SubnauticaRandomiser.Logic
             _log.Debug($"[PM] Unlocked new progression item {entity}");
 
             // A new progression item also necessitates new depth calculations.
-            int newDepth = CalculateReachableDepth(_unlockedProgressionEntities, _config.iDepthSearchTime);
+            int newDepth = CalculateReachableDepth(_unlockedProgressionEntities, _config.DepthSearchTime.Value);
             if (newDepth > ReachableDepth)
             {
                 ReachableDepth = newDepth;

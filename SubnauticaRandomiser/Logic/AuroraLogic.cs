@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using HarmonyLib;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Patches;
@@ -17,7 +18,7 @@ namespace SubnauticaRandomiser.Logic
     {
         private CoreLogic _coreLogic;
 
-        private RandomiserConfig _config => _coreLogic._Config;
+        private Config _config => _coreLogic._Config;
         private ILogHandler _log => _coreLogic._Log;
         private IRandomHandler _random => _coreLogic.Random;
         private EntitySerializer _serializer => CoreLogic._Serializer;
@@ -39,9 +40,9 @@ namespace SubnauticaRandomiser.Logic
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
-            if (_config.bRandomiseDoorCodes)
+            if (_config.RandomiseDoorCodes.Value)
                 RandomiseDoorCodes();
-            if (_config.bRandomiseSupplyBoxes)
+            if (_config.RandomiseSupplyBoxes.Value)
                 RandomiseSupplyBoxes();
         }
 

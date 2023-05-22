@@ -44,7 +44,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _log.Debug("[R] > Adding primary ingredient " + primaryIngredient);
 
             // Now fill up with random materials until the value threshold is more or less met, as defined by fuzziness.
-            while ((entity.Value - currentValue) > (entity.Value * _config.dRecipeValueVariance / 2))
+            while ((entity.Value - currentValue) > (entity.Value * _config.RecipeValueVariance.Value / 2))
             {
                 // If a config value mandates an early stop, stop.
                 if (CheckForConfigStop(entity, totalSize))
@@ -74,7 +74,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
         public override TechType GetScrapMetalReplacement()
         {
-            if (_baseTheme.GetBaseTheme() != null)
+            if (_baseTheme?.GetBaseTheme() != null)
                 return _baseTheme.GetBaseTheme().TechType;
 
             var options = _entityHandler.GetAllRawMaterials();
@@ -90,14 +90,14 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private bool CheckForConfigStop(LogicEntity entity, int totalSize)
         {
             // Respect the maximum number of ingredients set in the config.
-            if (_ingredients.Count >= _config.iMaxIngredientsPerRecipe)
+            if (_ingredients.Count >= _config.MaxIngredientsPerRecipe.Value)
             {
                 _log.Debug("[R] ! Recipe has reached maximum allowed number of ingredients, stopping.");
                 return true;
             }
             
             // If a recipe starts requiring too much space, shut it down early.
-            if (totalSize >= _config.iMaxInventorySizePerRecipe)
+            if (totalSize >= _config.MaxInventorySizePerRecipe.Value)
             {
                 _log.Debug("[R] ! Recipe is getting too large, stopping.");
                 return true;
@@ -105,7 +105,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             
             // For special case of outpost base parts, be conservative with ingredients.
             if (_recipeLogic.BasicOutpostPieces.ContainsKey(entity.TechType)
-                && _basicOutpostSize > _config.iMaxBasicOutpostSize * 0.7)
+                && _basicOutpostSize > _config.MaxBasicOutpostSize.Value * 0.7)
             {
                 _log.Debug("[R] ! Basic outpost size is getting too large, stopping.");
                 return true;
@@ -123,8 +123,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
         [NotNull]
         private LogicEntity ChoosePrimaryIngredient(LogicEntity entity)
         {
-            double maxValue = entity.Value * (_config.dPrimaryIngredientValue + 0.1);
-            double minValue = entity.Value * (_config.dPrimaryIngredientValue - 0.1);
+            double maxValue = entity.Value * (_config.PrimaryIngredientValue.Value + 0.1);
+            double minValue = entity.Value * (_config.PrimaryIngredientValue.Value - 0.1);
             List<LogicEntity> pIngredientCandidates = _validIngredients
                 .Where(e => minValue < e.Value && e.Value < maxValue && !_blacklist.Contains(e.Category)).ToList();
 
@@ -177,7 +177,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             // If a recipe starts requiring a lot of inventory space to complete, try to minimise adding more
             // ingredients.
-            if (totalSize + (ingredient.GetItemSize() * number) > _config.iMaxInventorySizePerRecipe)
+            if (totalSize + (ingredient.GetItemSize() * number) > _config.MaxInventorySizePerRecipe.Value)
                 number = 1;
             
             return (ingredient, number);
@@ -192,9 +192,9 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <returns>A positive integer.</returns>
         private int FindMaximum(LogicEntity ingredient, double targetValue, double currentValue)
         {
-            int max = (int)((targetValue + ((targetValue * _config.dRecipeValueVariance) / 2)) - currentValue) / ingredient.Value;
+            int max = (int)((targetValue + ((targetValue * _config.RecipeValueVariance.Value) / 2)) - currentValue) / ingredient.Value;
             max = max > 0 ? max : 1;
-            max = max > _config.iMaxAmountPerIngredient ? _config.iMaxAmountPerIngredient : max;
+            max = max > _config.MaxNumberPerIngredient.Value ? _config.MaxNumberPerIngredient.Value : max;
 
             // Tools and upgrades do not stack, but if the recipe would require several and you have more than one in
             // inventory, it will consume all of them.
@@ -205,7 +205,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             // Never require more than one (default) egg. That's tedious.
             if (ingredient.Category.Equals(TechTypeCategory.Eggs))
-                max = _config.iMaxEggsAsSingleIngredient;
+                max = _config.MaxEggsAsSingleIngredient.Value;
 
             return max;
         }

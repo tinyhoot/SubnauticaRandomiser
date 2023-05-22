@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Events;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace SubnauticaRandomiser.Logic
     {
         private CoreLogic _coreLogic;
         private ProgressionManager _manager;
-        private RandomiserConfig _config;
+        private Config _config;
         private ILogHandler _log;
         private readonly List<Tuple<TechType, int>> _progression = new List<Tuple<TechType, int>>();
 
@@ -109,20 +110,20 @@ namespace SubnauticaRandomiser.Logic
                 "",
                 "",
                 "///// Basic Information /////",
-                "Seed: " + _config.iSeed,
-                "Mode: " + _config.iRandomiserMode,
-                "Spawnpoint: " + _config.sSpawnPoint,
-                "Fish, Eggs, Seeds: " + _config.bUseFish + ", " + _config.bUseEggs + ", " + _config.bUseSeeds,
-                "Random Databoxes: " + _config.bRandomiseDataboxes,
-                "Random Fragments: " + _config.bRandomiseFragments,
-                "Random Fragment numbers: " + _config.bRandomiseNumFragments + ", " + _config.iMaxFragmentsToUnlock,
-                "Random Duplicate Scan Rewards: " + _config.bRandomiseDuplicateScans,
-                "Random Recipes: " + _config.bRandomiseRecipes,
-                "Vanilla Upgrade Chains: " + _config.bVanillaUpgradeChains,
-                "Base Theming: " + _config.bDoBaseTheming,
-                "Equipment, Tools, Upgrades: " + _config.iEquipmentAsIngredients + ", " + _config.iToolsAsIngredients + ", " + _config.iUpgradesAsIngredients,
-                "Max Ingredients: " + _config.iMaxIngredientsPerRecipe + " per recipe, " + _config.iMaxAmountPerIngredient + " per ingredient",
-                "Max Biomes per Fragment: " + _config.iMaxBiomesPerFragment,
+                "Seed: " + _config.Seed.Value,
+                "Mode: " + _config.RecipeMode.Value,
+                "Spawnpoint: " + _config.SpawnPoint.Value,
+                "Fish, Eggs, Seeds: " + _config.UseFish.Value + ", " + _config.UseEggs.Value + ", " + _config.UseSeeds.Value,
+                "Random Databoxes: " + _config.RandomiseDataboxes.Value,
+                "Random Fragments: " + _config.RandomiseFragments.Value,
+                "Random Fragment numbers: " + _config.RandomiseNumFragments.Value + ", " + _config.MaxFragmentsToUnlock.Value,
+                "Random Duplicate Scan Rewards: " + _config.RandomiseDuplicateScans.Value,
+                "Random Recipes: " + _config.RandomiseRecipes.Value,
+                "Vanilla Upgrade Chains: " + _config.VanillaUpgradeChains.Value,
+                "Base Theming: " + _config.BaseTheming.Value,
+                "Equipment, Tools, Upgrades: " + _config.EquipmentAsIngredients.Value + ", " + _config.ToolsAsIngredients.Value + ", " + _config.UpgradesAsIngredients.Value,
+                "Max Ingredients: " + _config.MaxIngredientsPerRecipe.Value + " per recipe, " + _config.MaxNumberPerIngredient.Value + " per ingredient",
+                "Max Biomes per Fragment: " + _config.MaxBiomesPerFragment.Value,
                 ""
             };
             _contentAdvanced = new[]
