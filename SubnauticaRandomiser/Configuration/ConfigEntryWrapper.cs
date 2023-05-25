@@ -10,7 +10,6 @@ namespace SubnauticaRandomiser.Configuration
     /// A wrapper around the BepInEx ConfigEntry which provides extra fields for ModOption
     /// labels and self-validation.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     internal class ConfigEntryWrapper<T>
     {
         public readonly ConfigEntry<T> Entry;
@@ -19,6 +18,7 @@ namespace SubnauticaRandomiser.Configuration
 
         public string OptionLabel;
         public string OptionTooltip;
+        public List<string> ToggleControllerIds;
 
         public ConfigEntryWrapper(ConfigEntry<T> entry)
         {
@@ -45,11 +45,25 @@ namespace SubnauticaRandomiser.Configuration
             );
         }
 
+        /// <summary>
+        /// Prepare the entry with custom label and description for display in the mod options menu.
+        /// </summary>
         public ConfigEntryWrapper<T> WithDescription(string label, string tooltip)
         {
             OptionLabel = label;
             OptionTooltip = tooltip;
 
+            return this;
+        }
+
+        /// <summary>
+        /// Prepare the entry as a controller for displaying or hiding other options in the mod options menu.
+        /// Only makes sense for ToggleOptions.
+        /// </summary>
+        /// <param name="optionIds">The ids of all options affected by this one.</param>
+        public ConfigEntryWrapper<T> WithControlOverOptions(params string[] optionIds)
+        {
+            ToggleControllerIds = new List<string>(optionIds);
             return this;
         }
 
@@ -66,6 +80,25 @@ namespace SubnauticaRandomiser.Configuration
         public string GetTooltip()
         {
             return OptionTooltip ?? Entry.Description?.Description;
+        }
+
+        /// <summary>
+        /// Set all other options' gameobjects to active/inactive state based on the value of this entry.
+        /// </summary>
+        public void UpdateControlledOptions(IReadOnlyCollection<OptionItem> options)
+        {
+            // Don't do anything if this option doesn't control any others.
+            if (!(ToggleControllerIds?.Count > 0))
+                return;
+            
+            // Ensure this only happens for entries with boolean values.
+            if (!(Value is bool active))
+                return;
+            foreach (var option in options)
+            {
+                if (ToggleControllerIds.Contains(option.Id))
+                    option.OptionGameObject.SetActive(active);
+            }
         }
     }
 
@@ -181,7 +214,11 @@ namespace SubnauticaRandomiser.Configuration
                 wrapper.Value,
                 wrapper.GetTooltip()
             );
-            modOption.OnChanged += (_, e) => wrapper.Entry.Value = e.Value;
+            modOption.OnChanged += (_, e) =>
+            {
+                wrapper.Entry.Value = e.Value;
+                wrapper.UpdateControlledOptions(ConfigModOptions.Instance.Options);
+            };
             return modOption;
         }
     }

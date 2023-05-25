@@ -11,6 +11,7 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntryWrapper<bool> DebugForceRandomise;
 
         // Alternate Start
+        public ConfigEntryWrapper<bool> EnableAlternateStartModule;
         public ConfigEntryWrapper<string> SpawnPoint;
 
         // Aurora
@@ -21,6 +22,7 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntryWrapper<bool> RandomiseDataboxes;
 
         // Fragments
+        public ConfigEntryWrapper<bool> EnableFragmentModule;
         public ConfigEntryWrapper<bool> RandomiseFragments;
         public ConfigEntryWrapper<bool> RandomiseNumFragments;
         public ConfigEntryWrapper<int> MaxFragmentsToUnlock;
@@ -35,6 +37,7 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntryWrapper<double> RareDropChance;
 
         // Recipes
+        public ConfigEntryWrapper<bool> EnableRecipeModule;
         public ConfigEntryWrapper<bool> RandomiseRecipes;
         public ConfigEntryWrapper<RecipeDifficultyMode> RecipeMode;
         public ConfigEntryWrapper<bool> UseFish;
@@ -116,6 +119,16 @@ namespace SubnauticaRandomiser.Configuration
             );
             
             // Alternate Start
+            EnableAlternateStartModule = new ConfigEntryWrapper<bool>(
+                configFile: _configFile,
+                section: "Spawn",
+                key: nameof(EnableAlternateStartModule),
+                defaultValue: false,
+                description: "Enable spawning module."
+            ).WithDescription(
+                "Enable Spawning Module",
+                null
+            );
             SpawnPoint = new ConfigEntryWrapper<string>(
                 configFile: _configFile,
                 section: "Spawn",
@@ -169,6 +182,16 @@ namespace SubnauticaRandomiser.Configuration
 
             
             // Fragments
+            EnableFragmentModule = new ConfigEntryWrapper<bool>(
+                configFile: _configFile,
+                section: "Fragments",
+                key: nameof(EnableFragmentModule),
+                defaultValue: true,
+                description: "Enable fragment module."
+            ).WithDescription(
+                "Enable Fragment Module",
+                null
+            );
             RandomiseFragments = new ConfigEntryWrapper<bool>(
                 configFile: _configFile,
                 section: "Fragments",
@@ -283,6 +306,16 @@ namespace SubnauticaRandomiser.Configuration
             
 
             // Recipes
+            EnableRecipeModule = new ConfigEntryWrapper<bool>(
+                configFile: _configFile,
+                section: "Recipes",
+                key: nameof(EnableRecipeModule),
+                defaultValue: true,
+                description: "Enable recipe module."
+            ).WithDescription(
+                "Enable Recipe Module",
+                null
+            );
             RandomiseRecipes = new ConfigEntryWrapper<bool>(
                 configFile: _configFile,
                 section: "Recipes",
@@ -508,6 +541,40 @@ namespace SubnauticaRandomiser.Configuration
             SaveVersion = _configFile.Bind("Z.Bottom.Saving", "SaveVersion", Initialiser._ExpectedSaveVersion,
                 "This helps the mod keep track of whether you updated into a save incompatibility. "
                 + "Do not touch this.");
+            
+            RegisterControllingOptions();
+        }
+
+        /// <summary>
+        /// Set up all options that can toggle the display of other options in the mod menu.
+        /// </summary>
+        private void RegisterControllingOptions()
+        {
+            EnableAlternateStartModule.WithControlOverOptions(
+                SpawnPoint.GetId()
+            );
+            EnableFragmentModule.WithControlOverOptions(
+                RandomiseFragments.GetId(),
+                RandomiseNumFragments.GetId(),
+                MaxFragmentsToUnlock.GetId(),
+                MaxBiomesPerFragment.GetId(),
+                RandomiseDuplicateScans.GetId()
+            );
+            EnableRecipeModule.WithControlOverOptions(
+                RandomiseRecipes.GetId(),
+                RecipeMode.GetId(),
+                UseFish.GetId(),
+                UseEggs.GetId(),
+                DiscoverEggs.GetId(),
+                UseSeeds.GetId(),
+                EquipmentAsIngredients.GetId(),
+                ToolsAsIngredients.GetId(),
+                UpgradesAsIngredients.GetId(),
+                VanillaUpgradeChains.GetId(),
+                BaseTheming.GetId(),
+                MaxNumberPerIngredient.GetId(),
+                MaxIngredientsPerRecipe.GetId()
+            );
         }
 
         public void Save()
