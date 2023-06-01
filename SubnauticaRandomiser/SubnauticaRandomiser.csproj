@@ -61,6 +61,7 @@
   <ItemGroup>
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Configuration\ConfigDefaults.cs" />
+    <Compile Include="Configuration\ConfigEntryWrapperBase.cs" />
     <Compile Include="Configuration\ConfigModOptions.cs" />
     <Compile Include="Configuration\ConfigEntryWrapper.cs" />
     <Compile Include="DataDumper.cs" />

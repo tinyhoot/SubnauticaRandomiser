@@ -7,18 +7,13 @@ using Nautilus.Options;
 namespace SubnauticaRandomiser.Configuration
 {
     /// <summary>
-    /// A wrapper around the BepInEx ConfigEntry which provides extra fields for ModOption
-    /// labels and self-validation.
+    /// A wrapper around the BepInEx ConfigEntry which provides extra fields for more fine-grained control over
+    /// ModOption behaviour in the in-game options menu.
     /// </summary>
-    internal class ConfigEntryWrapper<T>
+    internal class ConfigEntryWrapper<T> : ConfigEntryWrapperBase
     {
         public readonly ConfigEntry<T> Entry;
-
         public T Value => Entry.Value;
-
-        public string OptionLabel;
-        public string OptionTooltip;
-        public List<string> ToggleControllerIds;
 
         public ConfigEntryWrapper(ConfigEntry<T> entry)
         {
@@ -60,24 +55,33 @@ namespace SubnauticaRandomiser.Configuration
         /// Prepare the entry as a controller for displaying or hiding other options in the mod options menu.
         /// Only makes sense for ToggleOptions.
         /// </summary>
-        /// <param name="optionIds">The ids of all options affected by this one.</param>
-        public ConfigEntryWrapper<T> WithControlOverOptions(params string[] optionIds)
+        /// <param name="options">All options affected by this one.</param>
+        public ConfigEntryWrapper<T> WithControlOverOptions(params ConfigEntryWrapperBase[] options)
         {
-            ToggleControllerIds = new List<string>(optionIds);
+            ToggleControllerIds = new List<string>();
+            foreach (var option in options)
+            {
+                ToggleControllerIds.Add(option.GetId());
+                option.HasControllingParent = true;
+            }
+
             return this;
         }
 
-        public string GetId()
+        public override string GetId()
         {
             return Entry.Definition.Section + "_" + Entry.Definition.Key;
         }
 
-        public string GetLabel()
+        public override string GetLabel()
         {
-            return OptionLabel ?? Entry.Definition.Key;
+            var label = OptionLabel ?? Entry.Definition.Key;
+            if (HasControllingParent)
+                label = $"- {label}";
+            return label;
         }
 
-        public string GetTooltip()
+        public override string GetTooltip()
         {
             return OptionTooltip ?? Entry.Description?.Description;
         }

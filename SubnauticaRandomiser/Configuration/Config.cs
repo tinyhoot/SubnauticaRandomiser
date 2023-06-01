@@ -551,29 +551,29 @@ namespace SubnauticaRandomiser.Configuration
         private void RegisterControllingOptions()
         {
             EnableAlternateStartModule.WithControlOverOptions(
-                SpawnPoint.GetId()
+                SpawnPoint
             );
             EnableFragmentModule.WithControlOverOptions(
-                RandomiseFragments.GetId(),
-                RandomiseNumFragments.GetId(),
-                MaxFragmentsToUnlock.GetId(),
-                MaxBiomesPerFragment.GetId(),
-                RandomiseDuplicateScans.GetId()
+                RandomiseFragments,
+                RandomiseNumFragments,
+                MaxFragmentsToUnlock,
+                MaxBiomesPerFragment,
+                RandomiseDuplicateScans
             );
             EnableRecipeModule.WithControlOverOptions(
-                RandomiseRecipes.GetId(),
-                RecipeMode.GetId(),
-                UseFish.GetId(),
-                UseEggs.GetId(),
-                DiscoverEggs.GetId(),
-                UseSeeds.GetId(),
-                EquipmentAsIngredients.GetId(),
-                ToolsAsIngredients.GetId(),
-                UpgradesAsIngredients.GetId(),
-                VanillaUpgradeChains.GetId(),
-                BaseTheming.GetId(),
-                MaxNumberPerIngredient.GetId(),
-                MaxIngredientsPerRecipe.GetId()
+                RandomiseRecipes,
+                RecipeMode,
+                UseFish,
+                UseEggs,
+                DiscoverEggs,
+                UseSeeds,
+                EquipmentAsIngredients,
+                ToolsAsIngredients,
+                UpgradesAsIngredients,
+                VanillaUpgradeChains,
+                BaseTheming,
+                MaxNumberPerIngredient,
+                MaxIngredientsPerRecipe
             );
         }
 
