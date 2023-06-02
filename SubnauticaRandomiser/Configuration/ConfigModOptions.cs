@@ -6,6 +6,9 @@ using Random = System.Random;
 
 namespace SubnauticaRandomiser.Configuration
 {
+    /// <summary>
+    /// Handles how the mod presents itself in the in-game menu.
+    /// </summary>
     internal class ConfigModOptions : ModOptions
     {
         public static ConfigModOptions Instance;
@@ -61,6 +64,9 @@ namespace SubnauticaRandomiser.Configuration
             AddItem(_config.MaxIngredientsPerRecipe.ToModSliderOption(1, 10));
         }
 
+        /// <summary>
+        /// Constructs the in-game menu.
+        /// </summary>
         public override void BuildModOptions(uGUI_TabbedControlsPanel panel, int modsTabIndex, IReadOnlyCollection<OptionItem> options)
         {
             // Reset the options pane reference to avoid linking to a gameobject that was destroyed.

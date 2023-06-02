@@ -3,6 +3,9 @@ using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Configuration
 {
+    /// <summary>
+    /// Holds all configurable parameters and handles the configfile itself.
+    /// </summary>
     internal class Config
     {
         public ConfigEntryWrapper<int> Seed;
