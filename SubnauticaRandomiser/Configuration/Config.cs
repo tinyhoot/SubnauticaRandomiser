@@ -35,8 +35,7 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntryWrapper<int> MaxDuplicateScanYield;
         public ConfigEntryWrapper<int> MaxFragmentTypesPerBiome;
         public ConfigEntryWrapper<int> MinFragmentsToUnlock;
-        public ConfigEntryWrapper<float> FragmentSpawnChanceMax;
-        public ConfigEntryWrapper<float> FragmentSpawnChanceMin;
+        public ConfigEntryWrapper<float> FragmentSpawnChanceMult;
         public ConfigEntryWrapper<double> RareDropChance;
 
         // Recipes
@@ -277,24 +276,16 @@ namespace SubnauticaRandomiser.Configuration
                 description: "The number of fragment scans needed to unlock a blueprint will never undercut this value.",
                 acceptableValues: new AcceptableValueRange<int>(1, 30)
             );
-            FragmentSpawnChanceMax = new ConfigEntryWrapper<float>(
+            FragmentSpawnChanceMult = new ConfigEntryWrapper<float>(
                 configFile: ConfigFile,
                 section: "Fragments.Advanced",
-                key: nameof(FragmentSpawnChanceMax),
-                defaultValue: 0.6f,
-                description: "This setting, tethered with the one below, provides a global modifier for the "
+                key: nameof(FragmentSpawnChanceMult),
+                defaultValue: 0.7f,
+                description: "This setting,  provides a global multiplier for the "
                              + "randomiser to decide how likely a fragment spawn should be within a biome. The value "
                              + "it ultimately decides on is multiplied with the vanilla average fragment spawn rate "
                              + "within that biome. Small adjustments can have large effects, particularly if combined "
                              + "with the maximum number of fragments allowed to spawn in a single biome.",
-                acceptableValues: new AcceptableValueRange<float>(0.01f, 10.0f)
-            );
-            FragmentSpawnChanceMin = new ConfigEntryWrapper<float>(
-                configFile: ConfigFile,
-                section: "Fragments.Advanced",
-                key: nameof(FragmentSpawnChanceMin),
-                defaultValue: 0.3f,
-                description: "See above.",
                 acceptableValues: new AcceptableValueRange<float>(0.01f, 10.0f)
             );
             RareDropChance = new ConfigEntryWrapper<double>(
@@ -333,7 +324,7 @@ namespace SubnauticaRandomiser.Configuration
                 configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(RecipeMode),
-                defaultValue: Objects.Enums.RecipeDifficultyMode.Balanced,
+                defaultValue: RecipeDifficultyMode.Balanced,
                 description: "Recipe mode. Balanced tries to stick to standard expectations of what should be "
                              + "expensive and what shouldn't. Chaotic is almost purely random."
             ).WithDescription(
@@ -385,7 +376,7 @@ namespace SubnauticaRandomiser.Configuration
                 configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(EquipmentAsIngredients),
-                defaultValue: IngredientInclusionLevel.TopLevelOnly,
+                defaultValue: IngredientInclusionLevel.Never,
                 description: "Determine whether to include equipment as possible ingredients in other recipes.\n"
                              + $"{IngredientInclusionLevel.Never}: Equipment is not a valid ingredient.\n"
                              + $"{IngredientInclusionLevel.TopLevelOnly}: Equipment is a valid ingredient in recipes "
@@ -399,7 +390,7 @@ namespace SubnauticaRandomiser.Configuration
                 configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(ToolsAsIngredients),
-                defaultValue: IngredientInclusionLevel.TopLevelOnly,
+                defaultValue: IngredientInclusionLevel.Never,
                 description: "Determine whether to include tools as possible ingredients in other recipes.\n"
                              + $"{IngredientInclusionLevel.Never}: Tools are not valid ingredients.\n"
                              + $"{IngredientInclusionLevel.TopLevelOnly}: Tools are valid ingredients in recipes "
