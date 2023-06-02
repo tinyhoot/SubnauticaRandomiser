@@ -60,7 +60,6 @@
   
   <ItemGroup>
     <Compile Include="Configuration\Config.cs" />
-    <Compile Include="Configuration\ConfigDefaults.cs" />
     <Compile Include="Configuration\ConfigEntryWrapperBase.cs" />
     <Compile Include="Configuration\ConfigModOptions.cs" />
     <Compile Include="Configuration\ConfigEntryWrapper.cs" />
@@ -103,7 +102,6 @@
     <Compile Include="Logic\Recipes\ModeRandom.cs" />
     <Compile Include="Logic\Recipes\RecipeLogic.cs" />
     <Compile Include="Patches\AlternateStart.cs" />
-    <Compile Include="RandomiserConfig.cs" />
     <Compile Include="CSVReader.cs" />
     <Compile Include="Objects\Blueprint.cs" />
     <Compile Include="Objects\Enums\BiomeRegion.cs" />

@@ -309,7 +309,7 @@ namespace SubnauticaRandomiser.Logic
             float percentage = (_config.FragmentSpawnChanceMin.Value + (float)_random.NextDouble())
                 * (_config.FragmentSpawnChanceMax.Value - _config.FragmentSpawnChanceMin.Value);
             // If the number of scans needed per fragment is very high, increase the spawn rate proportionally.
-            int maxFragments = (int)ConfigDefaults.GetDefault("iMaxFragmentsToUnlock");
+            int maxFragments = (int)_config.MaxFragmentsToUnlock.Entry.DefaultValue;
             if (_config.MaxFragmentsToUnlock.Value > maxFragments)
                 percentage += 0.04f * (_config.MaxFragmentsToUnlock.Value - maxFragments);
             

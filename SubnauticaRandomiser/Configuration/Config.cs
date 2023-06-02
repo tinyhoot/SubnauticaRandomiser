@@ -65,16 +65,16 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntry<string> Base64Save;
         public ConfigEntry<int> SaveVersion;
 
-        private ConfigFile _configFile;
+        public ConfigFile ConfigFile { get; }
 
         public Config(ConfigFile configFile)
         {
-            _configFile = configFile;
+            ConfigFile = configFile;
         }
 
         public void RegisterOptions()
         {
-            _configFile.Bind("_Welcome", "Welcome", true,
+            ConfigFile.Bind("_Welcome", "Welcome", true,
                 "Welcome to the config file! A word before you edit anything.\n"
                 + "> Changes will not apply until the next time you randomise in game.\n"
                 + "> Invalid values for options will be silently reset to their defaults.\n"
@@ -84,7 +84,7 @@ namespace SubnauticaRandomiser.Configuration
             );
             
             Seed = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "General",
                 key: nameof(Seed),
                 defaultValue: 0,
@@ -92,14 +92,14 @@ namespace SubnauticaRandomiser.Configuration
             );
             // General Advanced
             DebugForceRandomise = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "General.Advanced",
                 key: nameof(DebugForceRandomise),
                 defaultValue: false,
                 description: "Forces a new seed and re-randomisation on every game startup."
             );
             DepthSearchTime = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "General.Advanced",
                 key: nameof(DepthSearchTime),
                 defaultValue: 15,
@@ -110,7 +110,7 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<int>(0, 45)
             );
             MaxDepthWithoutVehicle = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "General.Advanced",
                 key: nameof(MaxDepthWithoutVehicle),
                 defaultValue: 200,
@@ -123,7 +123,7 @@ namespace SubnauticaRandomiser.Configuration
             
             // Alternate Start
             EnableAlternateStartModule = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Spawn",
                 key: nameof(EnableAlternateStartModule),
                 defaultValue: false,
@@ -133,7 +133,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             SpawnPoint = new ConfigEntryWrapper<string>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Spawn",
                 key: nameof(SpawnPoint),
                 defaultValue: "Vanilla",
@@ -150,7 +150,7 @@ namespace SubnauticaRandomiser.Configuration
 
             // Aurora
             RandomiseDoorCodes = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Aurora",
                 key: nameof(RandomiseDoorCodes),
                 defaultValue: true,
@@ -160,7 +160,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             RandomiseSupplyBoxes = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Aurora",
                 key: nameof(RandomiseSupplyBoxes),
                 defaultValue: true,
@@ -172,7 +172,7 @@ namespace SubnauticaRandomiser.Configuration
 
             // Databoxes
             RandomiseDataboxes = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Databoxes",
                 key: nameof(RandomiseDataboxes),
                 defaultValue: true,
@@ -186,7 +186,7 @@ namespace SubnauticaRandomiser.Configuration
             
             // Fragments
             EnableFragmentModule = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments",
                 key: nameof(EnableFragmentModule),
                 defaultValue: true,
@@ -196,7 +196,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             RandomiseFragments = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments",
                 key: nameof(RandomiseFragments),
                 defaultValue: true,
@@ -206,7 +206,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             RandomiseNumFragments = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments",
                 key: nameof(RandomiseNumFragments),
                 defaultValue: true,
@@ -216,7 +216,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             MaxFragmentsToUnlock = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments",
                 key: nameof(MaxFragmentsToUnlock),
                 defaultValue: 5,
@@ -227,7 +227,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             MaxBiomesPerFragment = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments",
                 key: nameof(MaxBiomesPerFragment),
                 defaultValue: 5,
@@ -239,7 +239,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Use with caution. Very low/high values can make it difficult to find enough fragments."
             );
             RandomiseDuplicateScans = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments",
                 key: nameof(RandomiseDuplicateScans),
                 defaultValue: true,
@@ -251,7 +251,7 @@ namespace SubnauticaRandomiser.Configuration
             );
             // Fragments Advanced
             MaxDuplicateScanYield = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments.Advanced",
                 key: nameof(MaxDuplicateScanYield),
                 defaultValue: 2,
@@ -260,7 +260,7 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<int>(1, 10)
             );
             MaxFragmentTypesPerBiome = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments.Advanced",
                 key: nameof(MaxFragmentTypesPerBiome),
                 defaultValue: 4,
@@ -270,7 +270,7 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<int>(1, 10)
             );
             MinFragmentsToUnlock = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments.Advanced",
                 key: nameof(MinFragmentsToUnlock),
                 defaultValue: 2,
@@ -278,7 +278,7 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<int>(1, 30)
             );
             FragmentSpawnChanceMax = new ConfigEntryWrapper<float>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments.Advanced",
                 key: nameof(FragmentSpawnChanceMax),
                 defaultValue: 0.6f,
@@ -290,7 +290,7 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<float>(0.01f, 10.0f)
             );
             FragmentSpawnChanceMin = new ConfigEntryWrapper<float>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments.Advanced",
                 key: nameof(FragmentSpawnChanceMin),
                 defaultValue: 0.3f,
@@ -298,7 +298,7 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<float>(0.01f, 10.0f)
             );
             RareDropChance = new ConfigEntryWrapper<double>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Fragments.Advanced",
                 key: nameof(RareDropChance),
                 defaultValue: 0.05,
@@ -310,7 +310,7 @@ namespace SubnauticaRandomiser.Configuration
 
             // Recipes
             EnableRecipeModule = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(EnableRecipeModule),
                 defaultValue: true,
@@ -320,7 +320,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             RandomiseRecipes = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(RandomiseRecipes),
                 defaultValue: true,
@@ -330,7 +330,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             RecipeMode = new ConfigEntryWrapper<RecipeDifficultyMode>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(RecipeMode),
                 defaultValue: Objects.Enums.RecipeDifficultyMode.Balanced,
@@ -342,7 +342,7 @@ namespace SubnauticaRandomiser.Configuration
                 + "shouldn't. Chaotic is almost purely random."
             );
             UseFish = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(UseFish),
                 defaultValue: true,
@@ -352,7 +352,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             UseEggs = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(UseEggs),
                 defaultValue: false,
@@ -362,7 +362,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             DiscoverEggs = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(DiscoverEggs),
                 defaultValue: false,
@@ -372,7 +372,7 @@ namespace SubnauticaRandomiser.Configuration
                 "This skips having to build an ACU before using eggs."
             );
             UseSeeds = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(UseSeeds),
                 defaultValue: true,
@@ -382,7 +382,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             EquipmentAsIngredients = new ConfigEntryWrapper<IngredientInclusionLevel>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(EquipmentAsIngredients),
                 defaultValue: IngredientInclusionLevel.TopLevelOnly,
@@ -396,7 +396,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Top-level recipes are recipes which cannot be re-used as ingredients, such as base pieces."
             );
             ToolsAsIngredients = new ConfigEntryWrapper<IngredientInclusionLevel>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(ToolsAsIngredients),
                 defaultValue: IngredientInclusionLevel.TopLevelOnly,
@@ -410,7 +410,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Top-level recipes are recipes which cannot be re-used as ingredients, such as base pieces."
             );
             UpgradesAsIngredients = new ConfigEntryWrapper<IngredientInclusionLevel>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(UpgradesAsIngredients),
                 defaultValue: IngredientInclusionLevel.TopLevelOnly,
@@ -424,7 +424,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Top-level recipes are recipes which cannot be re-used as ingredients, such as base pieces."
             );
             VanillaUpgradeChains = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(VanillaUpgradeChains),
                 defaultValue: false,
@@ -435,7 +435,7 @@ namespace SubnauticaRandomiser.Configuration
                 "If enabled, forces upgrades to be sequential. E.g. vehicle depth upgrade 3 will always require upgrade 2 first."
             );
             BaseTheming = new ConfigEntryWrapper<bool>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(BaseTheming),
                 defaultValue: false,
@@ -446,7 +446,7 @@ namespace SubnauticaRandomiser.Configuration
                 "If enabled, every base part will require the same random ingredient in addition to its other ingredients."
             );
             MaxNumberPerIngredient = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(MaxNumberPerIngredient),
                 defaultValue: 5,
@@ -458,7 +458,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Recipes cannot require more than this many of a single ingredient at once, e.g. no more than 5 titanium."
             );
             MaxIngredientsPerRecipe = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes",
                 key: nameof(MaxIngredientsPerRecipe),
                 defaultValue: 7,
@@ -471,7 +471,7 @@ namespace SubnauticaRandomiser.Configuration
             );
             // Recipes Advanced
             MaxBasicOutpostSize = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes.Advanced",
                 key: nameof(MaxBasicOutpostSize),
                 defaultValue: 24,
@@ -481,7 +481,7 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<int>(4, 48)
             );
             MaxEggsAsSingleIngredient = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes.Advanced",
                 key: nameof(MaxEggsAsSingleIngredient),
                 defaultValue: 1,
@@ -492,7 +492,7 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<int>(1, 10)
             );
             MaxInventorySizePerRecipe = new ConfigEntryWrapper<int>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes.Advanced",
                 key: nameof(MaxInventorySizePerRecipe),
                 defaultValue: 24,
@@ -507,7 +507,7 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<int>(4, 144)
             );
             PrimaryIngredientValue = new ConfigEntryWrapper<double>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes.Advanced",
                 key: nameof(PrimaryIngredientValue),
                 defaultValue: 0.45,
@@ -522,7 +522,7 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<double>(0.0, 1.0)
             );
             RecipeValueVariance = new ConfigEntryWrapper<double>(
-                configFile: _configFile,
+                configFile: ConfigFile,
                 section: "Recipes.Advanced",
                 key: nameof(RecipeValueVariance),
                 defaultValue: 0.2,
@@ -539,9 +539,9 @@ namespace SubnauticaRandomiser.Configuration
             );
             
             // Saving
-            Base64Save = _configFile.Bind("Z.Bottom.Saving", "Base64Save", "",
+            Base64Save = ConfigFile.Bind("Z.Bottom.Saving", "Base64Save", "",
                 "This is your saved randomisation state. Delete this to delete your save.");
-            SaveVersion = _configFile.Bind("Z.Bottom.Saving", "SaveVersion", Initialiser._ExpectedSaveVersion,
+            SaveVersion = ConfigFile.Bind("Z.Bottom.Saving", "SaveVersion", Initialiser._ExpectedSaveVersion,
                 "This helps the mod keep track of whether you updated into a save incompatibility. "
                 + "Do not touch this.");
             
@@ -582,12 +582,12 @@ namespace SubnauticaRandomiser.Configuration
         
         public void Reload()
         {
-            _configFile.Reload();
+            ConfigFile.Reload();
         }
         
         public void Save()
         {
-            _configFile.Save();
+            ConfigFile.Save();
         }
     }
 }

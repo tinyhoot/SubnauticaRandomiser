@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
+using System.Linq;
 using System.Threading.Tasks;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Objects;
@@ -22,8 +22,7 @@ namespace SubnauticaRandomiser.Logic
         private Config _config;
         private ILogHandler _log;
         private readonly List<Tuple<TechType, int>> _progression = new List<Tuple<TechType, int>>();
-
-        private List<string> _basicOptions;
+        
         private string[] _contentHeader;
         private string[] _contentBasics;
         private string[] _contentAdvanced;
@@ -81,22 +80,6 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void PrepareStrings()
         {
-            _basicOptions = new List<string>()
-            {
-                "iSeed",
-                "iRandomiserMode",
-                "bUseFish", "bUseEggs", "bUseSeeds",
-                "bRandomiseDataboxes",
-                "bRandomiseFragments",
-                "bRandomiseNumFragments", "iMaxFragmentsToUnlock",
-                "bRandomiseDuplicateScans",
-                "bRandomiseRecipes",
-                "bVanillaUpgradeChains",
-                "bDoBaseTheming",
-                "iEquipmentAsIngredients", "iToolsAsIngredients", "iUpgradesAsIngredients",
-                "iMaxIngredientsPerRecipe", "iMaxAmountPerIngredient",
-                "bMaxBiomesPerFragments"
-            };
             _contentHeader = new[]
             {
                 "*************************************************",
@@ -156,22 +139,12 @@ namespace SubnauticaRandomiser.Logic
         private string[] PrepareAdvancedSettings()
         {
             List<string> preparedAdvSettings = new List<string>();
-            FieldInfo[] fieldInfoArray = typeof(RandomiserConfig).GetFields(BindingFlags.Public | BindingFlags.Instance);
-            
-            foreach (FieldInfo field in fieldInfoArray)
+
+            foreach (var kvpair in _config.ConfigFile.Where(kv => kv.Key.Section.Contains("Advanced")))
             {
-                // Check whether this field is an advanced config option or not.
-                if (_basicOptions.Contains(field.Name))
-                    continue;
-                if (!ConfigDefaults.Contains(field.Name))
-                    continue;
-                
-                var userValue = field.GetValue(_config);
-                var defaultValue = ConfigDefaults.GetDefault(field.Name);
-                // If the value of a config field does not correspond to its default value, the user must have
-                // modified it. Add it to the list in that case.
-                if (!userValue.Equals(defaultValue))
-                    preparedAdvSettings.Add(field.Name + ": " + userValue);
+                var entry = kvpair.Value;
+                if (entry.DefaultValue != null && !entry.DefaultValue.Equals(entry.BoxedValue))
+                    preparedAdvSettings.Add($"{kvpair.Key.Key}: {entry.BoxedValue}");
             }
             _log.Debug("Added anomalies: " + preparedAdvSettings.Count);
 
