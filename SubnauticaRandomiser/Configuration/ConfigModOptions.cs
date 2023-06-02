@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Nautilus.Options;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = System.Random;
@@ -70,15 +71,25 @@ namespace SubnauticaRandomiser.Configuration
         public override void BuildModOptions(uGUI_TabbedControlsPanel panel, int modsTabIndex, IReadOnlyCollection<OptionItem> options)
         {
             // Reset the options pane reference to avoid linking to a gameobject that was destroyed.
-            _modOptionsPane = null;
+            FindModOptionsPane(panel, modsTabIndex);
             _separator = null;
             
             panel.AddHeading(modsTabIndex, Initialiser.NAME);
-
+            
+            // If this is not the main menu, replace the entire menu with a warning and exit immediately.
+            // The menu should never be accessible from in-game.
+            if (!IsMainMenu(panel))
+            {
+                AddText("The settings for this mod can only be accessed from the main menu.");
+                return;
+            }
+            
+            AddText("After changing any options here you must <color=#FF0000FF>press the button below</color> or "
+                    + "your changes will not do anything!");
             foreach (var option in options)
             {
                 if (_addSeparatorBefore.Contains(option.Id))
-                    AddSeparator(panel, modsTabIndex);
+                    AddSeparator(panel);
                 option.AddToPanel(panel, modsTabIndex);
             }
             
@@ -87,13 +98,27 @@ namespace SubnauticaRandomiser.Configuration
             _config.EnableRecipeModule.UpdateControlledOptions(options);
         }
 
-        private void AddSeparator(uGUI_TabbedControlsPanel panel, int modsTabIndex)
+        private void AddSeparator(uGUI_TabbedControlsPanel panel)
         {
-            _modOptionsPane ??= panel.transform.Find("Middle/PanesHolder").GetChild(modsTabIndex).Find("Viewport/Content");
             _separator ??= CreateSeparator(panel);
             GameObject.Instantiate(_separator, _modOptionsPane, false);
         }
-
+        
+        /// <summary>
+        /// Add a pure text label without attachment to any ModOptions to the menu.
+        /// </summary>
+        private void AddText(string text, float fontSize = 30f)
+        {
+            var textObject = new GameObject("Text Label");
+            textObject.transform.SetParent(_modOptionsPane, false);
+            var textMesh = textObject.AddComponent<TextMeshProUGUI>();
+            textMesh.autoSizeTextContainer = true;
+            textMesh.fontSize = fontSize;
+            textMesh.enableWordWrapping = true;
+            textMesh.overflowMode = TextOverflowModes.Overflow;
+            textMesh.text = text;
+        }
+        
         /// <summary>
         /// Creates a GameObject which can act as a visual separator in the options menu.
         /// </summary>
@@ -124,6 +149,19 @@ namespace SubnauticaRandomiser.Configuration
             image.sprite = Utils.RecolourSprite(sprite, new Color(0.4f, 0.7f, 0.9f));
 
             return separator;
+        }
+
+        private void FindModOptionsPane(uGUI_TabbedControlsPanel panel, int modsTabIndex)
+        {
+            _modOptionsPane = panel.transform.Find("Middle/PanesHolder").GetChild(modsTabIndex).Find("Viewport/Content");
+        }
+
+        /// <summary>
+        /// Check whether this panel is part of the main menu.
+        /// </summary>
+        private bool IsMainMenu(uGUI_TabbedControlsPanel panel)
+        {
+            return panel.GetComponentInParent<uGUI_MainMenu>() != null;
         }
 
         private void RandomiseNewSeed(ButtonClickedEventArgs args)
