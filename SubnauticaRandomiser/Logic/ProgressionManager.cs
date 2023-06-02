@@ -14,6 +14,7 @@ namespace SubnauticaRandomiser.Logic
     /// the logic progresses, and defines what progression <em>is</em>.
     /// </summary>
     [RequireComponent(typeof(CoreLogic))]
+    [DisallowMultipleComponent]
     internal class ProgressionManager : MonoBehaviour
     {
         private CoreLogic _coreLogic;

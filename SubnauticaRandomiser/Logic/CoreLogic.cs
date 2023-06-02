@@ -22,6 +22,7 @@ namespace SubnauticaRandomiser.Logic
     /// Acts as the core for handling all randomising logic in the mod, registering or enabling modules, and invoking
     /// the most important events.
     /// </summary>
+    [DisallowMultipleComponent]
     internal class CoreLogic : MonoBehaviour
     {
         public static CoreLogic Main;
