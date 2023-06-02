@@ -30,10 +30,10 @@ namespace SubnauticaRandomiser.Configuration
             Instance = this;
             _config = config;
             
-            // TODO: Add tooltip once nautilus fixes that.
-            AddItem(ModButtonOption.Create("button_randomise", "Randomise!", RandomiseNewSeed));
-            AddItem(ModButtonOption.Create("button_randomiseFromConfig", "Apply config from disk",
-                RandomiseFromConfig));
+            AddItem(ModButtonOption.Create("button_randomise", "Randomise!", RandomiseNewSeed,
+                tooltip: "Apply your config changes and randomise. Restart your game afterwards!"));
+            AddItem(ModButtonOption.Create("button_randomiseFromConfig", "Apply config from disk", RandomiseFromConfig, 
+                tooltip: "If someone else gave you their config file, click here to load it. Restart your game afterwards!"));
 
             AddItem(_config.EnableAlternateStartModule.ToModToggleOption());
             AddItem(_config.SpawnPoint.ToModChoiceOption());
