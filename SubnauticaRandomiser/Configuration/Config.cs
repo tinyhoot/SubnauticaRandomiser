@@ -281,7 +281,7 @@ namespace SubnauticaRandomiser.Configuration
                 section: "Fragments.Advanced",
                 key: nameof(FragmentSpawnChanceMult),
                 defaultValue: 0.7f,
-                description: "This setting,  provides a global multiplier for the "
+                description: "This setting provides a global multiplier for the "
                              + "randomiser to decide how likely a fragment spawn should be within a biome. The value "
                              + "it ultimately decides on is multiplied with the vanilla average fragment spawn rate "
                              + "within that biome. Small adjustments can have large effects, particularly if combined "
@@ -292,7 +292,7 @@ namespace SubnauticaRandomiser.Configuration
                 configFile: ConfigFile,
                 section: "Fragments.Advanced",
                 key: nameof(RareDropChance),
-                defaultValue: 0.05,
+                defaultValue: 0.0025,
                 description: "Scanning a known fragment has a chance to grant a high-value drop. This setting controls "
                              + "how often these high value drops occur.",
                 acceptableValues: new AcceptableValueRange<double>(0.0, 1.0)
