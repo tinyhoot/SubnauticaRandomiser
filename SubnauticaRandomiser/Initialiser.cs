@@ -178,9 +178,9 @@ namespace SubnauticaRandomiser
         private void SetupGameObject()
         {
             // Instantiating this automatically starts running the Awake() methods of all components.
-            _LogicObject = new GameObject("Randomiser Logic", typeof(CoreLogic), typeof(ProgressionManager));
+            _LogicObject = new GameObject("Randomiser Logic", typeof(CoreLogic));
             // Set this plugin (or BepInEx) as the parent of the logic GameObject.
-            _LogicObject.transform.parent = transform;
+            _LogicObject.transform.SetParent(transform, false);
             _coreLogic = _LogicObject.GetComponent<CoreLogic>();
         }
 
