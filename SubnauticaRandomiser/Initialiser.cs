@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using BepInEx;
+using BepInEx.Configuration;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
@@ -54,7 +55,8 @@ namespace SubnauticaRandomiser
 
             // Register options menu.
             _ModDirectory = GetModDirectory();
-            _Config = new Config(Config);
+            var file = new ConfigFile(Path.Combine(Paths.ConfigPath, $"{NAME.Replace(" ", string.Empty)}.cfg"), true, Info.Metadata);
+            _Config = new Config(file);
             _Config.RegisterOptions();
             var modOptions = new ConfigModOptions(NAME, _Config);
             OptionsPanelHandler.RegisterModOptions(modOptions);
