@@ -56,7 +56,7 @@ namespace SubnauticaRandomiser
             _ModDirectory = GetModDirectory();
             _Config = new Config(Config);
             _Config.RegisterOptions();
-            var modOptions = new ConfigModOptions(NAME);
+            var modOptions = new ConfigModOptions(NAME, _Config);
             OptionsPanelHandler.RegisterModOptions(modOptions);
             _Log.Debug("Registered options menu.");
 

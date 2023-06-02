@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Nautilus.Options;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = System.Random;
 
 namespace SubnauticaRandomiser.Configuration
 {
@@ -9,6 +10,7 @@ namespace SubnauticaRandomiser.Configuration
     {
         public static ConfigModOptions Instance;
         
+        private Config _config;
         private Transform _modOptionsPane;
         private GameObject _separator;
         private List<string> _addSeparatorBefore = new List<string>
@@ -18,45 +20,52 @@ namespace SubnauticaRandomiser.Configuration
             Initialiser._Config.EnableRecipeModule.GetId(),
         };
         
-        public ConfigModOptions(string name) : base(name)
+        public ConfigModOptions(string name, Config config) : base(name)
         {
             // Needed so that individual options can access the list of all other ones.
             Instance = this;
+            _config = config;
+            
+            // TODO: Add tooltip once nautilus fixes that.
+            AddItem(ModButtonOption.Create("button_randomise", "Randomise!", RandomiseNewSeed));
+            AddItem(ModButtonOption.Create("button_randomiseFromConfig", "Apply config from disk",
+                RandomiseFromConfig));
 
-            AddItem(Initialiser._Config.EnableAlternateStartModule.ToModToggleOption());
-            AddItem(Initialiser._Config.SpawnPoint.ToModChoiceOption());
+            AddItem(_config.EnableAlternateStartModule.ToModToggleOption());
+            AddItem(_config.SpawnPoint.ToModChoiceOption());
 
-            AddItem(Initialiser._Config.RandomiseDataboxes.ToModToggleOption());
-            AddItem(Initialiser._Config.RandomiseDoorCodes.ToModToggleOption());
-            AddItem(Initialiser._Config.RandomiseSupplyBoxes.ToModToggleOption());
+            AddItem(_config.RandomiseDataboxes.ToModToggleOption());
+            AddItem(_config.RandomiseDoorCodes.ToModToggleOption());
+            AddItem(_config.RandomiseSupplyBoxes.ToModToggleOption());
 
-            AddItem(Initialiser._Config.EnableFragmentModule.ToModToggleOption());
-            AddItem(Initialiser._Config.RandomiseFragments.ToModToggleOption());
-            AddItem(Initialiser._Config.RandomiseNumFragments.ToModToggleOption());
-            AddItem(Initialiser._Config.MaxFragmentsToUnlock.ToModSliderOption(1, 20));
-            AddItem(Initialiser._Config.MaxBiomesPerFragment.ToModSliderOption(3, 10));
-            AddItem(Initialiser._Config.RandomiseDuplicateScans.ToModToggleOption());
+            AddItem(_config.EnableFragmentModule.ToModToggleOption());
+            AddItem(_config.RandomiseFragments.ToModToggleOption());
+            AddItem(_config.RandomiseNumFragments.ToModToggleOption());
+            AddItem(_config.MaxFragmentsToUnlock.ToModSliderOption(1, 20));
+            AddItem(_config.MaxBiomesPerFragment.ToModSliderOption(3, 10));
+            AddItem(_config.RandomiseDuplicateScans.ToModToggleOption());
 
-            AddItem(Initialiser._Config.EnableRecipeModule.ToModToggleOption());
-            AddItem(Initialiser._Config.RandomiseRecipes.ToModToggleOption());
-            AddItem(Initialiser._Config.RecipeMode.ToModChoiceOption());
-            AddItem(Initialiser._Config.UseFish.ToModToggleOption());
-            AddItem(Initialiser._Config.UseSeeds.ToModToggleOption());
-            AddItem(Initialiser._Config.UseEggs.ToModToggleOption());
-            AddItem(Initialiser._Config.DiscoverEggs.ToModToggleOption());
-            AddItem(Initialiser._Config.EquipmentAsIngredients.ToModChoiceOption());
-            AddItem(Initialiser._Config.ToolsAsIngredients.ToModChoiceOption());
-            AddItem(Initialiser._Config.UpgradesAsIngredients.ToModChoiceOption());
-            AddItem(Initialiser._Config.VanillaUpgradeChains.ToModToggleOption());
-            AddItem(Initialiser._Config.BaseTheming.ToModToggleOption());
-            AddItem(Initialiser._Config.MaxNumberPerIngredient.ToModSliderOption(1, 10));
-            AddItem(Initialiser._Config.MaxIngredientsPerRecipe.ToModSliderOption(1, 10));
+            AddItem(_config.EnableRecipeModule.ToModToggleOption());
+            AddItem(_config.RandomiseRecipes.ToModToggleOption());
+            AddItem(_config.RecipeMode.ToModChoiceOption());
+            AddItem(_config.UseFish.ToModToggleOption());
+            AddItem(_config.UseSeeds.ToModToggleOption());
+            AddItem(_config.UseEggs.ToModToggleOption());
+            AddItem(_config.DiscoverEggs.ToModToggleOption());
+            AddItem(_config.EquipmentAsIngredients.ToModChoiceOption());
+            AddItem(_config.ToolsAsIngredients.ToModChoiceOption());
+            AddItem(_config.UpgradesAsIngredients.ToModChoiceOption());
+            AddItem(_config.VanillaUpgradeChains.ToModToggleOption());
+            AddItem(_config.BaseTheming.ToModToggleOption());
+            AddItem(_config.MaxNumberPerIngredient.ToModSliderOption(1, 10));
+            AddItem(_config.MaxIngredientsPerRecipe.ToModSliderOption(1, 10));
         }
 
         public override void BuildModOptions(uGUI_TabbedControlsPanel panel, int modsTabIndex, IReadOnlyCollection<OptionItem> options)
         {
-            // Reset the options pane reference to avoid linking to a gameobject that no longer exists.
+            // Reset the options pane reference to avoid linking to a gameobject that was destroyed.
             _modOptionsPane = null;
+            _separator = null;
             
             panel.AddHeading(modsTabIndex, Initialiser.NAME);
 
@@ -67,9 +76,9 @@ namespace SubnauticaRandomiser.Configuration
                 option.AddToPanel(panel, modsTabIndex);
             }
             
-            Initialiser._Config.EnableAlternateStartModule.UpdateControlledOptions(options);
-            Initialiser._Config.EnableFragmentModule.UpdateControlledOptions(options);
-            Initialiser._Config.EnableRecipeModule.UpdateControlledOptions(options);
+            _config.EnableAlternateStartModule.UpdateControlledOptions(options);
+            _config.EnableFragmentModule.UpdateControlledOptions(options);
+            _config.EnableRecipeModule.UpdateControlledOptions(options);
         }
 
         private void AddSeparator(uGUI_TabbedControlsPanel panel, int modsTabIndex)
@@ -109,6 +118,24 @@ namespace SubnauticaRandomiser.Configuration
             image.sprite = Utils.RecolourSprite(sprite, new Color(0.4f, 0.7f, 0.9f));
 
             return separator;
+        }
+
+        private void RandomiseNewSeed(ButtonClickedEventArgs args)
+        {
+            Random random = new Random();
+            int seed = random.Next();
+            _config.Seed.Entry.Value = seed;
+            Initialiser._Log.InGameMessage("Changed seed to " + seed);
+            Initialiser._Log.InGameMessage("Randomising...");
+            Initialiser._Main.RandomiseFromConfig();
+        }
+
+        private void RandomiseFromConfig(ButtonClickedEventArgs args)
+        {
+            Initialiser._Log.InGameMessage("Randomising...");
+            // Ensure all manual changes to the config file are loaded.
+            _config.Reload();
+            Initialiser._Main.RandomiseFromConfig();
         }
     }
 }

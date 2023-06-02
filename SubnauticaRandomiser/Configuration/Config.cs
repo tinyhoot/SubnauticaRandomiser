@@ -576,7 +576,12 @@ namespace SubnauticaRandomiser.Configuration
                 MaxIngredientsPerRecipe
             );
         }
-
+        
+        public void Reload()
+        {
+            _configFile.Reload();
+        }
+        
         public void Save()
         {
             _configFile.Save();
