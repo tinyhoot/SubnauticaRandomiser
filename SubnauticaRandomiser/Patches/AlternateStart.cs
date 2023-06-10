@@ -37,14 +37,15 @@ namespace SubnauticaRandomiser.Patches
             // Get the distance tracker from the Aurora's Radiation gameObject.
             PlayerDistanceTracker tracker = LeakingRadiation.main.gameObject.GetComponent<PlayerDistanceTracker>();
             float maxRadius = LeakingRadiation.main.kMaxRadius;
+            float curRadius = LeakingRadiation.main.currentRadius;
 
             if (tracker.distanceToPlayer <= maxRadius)
             {
-                float time = (maxRadius - LeakingRadiation.main.kStartRadius) / LeakingRadiation.main.kGrowRate;
-                int days = (int)Math.Floor(time / DayNightCycle.kDayLengthSeconds);
+                float time = (tracker.distanceToPlayer - curRadius) / LeakingRadiation.main.kGrowRate;
+                float days = time / DayNightCycle.kDayLengthSeconds;
                 
                 Initialiser._Log.InGameMessage("CAUTION: You are inside the Aurora's radiation radius.");
-                Initialiser._Log.InGameMessage($"Radiation will reach the lifepod {days} days after explosion.");
+                Initialiser._Log.InGameMessage($"Radiation will reach the lifepod {days:F1} days after explosion.");
             }
         }
     }
