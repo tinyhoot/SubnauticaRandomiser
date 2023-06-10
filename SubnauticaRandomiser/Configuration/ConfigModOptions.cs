@@ -37,6 +37,7 @@ namespace SubnauticaRandomiser.Configuration
 
             AddItem(_config.EnableAlternateStartModule.ToModToggleOption());
             AddItem(_config.SpawnPoint.ToModChoiceOption());
+            AddItem(_config.AllowRadiatedStarts.ToModToggleOption());
 
             AddItem(_config.RandomiseDataboxes.ToModToggleOption());
             AddItem(_config.RandomiseDoorCodes.ToModToggleOption());

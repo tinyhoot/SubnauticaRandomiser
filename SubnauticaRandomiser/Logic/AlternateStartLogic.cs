@@ -26,6 +26,9 @@ namespace SubnauticaRandomiser.Logic
         private IRandomHandler _random;
         
         private Dictionary<BiomeRegion, List<float[]>> _alternateStarts;
+        private readonly Vector3 _radiationCentre = new Vector3(1038, -3, -163);
+        // Actually 950 ingame but this way there's a little buffer.
+        private const int _radiationMaxRadius = 1100;
 
         public void Awake()
         {
@@ -98,14 +101,33 @@ namespace SubnauticaRandomiser.Logic
                 throw new ArgumentException($"Starting biome '{startBiome}' is invalid!");
             }
 
-            // Choose one of the possible spawning boxes within the biome.
-            float[] box = _random.Choice(_alternateStarts[biome]);
-            // Choose the specific spawn point within the box.
-            int x = _random.Next((int)box[0], (int)box[2] + 1);
-            int z = _random.Next((int)box[3], (int)box[1] + 1);
+            // Keep trying for a random spawnpoint in this biome until we get a valid one.
+            Vector3 spawn;
+            do
+            {
+                // Choose one of the possible spawning boxes within the biome.
+                float[] box = _random.Choice(_alternateStarts[biome]);
+                // Choose the specific spawn point within the box.
+                int x = _random.Next((int)box[0], (int)box[2] + 1);
+                int z = _random.Next((int)box[3], (int)box[1] + 1);
+                spawn = new Vector3(x, 0, z);
+            } while (!IsValidStart(spawn));
 
-            _log.Debug("[AS] Chosen new lifepod spawnpoint at x:" + x + " y:0" + " z:" + z);
-            return new RandomiserVector(x, 0, z);
+            _log.Debug("[AS] Chosen new lifepod spawnpoint at x:" + spawn.x + " y:0" + " z:" + spawn.z);
+            return new RandomiserVector(spawn);
+        }
+
+        /// <summary>
+        /// Checks whether the given spawnpoint is valid considering all config options.
+        /// </summary>
+        /// <param name="spawn">The chosen location for a possible spawn.</param>
+        private bool IsValidStart(Vector3 spawn)
+        {
+            if (_config.AllowRadiatedStarts.Value)
+                return true;
+            
+            // DistanceSqr returns a squared magnitude since Sqrt() is slow. Use radius^2 to compare.
+            return spawn.DistanceSqrXZ(_radiationCentre) > Math.Pow(_radiationMaxRadius, 2);
         }
 
         private async Task ParseDataFileAsync()

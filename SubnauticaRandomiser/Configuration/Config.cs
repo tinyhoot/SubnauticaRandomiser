@@ -16,6 +16,7 @@ namespace SubnauticaRandomiser.Configuration
         // Alternate Start
         public ConfigEntryWrapper<bool> EnableAlternateStartModule;
         public ConfigEntryWrapper<string> SpawnPoint;
+        public ConfigEntryWrapper<bool> AllowRadiatedStarts;
 
         // Aurora
         public ConfigEntryWrapper<bool> RandomiseDoorCodes;
@@ -145,6 +146,18 @@ namespace SubnauticaRandomiser.Configuration
             ).WithDescription(
                 "Spawnpoint biome",
                 "Random is limited to early game biomes, Chaotic Random chooses from ALL available biomes."
+            );
+            AllowRadiatedStarts = new ConfigEntryWrapper<bool>(
+                configFile: ConfigFile,
+                section: "Spawn",
+                key: nameof(AllowRadiatedStarts),
+                defaultValue: false,
+                description: "Allow spawns that start inside the Aurora's expanding radiation zone. This probably will "
+                             + "not spawn you close enough to take damage immediately, but the radiation will expand "
+                             + "to cover the lifepod within days."
+            ).WithDescription(
+                "Allow irradiated spawns?",
+                "May spawn you inside the radiation radius if enabled."
             );
 
             // Aurora
@@ -545,7 +558,8 @@ namespace SubnauticaRandomiser.Configuration
         private void RegisterControllingOptions()
         {
             EnableAlternateStartModule.WithControlOverOptions(
-                SpawnPoint
+                SpawnPoint,
+                AllowRadiatedStarts
             );
             EnableFragmentModule.WithControlOverOptions(
                 RandomiseFragments,

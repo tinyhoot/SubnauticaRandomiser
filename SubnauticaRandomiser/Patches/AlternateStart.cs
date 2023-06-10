@@ -44,6 +44,7 @@ namespace SubnauticaRandomiser.Patches
                 float time = (tracker.distanceToPlayer - curRadius) / LeakingRadiation.main.kGrowRate;
                 float days = time / DayNightCycle.kDayLengthSeconds;
                 
+                Initialiser._Log.Debug($"{LeakingRadiation.main.kMaxRadius}");
                 Initialiser._Log.InGameMessage("CAUTION: You are inside the Aurora's radiation radius.");
                 Initialiser._Log.InGameMessage($"Radiation will reach the lifepod {days:F1} days after explosion.");
             }
