@@ -103,15 +103,16 @@ namespace SubnauticaRandomiser.Logic
 
         private void EnableModules()
         {
-            if (!_Config.SpawnPoint.Value.Equals("Vanilla"))
+            if (_Config.EnableAlternateStartModule.Value && !_Config.SpawnPoint.Value.Equals("Vanilla"))
                 RegisterModule<AlternateStartLogic>();
             if (_Config.RandomiseDoorCodes.Value || _Config.RandomiseSupplyBoxes.Value)
                 RegisterModule<AuroraLogic>();
             if (_Config.RandomiseDataboxes.Value)
                 RegisterModule<DataboxLogic>();
-            if (_Config.RandomiseFragments.Value || _Config.RandomiseNumFragments.Value || _Config.RandomiseDuplicateScans.Value)
+            if (_Config.EnableFragmentModule.Value &&
+                (_Config.RandomiseFragments.Value || _Config.RandomiseNumFragments.Value || _Config.RandomiseDuplicateScans.Value))
                 RegisterModule<FragmentLogic>();
-            if (_Config.RandomiseRecipes.Value)
+            if (_Config.EnableRecipeModule.Value && _Config.RandomiseRecipes.Value)
             {
                 RegisterModule<RawMaterialLogic>();
                 RegisterModule<RecipeLogic>();
