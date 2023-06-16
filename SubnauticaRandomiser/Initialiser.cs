@@ -30,7 +30,6 @@ namespace SubnauticaRandomiser
         public const string _BiomeFile = "biomeSlots.csv";
         public const string _RecipeFile = "recipeInformation.csv";
         public const string _WreckageFile = "wreckInformation.csv";
-        internal const string _ExpectedRecipeMD5 = "11cc2c8e44db4473c6e0d196b869d582";
         internal const int _ExpectedSaveVersion = 6;
         private static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
         {
