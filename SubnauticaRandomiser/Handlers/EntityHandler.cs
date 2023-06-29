@@ -289,6 +289,15 @@ namespace SubnauticaRandomiser.Handlers
         {
             _allEntities = await CSVReader.ParseDataFileAsync(fileName, CSVReader.ParseRecipeLine);
             AddBaseBuilderPrerequisite();
+            UpdateEntityValues(Initialiser._Config.RecipeValueMult.Value);
+        }
+
+        /// <summary>
+        /// Multiply all entities' value by a multiplier.
+        /// </summary>
+        private void UpdateEntityValues(float multiplier)
+        {
+            _allEntities.ForEach(entity => entity.Value = (int)(entity.Value * multiplier));
         }
     }
 }
