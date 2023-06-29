@@ -109,18 +109,15 @@ namespace SubnauticaRandomiser.Objects
             }
 
             // Ensure that necessary fragments have already been randomised.
-            if (logic._Config.RandomiseFragments.Value && Blueprint.Fragments?.Count > 0)
+            if (Blueprint.Fragments?.Count > 0)
             {
-                foreach (TechType fragment in Blueprint.Fragments)
-                {
-                    if (!CoreLogic._Serializer.SpawnDataDict.ContainsKey(fragment))
-                    {
-                        //LogHandler.Debug($"[B] Entity {this} missing fragment {fragment.AsString()}");
-                        return false;
-                    }
-                }
-
-                return true;
+                bool fragmentsOkay = Blueprint.Fragments.All(f => logic.EntityHandler.IsInLogic(f));
+                if (logic._Config.EnableFragmentModule.Value && logic._Config.RandomiseFragments.Value)
+                    return fragmentsOkay;
+                // If the fragment module is not enabled BUT fragments are all in logic anyway this is probably a
+                // priority entity being randomised. In that case, skip all other checks.
+                if (fragmentsOkay)
+                    return true;
             }
 
             return depth >= Blueprint.UnlockDepth;
