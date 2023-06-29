@@ -73,8 +73,6 @@ namespace SubnauticaRandomiser.Configuration
         {
             // Reset the options pane reference to avoid linking to a gameobject that was destroyed.
             FindModOptionsPane(panel, modsTabIndex);
-            _separator = null;
-            
             panel.AddHeading(modsTabIndex, Initialiser.NAME);
             
             // If this is not the main menu, replace the entire menu with a warning and exit immediately.
@@ -127,6 +125,7 @@ namespace SubnauticaRandomiser.Configuration
         {
             GameObject separator = new GameObject("OptionSeparator");
             separator.layer = 5;
+            separator.transform.SetParent(Initialiser._Main.transform);
             Transform panesHolder = panel.transform.Find("Middle/PanesHolder");
 
             LayoutElement layout = separator.EnsureComponent<LayoutElement>();
