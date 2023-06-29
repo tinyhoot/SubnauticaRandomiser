@@ -1,6 +1,7 @@
 using System;
 using HarmonyLib;
 using SubnauticaRandomiser.Logic;
+using SubnauticaRandomiser.Objects;
 using UnityEngine;
 
 namespace SubnauticaRandomiser.Patches
@@ -19,7 +20,7 @@ namespace SubnauticaRandomiser.Patches
             if (__result.y > 50f)
                 // User is likely using Lifepod Unleashed, skip randomising in that case.
                 return;
-            if (CoreLogic._Serializer?.StartPoint is null)
+            if (CoreLogic._Serializer?.StartPoint is null || CoreLogic._Serializer.StartPoint == RandomiserVector.ZERO)
                 // Has not been randomised, don't do anything.
                 return;
 

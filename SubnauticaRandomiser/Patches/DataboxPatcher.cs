@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using HarmonyLib;
+﻿using HarmonyLib;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Objects;
 using UnityEngine;
@@ -33,15 +32,8 @@ namespace SubnauticaRandomiser.Patches
 
         private static TechType GetTechTypeForPosition(Vector3 position)
         {
-            Dictionary<RandomiserVector, TechType> boxDict = CoreLogic._Serializer.Databoxes;
-
-            foreach (RandomiserVector vector in boxDict.Keys)
-            {
-                if (vector.EqualsUnityVector(position))
-                {
-                    return boxDict[vector];
-                }
-            }
+            if (CoreLogic._Serializer.Databoxes.TryGetValue(position.ToRandomiserVector(), out TechType replacement))
+                return replacement;
 
             Initialiser._Log.Warn($"[D] Failed to find databox replacement for position {position}!");
             return TechType.None;

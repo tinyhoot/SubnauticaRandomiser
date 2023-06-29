@@ -92,7 +92,7 @@ namespace SubnauticaRandomiser.Logic
         public RandomiserVector GetRandomStart(string startBiome)
         {
             if (startBiome.StartsWith("Vanilla"))
-                return null;
+                return RandomiserVector.ZERO;
             
             BiomeRegion biome = GetBiome(startBiome);
             if (!_alternateStarts.ContainsKey(biome))
