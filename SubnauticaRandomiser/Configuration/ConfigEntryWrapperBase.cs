@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using BepInEx.Configuration;
+using Nautilus.Options;
 
 namespace SubnauticaRandomiser.Configuration
 {
@@ -9,11 +11,15 @@ namespace SubnauticaRandomiser.Configuration
     {
         public string OptionLabel;
         public string OptionTooltip;
-        public List<string> ToggleControllerIds;
+        public List<string> ControlledOptionIds;
         public bool HasControllingParent = false;
-
+        public bool IsControllingParent => ControlledOptionIds?.Count > 0;
+        
+        public abstract string GetSection();
+        public abstract string GetKey();
         public abstract string GetId();
         public abstract string GetLabel();
         public abstract string GetTooltip();
+        public abstract void UpdateControlledOptions(IEnumerable<OptionItem> options);
     }
 }

@@ -87,6 +87,7 @@
     <Compile Include="Objects\Events\SetupPriorityEventArgs.cs" />
     <Compile Include="Objects\Events\SetupProgressionEventArgs.cs" />
     <Compile Include="Objects\Events\SetupVehiclesEventArgs.cs" />
+    <Compile Include="Objects\Exceptions\ConfigFieldException.cs" />
     <Compile Include="Objects\LogicEntityEqualityComparer.cs" />
     <Compile Include="Objects\LootTable.cs" />
     <Compile Include="Patches\AuroraPatcher.cs" />

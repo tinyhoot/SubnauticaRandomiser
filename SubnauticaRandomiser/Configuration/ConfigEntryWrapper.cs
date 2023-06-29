@@ -12,6 +12,7 @@ namespace SubnauticaRandomiser.Configuration
     /// </summary>
     internal class ConfigEntryWrapper<T> : ConfigEntryWrapperBase
     {
+        public Dictionary<T, HashSet<string>> ControllingValues;
         public readonly ConfigEntry<T> Entry;
         public T Value => Entry.Value;
 
@@ -51,22 +52,8 @@ namespace SubnauticaRandomiser.Configuration
             return this;
         }
 
-        /// <summary>
-        /// Prepare the entry as a controller for displaying or hiding other options in the mod options menu.
-        /// Only makes sense for ToggleOptions.
-        /// </summary>
-        /// <param name="options">All options affected by this one.</param>
-        public ConfigEntryWrapper<T> WithControlOverOptions(params ConfigEntryWrapperBase[] options)
-        {
-            ToggleControllerIds = new List<string>();
-            foreach (var option in options)
-            {
-                ToggleControllerIds.Add(option.GetId());
-                option.HasControllingParent = true;
-            }
-
-            return this;
-        }
+        public override string GetSection() => Entry.Definition.Section;
+        public override string GetKey() => Entry.Definition.Key;
 
         public override string GetId()
         {
@@ -89,20 +76,72 @@ namespace SubnauticaRandomiser.Configuration
         /// <summary>
         /// Set all other options' gameobjects to active/inactive state based on the value of this entry.
         /// </summary>
-        public void UpdateControlledOptions(IReadOnlyCollection<OptionItem> options)
+        public override void UpdateControlledOptions(IEnumerable<OptionItem> options)
         {
             // Don't do anything if this option doesn't control any others.
-            if (!(ToggleControllerIds?.Count > 0))
+            if (!IsControllingParent)
                 return;
             
-            // Ensure this only happens for entries with boolean values.
-            if (!(Value is bool active))
-                return;
-            foreach (var option in options)
+            // Collect a list of all child options which themselves also control children.
+            List<ConfigEntryWrapperBase> controllers = new List<ConfigEntryWrapperBase>();
+            
+            var optionItems = options as OptionItem[] ?? options.ToArray();
+            foreach (var option in optionItems)
             {
-                if (ToggleControllerIds.Contains(option.Id))
-                    option.OptionGameObject.SetActive(active);
+                if (!ControlledOptionIds.Contains(option.Id))
+                    continue;
+                
+                bool active = ControllingValues.GetOrDefault(Value, null)?.Contains(option.Id) ?? false;
+                option.OptionGameObject.SetActive(active);
+                // Add the option to the list of child controllers if it is one.
+                if (active)
+                {
+                    var optionWrapper = Initialiser._Config.GetEntryById(option.Id);
+                    if (optionWrapper.IsControllingParent)
+                        controllers.Add(optionWrapper);
+                }
             }
+            
+            // Trigger updates for each child controller.
+            controllers.ForEach(wrapper => wrapper.UpdateControlledOptions(optionItems));
+        }
+
+        /// <summary>
+        /// Prepare the entry as a controller for displaying or hiding other options in the mod options menu.
+        /// This enables showing options with preconditions, such as hiding all options of a module when that module
+        /// is not active.
+        ///
+        /// Options controlled in this way will only display when the value of this entry matches their precondition.
+        /// It is possible to enable an option for multiple values. Useful e.g. for ChoiceOptions.
+        /// </summary>
+        /// <param name="value">The value this entry must be set to to enable all the other options.</param>
+        /// <param name="enabledOptions">All options shown when the value is set correctly.</param>
+        public ConfigEntryWrapper<T> WithConditionalOptions(T value, params ConfigEntryWrapperBase[] enabledOptions)
+        {
+            ControlledOptionIds ??= new List<string>();
+            ControllingValues ??= new Dictionary<T, HashSet<string>>();
+            if (!ControllingValues.ContainsKey(value))
+                ControllingValues.Add(value, new HashSet<string>());
+
+            foreach (var option in enabledOptions)
+            {
+                ControlledOptionIds.Add(option.GetId());
+                ControllingValues[value].Add(option.GetId());
+                option.HasControllingParent = true;
+            }
+
+            return this;
+        }
+
+        /// <summary><inheritdoc cref="WithConditionalOptions(T,SubnauticaRandomiser.Configuration.ConfigEntryWrapperBase[])"/></summary>
+        /// <param name="value"><inheritdoc cref="WithConditionalOptions(T,SubnauticaRandomiser.Configuration.ConfigEntryWrapperBase[])"/></param>
+        /// <param name="section">This option will have control over this entire section.</param>
+        public ConfigEntryWrapper<T> WithConditionalOptions(T value, string section)
+        {
+            return WithConditionalOptions(value,
+                Initialiser._Config.GetSectionEntries(section)
+                    .Where(entry => !entry.GetId().Equals(this.GetId()))
+                    .ToArray());
         }
     }
 
@@ -127,7 +166,11 @@ namespace SubnauticaRandomiser.Configuration
                 value: wrapper.Value,
                 tooltip: wrapper.GetTooltip()
             );
-            modOption.OnChanged += (_, e) => wrapper.Entry.Value = e.Value;
+            modOption.OnChanged += (_, e) => 
+            {
+                wrapper.Entry.Value = e.Value;
+                wrapper.UpdateControlledOptions(ConfigModOptions.Instance.Options);
+            };
             return modOption;
         }
 
@@ -144,7 +187,11 @@ namespace SubnauticaRandomiser.Configuration
                 value: wrapper.Value,
                 tooltip: wrapper.GetTooltip()
             );
-            modOption.OnChanged += (_, e) => wrapper.Entry.Value = e.Value;
+            modOption.OnChanged += (_, e) => 
+            {
+                wrapper.Entry.Value = e.Value;
+                wrapper.UpdateControlledOptions(ConfigModOptions.Instance.Options);
+            };
             return modOption;
         }
 

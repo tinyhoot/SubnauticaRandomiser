@@ -53,6 +53,7 @@ namespace SubnauticaRandomiser.Configuration
             AddItem(_config.EnableRecipeModule.ToModToggleOption());
             AddItem(_config.RandomiseRecipes.ToModToggleOption());
             AddItem(_config.RecipeMode.ToModChoiceOption());
+            AddItem(_config.RecipeValueMult.ToModSliderOption(0.1f, 3.0f, stepSize: 0.01f));
             AddItem(_config.UseFish.ToModToggleOption());
             AddItem(_config.UseSeeds.ToModToggleOption());
             AddItem(_config.UseEggs.ToModToggleOption());
