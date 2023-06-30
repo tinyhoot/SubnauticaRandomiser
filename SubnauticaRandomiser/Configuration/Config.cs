@@ -76,10 +76,6 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntryWrapper<int> MaxInventorySizePerRecipe;
         public ConfigEntryWrapper<double> PrimaryIngredientValue;
         public ConfigEntryWrapper<double> RecipeValueVariance;
-        
-        // Saving
-        public ConfigEntry<string> Base64Save;
-        public ConfigEntry<int> SaveVersion;
 
         public ConfigFile ConfigFile { get; }
 
@@ -572,14 +568,7 @@ namespace SubnauticaRandomiser.Configuration
                              + "values of this setting thus lead to a much more random experience.",
                 acceptableValues: new AcceptableValueRange<double>(0.0, 1.0)
             );
-            
-            // Saving
-            Base64Save = ConfigFile.Bind("Z.Bottom.Saving", "Base64Save", "",
-                "This is your saved randomisation state. Delete this to delete your save.");
-            SaveVersion = ConfigFile.Bind("Z.Bottom.Saving", "SaveVersion", Initialiser._ExpectedSaveVersion,
-                "This helps the mod keep track of whether you updated into a save incompatibility. "
-                + "Do not touch this.");
-            
+
             RegisterControllingOptions();
             UpdateOptionParentCounts();
         }

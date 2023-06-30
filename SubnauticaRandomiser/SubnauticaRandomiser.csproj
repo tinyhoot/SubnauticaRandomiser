@@ -63,6 +63,7 @@
     <Compile Include="Configuration\ConfigEntryWrapperBase.cs" />
     <Compile Include="Configuration\ConfigModOptions.cs" />
     <Compile Include="Configuration\ConfigEntryWrapper.cs" />
+    <Compile Include="Configuration\SaveFile.cs" />
     <Compile Include="DataDumper.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Handlers\EntityHandler.cs" />

@@ -27,6 +27,7 @@ namespace SubnauticaRandomiser
         // Files and structure.
         internal static string _ModDirectory;
         internal static Config _Config;
+        internal static SaveFile _SaveFile;
         public const string _AlternateStartFile = "alternateStarts.csv";
         public const string _BiomeFile = "biomeSlots.csv";
         public const string _RecipeFile = "recipeInformation.csv";
@@ -55,12 +56,14 @@ namespace SubnauticaRandomiser
 
             // Register options menu.
             _ModDirectory = GetModDirectory();
-            var file = new ConfigFile(Path.Combine(Paths.ConfigPath, GetConfigFileName()), true, Info.Metadata);
-            _Config = new Config(file);
+            var configFile = new ConfigFile(Path.Combine(Paths.ConfigPath, GetConfigFileName()), true, Info.Metadata);
+            _Config = new Config(configFile);
             _Config.RegisterOptions();
             var modOptions = new ConfigModOptions(NAME, _Config);
             OptionsPanelHandler.RegisterModOptions(modOptions);
             _Log.Debug("Registered options menu.");
+            // Set up the save file.
+            _SaveFile = new SaveFile(Path.Combine(_ModDirectory, GetSaveFileName()), _ExpectedSaveVersion);
 
             // Ensure the user did not update into a save incompatibility, and abort if they did to preserve a prior
             // version's state.
@@ -90,10 +93,10 @@ namespace SubnauticaRandomiser
         /// </summary>
         private bool CheckSaveCompatibility()
         {
-            if (_Config.SaveVersion.Value == _ExpectedSaveVersion)
+            if (_SaveFile.SaveVersion == _ExpectedSaveVersion)
                 return true;
             
-            s_versionDict.TryGetValue(_Config.SaveVersion.Value, out string version);
+            s_versionDict.TryGetValue(_SaveFile.SaveVersion, out string version);
             if (string.IsNullOrEmpty(version))
                 version = "unknown or corrupted.";
 
@@ -127,13 +130,15 @@ namespace SubnauticaRandomiser
             return $"{NAME.Replace(" ", string.Empty)}.cfg";
         }
         
+        private static string GetSaveFileName(){
+            return $"{NAME.Replace(" ", string.Empty)}_Save.sav";
+        }
+        
         /// <summary>
         /// Randomise the game, discarding any earlier randomisation data.
         /// </summary>
         private void Randomise()
         {
-            _Config.SaveVersion.Value = _ExpectedSaveVersion;
-
             // Create a new seed if the current one is just a default
             if (_Config.Seed.Value == 0)
                 _Config.Seed.Entry.Value = new RandomHandler().Next();

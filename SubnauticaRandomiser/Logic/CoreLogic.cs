@@ -35,6 +35,7 @@ namespace SubnauticaRandomiser.Logic
 
         private Harmony _harmony;
         private ProgressionManager _manager;
+        private SaveFile _saveFile;
         private SpoilerLog _spoilerLog;
 
         private List<Task> _fileTasks;
@@ -91,6 +92,7 @@ namespace SubnauticaRandomiser.Logic
             _Log = Initialiser._Log;
             EntityHandler = new EntityHandler(_Log);
             Random = new RandomHandler(_Config.Seed.Value);
+            _saveFile = Initialiser._SaveFile;
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
             _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
@@ -149,7 +151,7 @@ namespace SubnauticaRandomiser.Logic
             ApplyAllChanges();
             
             _Serializer.EnabledModules = _modules.Select(module => module.GetType()).ToList();
-            _Serializer.Serialize(_Config);
+            _Serializer.Serialize(_saveFile, Initialiser._ExpectedSaveVersion);
             
             _Log.InGameMessage("Finished randomising! Please restart your game for all changes to take effect.");
         }
@@ -409,14 +411,14 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         internal bool TryRestoreSave()
         {
-            if (string.IsNullOrEmpty(_Config.Base64Save.Value))
+            if (string.IsNullOrEmpty(Initialiser._SaveFile.Base64Save))
             {
                 _Log.Debug("[Core] base64 seed is empty.");
                 return false;
             }
 
             _Log.Debug("[Core] Trying to decode base64 string...");
-            EntitySerializer serializer = EntitySerializer.FromBase64String(_Config.Base64Save.Value);
+            EntitySerializer serializer = EntitySerializer.FromBase64String(Initialiser._SaveFile.Base64Save);
 
             if (serializer?.SpawnDataDict is null || serializer.RecipeDict is null)
             {

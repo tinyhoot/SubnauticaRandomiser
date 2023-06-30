@@ -132,11 +132,10 @@ namespace SubnauticaRandomiser
         /// <summary>
         /// Serialise the current randomisation state to disk.
         /// </summary>
-        public void Serialize(Config config)
+        public void Serialize(SaveFile save, int saveVersion)
         {
             string base64 = ToBase64String();
-            config.Base64Save.Value = base64;
-            config.Save();
+            save.Save(base64, saveVersion);
             _log.Debug("[ES] Saved game state to disk!");
         }
         
