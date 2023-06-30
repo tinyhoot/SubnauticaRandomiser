@@ -581,6 +581,7 @@ namespace SubnauticaRandomiser.Configuration
                 + "Do not touch this.");
             
             RegisterControllingOptions();
+            UpdateOptionParentCounts();
         }
 
         /// <summary>
@@ -592,6 +593,29 @@ namespace SubnauticaRandomiser.Configuration
             EnableFragmentModule.WithConditionalOptions(true, SectionFragments);
             EnableRecipeModule.WithConditionalOptions(true, SectionRecipes);
             RecipeMode.WithConditionalOptions(RecipeDifficultyMode.Balanced, RecipeValueMult);
+        }
+
+        /// <summary>
+        /// Update all option labels based on how many controlling parents they have.
+        /// </summary>
+        private void UpdateOptionParentCounts()
+        {
+            Dictionary<string, int> parentCount = new Dictionary<string, int>();
+            List<ConfigEntryWrapperBase> entries = GetConfigEntries().ToList();
+            // First, count the exact number of parents and children.
+            foreach (var wrapper in entries)
+            {
+                foreach (var child in (wrapper.ControlledOptionIds ?? Enumerable.Empty<string>()))
+                {
+                    parentCount[child] = parentCount.GetOrDefault(child, 0) + 1;
+                }
+            }
+            
+            // Second, relay this information to each child.
+            foreach (var wrapper in entries)
+            {
+                wrapper.NumControllingParents = parentCount.GetOrDefault(wrapper.GetId(), 0);
+            }
         }
 
         private IEnumerable<ConfigEntryWrapperBase> GetConfigEntries()

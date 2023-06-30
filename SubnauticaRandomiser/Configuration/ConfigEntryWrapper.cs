@@ -63,8 +63,8 @@ namespace SubnauticaRandomiser.Configuration
         public override string GetLabel()
         {
             var label = OptionLabel ?? Entry.Definition.Key;
-            if (HasControllingParent)
-                label = $"- {label}";
+            if (NumControllingParents > 0)
+                label = string.Concat(Enumerable.Repeat("   ", NumControllingParents - 1)) + $" - {label}";
             return label;
         }
 
@@ -127,7 +127,6 @@ namespace SubnauticaRandomiser.Configuration
             {
                 ControlledOptionIds.Add(option.GetId());
                 ControllingValues[value].Add(option.GetId());
-                option.HasControllingParent = true;
             }
 
             return this;
