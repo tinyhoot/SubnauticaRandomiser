@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using BepInEx;
 using BepInEx.Configuration;
 using Nautilus.Handlers;
@@ -54,7 +55,7 @@ namespace SubnauticaRandomiser
 
             // Register options menu.
             _ModDirectory = GetModDirectory();
-            var file = new ConfigFile(Path.Combine(Paths.ConfigPath, $"{NAME.Replace(" ", string.Empty)}.cfg"), true, Info.Metadata);
+            var file = new ConfigFile(Path.Combine(Paths.ConfigPath, GetConfigFileName()), true, Info.Metadata);
             _Config = new Config(file);
             _Config.RegisterOptions();
             var modOptions = new ConfigModOptions(NAME, _Config);
@@ -111,12 +112,19 @@ namespace SubnauticaRandomiser
         /// <exception cref="Exception"></exception>
         internal static void FatalError(Exception exception)
         {
-            _Log.InGameMessage($"{exception.GetType().Name.ToUpper()}: Something went wrong. Please report this error "
-                               + "with the config.json from your mod folder on Github or NexusMods.", true);
+            _Log.InGameMessage($"<color=#FF0000FF>{exception.GetType().Name.ToUpper()}:</color> Something went wrong. "
+                               + $"Please report this error with the {GetConfigFileName()} from your BepInEx config "
+                               + $"folder on Github or NexusMods.", true);
             _Log.Fatal($"{exception.GetType()}: {exception.Message}");
             _Log.Fatal(exception.StackTrace);
             // Ensure that the randomiser crashes completely if things go wrong this badly.
-            throw exception;
+            // Rethrowing in this way preserves the original stacktrace.
+            ExceptionDispatchInfo.Capture(exception).Throw();
+        }
+
+        private static string GetConfigFileName()
+        {
+            return $"{NAME.Replace(" ", string.Empty)}.cfg";
         }
         
         /// <summary>
@@ -124,7 +132,6 @@ namespace SubnauticaRandomiser
         /// </summary>
         private void Randomise()
         {
-            // _Config.SanitiseConfigValues();
             _Config.SaveVersion.Value = _ExpectedSaveVersion;
 
             // Create a new seed if the current one is just a default

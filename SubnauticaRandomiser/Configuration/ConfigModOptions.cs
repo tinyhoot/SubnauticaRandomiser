@@ -177,7 +177,7 @@ namespace SubnauticaRandomiser.Configuration
 
         private void RandomiseFromConfig(ButtonClickedEventArgs args)
         {
-            Initialiser._Log.InGameMessage("Randomising...");
+            Initialiser._Log.InGameMessage("Restoring state from config...");
             // Ensure all manual changes to the config file are loaded.
             _config.Reload();
             Initialiser._Main.RandomiseFromConfig();
