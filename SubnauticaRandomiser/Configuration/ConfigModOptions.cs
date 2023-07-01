@@ -113,10 +113,14 @@ namespace SubnauticaRandomiser.Configuration
             textObject.transform.SetParent(_modOptionsPane, false);
             var textMesh = textObject.AddComponent<TextMeshProUGUI>();
             textMesh.autoSizeTextContainer = true;
+            textMesh.font = uGUI.main.intro.mainText.text.font;
             textMesh.fontSize = fontSize;
+            textMesh.fontStyle = FontStyles.Normal;
             textMesh.enableWordWrapping = true;
             textMesh.overflowMode = TextOverflowModes.Overflow;
+            textMesh.material = uGUI.main.intro.mainText.text.material;
             textMesh.text = text;
+            textMesh.verticalAlignment = VerticalAlignmentOptions.Middle;
         }
         
         /// <summary>
