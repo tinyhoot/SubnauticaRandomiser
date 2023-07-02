@@ -68,6 +68,7 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntryWrapper<IngredientInclusionLevel> UpgradesAsIngredients;
         public ConfigEntryWrapper<bool> VanillaUpgradeChains;
         public ConfigEntryWrapper<bool> BaseTheming;
+        public ConfigEntryWrapper<RandomDistribution> DistributionWeighting;
         public ConfigEntryWrapper<int> MaxNumberPerIngredient;
         public ConfigEntryWrapper<int> MaxIngredientsPerRecipe;
         public ConfigEntryWrapper<int> MaxInventorySizePerRecipe;
@@ -475,6 +476,25 @@ namespace SubnauticaRandomiser.Configuration
             ).WithDescription(
                 "Theme base parts around a common ingredient?",
                 "If enabled, every base part will require the same random ingredient in addition to its other ingredients."
+            );
+            DistributionWeighting = new ConfigEntryWrapper<RandomDistribution>(
+                configFile: ConfigFile,
+                section: SectionRecipes,
+                key: nameof(DistributionWeighting),
+                defaultValue: RandomDistribution.Normal,
+                description: "The weighting to apply to ingredient selection. This affects the number of ingredients"
+                             + "and ingredient types required in a recipe.\n"
+                             + "Normal: All values are equally probable.\n"
+                             + "PreferLow: Stronger weighting is applied to low values, resulting in cheaper recipes.\n"
+                             + "PreferHigh: Stronger weighting is applied to higher values, resulting in more expensive recipes.\n"
+                             + "PreferExtremes: Recipes will be either very cheap or very expensive, rarely anything in between."
+            ).WithDescription(
+                "Distribution Weighting",
+                "Recipes will tend to follow the chosen distribution.\n"
+                + "Normal: All values are equally probable.\n"
+                + "PreferLow: Stronger weighting is applied to low values, resulting in cheaper recipes.\n"
+                + "PreferHigh: Stronger weighting is applied to higher values, resulting in more expensive recipes.\n"
+                + "PreferExtremes: Recipes will be either very cheap or very expensive, rarely anything in between."
             );
             MaxNumberPerIngredient = new ConfigEntryWrapper<int>(
                 configFile: ConfigFile,

@@ -63,6 +63,7 @@ namespace SubnauticaRandomiser.Configuration
             AddItem(_config.UpgradesAsIngredients.ToModChoiceOption());
             AddItem(_config.VanillaUpgradeChains.ToModToggleOption());
             AddItem(_config.BaseTheming.ToModToggleOption());
+            AddItem(_config.DistributionWeighting.ToModChoiceOption());
             AddItem(_config.MaxNumberPerIngredient.ToModSliderOption(1, 10));
             AddItem(_config.MaxIngredientsPerRecipe.ToModSliderOption(1, 10));
             AddItem(_config.MaxInventorySizePerRecipe.ToModSliderOption(4, 40));

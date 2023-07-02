@@ -100,7 +100,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // What's the maximum number of this ingredient the recipe can still sustain?
             int max = FindMaximum(ingredient, entity.Value, currentValue);
             // Figure out how many to actually use.
-            int number = _random.Next(1, max + 1);
+            int number = _random.Next(1, max + 1, _distribution);
 
             return (ingredient, number);
         }
@@ -119,7 +119,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
         protected override int GetBaseThemeIngredientNumber(LogicEntity baseTheme)
         {
-            return _random.Next(1, (int)Mathf.Ceil(_config.MaxNumberPerIngredient.Value / 2f));
+            return _random.Next(1, (int)Mathf.Ceil(_config.MaxNumberPerIngredient.Value / 2f), _distribution);
         }
         
         /// <summary>

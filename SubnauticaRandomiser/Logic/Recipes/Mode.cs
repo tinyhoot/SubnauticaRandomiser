@@ -28,6 +28,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         protected List<TechTypeCategory> _categoryBlacklist = new List<TechTypeCategory>();
         protected BaseTheme _baseTheme;
         private int _basicOutpostSize;
+        protected RandomDistribution _distribution;
 
         protected Mode(CoreLogic coreLogic, RecipeLogic recipeLogic)
         {
@@ -36,6 +37,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
             if (_config.BaseTheming.Value)
                 _baseTheme = new BaseTheme(_entityHandler, _log, _random);
+            _distribution = _config.DistributionWeighting.Value;
         }
 
         /// <summary>

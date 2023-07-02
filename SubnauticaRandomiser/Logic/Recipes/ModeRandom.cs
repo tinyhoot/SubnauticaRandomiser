@@ -15,7 +15,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         protected override IEnumerable<(LogicEntity, int)> YieldRandomIngredients(LogicEntity entity,
             ReadOnlyCollection<RandomiserIngredient> ingredients, Func<TechType, bool> isDuplicate)
         {
-            int number = _random.Next(1, _config.MaxIngredientsPerRecipe.Value + 1);
+            int number = _random.Next(1, _config.MaxIngredientsPerRecipe.Value + 1, _distribution);
 
             for (int i = 1; i <= number; i++)
             {
@@ -29,13 +29,13 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 }
 
                 int max = FindMaximum(ingredientEntity);
-                yield return (ingredientEntity, _random.Next(1, max + 1));
+                yield return (ingredientEntity, _random.Next(1, max + 1, _distribution));
             }
         }
 
         protected override int GetBaseThemeIngredientNumber(LogicEntity baseTheme)
         {
-            return _random.Next(1, FindMaximum(baseTheme) + 1);
+            return _random.Next(1, FindMaximum(baseTheme) + 1, _distribution);
         }
 
         public override TechType GetScrapMetalReplacement()

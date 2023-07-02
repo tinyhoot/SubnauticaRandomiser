@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using SubnauticaRandomiser.Interfaces;
+using SubnauticaRandomiser.Objects.Enums;
+using Random = System.Random;
 
 namespace SubnauticaRandomiser.Handlers
 {
@@ -44,9 +46,19 @@ namespace SubnauticaRandomiser.Handlers
             return _random.Next();
         }
 
+        public int Next(RandomDistribution dist)
+        {
+            return Next(0, int.MaxValue, dist);
+        }
+
         public int Next(int maxValue)
         {
             return _random.Next(maxValue);
+        }
+
+        public int Next(int maxValue, RandomDistribution dist)
+        {
+            return Next(0, maxValue, dist);
         }
 
         public int Next(int minValue, int maxValue)
@@ -54,9 +66,21 @@ namespace SubnauticaRandomiser.Handlers
             return _random.Next(minValue, maxValue);
         }
 
+        public int Next(int minValue, int maxValue, RandomDistribution dist)
+        {
+            double weight = NextDouble(dist);
+            int x = (int)Math.Floor((maxValue - minValue) * weight);
+            return minValue + x;
+        }
+
         public double NextDouble()
         {
             return _random.NextDouble();
+        }
+
+        public double NextDouble(RandomDistribution dist)
+        {
+            return dist.ApplyFunction(NextDouble());
         }
     }
 }
