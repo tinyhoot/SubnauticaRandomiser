@@ -146,7 +146,7 @@ namespace SubnauticaRandomiser.Logic
             
             // Force a new frame before the main loop.
             yield return null;
-            yield return RandomiseMainEntities(mainEntities);
+            yield return Utils.WrapCoroutine(RandomiseMainEntities(mainEntities), Initialiser.FatalError);
             yield return null;
             ApplyAllChanges();
             
