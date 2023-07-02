@@ -22,7 +22,7 @@ namespace SubnauticaRandomiser
     {
         public const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
         public const string NAME = "Subnautica Randomiser";
-        public const string VERSION = "0.10.1";
+        public const string VERSION = "0.11.0";
         
         // Files and structure.
         internal static string _ModDirectory;
@@ -32,7 +32,7 @@ namespace SubnauticaRandomiser
         public const string _BiomeFile = "biomeSlots.csv";
         public const string _RecipeFile = "recipeInformation.csv";
         public const string _WreckageFile = "wreckInformation.csv";
-        internal const int _ExpectedSaveVersion = 6;
+        internal const int _ExpectedSaveVersion = 7;
         private static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
         {
             [1] = "v0.5.1",
@@ -40,6 +40,7 @@ namespace SubnauticaRandomiser
             [3] = "v0.7.0",
             [4] = "v0.8.2",
             [5] = "v0.9.2",
+            [6] = "v0.10.1",
             [_ExpectedSaveVersion] = "v" + VERSION
         };
 
