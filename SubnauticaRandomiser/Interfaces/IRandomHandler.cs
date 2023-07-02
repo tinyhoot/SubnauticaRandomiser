@@ -24,7 +24,6 @@ namespace SubnauticaRandomiser.Interfaces
         /// <param name="dist">The random distribution weighting to apply to the variable.</param>
         public int Next(int maxValue, RandomDistribution dist);
 
-        
         /// <summary>
         /// Get a random integer between the lower and upper bound.
         /// </summary>

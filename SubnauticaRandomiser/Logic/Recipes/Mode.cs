@@ -49,17 +49,9 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             List<RandomiserIngredient> ingredients = new List<RandomiserIngredient>();
             bool isDuplicate(TechType t) => ingredients.Exists(ing => ing.techType.Equals(t));
-            int totalSize = 0;
             UpdateBlacklist(recipe);
 
-            // Add the base theme first if necessary.
-            if (_baseTheme?.GetThemeForEntity(recipe) != null)
-                AddIngredientWithMaxUsesCheck(ingredients, _baseTheme.GetBaseTheme(),
-                    GetBaseThemeIngredientNumber(_baseTheme.GetBaseTheme()));
-            // If vanilla upgrade chains are set to be preserved, prioritise the basic item.
-            LogicEntity vanilla;
-            if (_config.VanillaUpgradeChains.Value && ((vanilla = _recipeLogic.GetBaseOfUpgrade(recipe.TechType, _entityHandler)) != null))
-                AddIngredientWithMaxUsesCheck(ingredients, vanilla, 1);
+            int totalSize = HandleSpecialIngredients(ingredients, recipe);
 
             // Get ingredients from the subclass one at a time.
             foreach ((LogicEntity ingredient, int number) in YieldRandomIngredients(recipe, ingredients.AsReadOnly(), isDuplicate))
@@ -77,8 +69,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
             
             // Update the total size of everything needed to build a basic outpost.
-            if (_recipeLogic.BasicOutpostPieces.ContainsKey(recipe.TechType))
-                _basicOutpostSize += (totalSize * _recipeLogic.BasicOutpostPieces[recipe.TechType]);
+            _basicOutpostSize += totalSize * _recipeLogic.BasicOutpostPieces.GetOrDefault(recipe.TechType, 0);
 
             recipe.Recipe.Ingredients = ingredients;
             recipe.Recipe.CraftAmount = CraftDataHandler.GetRecipeData(recipe.TechType)?.craftAmount ?? 1;
@@ -228,6 +219,34 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
 
             return randomEntity;
+        }
+
+        /// <summary>
+        /// Handle any config options that result in specialised items being added to the recipe.
+        /// </summary>
+        /// <returns>The new total size of the recipe.</returns>
+        private int HandleSpecialIngredients(List<RandomiserIngredient> ingredients, LogicEntity recipe)
+        {
+            int totalSize = 0;
+            
+            // Add the base theme first if necessary.
+            if (_baseTheme?.GetThemeForEntity(recipe) != null)
+            {
+                LogicEntity theme = _baseTheme.GetBaseTheme();
+                int number = GetBaseThemeIngredientNumber(theme);
+                AddIngredientWithMaxUsesCheck(ingredients, theme, number);
+                totalSize += _baseTheme.GetBaseTheme().GetItemSize() * number;
+            }
+
+            // If vanilla upgrade chains are set to be preserved, prioritise the thing this recipe upgrades from.
+            LogicEntity vanilla;
+            if (_config.VanillaUpgradeChains.Value && ((vanilla = _recipeLogic.GetBaseOfUpgrade(recipe.TechType, _entityHandler)) != null))
+            {
+                AddIngredientWithMaxUsesCheck(ingredients, vanilla, 1);
+                totalSize += vanilla.GetItemSize();
+            }
+
+            return totalSize;
         }
 
         /// <summary>

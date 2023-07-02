@@ -207,7 +207,6 @@ namespace SubnauticaRandomiser.Configuration
                 "Randomise blueprints in databoxes?",
                 "Databoxes will be in the same locations, but contain different blueprints."
             );
-
             
             // Fragments
             EnableFragmentModule = new ConfigEntryWrapper<bool>(
@@ -324,7 +323,6 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<double>(0.0, 1.0)
             );
             
-
             // Recipes
             EnableRecipeModule = new ConfigEntryWrapper<bool>(
                 configFile: ConfigFile,
