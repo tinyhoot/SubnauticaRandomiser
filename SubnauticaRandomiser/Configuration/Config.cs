@@ -70,10 +70,10 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntryWrapper<bool> BaseTheming;
         public ConfigEntryWrapper<int> MaxNumberPerIngredient;
         public ConfigEntryWrapper<int> MaxIngredientsPerRecipe;
+        public ConfigEntryWrapper<int> MaxInventorySizePerRecipe;
         // Recipes Advanced
         public ConfigEntryWrapper<int> MaxBasicOutpostSize;
         public ConfigEntryWrapper<int> MaxEggsAsSingleIngredient;
-        public ConfigEntryWrapper<int> MaxInventorySizePerRecipe;
         public ConfigEntryWrapper<double> PrimaryIngredientValue;
         public ConfigEntryWrapper<double> RecipeValueVariance;
 
@@ -500,6 +500,25 @@ namespace SubnauticaRandomiser.Configuration
                 "Max ingredient types per recipe",
                 "Recipes cannot require more than this many different ingredients."
             );
+            MaxInventorySizePerRecipe = new ConfigEntryWrapper<int>(
+                configFile: ConfigFile,
+                section: SectionRecipes,
+                key: nameof(MaxInventorySizePerRecipe),
+                defaultValue: 24,
+                description: "Some recipes, particularly mid-late game ones like the cyclops, are valued so highly "
+                             + "that the total number of ingredients you'd need to craft them would exceed how much "
+                             + "you can physically carry in your inventory. Without an inventory-expanding "
+                             + "mod, this results in a softlock. The vanilla inventory is 6x8, resulting in 48 "
+                             + "units of inventory space. The default value thus blocks any recipe from requiring "
+                             + "more than half your inventory at once.\n"
+                             + "This setting is included mostly for users of inventory-expanding mods. Increase "
+                             + "it at your own risk.",
+                acceptableValues: new AcceptableValueRange<int>(4, 144)
+            ).WithDescription(
+                "Max size of one recipe",
+                "A recipe's ingredients cannot require more than this many slots at once. This prevents "
+                + "softlocks from recipes larger than your inventory. The vanilla inventory contains 48 slots."
+            );
             // Recipes Advanced
             MaxBasicOutpostSize = new ConfigEntryWrapper<int>(
                 configFile: ConfigFile,
@@ -521,21 +540,6 @@ namespace SubnauticaRandomiser.Configuration
                              + "this setting by default caps them at 1. Note that both eggs and the fish that are "
                              + "bred from them are affected.",
                 acceptableValues: new AcceptableValueRange<int>(1, 10)
-            );
-            MaxInventorySizePerRecipe = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
-                section: SectionRecipesAdvanced,
-                key: nameof(MaxInventorySizePerRecipe),
-                defaultValue: 24,
-                description: "Some recipes, particularly mid-late game ones like the cyclops, are valued so highly "
-                             + "that the total number of ingredients you'd need to craft them would exceed how much "
-                             + "you can physically carry in your inventory. Without an inventory-expanding "
-                             + "mod, this results in a softlock. The vanilla inventory is 6x8, resulting in 48 "
-                             + "units of inventory space. The default value thus blocks any recipe from requiring "
-                             + "more than half your inventory at once.\n"
-                             + "This setting is included mostly for users of inventory-expanding mods. Increase "
-                             + "it at your own risk.",
-                acceptableValues: new AcceptableValueRange<int>(4, 144)
             );
             PrimaryIngredientValue = new ConfigEntryWrapper<double>(
                 configFile: ConfigFile,
