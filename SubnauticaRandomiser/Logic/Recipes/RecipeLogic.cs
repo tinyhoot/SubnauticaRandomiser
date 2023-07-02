@@ -102,7 +102,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 return false;
             }
             
-            entity = _mode.RandomiseIngredients(entity);
+            _log.Debug("[R] Figuring out ingredients for " + entity);
+            _mode.RandomiseIngredients(ref entity);
             CoreLogic._Serializer.AddRecipe(entity.Recipe.TechType, entity.Recipe);
             _log.Debug($"[R][+] Randomised recipe for [{entity}].");
 
