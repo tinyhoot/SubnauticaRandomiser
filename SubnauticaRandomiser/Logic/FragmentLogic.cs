@@ -244,7 +244,7 @@ namespace SubnauticaRandomiser.Logic
                 args.ProgressionEntities.Add(TechType.PropulsionCannonFragment);
             }
             // If fragments are randomised but recipes are not, force more depth calculations for fragments.
-            if (_config.RandomiseFragments.Value && !_config.RandomiseRecipes.Value)
+            if (_config.RandomiseFragments.Value && (!_config.EnableRecipeModule.Value || !_config.RandomiseRecipes.Value))
             {
                 var fragmentAdditions = new[]
                 {
@@ -266,7 +266,7 @@ namespace SubnauticaRandomiser.Logic
         {
             // If fragments are randomised but recipes are not, there is no way of achieving lower depths.
             // Define new vehicle depths to counteract that.
-            if (_config.RandomiseFragments.Value && !_config.RandomiseRecipes.Value)
+            if (_config.RandomiseFragments.Value && (!_config.EnableRecipeModule.Value || !_config.RandomiseRecipes.Value))
             {
                 args.VehicleDepths.Add(new[] { TechType.SeaglideFragment }, 50);
                 args.VehicleDepths.Add(new[] { TechType.SeamothFragment }, 100);
