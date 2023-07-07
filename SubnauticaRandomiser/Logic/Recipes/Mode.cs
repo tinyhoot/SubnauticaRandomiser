@@ -63,9 +63,13 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
                 // Ensure no number of ingredients can exceed the maximum config value.
                 int max = FindMaximum(ingredient, totalSize);
-                AddIngredientWithMaxUsesCheck(ingredients, ingredient, Math.Min(number, max));
-                totalSize += ingredient.GetItemSize() * number;
-                _log.Debug($"[R] > Adding ingredient: {ingredient}, {number}");
+                // If the maximum of allowable ingredients is less than 1, we hit a config limit and should stop.
+                if (max <= 0)
+                    break;
+                int chosenNum = Math.Min(number, max);
+                AddIngredientWithMaxUsesCheck(ingredients, ingredient, chosenNum);
+                totalSize += ingredient.GetItemSize() * chosenNum;
+                _log.Debug($"[R] > Adding ingredient: {ingredient}, {chosenNum}, size: {totalSize}");
             }
             
             // Update the total size of everything needed to build a basic outpost.
@@ -163,23 +167,27 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <param name="ingredient">The ingredient to consider.</param>
         /// <param name="totalSize">The total size of all ingredients added so far.</param>
         /// <returns>A positive integer.</returns>
-        protected int FindMaximum(LogicEntity ingredient, int totalSize = -1)
+        protected int FindMaximum(LogicEntity ingredient, int totalSize = 0)
         {
             if (totalSize >= _config.MaxInventorySizePerRecipe.Value)
                 return 1;
             
+            // Do not allow more ingredients than set in the config.
             int max = _config.MaxNumberPerIngredient.Value;
+            // Account for how much space this new ingredient would take up.
+            max = Math.Min(max, (_config.MaxInventorySizePerRecipe.Value - totalSize) / ingredient.GetItemSize());
+            _log.Debug($"Calc max: {max}");
             
             // Tools and upgrades do not stack, but if the recipe would require several and you have more than one in
             // inventory, it will consume all of them.
             if (ingredient.Category.Equals(TechTypeCategory.Tools) 
                 || ingredient.Category.Equals(TechTypeCategory.VehicleUpgrades) 
                 || ingredient.Category.Equals(TechTypeCategory.WorkBenchUpgrades))
-                max = 1;
+                max = Math.Min(max, 1);
             
             // Never require more than one (default) egg. That's tedious.
             if (ingredient.Category.Equals(TechTypeCategory.Eggs))
-                max = _config.MaxEggsAsSingleIngredient.Value;
+                max = Math.Min(max, _config.MaxEggsAsSingleIngredient.Value);
 
             return max;
         }
@@ -236,6 +244,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 int number = GetBaseThemeIngredientNumber(theme);
                 AddIngredientWithMaxUsesCheck(ingredients, theme, number);
                 totalSize += _baseTheme.GetBaseTheme().GetItemSize() * number;
+                _log.Debug($"[R] > Added base theme {theme}.");
             }
 
             // If vanilla upgrade chains are set to be preserved, prioritise the thing this recipe upgrades from.
@@ -244,6 +253,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             {
                 AddIngredientWithMaxUsesCheck(ingredients, vanilla, 1);
                 totalSize += vanilla.GetItemSize();
+                _log.Debug($"[R] > Added upgrade base {vanilla}.");
             }
 
             return totalSize;
