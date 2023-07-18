@@ -95,7 +95,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         public bool RandomiseEntity(ref LogicEntity entity)
         {
             // Does this recipe have all of its prerequisites fulfilled? Skip this check if the recipe is a priority.
-            if (!(_manager.IsPriorityEntity(entity, _manager.ReachableDepth)
+            if (!(entity.IsPriority
                   || (entity.CheckBlueprintFulfilled(_coreLogic, _manager.ReachableDepth) && entity.CheckPrerequisitesFulfilled(_coreLogic))))
             {
                 _log.Debug($"[R] --- Recipe [{entity}] did not fulfill requirements, skipping.");

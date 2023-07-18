@@ -312,6 +312,7 @@ namespace SubnauticaRandomiser.Logic
                     next = _priorityEntities[0];
                 }
                 _priorityEntities.RemoveAt(0);
+                next.IsPriority = true;
             }
             next ??= Random.Choice(notRandomised);
             while (HasRandomised(next))

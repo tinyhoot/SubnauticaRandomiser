@@ -20,6 +20,7 @@ namespace SubnauticaRandomiser.Objects
         public List<SpawnData> SpawnData;       // For spawning it naturally in the world
         public List<TechType> Prerequisites;    // What is absolutely mandatory before getting this?
         public bool InLogic;                    // Has this already been randomised?
+        public bool IsPriority;                 // Is this entity being prioritised?
         public int AccessibleDepth;             // How deep down must you reach to get to this?
         public int MaxUsesPerGame;              // How often can this get used in recipes?
         public int UsedInRecipes;               // How often did this get used in recipes?

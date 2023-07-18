@@ -138,7 +138,7 @@ namespace SubnauticaRandomiser.Logic
                 throw new ArgumentException($"Failed to find fragment '{entity}' in classId database!");
             
             // Check whether the fragment fulfills its prerequisites.
-            if (entity.AccessibleDepth > _manager.ReachableDepth)
+            if (!entity.IsPriority && entity.AccessibleDepth > _manager.ReachableDepth)
             {
                 _log.Debug($"[F] --- Fragment [{entity}] did not fulfill requirements, skipping.");
                 return false;
