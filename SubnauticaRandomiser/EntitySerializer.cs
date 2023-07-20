@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 
@@ -44,6 +45,7 @@ namespace SubnauticaRandomiser
         // All possible supply box contents.
         public LootTable<TechType> SupplyBoxContents;
         public bool DiscoverEggs;
+        public TechType ScrapMetalResult;
 
         public const int SaveVersion = Initialiser._ExpectedSaveVersion;
         [NonSerialized]
@@ -130,11 +132,10 @@ namespace SubnauticaRandomiser
         /// <summary>
         /// Serialise the current randomisation state to disk.
         /// </summary>
-        public void Serialize(RandomiserConfig config)
+        public void Serialize(SaveFile save, int saveVersion)
         {
             string base64 = ToBase64String();
-            config.sBase64Seed = base64;
-            config.Save();
+            save.Save(base64, saveVersion);
             _log.Debug("[ES] Saved game state to disk!");
         }
         

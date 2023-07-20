@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Recipes;
@@ -21,11 +22,12 @@ namespace SubnauticaRandomiser.Logic
     /// Acts as the core for handling all randomising logic in the mod, registering or enabling modules, and invoking
     /// the most important events.
     /// </summary>
+    [DisallowMultipleComponent]
     internal class CoreLogic : MonoBehaviour
     {
         public static CoreLogic Main;
         
-        internal RandomiserConfig _Config { get; private set; }
+        internal Config _Config { get; private set; }
         internal ILogHandler _Log { get; private set; }
         internal static EntitySerializer _Serializer { get; private set; }
         public EntityHandler EntityHandler { get; private set; }
@@ -33,6 +35,7 @@ namespace SubnauticaRandomiser.Logic
 
         private Harmony _harmony;
         private ProgressionManager _manager;
+        private SaveFile _saveFile;
         private SpoilerLog _spoilerLog;
 
         private List<Task> _fileTasks;
@@ -88,7 +91,8 @@ namespace SubnauticaRandomiser.Logic
             _Config = Initialiser._Config;
             _Log = Initialiser._Log;
             EntityHandler = new EntityHandler(_Log);
-            Random = new RandomHandler(_Config.iSeed);
+            Random = new RandomHandler(_Config.Seed.Value);
+            _saveFile = Initialiser._SaveFile;
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
             _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
@@ -101,15 +105,16 @@ namespace SubnauticaRandomiser.Logic
 
         private void EnableModules()
         {
-            if (!_Config.sSpawnPoint.Equals("Vanilla"))
+            if (_Config.EnableAlternateStartModule.Value && !_Config.SpawnPoint.Value.Equals("Vanilla"))
                 RegisterModule<AlternateStartLogic>();
-            if (_Config.bRandomiseDoorCodes || _Config.bRandomiseSupplyBoxes)
+            if (_Config.RandomiseDoorCodes.Value || _Config.RandomiseSupplyBoxes.Value)
                 RegisterModule<AuroraLogic>();
-            if (_Config.bRandomiseDataboxes)
+            if (_Config.RandomiseDataboxes.Value)
                 RegisterModule<DataboxLogic>();
-            if (_Config.bRandomiseFragments || _Config.bRandomiseNumFragments || _Config.bRandomiseDuplicateScans)
+            if (_Config.EnableFragmentModule.Value &&
+                (_Config.RandomiseFragments.Value || _Config.RandomiseNumFragments.Value || _Config.RandomiseDuplicateScans.Value))
                 RegisterModule<FragmentLogic>();
-            if (_Config.bRandomiseRecipes)
+            if (_Config.EnableRecipeModule.Value && _Config.RandomiseRecipes.Value)
             {
                 RegisterModule<RawMaterialLogic>();
                 RegisterModule<RecipeLogic>();
@@ -141,12 +146,12 @@ namespace SubnauticaRandomiser.Logic
             
             // Force a new frame before the main loop.
             yield return null;
-            yield return RandomiseMainEntities(mainEntities);
+            yield return Utils.WrapCoroutine(RandomiseMainEntities(mainEntities), Initialiser.FatalError);
             yield return null;
             ApplyAllChanges();
             
             _Serializer.EnabledModules = _modules.Select(module => module.GetType()).ToList();
-            _Serializer.Serialize(_Config);
+            _Serializer.Serialize(_saveFile, Initialiser._ExpectedSaveVersion);
             
             _Log.InGameMessage("Finished randomising! Please restart your game for all changes to take effect.");
         }
@@ -307,6 +312,7 @@ namespace SubnauticaRandomiser.Logic
                     next = _priorityEntities[0];
                 }
                 _priorityEntities.RemoveAt(0);
+                next.IsPriority = true;
             }
             next ??= Random.Choice(notRandomised);
             while (HasRandomised(next))
@@ -406,14 +412,14 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         internal bool TryRestoreSave()
         {
-            if (string.IsNullOrEmpty(_Config.sBase64Seed))
+            if (string.IsNullOrEmpty(Initialiser._SaveFile.Base64Save))
             {
                 _Log.Debug("[Core] base64 seed is empty.");
                 return false;
             }
 
             _Log.Debug("[Core] Trying to decode base64 string...");
-            EntitySerializer serializer = EntitySerializer.FromBase64String(_Config.sBase64Seed);
+            EntitySerializer serializer = EntitySerializer.FromBase64String(Initialiser._SaveFile.Base64Save);
 
             if (serializer?.SpawnDataDict is null || serializer.RecipeDict is null)
             {

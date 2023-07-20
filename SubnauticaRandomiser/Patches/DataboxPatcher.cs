@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using HarmonyLib;
+﻿using HarmonyLib;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Objects;
 using UnityEngine;
@@ -11,22 +10,33 @@ namespace SubnauticaRandomiser.Patches
     {
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BlueprintHandTarget), nameof(BlueprintHandTarget.Start))]
-        internal static bool PatchDatabox(ref BlueprintHandTarget __instance)
+        public static void PatchDatabox(ref BlueprintHandTarget __instance)
         {
-            Dictionary<RandomiserVector, TechType> boxDict = CoreLogic._Serializer.Databoxes;
-            Vector3 position = __instance.gameObject.transform.position;
+            TechType replacement = GetTechTypeForPosition(__instance.transform.position);
+            if (replacement != TechType.None)
+                __instance.unlockTechType = replacement;
+        }
 
-            foreach (RandomiserVector vector in boxDict.Keys)
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(DataboxSpawner), nameof(DataboxSpawner.Start))]
+        public static void PatchDataboxSpawner(ref DataboxSpawner __instance)
+        {
+            TechType replacement = GetTechTypeForPosition(__instance.transform.position);
+            if (replacement != TechType.None)
             {
-                if (vector.EqualsUnityVector(position))
-                {
-                    Initialiser._Log.Debug($"[D] Replacing databox {position} with {boxDict[vector].AsString()}");
-                    __instance.unlockTechType = boxDict[vector];
-                    break;
-                }
+                Initialiser._Log.Debug($"[D] Replacing databox [{__instance.spawnTechType} "
+                                       + $"{__instance.transform.position}] with {replacement}");
+                __instance.spawnTechType = replacement;
             }
-            
-            return true;
+        }
+
+        private static TechType GetTechTypeForPosition(Vector3 position)
+        {
+            if (CoreLogic._Serializer.Databoxes.TryGetValue(position.ToRandomiserVector(), out TechType replacement))
+                return replacement;
+
+            Initialiser._Log.Warn($"[D] Failed to find databox replacement for position {position}!");
+            return TechType.None;
         }
     }
 }

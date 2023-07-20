@@ -52,6 +52,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _log.Debug($"[R] Chose {_baseTheme} as base theme.");
             return _baseTheme;
         }
+
+        public LogicEntity GetBaseTheme() => _baseTheme;
         
         /// <summary>
         /// If the given entity is a base piece, return the base theming ingredient.
@@ -61,7 +63,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// <exception cref="InvalidOperationException">Thrown if this method is called before a base theme was chosen.
         /// </exception>
         [CanBeNull]
-        public LogicEntity GetBaseTheme(LogicEntity entity)
+        public LogicEntity GetThemeForEntity(LogicEntity entity)
         {
             if (_baseTheme is null)
                 throw new InvalidOperationException("Base theme must be chosen before it can be retrieved!");

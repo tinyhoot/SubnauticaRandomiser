@@ -3,34 +3,36 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 using BepInEx;
-using SMLHelper.V2.Handlers;
+using BepInEx.Configuration;
+using Nautilus.Handlers;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
-using Random = UnityEngine.Random;
 
 [assembly:InternalsVisibleTo("Tests")]
 namespace SubnauticaRandomiser
 {
     [BepInPlugin(GUID, NAME, VERSION)]
-    [BepInDependency("com.ahk1221.smlhelper", "2.15")]
+    [BepInDependency("com.snmodding.nautilus", "1.0")]
     internal class Initialiser : BaseUnityPlugin
     {
         public const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";
         public const string NAME = "Subnautica Randomiser";
-        public const string VERSION = "0.10.1";
+        public const string VERSION = "0.11.0";
         
         // Files and structure.
         internal static string _ModDirectory;
-        internal static RandomiserConfig _Config;
+        internal static Config _Config;
+        internal static SaveFile _SaveFile;
         public const string _AlternateStartFile = "alternateStarts.csv";
         public const string _BiomeFile = "biomeSlots.csv";
         public const string _RecipeFile = "recipeInformation.csv";
         public const string _WreckageFile = "wreckInformation.csv";
-        internal const string _ExpectedRecipeMD5 = "11cc2c8e44db4473c6e0d196b869d582";
-        internal const int _ExpectedSaveVersion = 6;
+        internal const int _ExpectedSaveVersion = 7;
         private static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
         {
             [1] = "v0.5.1",
@@ -38,6 +40,7 @@ namespace SubnauticaRandomiser
             [3] = "v0.7.0",
             [4] = "v0.8.2",
             [5] = "v0.9.2",
+            [6] = "v0.10.1",
             [_ExpectedSaveVersion] = "v" + VERSION
         };
 
@@ -54,8 +57,14 @@ namespace SubnauticaRandomiser
 
             // Register options menu.
             _ModDirectory = GetModDirectory();
-            _Config = OptionsPanelHandler.Main.RegisterModOptions<RandomiserConfig>();
+            var configFile = new ConfigFile(Path.Combine(Paths.ConfigPath, GetConfigFileName()), true, Info.Metadata);
+            _Config = new Config(configFile);
+            _Config.RegisterOptions();
+            var modOptions = new ConfigModOptions(NAME, _Config);
+            OptionsPanelHandler.RegisterModOptions(modOptions);
             _Log.Debug("Registered options menu.");
+            // Set up the save file.
+            _SaveFile = new SaveFile(Path.Combine(_ModDirectory, GetSaveFileName()), _ExpectedSaveVersion);
 
             // Ensure the user did not update into a save incompatibility, and abort if they did to preserve a prior
             // version's state.
@@ -85,10 +94,10 @@ namespace SubnauticaRandomiser
         /// </summary>
         private bool CheckSaveCompatibility()
         {
-            if (_Config.iSaveVersion == _ExpectedSaveVersion)
+            if (_SaveFile.SaveVersion == _ExpectedSaveVersion)
                 return true;
             
-            s_versionDict.TryGetValue(_Config.iSaveVersion, out string version);
+            s_versionDict.TryGetValue(_SaveFile.SaveVersion, out string version);
             if (string.IsNullOrEmpty(version))
                 version = "unknown or corrupted.";
 
@@ -107,11 +116,23 @@ namespace SubnauticaRandomiser
         /// <exception cref="Exception"></exception>
         internal static void FatalError(Exception exception)
         {
-            _Log.InGameMessage($"{exception.GetType().Name.ToUpper()}: Something went wrong. Please report this error"
-                               + "with the config.json from your mod folder on Github or NexusMods.", true);
+            _Log.InGameMessage($"<color=#FF0000FF>{exception.GetType().Name.ToUpper()}:</color> Something went wrong. "
+                               + $"Please report this error with the {GetConfigFileName()} from your BepInEx config "
+                               + $"folder on Github or NexusMods.", true);
             _Log.Fatal($"{exception.GetType()}: {exception.Message}");
+            _Log.Fatal(exception.StackTrace);
             // Ensure that the randomiser crashes completely if things go wrong this badly.
-            throw exception;
+            // Rethrowing in this way preserves the original stacktrace.
+            ExceptionDispatchInfo.Capture(exception).Throw();
+        }
+
+        private static string GetConfigFileName()
+        {
+            return $"{NAME.Replace(" ", string.Empty)}.cfg";
+        }
+        
+        private static string GetSaveFileName(){
+            return $"{NAME.Replace(" ", string.Empty)}_Save.sav";
         }
         
         /// <summary>
@@ -119,12 +140,9 @@ namespace SubnauticaRandomiser
         /// </summary>
         private void Randomise()
         {
-            _Config.SanitiseConfigValues();
-            _Config.iSaveVersion = _ExpectedSaveVersion;
-
             // Create a new seed if the current one is just a default
-            if (_Config.iSeed == 0)
-                _Config.iSeed = Random.Range(1, int.MaxValue);
+            if (_Config.Seed.Value == 0)
+                _Config.Seed.Entry.Value = new RandomHandler().Next();
 
             // Randomise!
             try
@@ -153,9 +171,9 @@ namespace SubnauticaRandomiser
         private void RestoreSavedState()
         {
             // Try and restore a game state from disk.
-            if (_Config.debug_forceRandomise || !_coreLogic.TryRestoreSave())
+            if (_Config.DebugForceRandomise.Value || !_coreLogic.TryRestoreSave())
             {
-                if (_Config.debug_forceRandomise)
+                if (_Config.DebugForceRandomise.Value)
                     _Log.Warn("Ignoring previous game state: Config forces fresh randomisation.");
                 _Log.Warn("Could not load game state from disk.");
             }
@@ -172,9 +190,9 @@ namespace SubnauticaRandomiser
         private void SetupGameObject()
         {
             // Instantiating this automatically starts running the Awake() methods of all components.
-            _LogicObject = new GameObject("Randomiser Logic", typeof(CoreLogic), typeof(ProgressionManager));
+            _LogicObject = new GameObject("Randomiser Logic", typeof(CoreLogic));
             // Set this plugin (or BepInEx) as the parent of the logic GameObject.
-            _LogicObject.transform.parent = transform;
+            _LogicObject.transform.SetParent(transform, false);
             _coreLogic = _LogicObject.GetComponent<CoreLogic>();
         }
 

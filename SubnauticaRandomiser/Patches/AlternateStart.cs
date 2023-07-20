@@ -1,6 +1,7 @@
 using System;
 using HarmonyLib;
 using SubnauticaRandomiser.Logic;
+using SubnauticaRandomiser.Objects;
 using UnityEngine;
 
 namespace SubnauticaRandomiser.Patches
@@ -19,7 +20,7 @@ namespace SubnauticaRandomiser.Patches
             if (__result.y > 50f)
                 // User is likely using Lifepod Unleashed, skip randomising in that case.
                 return;
-            if (CoreLogic._Serializer?.StartPoint is null)
+            if (CoreLogic._Serializer?.StartPoint is null || CoreLogic._Serializer.StartPoint == RandomiserVector.ZERO)
                 // Has not been randomised, don't do anything.
                 return;
 
@@ -37,14 +38,16 @@ namespace SubnauticaRandomiser.Patches
             // Get the distance tracker from the Aurora's Radiation gameObject.
             PlayerDistanceTracker tracker = LeakingRadiation.main.gameObject.GetComponent<PlayerDistanceTracker>();
             float maxRadius = LeakingRadiation.main.kMaxRadius;
+            float curRadius = LeakingRadiation.main.currentRadius;
 
             if (tracker.distanceToPlayer <= maxRadius)
             {
-                float time = (maxRadius - LeakingRadiation.main.kStartRadius) / LeakingRadiation.main.kGrowRate;
-                int days = (int)Math.Floor(time / DayNightCycle.kDayLengthSeconds);
+                float time = (tracker.distanceToPlayer - curRadius) / LeakingRadiation.main.kGrowRate;
+                float days = time / DayNightCycle.kDayLengthSeconds;
                 
+                Initialiser._Log.Debug($"{LeakingRadiation.main.kMaxRadius}");
                 Initialiser._Log.InGameMessage("CAUTION: You are inside the Aurora's radiation radius.");
-                Initialiser._Log.InGameMessage($"Radiation will reach the lifepod {days} days after explosion.");
+                Initialiser._Log.InGameMessage($"Radiation will reach the lifepod {days:F1} days after explosion.");
             }
         }
     }

@@ -20,6 +20,7 @@ namespace SubnauticaRandomiser.Objects
         public List<SpawnData> SpawnData;       // For spawning it naturally in the world
         public List<TechType> Prerequisites;    // What is absolutely mandatory before getting this?
         public bool InLogic;                    // Has this already been randomised?
+        public bool IsPriority;                 // Is this entity being prioritised?
         public int AccessibleDepth;             // How deep down must you reach to get to this?
         public int MaxUsesPerGame;              // How often can this get used in recipes?
         public int UsedInRecipes;               // How often did this get used in recipes?
@@ -97,9 +98,9 @@ namespace SubnauticaRandomiser.Objects
                 // fruitlessly searches for a bladderfish which never enters its algorithm.
                 // Eggs and seeds are never problematic in vanilla, but are covered in case users add their own
                 // modded items with those.
-                if ((!logic._Config.bUseFish && conditionEntity.Category.Equals(TechTypeCategory.Fish))
-                    || (!logic._Config.bUseEggs && conditionEntity.Category.Equals(TechTypeCategory.Eggs))
-                    || (!logic._Config.bUseSeeds && conditionEntity.Category.Equals(TechTypeCategory.Seeds)))
+                if ((!logic._Config.UseFish.Value && conditionEntity.Category.Equals(TechTypeCategory.Fish))
+                    || (!logic._Config.UseEggs.Value && conditionEntity.Category.Equals(TechTypeCategory.Eggs))
+                    || (!logic._Config.UseSeeds.Value && conditionEntity.Category.Equals(TechTypeCategory.Seeds)))
                     continue;
 
                 if (logic.EntityHandler.IsInLogic(conditionEntity))
@@ -109,18 +110,15 @@ namespace SubnauticaRandomiser.Objects
             }
 
             // Ensure that necessary fragments have already been randomised.
-            if (logic._Config.bRandomiseFragments && Blueprint.Fragments?.Count > 0)
+            if (Blueprint.Fragments?.Count > 0)
             {
-                foreach (TechType fragment in Blueprint.Fragments)
-                {
-                    if (!CoreLogic._Serializer.SpawnDataDict.ContainsKey(fragment))
-                    {
-                        //LogHandler.Debug($"[B] Entity {this} missing fragment {fragment.AsString()}");
-                        return false;
-                    }
-                }
-
-                return true;
+                bool fragmentsOkay = Blueprint.Fragments.All(f => logic.EntityHandler.IsInLogic(f));
+                if (logic._Config.EnableFragmentModule.Value && logic._Config.RandomiseFragments.Value)
+                    return fragmentsOkay;
+                // If the fragment module is not enabled BUT fragments are all in logic anyway this is probably a
+                // priority entity being randomised. In that case, skip all other checks.
+                if (fragmentsOkay)
+                    return true;
             }
 
             return depth >= Blueprint.UnlockDepth;

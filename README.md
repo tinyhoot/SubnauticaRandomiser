@@ -32,7 +32,7 @@ The randomisation persists between play sessions and save games. This means you 
 
 ## How to Use
 1. Install [BepInEx](https://www.nexusmods.com/subnautica/mods/1108)
-2. Install [SMLHelper](https://www.nexusmods.com/subnautica/mods/113)
+2. Install [Nautilus](https://www.nexusmods.com/subnautica/mods/1262)
 3. Extract this mod into your Subnautica/BepInEx/plugins folder
    * (Optional) Edit the config in the in-game options menu to your liking
    * Press the "Randomise!" button
@@ -40,12 +40,12 @@ The randomisation persists between play sessions and save games. This means you 
 4. Enjoy!
 
 ## How to Build
-* git clone
+* `git clone`
 * Add a SUBNAUTICA_DIR variable to your PATH pointing to your install directory of Subnautica
-* Install BepInEx and SMLHelper
+* Install BepInEx and Nautilus
 * Copy all dependencies to the project's empty `Dependencies` folder. This includes:
   * BepInEx
-  * SMLHelper
+  * Nautilus
   * Several Unity assemblies from the game folder
   * Publicised versions of Subnautica's `Assembly-CSharp.dll`. Start the game once using [the BepinEx publiciser](https://github.com/MrPurple6411/Bepinex-Tools/releases/) to generate them.
 * Building in the Release configuration should leave you with a `SubnauticaRandomiser.dll` in `SubnauticaRandomiser/bin/Release/` and automatically update the installed version in `$SUBNAUTICA_DIR/BepInEx/plugins`

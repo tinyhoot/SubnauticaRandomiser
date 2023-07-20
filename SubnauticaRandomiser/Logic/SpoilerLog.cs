@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
+using System.Linq;
 using System.Threading.Tasks;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
 using UnityEngine;
 using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
@@ -18,25 +20,31 @@ namespace SubnauticaRandomiser.Logic
     {
         private CoreLogic _coreLogic;
         private ProgressionManager _manager;
-        private RandomiserConfig _config;
         private ILogHandler _log;
         private readonly List<Tuple<TechType, int>> _progression = new List<Tuple<TechType, int>>();
-
-        private List<string> _basicOptions;
+        private string _spoilerDirectory;
+        
         private string[] _contentHeader;
-        private string[] _contentBasics;
-        private string[] _contentAdvanced;
         private string[] _contentDataboxes;
         private string[] _contentFragments;
-        
-        private const string _FileName = "spoilerlog.txt";
+        private string[] _contentRecipes;
+
+        private const string _DirName = "SpoilerLogs";
+        private const string _ProgressionFileName = "intended_progression_spoilers.txt";
+        private readonly Dictionary<EntityType, string> _EntityFileNames = new Dictionary<EntityType, string>
+        {
+            { EntityType.Databox, "databox_spoilers.txt" },
+            { EntityType.Fragment, "fragment_spoilers.txt" },
+            { EntityType.Craftable, "recipe_spoilers.txt" },
+        };
 
         private void Awake()
         {
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
-            _config = _coreLogic._Config;
             _log = _coreLogic._Log;
+            _spoilerDirectory = Path.Combine(Initialiser._ModDirectory, _DirName);
+            PrepareStrings();
 
             // Register events.
             _coreLogic.MainLoopCompleted += OnMainLoopCompleted;
@@ -58,7 +66,7 @@ namespace SubnauticaRandomiser.Logic
         private void OnMainLoopCompleted(object sender, EventArgs args)
         {
             // Start writing and discard the Task. Gets rid of a compiler warning.
-            _ = WriteLogAsync(CoreLogic._Serializer);
+            _ = WriteLogFilesAsync(CoreLogic._Serializer);
         }
 
         /// <summary>
@@ -80,111 +88,41 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void PrepareStrings()
         {
-            _basicOptions = new List<string>()
-            {
-                "iSeed",
-                "iRandomiserMode",
-                "bUseFish", "bUseEggs", "bUseSeeds",
-                "bRandomiseDataboxes",
-                "bRandomiseFragments",
-                "bRandomiseNumFragments", "iMaxFragmentsToUnlock",
-                "bRandomiseDuplicateScans",
-                "bRandomiseRecipes",
-                "bVanillaUpgradeChains",
-                "bDoBaseTheming",
-                "iEquipmentAsIngredients", "iToolsAsIngredients", "iUpgradesAsIngredients",
-                "iMaxIngredientsPerRecipe", "iMaxAmountPerIngredient",
-                "bMaxBiomesPerFragments"
-            };
             _contentHeader = new[]
             {
                 "*************************************************",
                 "*****   SUBNAUTICA RANDOMISER SPOILER LOG   *****",
                 "*************************************************",
                 "",
-                "Generated on " + DateTime.Now + " with " + Initialiser.VERSION
-            };
-            _contentBasics = new[]
-            {
+                "Generated on " + DateTime.Now + " with v" + Initialiser.VERSION,
                 "",
                 "",
-                "///// Basic Information /////",
-                "Seed: " + _config.iSeed,
-                "Mode: " + _config.iRandomiserMode,
-                "Spawnpoint: " + _config.sSpawnPoint,
-                "Fish, Eggs, Seeds: " + _config.bUseFish + ", " + _config.bUseEggs + ", " + _config.bUseSeeds,
-                "Random Databoxes: " + _config.bRandomiseDataboxes,
-                "Random Fragments: " + _config.bRandomiseFragments,
-                "Random Fragment numbers: " + _config.bRandomiseNumFragments + ", " + _config.iMaxFragmentsToUnlock,
-                "Random Duplicate Scan Rewards: " + _config.bRandomiseDuplicateScans,
-                "Random Recipes: " + _config.bRandomiseRecipes,
-                "Vanilla Upgrade Chains: " + _config.bVanillaUpgradeChains,
-                "Base Theming: " + _config.bDoBaseTheming,
-                "Equipment, Tools, Upgrades: " + _config.iEquipmentAsIngredients + ", " + _config.iToolsAsIngredients + ", " + _config.iUpgradesAsIngredients,
-                "Max Ingredients: " + _config.iMaxIngredientsPerRecipe + " per recipe, " + _config.iMaxAmountPerIngredient + " per ingredient",
-                "Max Biomes per Fragment: " + _config.iMaxBiomesPerFragment,
-                ""
-            };
-            _contentAdvanced = new[]
-            {
-                "",
-                "",
-                "///// Depth Progression Path /////"
             };
             _contentDataboxes = new[]
             {
+                "///// Databox Locations /////",
                 "",
-                "",
-                "///// Databox Locations /////"
             };
             _contentFragments = new[]
             {
-                "",
-                "",
                 "///// Fragment Locations /////",
                 "// Note: Biomes which end in _TechSite are the big, explorable wrecks.",
                 "//       Biomes which end in _TechSite_Barrier are inside the wrecks, behind laser cutter doors.",
-                "//       Biomes which end in _TechSite_Scatter are medium-sized Aurora debris out in the open."
+                "//       Biomes which end in _TechSite_Scatter are medium-sized Aurora debris out in the open.",
+                "",
+            };
+            _contentRecipes = new[]
+            {
+                "///// Generated Recipes /////",
+                "",
             };
         }
-        
-        /// <summary>
-        /// Add advanced settings to the spoiler log, but only if they have been modified.
-        /// </summary>
-        /// <returns>An array of modified settings.</returns>
-        private string[] PrepareAdvancedSettings()
-        {
-            List<string> preparedAdvSettings = new List<string>();
-            FieldInfo[] fieldInfoArray = typeof(RandomiserConfig).GetFields(BindingFlags.Public | BindingFlags.Instance);
-            
-            foreach (FieldInfo field in fieldInfoArray)
-            {
-                // Check whether this field is an advanced config option or not.
-                if (_basicOptions.Contains(field.Name))
-                    continue;
-                if (!ConfigDefaults.Contains(field.Name))
-                    continue;
-                
-                var userValue = field.GetValue(_config);
-                var defaultValue = ConfigDefaults.GetDefault(field.Name);
-                // If the value of a config field does not correspond to its default value, the user must have
-                // modified it. Add it to the list in that case.
-                if (!userValue.Equals(defaultValue))
-                    preparedAdvSettings.Add(field.Name + ": " + userValue);
-            }
-            _log.Debug("Added anomalies: " + preparedAdvSettings.Count);
 
-            if (preparedAdvSettings.Count == 0)
-                preparedAdvSettings.Add("No advanced settings were modified.");
-
-            return preparedAdvSettings.ToArray();
-        }
-        
         /// <summary>
         /// Grab the randomised boxes from the serializer, and sort them alphabetically.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
-        private string[] PrepareDataboxes(EntitySerializer serializer)
+        private IEnumerable<string> GetDataboxes(EntitySerializer serializer)
         {
             if (serializer.Databoxes is null)
                 return new [] { "Not randomised, all in vanilla locations." };
@@ -196,14 +134,14 @@ namespace SubnauticaRandomiser.Logic
             }
             preparedDataboxes.Sort();
 
-            return preparedDataboxes.ToArray();
+            return preparedDataboxes;
         }
 
         /// <summary>
         /// Grab the randomise fragments from the serializer, and sort them alphabetically.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
-        private string[] PrepareFragments(EntitySerializer serializer)
+        private IEnumerable<string> GetFragments(EntitySerializer serializer)
         {
             if (serializer.SpawnDataDict is null || serializer.SpawnDataDict.Count == 0)
                 return new[] { "Not randomised, all in vanilla locations." };
@@ -223,24 +161,14 @@ namespace SubnauticaRandomiser.Logic
             }
             preparedFragments.Sort();
             
-            return preparedFragments.ToArray();
+            return preparedFragments;
         }
-        
-        /// <summary>
-        /// Compare the MD5 of the recipe CSV and try to see if it's still the same.
-        /// Since this is done while parsing the CSV anyway, grab the value from there.
-        /// </summary>
-        /// <returns>The prepared log entry.</returns>
-        private string PrepareMD5()
-        {
-            return "recipeInformation.csv is unmodified.";
-        }
-        
+
         /// <summary>
         /// Prepare a human readable way to tell what must be crafted to reach greater depths.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
-        private string[] PrepareProgressionPath()
+        private IEnumerable<string> GetProgressionPath()
         {
             // When recipes are not randomised, this spoiler hint does more or less nothing; go with default value.
             if (_progression.Count == 0)
@@ -259,7 +187,31 @@ namespace SubnauticaRandomiser.Logic
                 lastDepth = pair.Item2;
             }
 
-            return preparedProgressionPath.ToArray();
+            return preparedProgressionPath;
+        }
+
+        /// <summary>
+        /// Prepare all recipes together with a list of their ingredients.
+        /// </summary>
+        /// <returns>The prepared log entries.</returns>
+        private IEnumerable<string> GetRecipes(EntitySerializer serializer)
+        {
+            if (serializer.RecipeDict is null || serializer.RecipeDict.Count == 0)
+                return new[] { "Recipes were not modified." };
+
+            List<string> preparedRecipes = new List<string>();
+            var recipes = serializer.RecipeDict.OrderBy(kv => kv.Key.AsString());
+            foreach (var kv in recipes)
+            {
+                preparedRecipes.Add(kv.Key.AsString());
+                foreach (var ingredient in kv.Value.Ingredients)
+                {
+                    preparedRecipes.Add($" > {ingredient.amount} {ingredient.techType}");
+                }
+                preparedRecipes.Add("");
+            }
+
+            return preparedRecipes;
         }
 
         /// <summary>
@@ -280,40 +232,44 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Write the log to disk.
+        /// Write the log files to disk.
         /// </summary>
-        public async Task WriteLogAsync(EntitySerializer serializer)
+        public async Task WriteLogFilesAsync(EntitySerializer serializer)
         {
-            List<string> lines = new List<string>();
-            PrepareStrings();
+            Directory.CreateDirectory(_spoilerDirectory);
 
-            lines.AddRange(_contentHeader);
-            // lines.Add(PrepareMD5());
-            
-            lines.AddRange(_contentBasics);
-            lines.AddRange(PrepareAdvancedSettings());
-            lines.AddRange(_contentAdvanced);
-            
-            lines.AddRange(PrepareProgressionPath());
-            lines.AddRange(_contentDataboxes);
-            lines.AddRange(PrepareDataboxes(serializer));
-            
-            lines.AddRange(_contentFragments);
-            lines.AddRange(PrepareFragments(serializer));
-
-            using (StreamWriter file = new StreamWriter(Path.Combine(Initialiser._ModDirectory, _FileName)))
+            using (StreamWriter file = new StreamWriter(Path.Combine(_spoilerDirectory, _ProgressionFileName)))
             {
-                await WriteTextToLog(file, lines.ToArray());
+                await WriteTextToLogAsync(file, _contentHeader, GetProgressionPath());
+            }
+            
+            using (StreamWriter file
+                   = new StreamWriter(Path.Combine(_spoilerDirectory, _EntityFileNames[EntityType.Databox])))
+            {
+                await WriteTextToLogAsync(file, _contentHeader, _contentDataboxes, GetDataboxes(serializer));
+            }
+            using (StreamWriter file
+                   = new StreamWriter(Path.Combine(_spoilerDirectory, _EntityFileNames[EntityType.Fragment])))
+            {
+                await WriteTextToLogAsync(file, _contentHeader, _contentFragments, GetFragments(serializer));
+            }
+            using (StreamWriter file
+                   = new StreamWriter(Path.Combine(_spoilerDirectory, _EntityFileNames[EntityType.Craftable])))
+            {
+                await WriteTextToLogAsync(file, _contentHeader, _contentRecipes, GetRecipes(serializer));
             }
 
             _log.Info("Wrote spoiler log to disk.");
         }
 
-        private async Task WriteTextToLog(StreamWriter file, IEnumerable<string> text)
+        private async Task WriteTextToLogAsync(StreamWriter file, params IEnumerable<string>[] content)
         {
-            foreach (string line in text)
+            foreach (IEnumerable<string> text in content)
             {
-                await file.WriteLineAsync(line);
+                foreach (string line in text)
+                {
+                    await file.WriteLineAsync(line);
+                }
             }
         }
     }

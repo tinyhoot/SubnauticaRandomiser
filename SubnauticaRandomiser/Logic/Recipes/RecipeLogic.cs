@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using JetBrains.Annotations;
-using SMLHelper.V2.Handlers;
+using Nautilus.Handlers;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
@@ -22,7 +23,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private CoreLogic _coreLogic;
         private ProgressionManager _manager;
 
-        private RandomiserConfig _config;
+        private Config _config;
         private ILogHandler _log;
         private EntityHandler _entityHandler;
         private Mode _mode;
@@ -41,16 +42,16 @@ namespace SubnauticaRandomiser.Logic.Recipes
             ValidIngredients = new HashSet<LogicEntity>(new LogicEntityEqualityComparer());
             
             // Decide which recipe mode will be used.
-            switch (_config.iRandomiserMode)
+            switch (_config.RecipeMode.Value)
             {
-                case (0):
+                case (RecipeDifficultyMode.Balanced):
                     _mode = new ModeBalanced(_coreLogic, this);
                     break;
-                case (1):
+                case (RecipeDifficultyMode.Chaotic):
                     _mode = new ModeRandom(_coreLogic, this);
                     break;
                 default:
-                    _log.Error("[R] Invalid recipe mode: " + _config.iRandomiserMode);
+                    _log.Error("[R] Invalid recipe mode: " + _config.RecipeMode.Value);
                     break;
             }
             
@@ -75,13 +76,16 @@ namespace SubnauticaRandomiser.Logic.Recipes
             
             foreach (TechType key in serializer.RecipeDict.Keys)
             {
-                CraftDataHandler.SetTechData(key, serializer.RecipeDict[key]);
+                CraftDataHandler.SetRecipeData(key, serializer.RecipeDict[key]);
             }
+            
+            ChangeScrapMetalResult(serializer.ScrapMetalResult);
         }
 
         public void RandomiseOutOfLoop(EntitySerializer serializer)
         {
-            _mode.ChooseBaseTheme(100, _config.bUseFish);
+            _mode.ChooseBaseTheme(100, _config.UseFish.Value);
+            serializer.ScrapMetalResult = _mode.GetScrapMetalReplacement();
         }
 
         /// <summary>
@@ -91,14 +95,15 @@ namespace SubnauticaRandomiser.Logic.Recipes
         public bool RandomiseEntity(ref LogicEntity entity)
         {
             // Does this recipe have all of its prerequisites fulfilled? Skip this check if the recipe is a priority.
-            if (!(_manager.IsPriorityEntity(entity, _manager.ReachableDepth)
+            if (!(entity.IsPriority
                   || (entity.CheckBlueprintFulfilled(_coreLogic, _manager.ReachableDepth) && entity.CheckPrerequisitesFulfilled(_coreLogic))))
             {
                 _log.Debug($"[R] --- Recipe [{entity}] did not fulfill requirements, skipping.");
                 return false;
             }
             
-            entity = _mode.RandomiseIngredients(entity);
+            _log.Debug("[R] Figuring out ingredients for " + entity);
+            _mode.RandomiseIngredients(ref entity);
             CoreLogic._Serializer.AddRecipe(entity.Recipe.TechType, entity.Recipe);
             _log.Debug($"[R][+] Randomised recipe for [{entity}].");
 
@@ -116,7 +121,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         private void OnEntityCollecting(object sender, CollectEntitiesEventArgs args)
         {
             args.ToBeRandomised.AddRange(_entityHandler.GetAllCraftables());
-            if (_config.bUseEggs)
+            if (_config.UseEggs.Value)
                 args.ToBeRandomised.AddRange(_entityHandler.GetByCategory(TechTypeCategory.Eggs));
         }
 
@@ -153,7 +158,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             };
 
             // Define the direct recipe chains that are present in vanilla.
-            if (_config.bVanillaUpgradeChains)
+            if (_config.VanillaUpgradeChains.Value)
             {
                 UpgradeChains = new Dictionary<TechType, TechType>
                 {
@@ -243,8 +248,8 @@ namespace SubnauticaRandomiser.Logic.Recipes
         /// </summary>
         private void AddEggWaterParkPrerequisite()
         {
-            CoreLogic._Serializer.DiscoverEggs = _config.bDiscoverEggs;
-            if (!_config.bDiscoverEggs)
+            CoreLogic._Serializer.DiscoverEggs = _config.DiscoverEggs.Value;
+            if (!_config.DiscoverEggs.Value)
                 _entityHandler.AddCategoryPrerequisite(TechTypeCategory.Eggs, TechType.BaseWaterPark);
             // Always add this requirement to fish hatched in containment.
             _entityHandler.AddCategoryPrerequisite(TechTypeCategory.EggsHatched, TechType.BaseWaterPark);
@@ -269,6 +274,38 @@ namespace SubnauticaRandomiser.Logic.Recipes
                     entity.Prerequisites = new List<TechType>();
                 entity.Prerequisites.Add(ingredient);
             }
+        }
+        
+        /// <summary>
+        /// Changes what kind of material scrap metal can be turned into.
+        /// </summary>
+        /// <param name="techType">The new material to get from scrap metal.</param>
+        /// <returns>The resulting Recipe, or null if the given TechType wasn't usable.</returns>
+        private Recipe ChangeScrapMetalResult(TechType techType)
+        {
+            if (techType.Equals(TechType.Titanium) || techType.Equals(TechType.None))
+                return null;
+            
+            // Create the new recipe.
+            Recipe recipe = new Recipe(techType);
+            recipe.Ingredients = new List<RandomiserIngredient>();
+            recipe.Ingredients.Add(new RandomiserIngredient(TechType.ScrapMetal, 1));
+            // Always use just as many items as can fit in four slots in the inventory.
+            var itemDimensions = CraftData.GetItemSize(techType);
+            int size = itemDimensions.x * itemDimensions.y;
+            recipe.CraftAmount = Math.Max(1, (int)Math.Floor(4f / size));
+            CraftDataHandler.SetRecipeData(techType, recipe);
+
+            // Remove the vanilla recipe from the fabricator and PDA.
+            CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "BasicMaterials", "Titanium");
+            CraftDataHandler.RemoveFromGroup(TechGroup.Resources, TechCategory.BasicMaterials, TechType.Titanium);
+            // Add the replacement recipe in its stead.
+            CraftTreeHandler.AddCraftingNode(CraftTree.Type.Fabricator, techType, "Resources", "BasicMaterials");
+            CraftDataHandler.AddToGroup(TechGroup.Resources, TechCategory.BasicMaterials, techType);
+            // Ensure access at game start.
+            KnownTechHandler.UnlockOnStart(techType);
+
+            return recipe;
         }
         
         /// <summary>
@@ -321,9 +358,9 @@ namespace SubnauticaRandomiser.Logic.Recipes
             else
                 _entityHandler.AddToLogic(TechTypeCategory.RawMaterials, depth, TechType.Knife, true);
 
-            if (_config.bUseFish)
+            if (_config.UseFish.Value)
                 _entityHandler.AddToLogic(TechTypeCategory.Fish, depth);
-            if (_config.bUseSeeds && IsAnyKnifeRandomised())
+            if (_config.UseSeeds.Value && IsAnyKnifeRandomised())
                 _entityHandler.AddToLogic(TechTypeCategory.Seeds, depth);
         }
     }

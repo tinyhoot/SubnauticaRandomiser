@@ -29,22 +29,25 @@
   </PropertyGroup>
 
   <!-- Define important extra files needed in the final distribution. -->
+  <PropertyGroup>
+    <DataDir>DataFiles</DataDir>
+  </PropertyGroup>
   <ItemGroup>
-    <DataFiles Include="$(SolutionDir)\DataFiles\*" />
+    <DataFiles Include="$(SolutionDir)\$(DataDir)\*" />
   </ItemGroup>
   
   <!-- Copy newly built files to the game directory. -->
   <Target Name="CopyToGameFolder" AfterTargets="Build">
     <Message Importance="high" Text="Copying files to game directory." />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SUBNAUTICA_DIR)\BepInEx\plugins\$(AssemblyName)" />
-    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(SUBNAUTICA_DIR)\BepInEx\plugins\$(AssemblyName)\DataFiles" />
+    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(SUBNAUTICA_DIR)\BepInEx\plugins\$(AssemblyName)\$(DataDir)" />
   </Target>
   
   <!-- Automatically create the zip file, ready for distribution. -->
   <Target Name="PrepareZip" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
     <Message Importance="normal" Text="Copying files to temporary directory." />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(OutputPath)\zipper\plugins\$(AssemblyName)" />
-    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(OutputPath)\zipper\plugins\$(AssemblyName)\DataFiles" />
+    <Copy SourceFiles="@(DataFiles)" DestinationFolder="$(OutputPath)\zipper\plugins\$(AssemblyName)\$(DataDir)" />
   </Target>
   <Target Name="CreateZip" AfterTargets="PrepareZip" Condition="'$(Configuration)' == 'Release'">
     <Message Importance="high" Text="Zipping project for distribution." />
@@ -56,7 +59,11 @@
   </Target>
   
   <ItemGroup>
-    <Compile Include="ConfigDefaults.cs" />
+    <Compile Include="Configuration\Config.cs" />
+    <Compile Include="Configuration\ConfigEntryWrapperBase.cs" />
+    <Compile Include="Configuration\ConfigModOptions.cs" />
+    <Compile Include="Configuration\ConfigEntryWrapper.cs" />
+    <Compile Include="Configuration\SaveFile.cs" />
     <Compile Include="DataDumper.cs" />
     <Compile Include="Handlers\CommandHandler.cs" />
     <Compile Include="Handlers\EntityHandler.cs" />
@@ -73,12 +80,16 @@
     <Compile Include="Logic\Recipes\BaseTheme.cs" />
     <Compile Include="Logic\SpoilerLog.cs" />
     <Compile Include="Objects\Enums\EntityType.cs" />
+    <Compile Include="Objects\Enums\IngredientInclusionLevel.cs" />
+    <Compile Include="Objects\Enums\RandomDistribution.cs" />
+    <Compile Include="Objects\Enums\RecipeDifficultyMode.cs" />
     <Compile Include="Objects\Events\CollectEntitiesEventArgs.cs" />
     <Compile Include="Objects\Events\EntityEventArgs.cs" />
     <Compile Include="Objects\Events\EntityListEventArgs.cs" />
     <Compile Include="Objects\Events\SetupPriorityEventArgs.cs" />
     <Compile Include="Objects\Events\SetupProgressionEventArgs.cs" />
     <Compile Include="Objects\Events\SetupVehiclesEventArgs.cs" />
+    <Compile Include="Objects\Exceptions\ConfigFieldException.cs" />
     <Compile Include="Objects\LogicEntityEqualityComparer.cs" />
     <Compile Include="Objects\LootTable.cs" />
     <Compile Include="Patches\AuroraPatcher.cs" />
@@ -94,7 +105,6 @@
     <Compile Include="Logic\Recipes\ModeRandom.cs" />
     <Compile Include="Logic\Recipes\RecipeLogic.cs" />
     <Compile Include="Patches\AlternateStart.cs" />
-    <Compile Include="RandomiserConfig.cs" />
     <Compile Include="CSVReader.cs" />
     <Compile Include="Objects\Blueprint.cs" />
     <Compile Include="Objects\Enums\BiomeRegion.cs" />
@@ -134,11 +144,14 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="SMLHelper">
-      <HintPath>..\Dependencies\SMLHelper.dll</HintPath>
+    <Reference Include="Nautilus">
+      <HintPath>..\Dependencies\Nautilus.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>..\Dependencies\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\Dependencies\UnityEngine.dll</HintPath>
       <Private>False</Private>
