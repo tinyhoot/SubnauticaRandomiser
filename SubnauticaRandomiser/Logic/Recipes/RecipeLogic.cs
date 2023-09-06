@@ -122,7 +122,10 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             args.ToBeRandomised.AddRange(_entityHandler.GetAllCraftables());
             if (_config.UseEggs.Value)
+            {
                 args.ToBeRandomised.AddRange(_entityHandler.GetByCategory(TechTypeCategory.Eggs));
+                args.ToBeRandomised.AddRange(_entityHandler.GetByCategory(TechTypeCategory.EggsHatched));
+            }
         }
 
         /// <summary>
