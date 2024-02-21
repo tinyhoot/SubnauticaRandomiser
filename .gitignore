@@ -5,6 +5,7 @@ packages
 **/bin
 **/obj
 **/Properties
+**/GameDirectory.targets
 SubnauticaRandomiser/Subnautica
 SubnauticaRandomiser.sln.DotSettings.user
 
