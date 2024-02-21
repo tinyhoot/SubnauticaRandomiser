@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
+using HootLib;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
@@ -146,7 +147,7 @@ namespace SubnauticaRandomiser.Logic
             
             // Force a new frame before the main loop.
             yield return null;
-            yield return Utils.WrapCoroutine(RandomiseMainEntities(mainEntities), Initialiser.FatalError);
+            yield return Hootils.WrapCoroutine(RandomiseMainEntities(mainEntities), Initialiser.FatalError);
             yield return null;
             ApplyAllChanges();
             
@@ -442,7 +443,7 @@ namespace SubnauticaRandomiser.Logic
         private IEnumerator WaitUntilFilesLoaded()
         {
             yield return new WaitUntil(() => _fileTasks.TrueForAll(task => task.IsCompleted));
-            StartCoroutine(Utils.WrapCoroutine(Randomise(), Initialiser.FatalError));
+            StartCoroutine(Hootils.WrapCoroutine(Randomise(), Initialiser.FatalError));
         }
     }
 }

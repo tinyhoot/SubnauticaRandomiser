@@ -30,9 +30,7 @@
 
     <ItemGroup>
         <Compile Include="Configuration\Config.cs"/>
-        <Compile Include="Configuration\ConfigEntryWrapperBase.cs"/>
         <Compile Include="Configuration\ConfigModOptions.cs"/>
-        <Compile Include="Configuration\ConfigEntryWrapper.cs"/>
         <Compile Include="Configuration\SaveFile.cs"/>
         <Compile Include="CSVReader.cs"/>
         <Compile Include="DataDumper.cs"/>
@@ -94,7 +92,6 @@
         <Compile Include="Patches\LanguagePatcher.cs"/>
         <Compile Include="Patches\VanillaBugfixes.cs"/>
         <Compile Include="Patches\FragmentPatcher.cs"/>
-        <Compile Include="Utils.cs"/>
     </ItemGroup>
     <ItemGroup>
         <Content Include="Assets\alternateStarts.csv"/>

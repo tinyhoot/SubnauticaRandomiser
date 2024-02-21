@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using BepInEx;
 using BepInEx.Configuration;
+using HootLib;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
@@ -57,11 +58,9 @@ namespace SubnauticaRandomiser
 
             // Register options menu.
             _ModDirectory = GetModDirectory();
-            var configFile = new ConfigFile(Path.Combine(Paths.ConfigPath, GetConfigFileName()), true, Info.Metadata);
-            _Config = new Config(configFile);
-            _Config.RegisterOptions();
-            var modOptions = new ConfigModOptions(NAME, _Config);
-            OptionsPanelHandler.RegisterModOptions(modOptions);
+            _Config = new Config(Hootils.GetConfigFileName(NAME), Info.Metadata);
+            _Config.Setup();
+            _Config.CreateModMenu(NAME, transform);
             _Log.Debug("Registered options menu.");
             // Set up the save file.
             _SaveFile = new SaveFile(Path.Combine(_ModDirectory, GetSaveFileName()), _ExpectedSaveVersion);
