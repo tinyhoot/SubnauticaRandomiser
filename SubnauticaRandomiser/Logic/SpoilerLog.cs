@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using SubnauticaRandomiser.Configuration;
+using HootLib;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
 using UnityEngine;
-using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -43,7 +43,7 @@ namespace SubnauticaRandomiser.Logic
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
             _log = _coreLogic._Log;
-            _spoilerDirectory = Path.Combine(Initialiser._ModDirectory, _DirName);
+            _spoilerDirectory = Path.Combine(Hootils.GetModDirectory(), _DirName);
             PrepareStrings();
 
             // Register events.

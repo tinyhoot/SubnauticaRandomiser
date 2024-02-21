@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using HootLib.Interfaces;
 using JetBrains.Annotations;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;

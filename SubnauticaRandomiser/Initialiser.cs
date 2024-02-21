@@ -5,14 +5,12 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using BepInEx;
-using BepInEx.Configuration;
 using HootLib;
-using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using UnityEngine;
-using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 [assembly:InternalsVisibleTo("Tests")]
 namespace SubnauticaRandomiser
@@ -26,7 +24,6 @@ namespace SubnauticaRandomiser
         public const string VERSION = "0.11.1";
         
         // Files and structure.
-        internal static string _ModDirectory;
         internal static Config _Config;
         internal static SaveFile _SaveFile;
         public const string _AlternateStartFile = "alternateStarts.csv";
@@ -46,24 +43,21 @@ namespace SubnauticaRandomiser
         };
 
         internal static ILogHandler _Log;
-        internal GameObject _LogicObject;
+        private GameObject _LogicObject;
         private CoreLogic _coreLogic;
-        internal static Initialiser _Main;
 
         private void Awake()
         {
-            _Main = this;
-            _Log = new LogHandler();
+            _Log = new HootLogger(NAME);
             _Log.Info($"{NAME} v{VERSION} starting up!");
 
             // Register options menu.
-            _ModDirectory = GetModDirectory();
             _Config = new Config(Hootils.GetConfigFileName(NAME), Info.Metadata);
             _Config.Setup();
             _Config.CreateModMenu(NAME, transform);
             _Log.Debug("Registered options menu.");
             // Set up the save file.
-            _SaveFile = new SaveFile(Path.Combine(_ModDirectory, GetSaveFileName()), _ExpectedSaveVersion);
+            _SaveFile = new SaveFile(Path.Combine(Hootils.GetModDirectory(), GetSaveFileName()), _ExpectedSaveVersion);
 
             // Ensure the user did not update into a save incompatibility, and abort if they did to preserve a prior
             // version's state.

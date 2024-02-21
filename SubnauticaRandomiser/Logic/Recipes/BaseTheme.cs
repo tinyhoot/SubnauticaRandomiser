@@ -1,4 +1,5 @@
 using System;
+using HootLib.Interfaces;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;

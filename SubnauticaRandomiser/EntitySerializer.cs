@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
+using HootLib.Interfaces;
 using SubnauticaRandomiser.Configuration;
-using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 
 namespace SubnauticaRandomiser

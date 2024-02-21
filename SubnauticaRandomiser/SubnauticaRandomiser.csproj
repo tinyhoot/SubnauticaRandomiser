@@ -37,11 +37,8 @@
         <Compile Include="EntitySerializer.cs"/>
         <Compile Include="Handlers\CommandHandler.cs"/>
         <Compile Include="Handlers\EntityHandler.cs"/>
-        <Compile Include="Handlers\EnumHandler.cs"/>
-        <Compile Include="Handlers\LogHandler.cs"/>
         <Compile Include="Handlers\RandomHandler.cs"/>
         <Compile Include="Initialiser.cs"/>
-        <Compile Include="Interfaces\ILogHandler.cs"/>
         <Compile Include="Interfaces\ILogicModule.cs"/>
         <Compile Include="Interfaces\IRandomHandler.cs"/>
         <Compile Include="Logic\AlternateStartLogic.cs"/>

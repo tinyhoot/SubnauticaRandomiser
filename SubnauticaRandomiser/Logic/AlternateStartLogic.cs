@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
+using HootLib;
 using SubnauticaRandomiser.Configuration;
-using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Patches;
 using UnityEngine;
-using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -81,7 +81,7 @@ namespace SubnauticaRandomiser.Logic
                     return BiomeRegion.None;
             }
 
-            return EnumHandler.Parse<BiomeRegion>(startBiome);
+            return Hootils.ParseEnum<BiomeRegion>(startBiome);
         }
 
         /// <summary>

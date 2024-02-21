@@ -5,7 +5,7 @@ using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Events;
 using UnityEngine;
-using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {

@@ -5,13 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using HootLib;
 using JetBrains.Annotations;
-using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Exceptions;
 using UnityEngine;
-using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
+using Blueprint = SubnauticaRandomiser.Objects.Blueprint;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser
 {
@@ -68,7 +69,7 @@ namespace SubnauticaRandomiser
                 string[] cells = lines[i];
                 try
                 {
-                    BiomeRegion biome = EnumHandler.Parse<BiomeRegion>(cells[0]);
+                    BiomeRegion biome = Hootils.ParseEnum<BiomeRegion>(cells[0]);
                     var starts = ParseAlternateStartLine(cells);
                     parsedStarts.Add(biome, starts);
                     _log.Debug($"Registered alternate starts for biome {biome}");
@@ -181,12 +182,12 @@ namespace SubnauticaRandomiser
             // Column 1: TechType
             if (string.IsNullOrEmpty(cellsTechType))
                 throw new ArgumentException("TechType is null or empty, but is a required field.");
-            techType = EnumHandler.Parse<TechType>(cellsTechType);
+            techType = Hootils.ParseEnum<TechType>(cellsTechType);
 
             // Column 2: Category
             if (string.IsNullOrEmpty(cellsCategory))
                 throw new ArgumentException("Category is null or empty, but is a required field.");
-            category = EnumHandler.Parse<TechTypeCategory>(cellsCategory);
+            category = Hootils.ParseEnum<TechTypeCategory>(cellsCategory);
             if (category.IsFragment())
                 entityType = EntityType.Fragment;
             if (category.IsCraftable())
@@ -219,11 +220,11 @@ namespace SubnauticaRandomiser
                 foreach (string str in conditions)
                 {
                     if (str.ToLower().Contains("fragment"))
-                        blueprintFragments.Add(EnumHandler.Parse<TechType>(str));
+                        blueprintFragments.Add(Hootils.ParseEnum<TechType>(str));
                     else if (str.ToLower().Contains("databox"))
                         blueprintDatabox = true;
                     else
-                        blueprintUnlockConditions.Add(EnumHandler.Parse<TechType>(str));
+                        blueprintUnlockConditions.Add(Hootils.ParseEnum<TechType>(str));
                 }
             }
 
@@ -281,7 +282,7 @@ namespace SubnauticaRandomiser
             // processed at all, the string itself is good enough.
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("BiomeType is null or empty, but is a required field.");
-            BiomeRegion biomeRegion = EnumHandler.Parse<BiomeRegion>(name);
+            BiomeRegion biomeRegion = Hootils.ParseEnum<BiomeRegion>(name);
 
             // Column 2: The number of small slots.
             if (string.IsNullOrEmpty(cellsSmallCount))
@@ -337,7 +338,7 @@ namespace SubnauticaRandomiser
             // Column 1: TechType
             if (string.IsNullOrEmpty(cellsTechType))
                 throw new ArgumentException("TechType is null or empty, but is a required field.");
-            type = EnumHandler.Parse<TechType>(cellsTechType);
+            type = Hootils.ParseEnum<TechType>(cellsTechType);
 
             // Column 2: Coordinates
             if (!string.IsNullOrEmpty(cellsCoordinates))
@@ -360,7 +361,7 @@ namespace SubnauticaRandomiser
 
             // Column 3: General location
             if (!string.IsNullOrEmpty(cellsEWreckage))
-                wreck = EnumHandler.Parse<Wreckage>(cellsEWreckage);
+                wreck = Hootils.ParseEnum<Wreckage>(cellsEWreckage);
 
             // Column 4: Is it a databox?
             // Redundant until fragments are implemented, so this does nothing.
@@ -420,7 +421,7 @@ namespace SubnauticaRandomiser
             {
                 if (!String.IsNullOrEmpty(s))
                 {
-                    TechType t = EnumHandler.Parse<TechType>(s);
+                    TechType t = Hootils.ParseEnum<TechType>(s);
                     output.Add(t);
                 }
             }

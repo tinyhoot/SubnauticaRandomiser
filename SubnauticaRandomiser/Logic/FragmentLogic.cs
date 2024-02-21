@@ -14,7 +14,7 @@ using SubnauticaRandomiser.Objects.Exceptions;
 using SubnauticaRandomiser.Patches;
 using UnityEngine;
 using static LootDistributionData;
-using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
