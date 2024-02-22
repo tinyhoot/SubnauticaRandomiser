@@ -403,7 +403,7 @@ namespace SubnauticaRandomiser
         /// <returns>The absolute path.</returns>
         private static string GetDataPath(string fileName)
         {
-            string dataFolder = Path.Combine(Initialiser.GetModDirectory(), "DataFiles");
+            string dataFolder = Path.Combine(Hootils.GetModDirectory(), "Assets");
             return Path.Combine(dataFolder, fileName);
         }
 

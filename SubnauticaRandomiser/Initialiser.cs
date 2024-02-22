@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.ExceptionServices;
 using BepInEx;
 using HootLib;
@@ -185,14 +184,6 @@ namespace SubnauticaRandomiser
             // Set this plugin (or BepInEx) as the parent of the logic GameObject.
             _LogicObject.transform.SetParent(transform, false);
             _coreLogic = _LogicObject.GetComponent<CoreLogic>();
-        }
-
-        /// <summary>
-        /// Get the installation directory of the mod.
-        /// </summary>
-        internal static string GetModDirectory()
-        {
-            return new FileInfo(Assembly.GetExecutingAssembly().Location).Directory?.FullName;
         }
     }
 }
