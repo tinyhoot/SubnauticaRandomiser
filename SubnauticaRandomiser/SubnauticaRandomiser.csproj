@@ -89,6 +89,7 @@
         <Compile Include="Patches\LanguagePatcher.cs"/>
         <Compile Include="Patches\VanillaBugfixes.cs"/>
         <Compile Include="Patches\FragmentPatcher.cs"/>
+        <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="Assets\alternateStarts.csv"/>
