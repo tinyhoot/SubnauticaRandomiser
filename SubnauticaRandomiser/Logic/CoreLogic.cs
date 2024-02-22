@@ -9,7 +9,8 @@ using HootLib;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.Logic.Recipes;
+using SubnauticaRandomiser.Logic.Modules;
+using SubnauticaRandomiser.Logic.Modules.Recipes;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
@@ -90,7 +91,7 @@ namespace SubnauticaRandomiser.Logic
             _priorityEntities = new List<LogicEntity>();
             
             _Config = Initialiser._Config;
-            _Log = Initialiser._Log;
+            _Log = PrefixLogHandler.Get("[Core]");
             EntityHandler = new EntityHandler(_Log);
             Random = new RandomHandler(_Config.Seed.Value);
             _saveFile = Initialiser._SaveFile;
@@ -162,7 +163,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private List<LogicEntity> Setup()
         {
-            _Log.Info("[Core] Setting up...");
+            _Log.Info("Setting up...");
             SetupBeginning?.Invoke(this, EventArgs.Empty);
             _manager.TriggerSetupEvents();
             
@@ -177,7 +178,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void RandomisePreLoop()
         {
-            _Log.Info("[Core] Randomising: Pre-loop content");
+            _Log.Info("Randomising: Pre-loop content");
             PreLoopRandomising?.Invoke(this, EventArgs.Empty);
             foreach (ILogicModule module in _modules)
             {
@@ -193,7 +194,7 @@ namespace SubnauticaRandomiser.Logic
         /// a valid solution.</exception>
         private IEnumerator RandomiseMainEntities(List<LogicEntity> notRandomised)
         {
-            _Log.Info("[Core] Randomising: Entering main loop");
+            _Log.Info("Randomising: Entering main loop");
             MainLoopRandomising?.Invoke(this, EventArgs.Empty);
 
             int circuitbreaker = 0;
@@ -205,8 +206,8 @@ namespace SubnauticaRandomiser.Logic
                     yield return null;
                 if (circuitbreaker > 3000)
                 {
-                    _Log.InGameMessage("[Core] Failed to randomise entities: stuck in infinite loop!");
-                    _Log.Fatal("[Core] Encountered infinite loop, aborting!");
+                    _Log.InGameMessage("Failed to randomise entities: stuck in infinite loop!");
+                    _Log.Fatal("Encountered infinite loop, aborting!");
                     throw new TimeoutException("Encountered infinite loop while randomising!");
                 }
 
@@ -217,7 +218,7 @@ namespace SubnauticaRandomiser.Logic
                 ILogicModule handler = _handlingModules.GetOrDefault(nextEntity.EntityType, null);
                 if (handler is null)
                 {
-                    _Log.Warn($"[Core] Unhandled entity in main loop: {nextEntity.EntityType} {nextEntity}");
+                    _Log.Warn($"Unhandled entity in main loop: {nextEntity.EntityType} {nextEntity}");
                     // Add the unhandled entity into logic as a stopgap solution, for cases where a prerequisite check
                     // would fail because it expects unhandled entities to be in logic first.
                     notRandomised.Remove(nextEntity);
@@ -236,7 +237,7 @@ namespace SubnauticaRandomiser.Logic
                 }
             }
             
-            _Log.Info($"[Core] Finished randomising within {circuitbreaker} cycles!");
+            _Log.Info($"Finished randomising within {circuitbreaker} cycles!");
             MainLoopCompleted?.Invoke(this, EventArgs.Empty);
         }
         
@@ -308,7 +309,7 @@ namespace SubnauticaRandomiser.Logic
                 // Ensure that any priority entity's prerequisites are always done first.
                 while (!next.CheckPrerequisitesFulfilled(this))
                 {
-                    _Log.Debug($"[Core] Adding prerequisites for {next} to priority queue.");
+                    _Log.Debug($"Adding prerequisites for {next} to priority queue.");
                     AddPrerequisitesAsPriority(next);
                     next = _priorityEntities[0];
                 }
@@ -318,7 +319,7 @@ namespace SubnauticaRandomiser.Logic
             next ??= Random.Choice(notRandomised);
             while (HasRandomised(next))
             {
-                _Log.Debug($"[Core] Found duplicate entity in main loop, removing: {next}");
+                _Log.Debug($"Found duplicate entity in main loop, removing: {next}");
                 notRandomised.Remove(next);
                 next = Random.Choice(notRandomised);
             }
@@ -415,16 +416,16 @@ namespace SubnauticaRandomiser.Logic
         {
             if (string.IsNullOrEmpty(Initialiser._SaveFile.Base64Save))
             {
-                _Log.Debug("[Core] base64 seed is empty.");
+                _Log.Debug("base64 seed is empty.");
                 return false;
             }
 
-            _Log.Debug("[Core] Trying to decode base64 string...");
+            _Log.Debug("Trying to decode base64 string...");
             EntitySerializer serializer = EntitySerializer.FromBase64String(Initialiser._SaveFile.Base64Save);
 
             if (serializer?.SpawnDataDict is null || serializer.RecipeDict is null)
             {
-                _Log.Error("[Core] base64 seed is invalid; could not deserialize.");
+                _Log.Error("base64 seed is invalid; could not deserialize.");
                 return false;
             }
             _Serializer = serializer;
@@ -436,7 +437,7 @@ namespace SubnauticaRandomiser.Logic
                 _modules.Add(component as ILogicModule);
             }
             
-            _Log.Debug("[Core] Save data restored.");
+            _Log.Debug("Save data restored.");
             return true;
         }
         

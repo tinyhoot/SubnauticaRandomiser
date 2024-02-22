@@ -11,7 +11,7 @@ using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 
-namespace SubnauticaRandomiser.Logic.Recipes
+namespace SubnauticaRandomiser.Logic.Modules.Recipes
 {
     /// <summary>
     /// The base class for deciding how or which ingredients are chosen in recipe randomisation.
@@ -23,7 +23,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         protected Config _config => _coreLogic._Config;
         protected EntityHandler _entityHandler => _coreLogic.EntityHandler;
         protected IRandomHandler _random => _coreLogic.Random;
-        protected ILogHandler _log => _coreLogic._Log;
+        protected ILogHandler _log;
 
         protected List<TechType> _blacklist = new List<TechType>();
         protected List<TechTypeCategory> _categoryBlacklist = new List<TechTypeCategory>();
@@ -35,6 +35,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             _coreLogic = coreLogic;
             _recipeLogic = recipeLogic;
+            _log = PrefixLogHandler.Get("[R]");
 
             if (_config.BaseTheming.Value)
                 _baseTheme = new BaseTheme(_entityHandler, _log, _random);
@@ -70,7 +71,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 int chosenNum = Math.Min(number, max);
                 AddIngredientWithMaxUsesCheck(ingredients, ingredient, chosenNum);
                 totalSize += ingredient.GetItemSize() * chosenNum;
-                _log.Debug($"[R] > Adding ingredient: {ingredient}, {chosenNum}, size: {totalSize}");
+                _log.Debug($"> Adding ingredient: {ingredient}, {chosenNum}, size: {totalSize}");
             }
             
             // Update the total size of everything needed to build a basic outpost.
@@ -114,7 +115,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (!entity.HasUsesLeft())
             {
                 _recipeLogic.ValidIngredients.Remove(entity);
-                _log.Debug($"[R] ! Removing {entity} ingredients list due to " + 
+                _log.Debug($"! Removing {entity} ingredients list due to " + 
                            $"max uses reached: {entity.UsedInRecipes}");
                 RemoveParentRecipes(entity);
             }
@@ -132,14 +133,14 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // Respect the maximum number of ingredients set in the config.
             if (ingredients.Count >= _config.MaxIngredientsPerRecipe.Value)
             {
-                _log.Debug("[R] ! Recipe has reached maximum allowed number of ingredients, stopping.");
+                _log.Debug("! Recipe has reached maximum allowed number of ingredients, stopping.");
                 return true;
             }
             
             // If a recipe starts requiring too much space, shut it down early.
             if (totalSize >= _config.MaxInventorySizePerRecipe.Value)
             {
-                _log.Debug("[R] ! Recipe is getting too large, stopping.");
+                _log.Debug("! Recipe is getting too large, stopping.");
                 return true;
             }
             
@@ -147,7 +148,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (_recipeLogic.BasicOutpostPieces.ContainsKey(entity.TechType)
                 && _basicOutpostSize > _config.MaxBasicOutpostSize.Value * 0.7)
             {
-                _log.Debug("[R] ! Basic outpost size is getting too large, stopping.");
+                _log.Debug("! Basic outpost size is getting too large, stopping.");
                 return true;
             }
 
@@ -245,7 +246,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 int number = GetBaseThemeIngredientNumber(theme);
                 AddIngredientWithMaxUsesCheck(ingredients, theme, number);
                 totalSize += _baseTheme.GetBaseTheme().GetItemSize() * number;
-                _log.Debug($"[R] > Added base theme {theme}.");
+                _log.Debug($"> Added base theme {theme}.");
             }
 
             // If vanilla upgrade chains are set to be preserved, prioritise the thing this recipe upgrades from.
@@ -254,7 +255,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             {
                 AddIngredientWithMaxUsesCheck(ingredients, vanilla, 1);
                 totalSize += vanilla.GetItemSize();
-                _log.Debug($"[R] > Added upgrade base {vanilla}.");
+                _log.Debug($"> Added upgrade base {vanilla}.");
             }
 
             return totalSize;
@@ -277,7 +278,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
         {
             int count = _recipeLogic.ValidIngredients.RemoveWhere(e =>
                 e.Recipe?.Ingredients.Any(i => i.techType.Equals(entity.TechType)) ?? false);
-            _log.Debug($"[R]   Also removing {count} parent recipes.");
+            _log.Debug($"  Also removing {count} parent recipes.");
         }
 
         /// <summary>

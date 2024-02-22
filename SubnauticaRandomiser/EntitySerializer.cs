@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using HootLib.Interfaces;
 using SubnauticaRandomiser.Configuration;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects;
 
 namespace SubnauticaRandomiser
@@ -56,13 +57,13 @@ namespace SubnauticaRandomiser
             NumFragmentsToUnlock = new Dictionary<TechType, int>();
             RecipeDict = new Dictionary<TechType, Recipe>();
             SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
-            _log = logger;
+            _log = new PrefixLogHandler("[Serial]", logger);
         }
         
         [OnDeserialized]
         private void OnDeserialized()
         {
-            _log = Initialiser._Log;
+            _log = new PrefixLogHandler("[Serial]", Initialiser._Log);
         }
 
         /// <summary>

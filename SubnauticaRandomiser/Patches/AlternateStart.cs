@@ -1,14 +1,17 @@
-using System;
 using HarmonyLib;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Objects;
 using UnityEngine;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Patches
 {
     [HarmonyPatch]
     internal static class AlternateStart
     {
+        private static ILogHandler _log => PrefixLogHandler.Get("[AS]");
+        
         /// <summary>
         /// Override the spawn location of the lifepod at the start of the game.
         /// </summary>
@@ -24,7 +27,7 @@ namespace SubnauticaRandomiser.Patches
                 // Has not been randomised, don't do anything.
                 return;
 
-            Initialiser._Log.Debug("[AS] Replacing lifepod spawnpoint with " + CoreLogic._Serializer.StartPoint);
+            _log.Debug("[AS] Replacing lifepod spawnpoint with " + CoreLogic._Serializer.StartPoint);
             __result = CoreLogic._Serializer.StartPoint.ToUnityVector();
         }
 
@@ -45,9 +48,9 @@ namespace SubnauticaRandomiser.Patches
                 float time = (tracker.distanceToPlayer - curRadius) / LeakingRadiation.main.kGrowRate;
                 float days = time / DayNightCycle.kDayLengthSeconds;
                 
-                Initialiser._Log.Debug($"{LeakingRadiation.main.kMaxRadius}");
-                Initialiser._Log.InGameMessage("CAUTION: You are inside the Aurora's radiation radius.");
-                Initialiser._Log.InGameMessage($"Radiation will reach the lifepod {days:F1} days after explosion.");
+                _log.Debug($"{LeakingRadiation.main.kMaxRadius}");
+                _log.InGameMessage("CAUTION: You are inside the Aurora's radiation radius.");
+                _log.InGameMessage($"Radiation will reach the lifepod {days:F1} days after explosion.");
             }
         }
     }

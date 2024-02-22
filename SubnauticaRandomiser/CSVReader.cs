@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using HootLib;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Exceptions;
@@ -22,7 +23,7 @@ namespace SubnauticaRandomiser
     internal static class CSVReader
     {
         private static readonly CultureInfo _culture = CultureInfo.InvariantCulture;
-        private static ILogHandler _log => Initialiser._Log;
+        private static ILogHandler _log => PrefixLogHandler.Get("[CSV]");
 
         /// <summary>
         /// Wow I wish this could be an async enumerator but NO WE'RE STUCK ON 4.7.2

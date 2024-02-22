@@ -1,13 +1,17 @@
 ﻿using HarmonyLib;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Objects;
 using UnityEngine;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Patches
 {
     [HarmonyPatch]
     internal class DataboxPatcher
     {
+        private static ILogHandler _log => PrefixLogHandler.Get("[D]");
+        
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BlueprintHandTarget), nameof(BlueprintHandTarget.Start))]
         public static void PatchDatabox(ref BlueprintHandTarget __instance)
@@ -24,7 +28,7 @@ namespace SubnauticaRandomiser.Patches
             TechType replacement = GetTechTypeForPosition(__instance.transform.position);
             if (replacement != TechType.None)
             {
-                Initialiser._Log.Debug($"[D] Replacing databox [{__instance.spawnTechType} "
+                _log.Debug($"Replacing databox [{__instance.spawnTechType} "
                                        + $"{__instance.transform.position}] with {replacement}");
                 __instance.spawnTechType = replacement;
             }
@@ -35,7 +39,7 @@ namespace SubnauticaRandomiser.Patches
             if (CoreLogic._Serializer.Databoxes.TryGetValue(position.ToRandomiserVector(), out TechType replacement))
                 return replacement;
 
-            Initialiser._Log.Warn($"[D] Failed to find databox replacement for position {position}!");
+            _log.Warn($"Failed to find databox replacement for position {position}!");
             return TechType.None;
         }
     }

@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using HarmonyLib;
 using SubnauticaRandomiser.Configuration;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Patches;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Modules
 {
     /// <summary>
     /// Handles randomising everything in and around the Aurora.
@@ -19,7 +20,7 @@ namespace SubnauticaRandomiser.Logic
         private CoreLogic _coreLogic;
 
         private Config _config => _coreLogic._Config;
-        private ILogHandler _log => _coreLogic._Log;
+        private ILogHandler _log;
         private IRandomHandler _random => _coreLogic.Random;
         private EntitySerializer _serializer => CoreLogic._Serializer;
 
@@ -34,6 +35,7 @@ namespace SubnauticaRandomiser.Logic
         private void Awake()
         {
             _coreLogic = GetComponent<CoreLogic>();
+            _log = PrefixLogHandler.Get("[Aurora]");
         }
 
         public void ApplySerializedChanges(EntitySerializer serializer) { }
@@ -77,7 +79,7 @@ namespace SubnauticaRandomiser.Logic
                 {
                     code = _random.Next(1111, 9999).ToString();
                 }
-                _log.Debug($"[AR] Assigning accessCode {code} to {classId}");
+                _log.Debug($"Assigning accessCode {code} to {classId}");
                 keyCodes.Add(classId, code);
             }
 

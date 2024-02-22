@@ -12,7 +12,7 @@ using SubnauticaRandomiser.Objects.Events;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser.Logic.Recipes
+namespace SubnauticaRandomiser.Logic.Modules.Recipes
 {
     /// <summary>
     /// Handles everything related to randomising recipes.
@@ -38,7 +38,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             _manager = GetComponent<ProgressionManager>();
             _config = _coreLogic._Config;
             _entityHandler = _coreLogic.EntityHandler;
-            _log = _coreLogic._Log;
+            _log = PrefixLogHandler.Get("[R]");
             ValidIngredients = new HashSet<LogicEntity>(new LogicEntityEqualityComparer());
             
             // Decide which recipe mode will be used.

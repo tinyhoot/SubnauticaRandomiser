@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SubnauticaRandomiser.Configuration;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Events;
 using UnityEngine;
@@ -61,7 +62,7 @@ namespace SubnauticaRandomiser.Logic
         {
             _coreLogic = GetComponent<CoreLogic>();
             _config = _coreLogic._Config;
-            _log = _coreLogic._Log;
+            _log = PrefixLogHandler.Get("[PM]");
             
             SetupPriorityEntities();
             SetupProgressionEntities();
@@ -318,7 +319,7 @@ namespace SubnauticaRandomiser.Logic
                 return;
 
             _unlockedProgressionEntities.Add(entity.TechType);
-            _log.Debug($"[PM] Unlocked new progression item {entity}");
+            _log.Debug($"Unlocked new progression item {entity}");
 
             // A new progression item also necessitates new depth calculations.
             int newDepth = CalculateReachableDepth(_unlockedProgressionEntities, _config.DepthSearchTime.Value);
@@ -372,7 +373,7 @@ namespace SubnauticaRandomiser.Logic
             {
                 LogicEntity entity = _coreLogic.EntityHandler.GetEntity(techType);
                 additions.Add(entity);
-                _log.Debug($"[PM] Adding priority entity {entity} to priority queue for depth {depth}");
+                _log.Debug($"Adding priority entity {entity} to priority queue for depth {depth}");
             }
 
             _coreLogic.AddPriorityEntities(additions);

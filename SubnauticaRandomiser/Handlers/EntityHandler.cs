@@ -24,7 +24,7 @@ namespace SubnauticaRandomiser.Handlers
         {
             // Use a custom comparer to make that hash work properly for these otherwise mutable entities.
             _inLogic = new HashSet<LogicEntity>(new LogicEntityEqualityComparer());
-            _log = logger;
+            _log = new PrefixLogHandler("[Entity]", logger);
         }
 
         public event EventHandler<EntityEventArgs> EntityEnteredLogic;

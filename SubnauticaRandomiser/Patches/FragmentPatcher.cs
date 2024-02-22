@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
+using HootLib.Interfaces;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 
@@ -10,6 +11,8 @@ namespace SubnauticaRandomiser.Patches
     [HarmonyPatch]
     internal class FragmentPatcher
     {
+        private static ILogHandler _log => PrefixLogHandler.Get("[F]");
+        
         /// <summary>
         /// This method patches a few lines into PDAScanner.Scan() to intercept the game's normal operations.
         /// Instead of hard-coding two titanium on scanning a duplicate fragment, the game will instead call
@@ -21,7 +24,7 @@ namespace SubnauticaRandomiser.Patches
         [HarmonyPatch(typeof(PDAScanner), nameof(PDAScanner.Scan))]
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> codeInstructions)
         {
-            Initialiser._Log.Debug("[F] Starting transpiler for duplicate scan results.");
+            _log.Debug("Starting transpiler for duplicate scan results.");
 
             List<CodeInstruction> instructions = new List<CodeInstruction>(codeInstructions);
 
@@ -46,7 +49,7 @@ namespace SubnauticaRandomiser.Patches
                     {
                         // Found the instruction pushing TechType 16 (Titanium) onto the stack.
                         methodArgsIndex = i + j;
-                        Initialiser._Log.Debug("[F] Found arg0 Titanium at index " + methodArgsIndex);
+                        _log.Debug("Found arg0 Titanium at index " + methodArgsIndex);
 
                         // The original method takes four arguments, but the replacement needs
                         // only one. Replace the first argument with the scan target (conveniently
@@ -58,7 +61,7 @@ namespace SubnauticaRandomiser.Patches
                         instructions[methodArgsIndex + 4].operand
                             = typeof(FragmentPatcher).GetMethod("YieldMaterial", new[] { typeof(TechType) });
 
-                        Initialiser._Log.Debug("[F] Successfully altered CodeInstructions.");
+                        _log.Debug("Successfully altered CodeInstructions.");
                         break;
                     }
                 }
@@ -66,7 +69,7 @@ namespace SubnauticaRandomiser.Patches
             }
 
             if (methodArgsIndex == 0)
-                Initialiser._Log.Error("[F] Failed to find argument index while trying to transpile fragment scan rewards!");
+                _log.Error("Failed to find argument index while trying to transpile fragment scan rewards!");
 
             return instructions.AsEnumerable();
         }
@@ -87,7 +90,7 @@ namespace SubnauticaRandomiser.Patches
             RandomHandler rand = new RandomHandler();
             TechType type = GetRandomMaterial(rand);
             int number = rand.Next(1, Initialiser._Config?.MaxDuplicateScanYield.Value + 1 ?? 4);
-            Initialiser._Log.Debug($"[F] Replacing duplicate fragment scan yield of target {target} with {type}");
+            _log.Debug($"Replacing duplicate fragment scan yield of target {target} with {type}");
             CraftData.AddToInventory(type, number, false, true);
         }
 

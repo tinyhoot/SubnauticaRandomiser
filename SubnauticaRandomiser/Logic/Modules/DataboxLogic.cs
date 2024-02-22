@@ -12,7 +12,7 @@ using SubnauticaRandomiser.Patches;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Modules
 {
     /// <summary>
     /// Handles everything related to randomising databoxes.
@@ -28,7 +28,7 @@ namespace SubnauticaRandomiser.Logic
         public void Awake()
         {
             _coreLogic = GetComponent<CoreLogic>();
-            _log = _coreLogic._Log;
+            _log = PrefixLogHandler.Get("[D]");
             _random = _coreLogic.Random;
             
             // Register this module as a handler for databox entities.
@@ -187,7 +187,7 @@ namespace SubnauticaRandomiser.Logic
                 randomDataboxes.Add(new Databox(originalBox.TechType, next, replacementBox.Wreck, 
                     replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
                 serializer.Databoxes.Add(new RandomiserVector(next), originalBox.TechType);
-                _log.Debug($"[D] Databox {next.ToString()} with {replacementBox}"
+                _log.Debug($"Databox {next.ToString()} with {replacementBox}"
                            + " now contains " + originalBox);
                 toBeRandomised.Remove(next);
             }
@@ -239,7 +239,7 @@ namespace SubnauticaRandomiser.Logic
                     entity.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
             }
             
-            _log.Debug($"[D] Updated unlock requirements for {_databoxes.Count} databoxes.");
+            _log.Debug($"Updated unlock requirements for {_databoxes.Count} databoxes.");
         }
     }
 }

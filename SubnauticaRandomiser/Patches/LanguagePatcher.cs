@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using HarmonyLib;
 using SubnauticaRandomiser.Logic;
+using SubnauticaRandomiser.Logic.Modules;
 
 namespace SubnauticaRandomiser.Patches
 {

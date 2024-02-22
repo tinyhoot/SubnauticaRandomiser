@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
@@ -16,7 +17,7 @@ using UnityEngine;
 using static LootDistributionData;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Modules
 {
     /// <summary>
     /// Handles everything related to randomising fragments.
@@ -75,7 +76,7 @@ namespace SubnauticaRandomiser.Logic
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
             _config = _coreLogic._Config;
-            _log = _coreLogic._Log;
+            _log = PrefixLogHandler.Get("[F]");
             _random = _coreLogic.Random;
 
             // Register events.
@@ -140,11 +141,11 @@ namespace SubnauticaRandomiser.Logic
             // Check whether the fragment fulfills its prerequisites.
             if (!entity.IsPriority && entity.AccessibleDepth > _manager.ReachableDepth)
             {
-                _log.Debug($"[F] --- Fragment [{entity}] did not fulfill requirements, skipping.");
+                _log.Debug($"--- Fragment [{entity}] did not fulfill requirements, skipping.");
                 return false;
             }
             
-            _log.Debug($"[F] Randomising fragment {entity} for depth {_manager.ReachableDepth}");
+            _log.Debug($"Randomising fragment {entity} for depth {_manager.ReachableDepth}");
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
@@ -176,7 +177,7 @@ namespace SubnauticaRandomiser.Logic
                     spawnList.Add(spawnData);
                 }
 
-                _log.Debug($"[F] + Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
+                _log.Debug($"+ Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
             }
 
             ApplyRandomisedFragment(entity, spawnList);
@@ -325,7 +326,7 @@ namespace SubnauticaRandomiser.Logic
                 return;
             
             int numFragments = _random.Next(_config.MinFragmentsToUnlock.Value, _config.MaxFragmentsToUnlock.Value + 1);
-            _log.Debug($"[F] New number of fragments required for {entity}: {numFragments}");
+            _log.Debug($"New number of fragments required for {entity}: {numFragments}");
             _serializer.AddFragmentUnlockNum(entity.TechType, numFragments);
         }
 
@@ -343,7 +344,7 @@ namespace SubnauticaRandomiser.Logic
             // In case no good biome is available, ignore overpopulation restrictions and choose any.
             if (choices.Count == 0)
             {
-                _log.Debug("[F] ! No valid biome choices, using fallback");
+                _log.Debug("! No valid biome choices, using fallback");
                 choices = _allBiomes.FindAll(x => x.AverageDepth <= depth);
                 if (choices.Count == 0)
                     throw new RandomisationException("No valid biome options for depth " + depth);

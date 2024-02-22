@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using HootLib;
 using SubnauticaRandomiser.Configuration;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
@@ -12,7 +13,7 @@ using SubnauticaRandomiser.Patches;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Modules
 {
     /// <summary>
     /// Provides a random starting location for the lifepod.
@@ -34,7 +35,7 @@ namespace SubnauticaRandomiser.Logic
         {
             _coreLogic = GetComponent<CoreLogic>();
             _config = _coreLogic._Config;
-            _log = _coreLogic._Log;
+            _log = PrefixLogHandler.Get("[AS]");
             _random = _coreLogic.Random;
 
             // Parse the list of valid alternate starts from a file.
@@ -97,7 +98,7 @@ namespace SubnauticaRandomiser.Logic
             BiomeRegion biome = GetBiome(startBiome);
             if (!_alternateStarts.ContainsKey(biome))
             {
-                _log.Error("[AS] No information found on chosen starting biome " + biome);
+                _log.Error("No information found on chosen starting biome " + biome);
                 throw new ArgumentException($"Starting biome '{startBiome}' is invalid!");
             }
 
@@ -113,7 +114,7 @@ namespace SubnauticaRandomiser.Logic
                 spawn = new Vector3(x, 0, z);
             } while (!IsValidStart(spawn));
 
-            _log.Debug("[AS] Chosen new lifepod spawnpoint at x:" + spawn.x + " y:0" + " z:" + spawn.z);
+            _log.Debug("Chosen new lifepod spawnpoint at x:" + spawn.x + " y:0" + " z:" + spawn.z);
             return new RandomiserVector(spawn);
         }
 

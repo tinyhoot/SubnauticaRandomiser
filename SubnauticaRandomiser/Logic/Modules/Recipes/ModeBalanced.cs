@@ -6,7 +6,7 @@ using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using UnityEngine;
 
-namespace SubnauticaRandomiser.Logic.Recipes
+namespace SubnauticaRandomiser.Logic.Modules.Recipes
 {
     /// <summary>
     /// Aims to provide a balanced, curated, sane approach to recipe randomisation. Has many checks and balances in
@@ -38,7 +38,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 LogicEntity primaryIngredient = ChoosePrimaryIngredient(recipe);
                 yield return (primaryIngredient, 1);
                 currentValue += primaryIngredient.Value;
-                _log.Debug("[R] > Adding primary ingredient " + primaryIngredient);
+                _log.Debug("> Adding primary ingredient " + primaryIngredient);
             }
 
             // Now fill up with random materials until the value threshold is more or less met, as defined by fuzziness.
@@ -52,7 +52,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 currentValue += ingredient.Value * number;
             }
 
-            _log.Debug($"[R] > Recipe is now valued {currentValue} out of {recipe.Value}");
+            _log.Debug($"> Recipe is now valued {currentValue} out of {recipe.Value}");
             recipe.Value = currentValue;
         }
 
@@ -134,7 +134,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             double range = 0.1;
 
             List<LogicEntity> betterOptions = new List<LogicEntity>();
-            _log.Debug("[R] Replacing undesirable ingredient " + undesirable);
+            _log.Debug("Replacing undesirable ingredient " + undesirable);
 
             // Progressively increase the search radius if no replacement is found,
             // but stop before it gets out of hand.

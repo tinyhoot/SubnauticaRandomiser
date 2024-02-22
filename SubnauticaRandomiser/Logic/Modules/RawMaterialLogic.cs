@@ -5,7 +5,7 @@ using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Patches;
 using UnityEngine;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Modules
 {
     /// <summary>
     /// Rudimentary module to handle raw materials like eggs in the logic.

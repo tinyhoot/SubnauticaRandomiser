@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HootLib;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
@@ -42,7 +43,7 @@ namespace SubnauticaRandomiser.Logic
         {
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
-            _log = _coreLogic._Log;
+            _log = PrefixLogHandler.Get("[Spoiler]");
             _spoilerDirectory = Path.Combine(Hootils.GetModDirectory(), _DirName);
             PrepareStrings();
 
