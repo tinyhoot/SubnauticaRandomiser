@@ -1,28 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using HarmonyLib;
 using HootLib;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.Logic.Modules;
-using SubnauticaRandomiser.Logic.Modules.Recipes;
 using SubnauticaRandomiser.Objects;
-using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
-using SubnauticaRandomiser.Patches;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
-    /// Acts as the core for handling all randomising logic in the mod, registering or enabling modules, and invoking
-    /// the most important events.
+    /// Acts as the core for handling all randomising logic in the mod while invoking vital events along the way.
     /// </summary>
     [DisallowMultipleComponent]
     internal class CoreLogic : MonoBehaviour
@@ -30,19 +22,15 @@ namespace SubnauticaRandomiser.Logic
         public static CoreLogic Main;
         
         internal Config _Config { get; private set; }
-        internal ILogHandler _Log { get; private set; }
         internal static EntitySerializer _Serializer { get; private set; }
         public EntityHandler EntityHandler { get; private set; }
         public IRandomHandler Random { get; private set; }
-
-        private Harmony _harmony;
+        
+        private ILogHandler _log;
         private ProgressionManager _manager;
         private SaveFile _saveFile;
         private SpoilerLog _spoilerLog;
-
-        private List<Task> _fileTasks;
-        private Dictionary<EntityType, ILogicModule> _handlingModules;
-        private List<ILogicModule> _modules;
+        
         private List<LogicEntity> _priorityEntities;
 
         /// <summary>
@@ -85,54 +73,23 @@ namespace SubnauticaRandomiser.Logic
         {
             Main = this;
             
-            _fileTasks = new List<Task>();
-            _handlingModules = new Dictionary<EntityType, ILogicModule>();
-            _modules = new List<ILogicModule>();
             _priorityEntities = new List<LogicEntity>();
             
             _Config = Initialiser._Config;
-            _Log = PrefixLogHandler.Get("[Core]");
-            EntityHandler = new EntityHandler(_Log);
+            _log = PrefixLogHandler.Get("[Core]");
+            EntityHandler = new EntityHandler(_log);
             Random = new RandomHandler(_Config.Seed.Value);
             _saveFile = Initialiser._SaveFile;
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
             _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
+            
+            Bootstrap.Main.RegisterFileLoadTask(EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
         }
 
-        private void OnDestroy()
+        internal void Initialise()
         {
-            _harmony?.UnpatchSelf();
-        }
-
-        private void EnableModules()
-        {
-            if (_Config.EnableAlternateStartModule.Value && !_Config.SpawnPoint.Value.Equals("Vanilla"))
-                RegisterModule<AlternateStartLogic>();
-            if (_Config.RandomiseDoorCodes.Value || _Config.RandomiseSupplyBoxes.Value)
-                RegisterModule<AuroraLogic>();
-            if (_Config.RandomiseDataboxes.Value)
-                RegisterModule<DataboxLogic>();
-            if (_Config.EnableFragmentModule.Value &&
-                (_Config.RandomiseFragments.Value || _Config.RandomiseNumFragments.Value || _Config.RandomiseDuplicateScans.Value))
-                RegisterModule<FragmentLogic>();
-            if (_Config.EnableRecipeModule.Value && _Config.RandomiseRecipes.Value)
-            {
-                RegisterModule<RawMaterialLogic>();
-                RegisterModule<RecipeLogic>();
-            }
-        }
-
-        /// <summary>
-        /// Run the randomiser and start randomising!
-        /// </summary>
-        internal void Run()
-        {
-            _Serializer = null;
-            RegisterFileLoadTask(EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
-            EnableModules();
-            // Wait and periodically check whether all file loading has completed. Only continue once that is done.
-            StartCoroutine(WaitUntilFilesLoaded());
+            StartCoroutine(Hootils.WrapCoroutine(Randomise(), Initialiser.FatalError));
         }
 
         /// <summary>
@@ -142,7 +99,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private IEnumerator Randomise()
         {
-            _Serializer = new EntitySerializer(_Log);
+            _Serializer = new EntitySerializer(_log);
             List<LogicEntity> mainEntities = Setup();
             RandomisePreLoop();
             
@@ -150,12 +107,13 @@ namespace SubnauticaRandomiser.Logic
             yield return null;
             yield return Hootils.WrapCoroutine(RandomiseMainEntities(mainEntities), Initialiser.FatalError);
             yield return null;
-            ApplyAllChanges();
             
-            _Serializer.EnabledModules = _modules.Select(module => module.GetType()).ToList();
+            _Serializer.EnabledModules = Bootstrap.Main.Modules.Select(module => module.GetType()).ToList();
             _Serializer.Serialize(_saveFile, Initialiser._ExpectedSaveVersion);
             
-            _Log.InGameMessage("Finished randomising! Please restart your game for all changes to take effect.");
+            Bootstrap.Main.SyncGameState(_Serializer);
+            
+            _log.InGameMessage("Finished randomising! Please restart your game for all changes to take effect.");
         }
 
         /// <summary>
@@ -163,7 +121,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private List<LogicEntity> Setup()
         {
-            _Log.Info("Setting up...");
+            _log.Info("Setting up...");
             SetupBeginning?.Invoke(this, EventArgs.Empty);
             _manager.TriggerSetupEvents();
             
@@ -178,9 +136,9 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private void RandomisePreLoop()
         {
-            _Log.Info("Randomising: Pre-loop content");
+            _log.Info("Randomising: Pre-loop content");
             PreLoopRandomising?.Invoke(this, EventArgs.Empty);
-            foreach (ILogicModule module in _modules)
+            foreach (ILogicModule module in Bootstrap.Main.Modules)
             {
                 module.RandomiseOutOfLoop(_Serializer);
             }
@@ -194,7 +152,7 @@ namespace SubnauticaRandomiser.Logic
         /// a valid solution.</exception>
         private IEnumerator RandomiseMainEntities(List<LogicEntity> notRandomised)
         {
-            _Log.Info("Randomising: Entering main loop");
+            _log.Info("Randomising: Entering main loop");
             MainLoopRandomising?.Invoke(this, EventArgs.Empty);
 
             int circuitbreaker = 0;
@@ -206,8 +164,8 @@ namespace SubnauticaRandomiser.Logic
                     yield return null;
                 if (circuitbreaker > 3000)
                 {
-                    _Log.InGameMessage("Failed to randomise entities: stuck in infinite loop!");
-                    _Log.Fatal("Encountered infinite loop, aborting!");
+                    _log.InGameMessage("Failed to randomise entities: stuck in infinite loop!");
+                    _log.Fatal("Encountered infinite loop, aborting!");
                     throw new TimeoutException("Encountered infinite loop while randomising!");
                 }
 
@@ -215,10 +173,10 @@ namespace SubnauticaRandomiser.Logic
                 if (nextEntity is null)
                     continue;
                 // Try to get a handler for this type of entity.
-                ILogicModule handler = _handlingModules.GetOrDefault(nextEntity.EntityType, null);
+                ILogicModule handler = Bootstrap.Main.GetEntityHandler(nextEntity.EntityType);
                 if (handler is null)
                 {
-                    _Log.Warn($"Unhandled entity in main loop: {nextEntity.EntityType} {nextEntity}");
+                    _log.Warn($"Unhandled entity in main loop: {nextEntity.EntityType} {nextEntity}");
                     // Add the unhandled entity into logic as a stopgap solution, for cases where a prerequisite check
                     // would fail because it expects unhandled entities to be in logic first.
                     notRandomised.Remove(nextEntity);
@@ -237,7 +195,7 @@ namespace SubnauticaRandomiser.Logic
                 }
             }
             
-            _Log.Info($"Finished randomising within {circuitbreaker} cycles!");
+            _log.Info($"Finished randomising within {circuitbreaker} cycles!");
             MainLoopCompleted?.Invoke(this, EventArgs.Empty);
         }
         
@@ -277,25 +235,6 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Apply any changes the randomiser has decided on to the game. Also used for re-applying a saved state.
-        /// </summary>
-        /// <exception cref="InvalidDataException">Raised if the serializer is null.</exception>
-        internal void ApplyAllChanges()
-        {
-            if (_Serializer is null)
-                throw new InvalidDataException("Cannot apply randomisation changes: Serializer is null!");
-            
-            // Load changes stored in the serializer.
-            foreach (ILogicModule module in _modules)
-            {
-                module.ApplySerializedChanges(_Serializer);
-            }
-
-            // Load any changes that rely on harmony patches.
-            EnableHarmony();
-        }
-
-        /// <summary>
         /// Get the next entity to be randomised, prioritising essential or elective ones.
         /// </summary>
         /// <returns>The next entity.</returns>
@@ -309,7 +248,7 @@ namespace SubnauticaRandomiser.Logic
                 // Ensure that any priority entity's prerequisites are always done first.
                 while (!next.CheckPrerequisitesFulfilled(this))
                 {
-                    _Log.Debug($"Adding prerequisites for {next} to priority queue.");
+                    _log.Debug($"Adding prerequisites for {next} to priority queue.");
                     AddPrerequisitesAsPriority(next);
                     next = _priorityEntities[0];
                 }
@@ -319,7 +258,7 @@ namespace SubnauticaRandomiser.Logic
             next ??= Random.Choice(notRandomised);
             while (HasRandomised(next))
             {
-                _Log.Debug($"Found duplicate entity in main loop, removing: {next}");
+                _log.Debug($"Found duplicate entity in main loop, removing: {next}");
                 notRandomised.Remove(next);
                 next = Random.Choice(notRandomised);
             }
@@ -328,20 +267,6 @@ namespace SubnauticaRandomiser.Logic
             EntityChosen?.Invoke(this, new EntityEventArgs(next));
 
             return next;
-        }
-
-        /// <summary>
-        /// Enables all necessary harmony patches based on the randomisation state in the serialiser.
-        /// </summary>
-        private void EnableHarmony()
-        {
-            _harmony = new Harmony(Initialiser.GUID);
-            foreach (ILogicModule module in _modules)
-            {
-                module.SetupHarmonyPatches(_harmony);
-            }
-            // Always apply bugfixes.
-            _harmony.PatchAll(typeof(VanillaBugfixes));
         }
 
         /// <summary>
@@ -371,80 +296,6 @@ namespace SubnauticaRandomiser.Logic
             {
                 _priorityEntities.Insert(index, entity);
             }
-        }
-
-        /// <summary>
-        /// Register a task responsible for loading critical data. Randomising will only begin once all of these tasks
-        /// have completed. Use this to ensure your module finishes loading data from disk before randomisation begins.
-        /// </summary>
-        /// <param name="task">The Task object from an async method for loading data files.</param>
-        public void RegisterFileLoadTask(Task task)
-        {
-            _fileTasks.Add(task);
-        }
-
-        /// <summary>
-        /// Register a logic module as a handler for a specific entity type. This will cause that handler's
-        /// RandomiseEntity() method to be called whenever an entity of that type needs to be randomised.
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if a handler for the given type of entity already
-        /// exists. There can be only one per type.</exception>
-        public void RegisterEntityHandler(EntityType type, ILogicModule module)
-        {
-            if (_handlingModules.ContainsKey(type))
-                throw new ArgumentException($"A handler for entity type '{type}' already exists: "
-                                            + $"{_handlingModules[type].GetType()}");
-            
-            _handlingModules.Add(type, module);
-        }
-
-        /// <summary>
-        /// Register a component module for use with the randomiser.
-        /// </summary>
-        /// <returns>The instantiated component.</returns>
-        public TLogicModule RegisterModule<TLogicModule>() where TLogicModule : MonoBehaviour, ILogicModule
-        {
-            TLogicModule component = gameObject.EnsureComponent<TLogicModule>();
-            _modules.Add(component);
-            return component;
-        }
-
-        /// <summary>
-        /// Try to restore a game state from disk.
-        /// </summary>
-        internal bool TryRestoreSave()
-        {
-            if (string.IsNullOrEmpty(Initialiser._SaveFile.Base64Save))
-            {
-                _Log.Debug("base64 seed is empty.");
-                return false;
-            }
-
-            _Log.Debug("Trying to decode base64 string...");
-            EntitySerializer serializer = EntitySerializer.FromBase64String(Initialiser._SaveFile.Base64Save);
-
-            if (serializer?.SpawnDataDict is null || serializer.RecipeDict is null)
-            {
-                _Log.Error("base64 seed is invalid; could not deserialize.");
-                return false;
-            }
-            _Serializer = serializer;
-
-            // Re-enable all modules that were active when the save data was generated.
-            foreach (Type module in _Serializer.EnabledModules ?? Enumerable.Empty<Type>())
-            {
-                Component component = gameObject.EnsureComponent(module);
-                _modules.Add(component as ILogicModule);
-            }
-            
-            _Log.Debug("Save data restored.");
-            return true;
-        }
-        
-        private IEnumerator WaitUntilFilesLoaded()
-        {
-            yield return new WaitUntil(() => _fileTasks.TrueForAll(task => task.IsCompleted));
-            StartCoroutine(Hootils.WrapCoroutine(Randomise(), Initialiser.FatalError));
         }
     }
 }

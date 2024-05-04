@@ -89,12 +89,12 @@ namespace SubnauticaRandomiser.Logic.Modules
                 _coreLogic.EntityCollecting += OnCollectFragments;
                 _manager.HasProgressed += OnProgression;
                 // Handle any fragment entities using this component.
-                _coreLogic.RegisterEntityHandler(EntityType.Fragment, this);
+                Bootstrap.Main.RegisterEntityHandler(EntityType.Fragment, this);
                 // Reset all existing fragment spawns.
                 Init();
             }
             
-            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
+            Bootstrap.Main.RegisterFileLoadTask(ParseDataFileAsync());
         }
         
         /// <summary>

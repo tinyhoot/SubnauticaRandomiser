@@ -42,7 +42,9 @@
         <Compile Include="Initialiser.cs"/>
         <Compile Include="Interfaces\ILogicModule.cs"/>
         <Compile Include="Interfaces\IRandomHandler.cs"/>
+        <Compile Include="Logic\Bootstrap.cs" />
         <Compile Include="Logic\CoreLogic.cs"/>
+        <Compile Include="Logic\GameStateSynchroniser.cs" />
         <Compile Include="Logic\Modules\AlternateStartLogic.cs" />
         <Compile Include="Logic\Modules\AuroraLogic.cs" />
         <Compile Include="Logic\Modules\DataboxLogic.cs" />

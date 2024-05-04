@@ -21,7 +21,7 @@ namespace SubnauticaRandomiser.Logic.Modules
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
 
-            _coreLogic.RegisterEntityHandler(EntityType.RawMaterial, this);
+            Bootstrap.Main.RegisterEntityHandler(EntityType.RawMaterial, this);
         }
 
         public void ApplySerializedChanges(EntitySerializer serializer) { }

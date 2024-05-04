@@ -32,11 +32,11 @@ namespace SubnauticaRandomiser.Logic.Modules
             _random = _coreLogic.Random;
             
             // Register this module as a handler for databox entities.
-            _coreLogic.RegisterEntityHandler(EntityType.Databox, this);
+            Bootstrap.Main.RegisterEntityHandler(EntityType.Databox, this);
             // Register events.
             _coreLogic.EntityCollecting += OnCollectDataboxes;
 
-            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
+            Bootstrap.Main.RegisterFileLoadTask(ParseDataFileAsync());
         }
 
         public void ApplySerializedChanges(EntitySerializer serializer) { }

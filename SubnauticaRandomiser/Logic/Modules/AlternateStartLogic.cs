@@ -39,7 +39,7 @@ namespace SubnauticaRandomiser.Logic.Modules
             _random = _coreLogic.Random;
 
             // Parse the list of valid alternate starts from a file.
-            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
+            Bootstrap.Main.RegisterFileLoadTask(ParseDataFileAsync());
         }
         
         public void ApplySerializedChanges(EntitySerializer serializer) { }

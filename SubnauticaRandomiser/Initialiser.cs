@@ -7,7 +7,6 @@ using HootLib;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
-using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser
@@ -40,8 +39,6 @@ namespace SubnauticaRandomiser
         };
 
         internal static ILogHandler _Log;
-        private GameObject _LogicObject;
-        private CoreLogic _coreLogic;
 
         private void Awake()
         {
@@ -66,17 +63,7 @@ namespace SubnauticaRandomiser
             cmd.RegisterCommands();
 
             // Setup the logic and restore from disk if possible.
-            SetupGameObject();
-            RestoreSavedState();
-
-            _Log.Info("Finished loading.");
-        }
-
-        private void Start()
-        {
-            // Randomise, but only if no existing state was loaded from disk.
-            if (_coreLogic != null && CoreLogic._Serializer is null)
-                Randomise();
+            Randomise();
         }
 
         /// <summary>
@@ -107,18 +94,13 @@ namespace SubnauticaRandomiser
         internal static void FatalError(Exception exception)
         {
             _Log.InGameMessage($"<color=#FF0000FF>{exception.GetType().Name.ToUpper()}:</color> Something went wrong. "
-                               + $"Please report this error with the {GetConfigFileName()} from your BepInEx config "
-                               + $"folder on Github or NexusMods.", true);
+                               + $"Please report this error with the {Hootils.GetConfigFileName(NAME)} from your "
+                               + $"BepInEx config folder on Github or NexusMods.", true);
             _Log.Fatal($"{exception.GetType()}: {exception.Message}");
             _Log.Fatal(exception.StackTrace);
             // Ensure that the randomiser crashes completely if things go wrong this badly.
             // Rethrowing in this way preserves the original stacktrace.
             ExceptionDispatchInfo.Capture(exception).Throw();
-        }
-
-        private static string GetConfigFileName()
-        {
-            return $"{NAME.Replace(" ", string.Empty)}.cfg";
         }
         
         private static string GetSaveFileName(){
@@ -137,7 +119,8 @@ namespace SubnauticaRandomiser
             // Randomise!
             try
             {
-                _coreLogic.Run();
+                Bootstrap bootstrap = new Bootstrap(_Config);
+                bootstrap.Initialise();
             }
             catch (Exception ex)
             {
@@ -148,42 +131,30 @@ namespace SubnauticaRandomiser
         internal void RandomiseFromConfig()
         {
             // Delete whatever previous state there was.
-            if (_LogicObject != null)
-                Destroy(_LogicObject);
+            // if (_LogicObject != null)
+            //     Destroy(_LogicObject);
             
-            SetupGameObject();
+            // SetupGameObject();
             Randomise();
         }
         
-        /// <summary>
-        /// Try to restore the game state from a previous session. If that fails, start fresh and randomise.
-        /// </summary>
-        private void RestoreSavedState()
-        {
-            // Try and restore a game state from disk.
-            if (_Config.DebugForceRandomise.Value || !_coreLogic.TryRestoreSave())
-            {
-                if (_Config.DebugForceRandomise.Value)
-                    _Log.Warn("Ignoring previous game state: Config forces fresh randomisation.");
-                _Log.Warn("Could not load game state from disk.");
-            }
-            else
-            {
-                _coreLogic.ApplyAllChanges();
-                _Log.Info("Successfully loaded game state from disk.");
-            }
-        }
-
-        /// <summary>
-        /// Initialise the GameObject that holds the randomisation logic components.
-        /// </summary>
-        private void SetupGameObject()
-        {
-            // Instantiating this automatically starts running the Awake() methods of all components.
-            _LogicObject = new GameObject("Randomiser Logic", typeof(CoreLogic));
-            // Set this plugin (or BepInEx) as the parent of the logic GameObject.
-            _LogicObject.transform.SetParent(transform, false);
-            _coreLogic = _LogicObject.GetComponent<CoreLogic>();
-        }
+        // /// <summary>
+        // /// Try to restore the game state from a previous session. If that fails, start fresh and randomise.
+        // /// </summary>
+        // private void RestoreSavedState()
+        // {
+        //     // Try and restore a game state from disk.
+        //     if (_Config.DebugForceRandomise.Value || !_coreLogic.TryRestoreSave())
+        //     {
+        //         if (_Config.DebugForceRandomise.Value)
+        //             _Log.Warn("Ignoring previous game state: Config forces fresh randomisation.");
+        //         _Log.Warn("Could not load game state from disk.");
+        //     }
+        //     else
+        //     {
+        //         _coreLogic.ApplyAllChanges();
+        //         _Log.Info("Successfully loaded game state from disk.");
+        //     }
+        // }
     }
 }
