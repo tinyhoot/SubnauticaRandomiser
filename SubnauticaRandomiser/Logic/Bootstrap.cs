@@ -2,14 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using BepInEx.Bootstrap;
 using HootLib;
+using Nautilus.Handlers;
+using Nautilus.Json;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Modules;
 using SubnauticaRandomiser.Logic.Modules.Recipes;
-using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Serialization;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using UWE;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
@@ -24,6 +28,7 @@ namespace SubnauticaRandomiser.Logic
     internal class Bootstrap
     {
         public static Bootstrap Main;
+        internal static SaveData SaveData;
         
         private Config _config;
         private ILogHandler _log = PrefixLogHandler.Get("[Bootstrap]");
@@ -33,7 +38,6 @@ namespace SubnauticaRandomiser.Logic
         private GameStateSynchroniser _sync;
         private readonly List<Task> _fileTasks = new List<Task>();
         private readonly List<ILogicModule> _modules = new List<ILogicModule>();
-        private readonly Dictionary<EntityType, ILogicModule> _handlingModules = new Dictionary<EntityType, ILogicModule>();
 
         public ReadOnlyCollection<ILogicModule> Modules => _modules.AsReadOnly();
 
@@ -41,8 +45,23 @@ namespace SubnauticaRandomiser.Logic
         {
             Main = this;
             _config = config;
+
+            // Register the save data file. Whether empty or populated, it will kick things off once loaded.
+            SaveData = SaveDataHandler.RegisterSaveDataCache<SaveData>();
+            SaveData.OnFinishedLoading += OnSaveDataLoaded;
         }
 
+        /// <summary>
+        /// Once the save data file has loaded, everything else can kick into gear.
+        /// </summary>
+        private void OnSaveDataLoaded(object sender, JsonFileEventArgs args)
+        {
+            Initialise();
+        }
+
+        /// <summary>
+        /// Prepare everything needed for a randomised game, be it randomising fresh or loading a saved game.
+        /// </summary>
         public void Initialise()
         {
             // Order of operations
@@ -53,6 +72,7 @@ namespace SubnauticaRandomiser.Logic
             // - Enable modules
             _log.Debug("Enabling modules.");
             EnableModules();
+            InitSaveData();
             // IF randomising
             //   - Let files load
             // Wait and periodically check whether all file loading has completed. Only continue once that is done.
@@ -96,18 +116,39 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
+        /// Give every registered module a chance to set up its own save data.
+        /// </summary>
+        private void InitSaveData()
+        {
+            foreach (ILogicModule module in Modules)
+            {
+                BaseModuleSaveData moduleData = module.SetupSaveData();
+                if (moduleData != null)
+                    SaveData.AddModuleData(moduleData);
+            }
+        }
+
+        /// <summary>
         /// Wait until all data files have finished loading and then hand off to the core logic.
         /// </summary>
         private IEnumerator WaitUntilFilesLoaded()
         {
             yield return new WaitUntil(() => _fileTasks.TrueForAll(task => task.IsCompleted));
-            _coreLogic.Initialise();
+            _coreLogic.Initialise(SaveData);
         }
 
-        public void SyncGameState(EntitySerializer serializer)
+        public void SyncGameState()
         {
             _sync ??= new GameStateSynchroniser(Initialiser.GUID);
-            _sync.SyncGameState(serializer);
+            _sync.SyncGameState(SaveData);
+        }
+
+        /// <summary>
+        /// Get all active modules as a list of their types.
+        /// </summary>
+        public List<Type> GetActiveModuleTypes()
+        {
+            return _modules.Select(module => module.GetType()).ToList();
         }
         
         /// <summary>
@@ -121,21 +162,6 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Register a logic module as a handler for a specific entity type. This will cause that handler's
-        /// RandomiseEntity() method to be called whenever an entity of that type needs to be randomised.
-        /// </summary>
-        /// <exception cref="ArgumentException">Thrown if a handler for the given type of entity already
-        /// exists. There can be only one per type.</exception>
-        public void RegisterEntityHandler(EntityType type, ILogicModule module)
-        {
-            if (_handlingModules.ContainsKey(type))
-                throw new ArgumentException($"A handler for entity type '{type}' already exists: "
-                                            + $"{_handlingModules[type].GetType()}");
-
-            _handlingModules.Add(type, module);
-        }
-
-        /// <summary>
         /// Register a component module for use with the randomiser.
         /// </summary>
         public TLogicModule RegisterModule<TLogicModule>() where TLogicModule : MonoBehaviour, ILogicModule
@@ -143,15 +169,6 @@ namespace SubnauticaRandomiser.Logic
             TLogicModule component = _logicObject.EnsureComponent<TLogicModule>();
             _modules.Add(component);
             return component;
-        }
-
-        /// <summary>
-        /// Gets a previously registered handler for the given entity type. Can be null if no handler was registered.
-        /// </summary>
-        /// <returns>The registered handler.</returns>
-        public ILogicModule GetEntityHandler(EntityType type)
-        {
-            return _handlingModules.GetOrDefault(type, null);
         }
     }
 }

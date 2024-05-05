@@ -5,6 +5,7 @@ using HarmonyLib;
 using HootLib.Interfaces;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
+using SubnauticaRandomiser.Serialization.Modules;
 
 namespace SubnauticaRandomiser.Patches
 {
@@ -81,14 +82,14 @@ namespace SubnauticaRandomiser.Patches
         public static void YieldMaterial(TechType target)
         {
             // If the options for yields were not randomised, just go with the game's default behaviour.
-            if (!(CoreLogic._Serializer?.FragmentMaterialYield?.Count > 0))
+            if (!Bootstrap.SaveData.TryGetModuleData(out FragmentSaveData saveData) || !(saveData.FragmentMaterialYield?.Count > 0))
             {
                 CraftData.AddToInventory(TechType.Titanium, 2, false, true);
                 return;
             }
 
             RandomHandler rand = new RandomHandler();
-            TechType type = GetRandomMaterial(rand);
+            TechType type = GetRandomMaterial(rand, saveData);
             int number = rand.Next(1, Initialiser._Config?.MaxDuplicateScanYield.Value + 1 ?? 4);
             _log.Debug($"Replacing duplicate fragment scan yield of target {target} with {type}");
             CraftData.AddToInventory(type, number, false, true);
@@ -98,13 +99,14 @@ namespace SubnauticaRandomiser.Patches
         /// Choose a random weighted material for duplicate scan rewards.
         /// </summary>
         /// <param name="rand">An instance of Random.</param>
+        /// <param name="saveData">The save data containing the randomised loot table.</param>
         /// <returns>The TechType of the chosen material, or Titanium if an error occurred.</returns>
-        private static TechType GetRandomMaterial(RandomHandler rand)
+        private static TechType GetRandomMaterial(RandomHandler rand, FragmentSaveData saveData)
         {
-            if (!(CoreLogic._Serializer?.FragmentMaterialYield?.Count > 0))
+            if (!(saveData.FragmentMaterialYield?.Count > 0))
                 return TechType.Titanium;
 
-            return CoreLogic._Serializer.FragmentMaterialYield.Drop(rand);
+            return saveData.FragmentMaterialYield.Drop(rand);
         }
     }
 }

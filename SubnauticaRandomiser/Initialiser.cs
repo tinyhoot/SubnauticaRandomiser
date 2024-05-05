@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Runtime.ExceptionServices;
 using BepInEx;
 using HootLib;
@@ -21,22 +19,10 @@ namespace SubnauticaRandomiser
         
         // Files and structure.
         internal static Config _Config;
-        internal static SaveFile _SaveFile;
         public const string _AlternateStartFile = "alternateStarts.csv";
         public const string _BiomeFile = "biomeSlots.csv";
         public const string _RecipeFile = "recipeInformation.csv";
         public const string _WreckageFile = "wreckInformation.csv";
-        internal const int _ExpectedSaveVersion = 7;
-        private static readonly Dictionary<int, string> s_versionDict = new Dictionary<int, string>
-        {
-            [1] = "v0.5.1",
-            [2] = "v0.6.1",
-            [3] = "v0.7.0",
-            [4] = "v0.8.2",
-            [5] = "v0.9.2",
-            [6] = "v0.10.1",
-            [_ExpectedSaveVersion] = "v" + VERSION
-        };
 
         internal static ILogHandler _Log;
 
@@ -50,47 +36,19 @@ namespace SubnauticaRandomiser
             _Config.Setup();
             _Config.CreateModMenu(NAME, transform);
             _Log.Debug("Registered options menu.");
-            // Set up the save file.
-            _SaveFile = new SaveFile(Path.Combine(Hootils.GetModDirectory(), GetSaveFileName()), _ExpectedSaveVersion);
-
-            // Ensure the user did not update into a save incompatibility, and abort if they did to preserve a prior
-            // version's state.
-            if (!CheckSaveCompatibility())
-                return;
             
             // Register console commands.
             CommandHandler cmd = gameObject.AddComponent<CommandHandler>();
             cmd.RegisterCommands();
 
-            // Setup the logic and restore from disk if possible.
-            Randomise();
-        }
-
-        /// <summary>
-        /// Ensure the user did not update into a save incompatibility.
-        /// </summary>
-        private bool CheckSaveCompatibility()
-        {
-            if (_SaveFile.SaveVersion == _ExpectedSaveVersion)
-                return true;
-            
-            s_versionDict.TryGetValue(_SaveFile.SaveVersion, out string version);
-            if (string.IsNullOrEmpty(version))
-                version = "unknown or corrupted.";
-
-            _Log.InGameMessage("It seems you updated Subnautica Randomiser. This version is incompatible with your previous savegame.", true);
-            _Log.InGameMessage("The last supported version for your savegame is " + version, true);
-            _Log.InGameMessage("To protect your previous savegame, no changes to the game have been made.", true);
-            _Log.InGameMessage("If you wish to continue anyway, randomise again in the options menu or delete your config.json", true);
-            return false;
+            // Set up the bootstrap to be ready for randomising later on.
+            Bootstrap bootstrap = new Bootstrap(_Config);
         }
 
         /// <summary>
         /// Coroutines make it impossible (or at least very annoying) to catch exceptions with a traditional try-catch
         /// block. Instead, use this as a central callback function for any part of the code that needs it.
         /// </summary>
-        /// <param name="exception"></param>
-        /// <exception cref="Exception"></exception>
         internal static void FatalError(Exception exception)
         {
             _Log.InGameMessage($"<color=#FF0000FF>{exception.GetType().Name.ToUpper()}:</color> Something went wrong. "
@@ -101,10 +59,6 @@ namespace SubnauticaRandomiser
             // Ensure that the randomiser crashes completely if things go wrong this badly.
             // Rethrowing in this way preserves the original stacktrace.
             ExceptionDispatchInfo.Capture(exception).Throw();
-        }
-        
-        private static string GetSaveFileName(){
-            return $"{NAME.Replace(" ", string.Empty)}_Save.sav";
         }
         
         /// <summary>

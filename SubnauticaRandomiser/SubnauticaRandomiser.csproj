@@ -31,10 +31,8 @@
     <ItemGroup>
         <Compile Include="Configuration\Config.cs"/>
         <Compile Include="Configuration\ConfigModOptions.cs"/>
-        <Compile Include="Configuration\SaveFile.cs"/>
         <Compile Include="CSVReader.cs"/>
         <Compile Include="DataDumper.cs"/>
-        <Compile Include="EntitySerializer.cs"/>
         <Compile Include="Handlers\CommandHandler.cs"/>
         <Compile Include="Handlers\EntityHandler.cs"/>
         <Compile Include="Handlers\PrefixLogHandler.cs" />
@@ -77,6 +75,7 @@
         <Compile Include="Objects\Exceptions\ConfigFieldException.cs" />
         <Compile Include="Objects\Exceptions\ParsingException.cs" />
         <Compile Include="Objects\Exceptions\RandomisationException.cs" />
+        <Compile Include="Objects\Exceptions\SaveDataException.cs" />
         <Compile Include="Objects\LogicEntity.cs" />
         <Compile Include="Objects\LogicEntityEqualityComparer.cs" />
         <Compile Include="Objects\LootTable.cs" />
@@ -93,6 +92,14 @@
         <Compile Include="Patches\VanillaBugfixes.cs" />
         <Compile Include="Patches\FragmentPatcher.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="Serialization\Modules\AlternateStartSaveData.cs" />
+        <Compile Include="Serialization\Modules\BaseModuleSaveData.cs" />
+        <Compile Include="Serialization\Modules\DataboxSaveData.cs" />
+        <Compile Include="Serialization\Modules\DoorSaveData.cs" />
+        <Compile Include="Serialization\Modules\FragmentSaveData.cs" />
+        <Compile Include="Serialization\Modules\RecipeSaveData.cs" />
+        <Compile Include="Serialization\Modules\SupplyBoxSaveData.cs" />
+        <Compile Include="Serialization\SaveData.cs" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="Assets\alternateStarts.csv" />

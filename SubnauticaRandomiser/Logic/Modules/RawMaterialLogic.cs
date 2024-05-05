@@ -3,6 +3,8 @@ using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Patches;
+using SubnauticaRandomiser.Serialization;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 
 namespace SubnauticaRandomiser.Logic.Modules
@@ -21,12 +23,17 @@ namespace SubnauticaRandomiser.Logic.Modules
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
 
-            Bootstrap.Main.RegisterEntityHandler(EntityType.RawMaterial, this);
+            _coreLogic.RegisterEntityHandler(EntityType.RawMaterial, this);
         }
 
-        public void ApplySerializedChanges(EntitySerializer serializer) { }
+        public BaseModuleSaveData SetupSaveData()
+        {
+            return null;
+        }
 
-        public void RandomiseOutOfLoop(EntitySerializer serializer) { }
+        public void ApplySerializedChanges(SaveData saveData) { }
+
+        public void RandomiseOutOfLoop(SaveData saveData) { }
 
         public bool RandomiseEntity(ref LogicEntity entity)
         {
@@ -35,11 +42,9 @@ namespace SubnauticaRandomiser.Logic.Modules
                    && entity.AccessibleDepth <= _manager.ReachableDepth;
         }
 
-        public void SetupHarmonyPatches(Harmony harmony)
+        public void SetupHarmonyPatches(Harmony harmony, SaveData saveData)
         {
-            // This one is an exception and *can* rely on config values because the patch only has to be applied once
-            // on game start, and the saved data will carry over from then on.
-            if (CoreLogic._Serializer.DiscoverEggs)
+            if (saveData.GetModuleData<RecipeSaveData>().DiscoverEggs)
                 harmony.PatchAll(typeof(EggPatcher));
         }
     }

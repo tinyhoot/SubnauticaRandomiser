@@ -6,6 +6,8 @@ using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Patches;
+using SubnauticaRandomiser.Serialization;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
@@ -22,7 +24,6 @@ namespace SubnauticaRandomiser.Logic.Modules
         private Config _config => _coreLogic._Config;
         private ILogHandler _log;
         private IRandomHandler _random => _coreLogic.Random;
-        private EntitySerializer _serializer => CoreLogic._Serializer;
 
         public static readonly Dictionary<string, string> KeypadPrefabClassIds = new Dictionary<string, string>
         {
@@ -38,14 +39,19 @@ namespace SubnauticaRandomiser.Logic.Modules
             _log = PrefixLogHandler.Get("[Aurora]");
         }
 
-        public void ApplySerializedChanges(EntitySerializer serializer) { }
+        public BaseModuleSaveData SetupSaveData()
+        {
+            return null;
+        }
 
-        public void RandomiseOutOfLoop(EntitySerializer serializer)
+        public void ApplySerializedChanges(SaveData saveData) { }
+
+        public void RandomiseOutOfLoop(SaveData saveData)
         {
             if (_config.RandomiseDoorCodes.Value)
-                RandomiseDoorCodes();
+                saveData.AddModuleData(RandomiseDoorCodes());
             if (_config.RandomiseSupplyBoxes.Value)
-                RandomiseSupplyBoxes();
+                saveData.AddModuleData(RandomiseSupplyBoxes());
         }
 
         public bool RandomiseEntity(ref LogicEntity entity)
@@ -54,21 +60,21 @@ namespace SubnauticaRandomiser.Logic.Modules
             throw new NotImplementedException();
         }
 
-        public void SetupHarmonyPatches(Harmony harmony)
+        public void SetupHarmonyPatches(Harmony harmony, SaveData saveData)
         {
-            if (CoreLogic._Serializer?.DoorKeyCodes?.Count > 0)
+            if (saveData.Contains<DoorSaveData>())
             {
-                harmony.PatchAll(typeof(AuroraPatcher_KeyCodes)); 
+                harmony.PatchAll(typeof(AuroraPatcher_KeyCodes));
                 harmony.PatchAll(typeof(LanguagePatcher));
             }
-            if (CoreLogic._Serializer?.SupplyBoxContents?.Count > 0)
+            if (saveData.Contains<SupplyBoxSaveData>())
                 harmony.PatchAll(typeof(AuroraPatcher_SupplyBoxes));
         }
 
         /// <summary>
         /// Randomise the access codes for all doors in the Aurora.
         /// </summary>
-        public void RandomiseDoorCodes()
+        private DoorSaveData RandomiseDoorCodes()
         {
             Dictionary<string, string> keyCodes = new Dictionary<string, string>();
             foreach (string classId in KeypadPrefabClassIds.Keys)
@@ -82,14 +88,14 @@ namespace SubnauticaRandomiser.Logic.Modules
                 _log.Debug($"Assigning accessCode {code} to {classId}");
                 keyCodes.Add(classId, code);
             }
-
-            _serializer.DoorKeyCodes = keyCodes;
+            
+            return new DoorSaveData { DoorKeyCodes = keyCodes };
         }
 
         /// <summary>
         /// Prepare a new table of possible contents for supply boxes.
         /// </summary>
-        public void RandomiseSupplyBoxes()
+        private SupplyBoxSaveData RandomiseSupplyBoxes()
         {
             LootTable<TechType> table = new LootTable<TechType>
             {
@@ -109,7 +115,7 @@ namespace SubnauticaRandomiser.Logic.Modules
                 { TechType.VehicleStorageModule, 0.1 },
                 { TechType.CyclopsThermalReactorModule, 0.1 },
             };
-            _serializer.SupplyBoxContents = table;
+            return new SupplyBoxSaveData { LootTable = table };
         }
     }
 }

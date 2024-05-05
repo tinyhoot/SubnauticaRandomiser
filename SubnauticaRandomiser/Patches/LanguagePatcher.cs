@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using HarmonyLib;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.Modules;
+using SubnauticaRandomiser.Serialization.Modules;
 
 namespace SubnauticaRandomiser.Patches
 {
@@ -15,7 +16,7 @@ namespace SubnauticaRandomiser.Patches
         [HarmonyPatch(typeof(Language), nameof(Language.SetCurrentLanguage))]
         public static void PatchAccessCodeEntries()
         {
-            foreach (var kv in CoreLogic._Serializer.DoorKeyCodes)
+            foreach (var kv in Bootstrap.SaveData.GetModuleData<DoorSaveData>().DoorKeyCodes)
             {
                 string descId = AuroraLogic.KeypadPrefabClassIds[kv.Key];
                 string originalDesc = Language.main.Get(descId);

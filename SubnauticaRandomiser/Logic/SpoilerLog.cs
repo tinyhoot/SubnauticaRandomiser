@@ -8,6 +8,8 @@ using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
+using SubnauticaRandomiser.Serialization;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
@@ -67,7 +69,7 @@ namespace SubnauticaRandomiser.Logic
         private void OnMainLoopCompleted(object sender, EventArgs args)
         {
             // Start writing and discard the Task. Gets rid of a compiler warning.
-            _ = WriteLogFilesAsync(CoreLogic._Serializer);
+            _ = WriteLogFilesAsync(Bootstrap.SaveData);
         }
 
         /// <summary>
@@ -123,13 +125,13 @@ namespace SubnauticaRandomiser.Logic
         /// Grab the randomised boxes from the serializer, and sort them alphabetically.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
-        private IEnumerable<string> GetDataboxes(EntitySerializer serializer)
+        private IEnumerable<string> GetDataboxes(DataboxSaveData saveData)
         {
-            if (serializer.Databoxes is null)
+            if (saveData.Databoxes is null)
                 return new [] { "Not randomised, all in vanilla locations." };
 
             List<string> preparedDataboxes = new List<string>();
-            foreach (KeyValuePair<RandomiserVector, TechType> entry in serializer.Databoxes) 
+            foreach (KeyValuePair<RandomiserVector, TechType> entry in saveData.Databoxes) 
             {
                 preparedDataboxes.Add(entry.Value.AsString() + " can be found at " + entry.Key);
             }
@@ -142,14 +144,14 @@ namespace SubnauticaRandomiser.Logic
         /// Grab the randomise fragments from the serializer, and sort them alphabetically.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
-        private IEnumerable<string> GetFragments(EntitySerializer serializer)
+        private IEnumerable<string> GetFragments(FragmentSaveData saveData)
         {
-            if (serializer.SpawnDataDict is null || serializer.SpawnDataDict.Count == 0)
+            if (saveData.SpawnDataDict is null || saveData.SpawnDataDict.Count == 0)
                 return new[] { "Not randomised, all in vanilla locations." };
 
             List<string> preparedFragments = new List<string>();
             // Iterate through every TechType representing each fragment.
-            foreach (var kv in serializer.SpawnDataDict)
+            foreach (var kv in saveData.SpawnDataDict)
             {
                 string line = kv.Key.AsString() + ": ";
                 // Fragments are split up into their respective prefabs, but those all have the same spawn biomes
@@ -195,13 +197,13 @@ namespace SubnauticaRandomiser.Logic
         /// Prepare all recipes together with a list of their ingredients.
         /// </summary>
         /// <returns>The prepared log entries.</returns>
-        private IEnumerable<string> GetRecipes(EntitySerializer serializer)
+        private IEnumerable<string> GetRecipes(RecipeSaveData saveData)
         {
-            if (serializer.RecipeDict is null || serializer.RecipeDict.Count == 0)
+            if (saveData.RecipeDict is null || saveData.RecipeDict.Count == 0)
                 return new[] { "Recipes were not modified." };
 
             List<string> preparedRecipes = new List<string>();
-            var recipes = serializer.RecipeDict.OrderBy(kv => kv.Key.AsString());
+            var recipes = saveData.RecipeDict.OrderBy(kv => kv.Key.AsString());
             foreach (var kv in recipes)
             {
                 preparedRecipes.Add(kv.Key.AsString());
@@ -235,7 +237,7 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Write the log files to disk.
         /// </summary>
-        public async Task WriteLogFilesAsync(EntitySerializer serializer)
+        public async Task WriteLogFilesAsync(SaveData saveData)
         {
             Directory.CreateDirectory(_spoilerDirectory);
 
@@ -244,20 +246,20 @@ namespace SubnauticaRandomiser.Logic
                 await WriteTextToLogAsync(file, _contentHeader, GetProgressionPath());
             }
             
-            using (StreamWriter file
-                   = new StreamWriter(Path.Combine(_spoilerDirectory, _EntityFileNames[EntityType.Databox])))
+            if (saveData.TryGetModuleData(out DataboxSaveData databoxes))
             {
-                await WriteTextToLogAsync(file, _contentHeader, _contentDataboxes, GetDataboxes(serializer));
+                using StreamWriter file = new StreamWriter(Path.Combine(_spoilerDirectory, _EntityFileNames[EntityType.Databox]));
+                await WriteTextToLogAsync(file, _contentHeader, _contentDataboxes, GetDataboxes(databoxes));
             }
-            using (StreamWriter file
-                   = new StreamWriter(Path.Combine(_spoilerDirectory, _EntityFileNames[EntityType.Fragment])))
+            if (saveData.TryGetModuleData(out FragmentSaveData fragments))
             {
-                await WriteTextToLogAsync(file, _contentHeader, _contentFragments, GetFragments(serializer));
+                using StreamWriter file = new StreamWriter(Path.Combine(_spoilerDirectory, _EntityFileNames[EntityType.Fragment]));
+                await WriteTextToLogAsync(file, _contentHeader, _contentFragments, GetFragments(fragments));
             }
-            using (StreamWriter file
-                   = new StreamWriter(Path.Combine(_spoilerDirectory, _EntityFileNames[EntityType.Craftable])))
+            if (saveData.TryGetModuleData(out RecipeSaveData recipes))
             {
-                await WriteTextToLogAsync(file, _contentHeader, _contentRecipes, GetRecipes(serializer));
+                using StreamWriter file = new StreamWriter(Path.Combine(_spoilerDirectory, _EntityFileNames[EntityType.Craftable]));
+                await WriteTextToLogAsync(file, _contentHeader, _contentRecipes, GetRecipes(recipes));
             }
 
             _log.Info("Wrote spoiler log to disk.");

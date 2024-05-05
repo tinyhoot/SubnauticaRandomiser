@@ -9,6 +9,8 @@ using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
+using SubnauticaRandomiser.Serialization;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
@@ -51,7 +53,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                     _mode = new ModeRandom(_coreLogic, this);
                     break;
                 default:
-                    _log.Error("[R] Invalid recipe mode: " + _config.RecipeMode.Value);
+                    _log.Error("Invalid recipe mode: " + _config.RecipeMode.Value);
                     break;
             }
             
@@ -63,29 +65,35 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             _manager.SetupPriority += OnSetupPriorityEntities;
             _manager.SetupProgression += OnSetupProgressionEntitites;
             // Register this module as handler for recipe type entities.
-            Bootstrap.Main.RegisterEntityHandler(EntityType.Craftable, this);
+            _coreLogic.RegisterEntityHandler(EntityType.Craftable, this);
+        }
+
+        public BaseModuleSaveData SetupSaveData()
+        {
+            return new RecipeSaveData();
         }
         
         /// <summary>
         /// Apply all recipe changes stored in the serializer to the game.
         /// </summary>
-        public void ApplySerializedChanges(EntitySerializer serializer)
+        public void ApplySerializedChanges(SaveData saveData)
         {
-            if (serializer.RecipeDict is null || serializer.RecipeDict.Count == 0)
+            RecipeSaveData recipeSave = saveData.GetModuleData<RecipeSaveData>();
+            if (recipeSave.RecipeDict is null || recipeSave.RecipeDict.Count == 0)
                 return;
             
-            foreach (TechType key in serializer.RecipeDict.Keys)
+            foreach (TechType key in recipeSave.RecipeDict.Keys)
             {
-                CraftDataHandler.SetRecipeData(key, serializer.RecipeDict[key]);
+                CraftDataHandler.SetRecipeData(key, recipeSave.RecipeDict[key]);
             }
             
-            ChangeScrapMetalResult(serializer.ScrapMetalResult);
+            ChangeScrapMetalResult(recipeSave.ScrapMetalResult);
         }
 
-        public void RandomiseOutOfLoop(EntitySerializer serializer)
+        public void RandomiseOutOfLoop(SaveData saveData)
         {
             _mode.ChooseBaseTheme(100, _config.UseFish.Value);
-            serializer.ScrapMetalResult = _mode.GetScrapMetalReplacement();
+            saveData.GetModuleData<RecipeSaveData>().ScrapMetalResult = _mode.GetScrapMetalReplacement();
         }
 
         /// <summary>
@@ -98,22 +106,20 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             if (!(entity.IsPriority
                   || (entity.CheckBlueprintFulfilled(_coreLogic, _manager.ReachableDepth) && entity.CheckPrerequisitesFulfilled(_coreLogic))))
             {
-                _log.Debug($"[R] --- Recipe [{entity}] did not fulfill requirements, skipping.");
+                _log.Debug($"--- Recipe [{entity}] did not fulfill requirements, skipping.");
                 return false;
             }
             
-            _log.Debug("[R] Figuring out ingredients for " + entity);
+            _log.Debug("Figuring out ingredients for " + entity);
             _mode.RandomiseIngredients(ref entity);
-            CoreLogic._Serializer.AddRecipe(entity.Recipe.TechType, entity.Recipe);
-            _log.Debug($"[R][+] Randomised recipe for [{entity}].");
+            Bootstrap.SaveData.GetModuleData<RecipeSaveData>().AddRecipe(entity.Recipe.TechType, entity.Recipe);
+            _log.Debug($"[+] Randomised recipe for [{entity}].");
 
             return true;
         }
         
-        // Unused.
-        public void SetupHarmonyPatches(Harmony harmony)
-        {
-        }
+        // All recipe related changes can be sent via Nautilus, no harmony patches are necessary.
+        public void SetupHarmonyPatches(Harmony harmony, SaveData saveData) { }
 
         /// <summary>
         /// Add all recipes to the main loop.
@@ -184,7 +190,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             {
                 UpgradeChains = new Dictionary<TechType, TechType>();
             }
-            AddEggWaterParkPrerequisite();
+            AddEggWaterParkPrerequisite(Bootstrap.SaveData.GetModuleData<RecipeSaveData>());
             
             // Add basic raw materials into the logic.
             UpdateValidIngredients(0);
@@ -249,9 +255,9 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// <summary>
         /// Add the Alien Containment Unit as a prerequisite to all eggs.
         /// </summary>
-        private void AddEggWaterParkPrerequisite()
+        private void AddEggWaterParkPrerequisite(RecipeSaveData saveData)
         {
-            CoreLogic._Serializer.DiscoverEggs = _config.DiscoverEggs.Value;
+            saveData.DiscoverEggs = _config.DiscoverEggs.Value;
             if (!_config.DiscoverEggs.Value)
                 _entityHandler.AddCategoryPrerequisite(TechTypeCategory.Eggs, TechType.BaseWaterPark);
             // Always add this requirement to fish hatched in containment.

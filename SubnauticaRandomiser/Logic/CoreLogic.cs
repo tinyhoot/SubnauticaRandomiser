@@ -7,7 +7,9 @@ using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
+using SubnauticaRandomiser.Serialization;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
@@ -22,15 +24,14 @@ namespace SubnauticaRandomiser.Logic
         public static CoreLogic Main;
         
         internal Config _Config { get; private set; }
-        internal static EntitySerializer _Serializer { get; private set; }
         public EntityHandler EntityHandler { get; private set; }
         public IRandomHandler Random { get; private set; }
         
         private ILogHandler _log;
         private ProgressionManager _manager;
-        private SaveFile _saveFile;
         private SpoilerLog _spoilerLog;
         
+        private readonly Dictionary<EntityType, ILogicModule> _handlingModules = new Dictionary<EntityType, ILogicModule>();
         private List<LogicEntity> _priorityEntities;
 
         /// <summary>
@@ -79,7 +80,6 @@ namespace SubnauticaRandomiser.Logic
             _log = PrefixLogHandler.Get("[Core]");
             EntityHandler = new EntityHandler(_log);
             Random = new RandomHandler(_Config.Seed.Value);
-            _saveFile = Initialiser._SaveFile;
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
             _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
@@ -87,9 +87,9 @@ namespace SubnauticaRandomiser.Logic
             Bootstrap.Main.RegisterFileLoadTask(EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
         }
 
-        internal void Initialise()
+        internal void Initialise(SaveData saveData)
         {
-            StartCoroutine(Hootils.WrapCoroutine(Randomise(), Initialiser.FatalError));
+            StartCoroutine(Hootils.WrapCoroutine(Randomise(saveData), Initialiser.FatalError));
         }
 
         /// <summary>
@@ -97,9 +97,8 @@ namespace SubnauticaRandomiser.Logic
         /// Running this as a coroutine spaces the logic out over several frames, which prevents the game from
         /// locking up / freezing.
         /// </summary>
-        private IEnumerator Randomise()
+        private IEnumerator Randomise(SaveData saveData)
         {
-            _Serializer = new EntitySerializer(_log);
             List<LogicEntity> mainEntities = Setup();
             RandomisePreLoop();
             
@@ -108,10 +107,10 @@ namespace SubnauticaRandomiser.Logic
             yield return Hootils.WrapCoroutine(RandomiseMainEntities(mainEntities), Initialiser.FatalError);
             yield return null;
             
-            _Serializer.EnabledModules = Bootstrap.Main.Modules.Select(module => module.GetType()).ToList();
-            _Serializer.Serialize(_saveFile, Initialiser._ExpectedSaveVersion);
+            saveData.SetEnabledModules(Bootstrap.Main.GetActiveModuleTypes());
+            saveData.Save();
             
-            Bootstrap.Main.SyncGameState(_Serializer);
+            Bootstrap.Main.SyncGameState();
             
             _log.InGameMessage("Finished randomising! Please restart your game for all changes to take effect.");
         }
@@ -140,7 +139,7 @@ namespace SubnauticaRandomiser.Logic
             PreLoopRandomising?.Invoke(this, EventArgs.Empty);
             foreach (ILogicModule module in Bootstrap.Main.Modules)
             {
-                module.RandomiseOutOfLoop(_Serializer);
+                module.RandomiseOutOfLoop(Bootstrap.SaveData);
             }
         }
         
@@ -173,7 +172,7 @@ namespace SubnauticaRandomiser.Logic
                 if (nextEntity is null)
                     continue;
                 // Try to get a handler for this type of entity.
-                ILogicModule handler = Bootstrap.Main.GetEntityHandler(nextEntity.EntityType);
+                ILogicModule handler = _handlingModules.GetOrDefault(nextEntity.EntityType, null);
                 if (handler is null)
                 {
                     _log.Warn($"Unhandled entity in main loop: {nextEntity.EntityType} {nextEntity}");
@@ -296,6 +295,21 @@ namespace SubnauticaRandomiser.Logic
             {
                 _priorityEntities.Insert(index, entity);
             }
+        }
+        
+        /// <summary>
+        /// Register a logic module as a handler for a specific entity type. This will cause that handler's
+        /// RandomiseEntity() method to be called whenever an entity of that type needs to be randomised.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if a handler for the given type of entity already
+        /// exists. There can be only one per type.</exception>
+        public void RegisterEntityHandler(EntityType type, ILogicModule module)
+        {
+            if (_handlingModules.TryGetValue(type, out ILogicModule existingModule))
+                throw new ArgumentException($"A handler for entity type '{type}' already exists: "
+                                            + $"{existingModule.GetType()}");
+
+            _handlingModules.Add(type, module);
         }
     }
 }

@@ -10,6 +10,8 @@ using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Patches;
+using SubnauticaRandomiser.Serialization;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
@@ -41,12 +43,17 @@ namespace SubnauticaRandomiser.Logic.Modules
             // Parse the list of valid alternate starts from a file.
             Bootstrap.Main.RegisterFileLoadTask(ParseDataFileAsync());
         }
-        
-        public void ApplySerializedChanges(EntitySerializer serializer) { }
 
-        public void RandomiseOutOfLoop(EntitySerializer serializer)
+        public BaseModuleSaveData SetupSaveData()
         {
-            serializer.StartPoint = GetRandomStart(_config.SpawnPoint.Value);
+            return new AlternateStartSaveData();
+        }
+
+        public void ApplySerializedChanges(SaveData saveData) { }
+
+        public void RandomiseOutOfLoop(SaveData saveData)
+        {
+            saveData.GetModuleData<AlternateStartSaveData>().StartPoint = GetRandomStart(_config.SpawnPoint.Value);
         }
 
         public bool RandomiseEntity(ref LogicEntity entity)
@@ -55,7 +62,7 @@ namespace SubnauticaRandomiser.Logic.Modules
             throw new NotImplementedException();
         }
 
-        public void SetupHarmonyPatches(Harmony harmony)
+        public void SetupHarmonyPatches(Harmony harmony, SaveData _)
         {
             harmony.PatchAll(typeof(AlternateStart));
         }

@@ -2,6 +2,7 @@
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
@@ -36,7 +37,9 @@ namespace SubnauticaRandomiser.Patches
 
         private static TechType GetTechTypeForPosition(Vector3 position)
         {
-            if (CoreLogic._Serializer.Databoxes.TryGetValue(position.ToRandomiserVector(), out TechType replacement))
+            if (!Bootstrap.SaveData.TryGetModuleData(out DataboxSaveData saveData))
+                return TechType.None;
+            if (saveData.Databoxes.TryGetValue(position.ToRandomiserVector(), out TechType replacement))
                 return replacement;
 
             _log.Warn($"Failed to find databox replacement for position {position}!");

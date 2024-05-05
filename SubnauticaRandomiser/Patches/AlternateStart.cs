@@ -2,6 +2,7 @@ using HarmonyLib;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
@@ -23,12 +24,13 @@ namespace SubnauticaRandomiser.Patches
             if (__result.y > 50f)
                 // User is likely using Lifepod Unleashed, skip randomising in that case.
                 return;
-            if (CoreLogic._Serializer?.StartPoint is null || CoreLogic._Serializer.StartPoint == RandomiserVector.ZERO)
+            if (!Bootstrap.SaveData.TryGetModuleData(out AlternateStartSaveData saveData) 
+                || saveData.StartPoint == RandomiserVector.ZERO)
                 // Has not been randomised, don't do anything.
                 return;
 
-            _log.Debug("[AS] Replacing lifepod spawnpoint with " + CoreLogic._Serializer.StartPoint);
-            __result = CoreLogic._Serializer.StartPoint.ToUnityVector();
+            _log.Debug("Replacing lifepod spawnpoint with " + saveData.StartPoint);
+            __result = saveData.StartPoint.ToUnityVector();
         }
 
         /// <summary>
