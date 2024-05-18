@@ -61,55 +61,5 @@ namespace SubnauticaRandomiser
             // Rethrowing in this way preserves the original stacktrace.
             ExceptionDispatchInfo.Capture(exception).Throw();
         }
-        
-        /// <summary>
-        /// Randomise the game, discarding any earlier randomisation data.
-        /// </summary>
-        private void Randomise()
-        {
-            // Create a new seed if the current one is just a default
-            if (_Config.Seed.Value == 0)
-                _Config.Seed.Entry.Value = new RandomHandler().Next();
-
-            // Randomise!
-            try
-            {
-                Bootstrap bootstrap = new Bootstrap(_Config);
-                bootstrap.Initialise();
-            }
-            catch (Exception ex)
-            {
-                FatalError(ex);
-            }
-        }
-
-        internal void RandomiseFromConfig()
-        {
-            // Delete whatever previous state there was.
-            // if (_LogicObject != null)
-            //     Destroy(_LogicObject);
-            
-            // SetupGameObject();
-            Randomise();
-        }
-        
-        // /// <summary>
-        // /// Try to restore the game state from a previous session. If that fails, start fresh and randomise.
-        // /// </summary>
-        // private void RestoreSavedState()
-        // {
-        //     // Try and restore a game state from disk.
-        //     if (_Config.DebugForceRandomise.Value || !_coreLogic.TryRestoreSave())
-        //     {
-        //         if (_Config.DebugForceRandomise.Value)
-        //             _Log.Warn("Ignoring previous game state: Config forces fresh randomisation.");
-        //         _Log.Warn("Could not load game state from disk.");
-        //     }
-        //     else
-        //     {
-        //         _coreLogic.ApplyAllChanges();
-        //         _Log.Info("Successfully loaded game state from disk.");
-        //     }
-        // }
     }
 }

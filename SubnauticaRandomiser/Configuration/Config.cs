@@ -1,13 +1,7 @@
-using System.Collections.Generic;
-using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
-using HarmonyLib;
 using HootLib.Configuration;
-using Nautilus.Options;
 using SubnauticaRandomiser.Objects.Enums;
-using SubnauticaRandomiser.Objects.Exceptions;
-using UnityEngine;
 
 namespace SubnauticaRandomiser.Configuration
 {
@@ -561,11 +555,10 @@ namespace SubnauticaRandomiser.Configuration
 
         protected override void RegisterModOptions(HootModOptions modOptions)
         {
-            modOptions.AddItem(ModButtonOption.Create("button_randomise", "Randomise!", _ => Initialiser._Log.InGameMessage("Rand!"),
-                tooltip: "Apply your config changes and randomise. Restart your game afterwards!"));
-            modOptions.AddItem(ModButtonOption.Create("button_randomiseFromConfig", "Apply config from disk", _ => Initialiser._Log.InGameMessage("RandConf!"), 
-                tooltip: "If someone else gave you their config file, click here to load it. Restart your game afterwards!"));
-
+            modOptions.AddText("These options automatically apply when starting a new game. You cannot change the "
+                               + "settings of an ongoing save.");
+            
+            modOptions.AddSeparator();
             modOptions.AddItem(EnableAlternateStartModule.ToModToggleOption());
             modOptions.AddItem(SpawnPoint.ToModChoiceOption());
             modOptions.AddItem(AllowRadiatedStarts.ToModToggleOption());
