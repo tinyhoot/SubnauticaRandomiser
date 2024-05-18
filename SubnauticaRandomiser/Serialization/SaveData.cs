@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Nautilus.Json;
+using Newtonsoft.Json;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects.Exceptions;
 using SubnauticaRandomiser.Serialization.Modules;
@@ -12,13 +13,16 @@ namespace SubnauticaRandomiser.Serialization
     /// <summary>
     /// Saves all randomised state for easy replication at a later time.
     /// </summary>
+    [JsonObject(MemberSerialization.Fields)]
     internal class SaveData : SaveDataCache
     {
         private List<Type> _enabledModules = new List<Type>();
+        // Ensure this collection of abstract save data deserialises properly into the correct subclasses.
+        [JsonProperty(ItemTypeNameHandling = TypeNameHandling.All)]
         private HashSet<BaseModuleSaveData> _moduleSaveData = new HashSet<BaseModuleSaveData>();
-        public readonly int SaveVersion = -1;
+        public int SaveVersion = -1;
 
-        public ReadOnlyCollection<Type> EnabledModules => _enabledModules.AsReadOnly();
+        [JsonIgnore] public ReadOnlyCollection<Type> EnabledModules => _enabledModules.AsReadOnly();
 
         public void AddModuleData(BaseModuleSaveData data)
         {

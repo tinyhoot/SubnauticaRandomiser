@@ -131,9 +131,9 @@ namespace SubnauticaRandomiser.Logic
                 return new [] { "Not randomised, all in vanilla locations." };
 
             List<string> preparedDataboxes = new List<string>();
-            foreach (KeyValuePair<RandomiserVector, TechType> entry in saveData.Databoxes) 
+            foreach (Databox databox in saveData.Databoxes) 
             {
-                preparedDataboxes.Add(entry.Value.AsString() + " can be found at " + entry.Key);
+                preparedDataboxes.Add(databox.TechType.AsString() + " can be found at " + databox.Coordinates);
             }
             preparedDataboxes.Sort();
 

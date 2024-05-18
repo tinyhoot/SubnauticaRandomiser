@@ -23,6 +23,7 @@ namespace SubnauticaRandomiser
         public const string _BiomeFile = "biomeSlots.csv";
         public const string _RecipeFile = "recipeInformation.csv";
         public const string _WreckageFile = "wreckInformation.csv";
+        public const int SaveVersion = 8;
 
         internal static ILogHandler _Log;
 

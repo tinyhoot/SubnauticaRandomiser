@@ -182,7 +182,6 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <returns>The list of newly randomised databoxes.</returns>
         public List<Databox> RandomiseDataboxes()
         {
-            _saveData.Databoxes = new Dictionary<RandomiserVector, TechType>();
             List<Databox> randomDataboxes = new List<Databox>();
             List<Vector3> toBeRandomised = new List<Vector3>();
 
@@ -198,13 +197,13 @@ namespace SubnauticaRandomiser.Logic.Modules
 
                 randomDataboxes.Add(new Databox(originalBox.TechType, next, replacementBox.Wreck, 
                     replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
-                _saveData.Databoxes.Add(new RandomiserVector(next), originalBox.TechType);
                 _log.Debug($"Databox {next.ToString()} with {replacementBox}"
                            + " now contains " + originalBox);
                 toBeRandomised.Remove(next);
             }
 
             _databoxes = randomDataboxes;
+            _saveData.Databoxes = randomDataboxes;
             return randomDataboxes;
         }
 

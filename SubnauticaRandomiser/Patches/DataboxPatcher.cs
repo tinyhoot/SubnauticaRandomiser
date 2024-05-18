@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System.Linq;
+using HarmonyLib;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Objects;
@@ -39,8 +40,9 @@ namespace SubnauticaRandomiser.Patches
         {
             if (!Bootstrap.SaveData.TryGetModuleData(out DataboxSaveData saveData))
                 return TechType.None;
-            if (saveData.Databoxes.TryGetValue(position.ToRandomiserVector(), out TechType replacement))
-                return replacement;
+            Databox replacement = saveData.Databoxes.FirstOrDefault(box => box.Coordinates.Equals(position));
+            if (replacement != null)
+                return replacement.TechType;
 
             _log.Warn($"Failed to find databox replacement for position {position}!");
             return TechType.None;

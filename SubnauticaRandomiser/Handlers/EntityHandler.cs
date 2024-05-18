@@ -20,11 +20,11 @@ namespace SubnauticaRandomiser.Handlers
         private readonly HashSet<LogicEntity> _inLogic;
         private readonly ILogHandler _log;
 
-        public EntityHandler(ILogHandler logger)
+        public EntityHandler()
         {
             // Use a custom comparer to make that hash work properly for these otherwise mutable entities.
             _inLogic = new HashSet<LogicEntity>(new LogicEntityEqualityComparer());
-            _log = new PrefixLogHandler("[Entity]", logger);
+            _log = PrefixLogHandler.Get("[Entity]");
         }
 
         public event EventHandler<EntityEventArgs> EntityEnteredLogic;

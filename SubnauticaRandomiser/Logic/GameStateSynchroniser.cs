@@ -55,7 +55,7 @@ namespace SubnauticaRandomiser.Logic
         {
             _log.Debug($"Saved modules: {saveData.EnabledModules.ElementsToString()}");
             var activeModules = Bootstrap.Main.GetActiveModuleTypes();
-            _log.Debug($"Enabled modules: {activeModules}");
+            _log.Debug($"Enabled modules: {activeModules.ElementsToString()}");
             // Compare the elements of the two lists by checking the length of the set difference.
             return !saveData.EnabledModules.Except(activeModules).Any();
         }

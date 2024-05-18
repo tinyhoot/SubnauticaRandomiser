@@ -78,7 +78,7 @@ namespace SubnauticaRandomiser.Logic
             
             _Config = Initialiser._Config;
             _log = PrefixLogHandler.Get("[Core]");
-            EntityHandler = new EntityHandler(_log);
+            EntityHandler = new EntityHandler();
             Random = new RandomHandler(_Config.Seed.Value);
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
