@@ -38,8 +38,11 @@ namespace SubnauticaRandomiser.Logic.Modules
             _coreLogic.RegisterEntityHandler(EntityType.Databox, this);
             // Register events.
             _coreLogic.EntityCollecting += OnCollectDataboxes;
-
-            Bootstrap.Main.RegisterFileLoadTask(ParseDataFileAsync());
+        }
+        
+        public IEnumerable<Task> LoadFiles()
+        {
+            return new[] { ParseDataFileAsync() };
         }
 
         public BaseModuleSaveData SetupSaveData()

@@ -83,8 +83,6 @@ namespace SubnauticaRandomiser.Logic
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
             _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
-            
-            Bootstrap.Main.RegisterFileLoadTask(EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
         }
 
         internal void Initialise(SaveData saveData)

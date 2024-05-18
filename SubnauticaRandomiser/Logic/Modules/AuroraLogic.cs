@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using HarmonyLib;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
@@ -37,6 +39,11 @@ namespace SubnauticaRandomiser.Logic.Modules
         {
             _coreLogic = GetComponent<CoreLogic>();
             _log = PrefixLogHandler.Get("[Aurora]");
+        }
+        
+        public IEnumerable<Task> LoadFiles()
+        {
+            return Enumerable.Empty<Task>();
         }
 
         public BaseModuleSaveData SetupSaveData()

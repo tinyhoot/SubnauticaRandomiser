@@ -94,8 +94,11 @@ namespace SubnauticaRandomiser.Logic.Modules
                 // Reset all existing fragment spawns.
                 Init();
             }
-            
-            Bootstrap.Main.RegisterFileLoadTask(ParseDataFileAsync());
+        }
+        
+        public IEnumerable<Task> LoadFiles()
+        {
+            return new[] { ParseDataFileAsync() };
         }
 
         public BaseModuleSaveData SetupSaveData()

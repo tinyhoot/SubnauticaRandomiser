@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using HarmonyLib;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
@@ -24,6 +27,11 @@ namespace SubnauticaRandomiser.Logic.Modules
             _manager = GetComponent<ProgressionManager>();
 
             _coreLogic.RegisterEntityHandler(EntityType.RawMaterial, this);
+        }
+        
+        public IEnumerable<Task> LoadFiles()
+        {
+            return Enumerable.Empty<Task>();
         }
 
         public BaseModuleSaveData SetupSaveData()

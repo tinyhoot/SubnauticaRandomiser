@@ -39,9 +39,11 @@ namespace SubnauticaRandomiser.Logic.Modules
             _config = _coreLogic._Config;
             _log = PrefixLogHandler.Get("[AS]");
             _random = _coreLogic.Random;
+        }
 
-            // Parse the list of valid alternate starts from a file.
-            Bootstrap.Main.RegisterFileLoadTask(ParseDataFileAsync());
+        public IEnumerable<Task> LoadFiles()
+        {
+            return new[] { ParseDataFileAsync() };
         }
 
         public BaseModuleSaveData SetupSaveData()
@@ -138,6 +140,9 @@ namespace SubnauticaRandomiser.Logic.Modules
             return spawn.DistanceSqrXZ(_radiationCentre) > Math.Pow(_radiationMaxRadius, 2);
         }
 
+        /// <summary>
+        /// Parse the list of valid start locations from a separate file.
+        /// </summary>
         private async Task ParseDataFileAsync()
         {
             _alternateStarts = await CSVReader.ParseAlternateStartAsync(Initialiser._AlternateStartFile);

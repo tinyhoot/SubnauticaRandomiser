@@ -73,6 +73,7 @@ namespace SubnauticaRandomiser.Logic
             {
                 _log.Info("Starting new game, randomising...");
                 EnableModules();
+                InitFileLoadTasks();
                 InitSaveData();
                 // Wait and periodically check whether all file loading has completed. Only continue once that is done.
                 CoroutineHost.StartCoroutine(WaitUntilFilesLoaded());
@@ -133,6 +134,20 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
+        /// Get every module's async tasks for loading file from disks so that randomising can be delayed until they
+        /// have all completed.
+        /// </summary>
+        private void InitFileLoadTasks()
+        {
+            // The entity handler loads a file with critical information on every entity. It is always required.
+            _fileTasks.Add(_coreLogic.EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
+            foreach (ILogicModule module in Modules)
+            {
+                _fileTasks.AddRange(module.LoadFiles());
+            }
+        }
+
+        /// <summary>
         /// Give every registered module a chance to set up its own save data.
         /// </summary>
         private void InitSaveData()
@@ -167,16 +182,6 @@ namespace SubnauticaRandomiser.Logic
         public List<Type> GetActiveModuleTypes()
         {
             return _modules.Select(module => module.GetType()).ToList();
-        }
-        
-        /// <summary>
-        /// Register a task responsible for loading critical data. Randomising will only begin once all of these tasks
-        /// have completed. Use this to ensure your module finishes loading data from disk before randomisation begins.
-        /// </summary>
-        /// <param name="task">The Task object from an async method for loading data files.</param>
-        public void RegisterFileLoadTask(Task task)
-        {
-            _fileTasks.Add(task);
         }
 
         /// <summary>

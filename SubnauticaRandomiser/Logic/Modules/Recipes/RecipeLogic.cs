@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using HarmonyLib;
 using JetBrains.Annotations;
 using Nautilus.Handlers;
@@ -66,6 +68,11 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             _manager.SetupProgression += OnSetupProgressionEntitites;
             // Register this module as handler for recipe type entities.
             _coreLogic.RegisterEntityHandler(EntityType.Craftable, this);
+        }
+        
+        public IEnumerable<Task> LoadFiles()
+        {
+            return Enumerable.Empty<Task>();
         }
 
         public BaseModuleSaveData SetupSaveData()

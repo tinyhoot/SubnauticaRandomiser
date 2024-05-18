@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using HarmonyLib;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Serialization;
@@ -10,6 +12,12 @@ namespace SubnauticaRandomiser.Interfaces
     /// </summary>
     internal interface ILogicModule
     {
+        /// <summary>
+        /// If the module requires any kind of external file to be able to randomise, register a task responsible for
+        /// loading this critical data. Randomising will only begin once all of these tasks have completed.
+        /// </summary>
+        public IEnumerable<Task> LoadFiles();
+        
         /// <summary>
         /// If the module requires any kind of save data, initialise it here. If no data is required, simply return
         /// null instead.
