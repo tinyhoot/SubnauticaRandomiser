@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace SubnauticaRandomiser
 {
@@ -83,6 +84,19 @@ namespace SubnauticaRandomiser
             foreach (string classId in keys)
             {
                 Initialiser._Log.Debug($"classId: {classId}, prefab: {UWE.PrefabDatabase.prefabFiles[classId]}");
+            }
+        }
+
+        public static void LogAssets()
+        {
+            foreach (var bundle in AssetBundle.GetAllLoadedAssetBundles())
+            {
+                Initialiser._Log.Debug($"Bundle: {bundle.name}");
+                
+                foreach (var path in bundle.GetAllAssetNames())
+                {
+                    Initialiser._Log.Debug($"> {path}");
+                }
             }
         }
     }

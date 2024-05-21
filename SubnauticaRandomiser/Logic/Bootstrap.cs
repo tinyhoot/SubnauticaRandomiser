@@ -72,8 +72,6 @@ namespace SubnauticaRandomiser.Logic
             if (SaveData.SaveVersion < 0)
             {
                 _log.Info("Starting new game, randomising...");
-                _config.Seed.Entry.Value = new RandomHandler().Next();
-                _log.Info($"Seed is now {_config.Seed.Value}");
                 EnableModules();
                 InitFileLoadTasks();
                 InitSaveData();

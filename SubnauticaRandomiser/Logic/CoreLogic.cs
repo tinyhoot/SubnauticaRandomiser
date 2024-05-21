@@ -79,7 +79,6 @@ namespace SubnauticaRandomiser.Logic
             _Config = Initialiser._Config;
             _log = PrefixLogHandler.Get("[Core]");
             EntityHandler = new EntityHandler();
-            Random = new RandomHandler(_Config.Seed.Value);
             
             _manager = gameObject.EnsureComponent<ProgressionManager>();
             _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
@@ -87,7 +86,22 @@ namespace SubnauticaRandomiser.Logic
 
         internal void Initialise(SaveData saveData)
         {
+            Random = new RandomHandler(GetSeedFromConfig());
             StartCoroutine(Hootils.WrapCoroutine(Randomise(saveData), Initialiser.FatalError));
+        }
+        
+        /// <summary>
+        /// Parse the current config settings into a numeric seed.
+        /// </summary>
+        private int GetSeedFromConfig()
+        {
+            // Ensure an empty seed is replaced with something random.
+            if (string.IsNullOrEmpty(_Config.Seed.Value))
+                return (int)(Time.realtimeSinceStartup * 1000f);
+            if (int.TryParse(_Config.Seed.Value, out int seed))
+                return seed;
+            _log.Warn("Seed was non-numeric value, substituting current time.");
+            return (int)(Time.realtimeSinceStartup * 1000f);
         }
 
         /// <summary>

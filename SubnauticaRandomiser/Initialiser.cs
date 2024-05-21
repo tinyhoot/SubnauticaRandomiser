@@ -33,7 +33,7 @@ namespace SubnauticaRandomiser
             _Log.Info($"{NAME} v{VERSION} starting up!");
 
             // Register options menu.
-            _Config = new Config(Hootils.GetConfigFileName(NAME), Info.Metadata);
+            _Config = new Config(Hootils.GetConfigFilePath(NAME), Info.Metadata);
             _Config.Setup();
             _Config.CreateModMenu(NAME, transform);
             _Log.Debug("Registered options menu.");

@@ -2,6 +2,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using HootLib.Configuration;
 using SubnauticaRandomiser.Objects.Enums;
+using TMPro;
 
 namespace SubnauticaRandomiser.Configuration
 {
@@ -21,10 +22,9 @@ namespace SubnauticaRandomiser.Configuration
         private static readonly string SectionRecipes = "Recipes";
         private static readonly string SectionRecipesAdvanced = "Recipes.Advanced";
         
-        public ConfigEntryWrapper<int> Seed;
+        public ConfigEntryWrapper<string> Seed;
         public ConfigEntryWrapper<int> DepthSearchTime;
         public ConfigEntryWrapper<int> MaxDepthWithoutVehicle;
-        public ConfigEntryWrapper<bool> DebugForceRandomise;
 
         // Alternate Start
         public ConfigEntryWrapper<bool> EnableAlternateStartModule;
@@ -91,16 +91,10 @@ namespace SubnauticaRandomiser.Configuration
             Seed = RegisterEntry(
                 section: SectionGeneral,
                 key: nameof(Seed),
-                defaultValue: 0,
-                description: "The random seed used to generate a game state."
+                defaultValue: "",
+                description: "The seed used to generate a random game state."
             );
             // General Advanced
-            DebugForceRandomise = RegisterEntry(
-                section: SectionGeneralAdvanced,
-                key: nameof(DebugForceRandomise),
-                defaultValue: false,
-                description: "Forces a new seed and re-randomisation on every game startup."
-            );
             DepthSearchTime = RegisterEntry(
                 section: SectionGeneralAdvanced,
                 key: nameof(DepthSearchTime),
@@ -557,6 +551,7 @@ namespace SubnauticaRandomiser.Configuration
         {
             modOptions.AddText("These options automatically apply when starting a new game. You cannot change the "
                                + "settings of an ongoing save.");
+            modOptions.AddItem(Seed.ToTextInputModOption("Leave empty for random seed", TMP_InputField.ContentType.IntegerNumber));
             
             modOptions.AddSeparator();
             modOptions.AddItem(EnableAlternateStartModule.ToModToggleOption());
