@@ -41,9 +41,9 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         public void ApplySerializedChanges(SaveData saveData) { }
 
-        public void RandomiseOutOfLoop(SaveData saveData) { }
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData) { }
 
-        public bool RandomiseEntity(ref LogicEntity entity)
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             // Simply add this into the logic if prerequisites and depth check out.
             return entity.CheckReady(_coreLogic, _manager.ReachableDepth)

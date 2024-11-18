@@ -26,7 +26,6 @@ namespace SubnauticaRandomiser.Logic.Modules
         private CoreLogic _coreLogic;
         private Config _config;
         private ILogHandler _log;
-        private IRandomHandler _random;
         
         private Dictionary<BiomeRegion, List<float[]>> _alternateStarts;
         private readonly Vector3 _radiationCentre = new Vector3(1038, -3, -163);
@@ -38,7 +37,6 @@ namespace SubnauticaRandomiser.Logic.Modules
             _coreLogic = GetComponent<CoreLogic>();
             _config = _coreLogic._Config;
             _log = PrefixLogHandler.Get("[AS]");
-            _random = _coreLogic.Random;
         }
 
         public IEnumerable<Task> LoadFiles()
@@ -53,12 +51,12 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         public void ApplySerializedChanges(SaveData saveData) { }
 
-        public void RandomiseOutOfLoop(SaveData saveData)
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
         {
-            saveData.GetModuleData<AlternateStartSaveData>().StartPoint = GetRandomStart(_config.SpawnPoint.Value);
+            saveData.GetModuleData<AlternateStartSaveData>().StartPoint = GetRandomStart(rng, _config.SpawnPoint.Value);
         }
 
-        public bool RandomiseEntity(ref LogicEntity entity)
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             // This module does not handle any entity types in the main loop.
             throw new NotImplementedException();
@@ -73,16 +71,16 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// Convert the config value to a usable biome.
         /// </summary>
         /// <returns>The biome.</returns>
-        private BiomeRegion GetBiome(string startBiome)
+        private BiomeRegion GetBiome(IRandomHandler rng, string startBiome)
         {
             switch (startBiome)
             {
                 case "Random":
                     // Only use starts where you can actually reach the ground.
-                    return _random.Choice(_alternateStarts.Keys.ToList()
+                    return rng.Choice(_alternateStarts.Keys.ToList()
                         .FindAll(biome => !biome.Equals(BiomeRegion.None) && biome.GetAccessibleDepth() <= 100));
                 case "Chaotic Random":
-                    return _random.Choice(_alternateStarts.Keys);
+                    return rng.Choice(_alternateStarts.Keys);
                 case "BulbZone":
                     return BiomeRegion.KooshZone;
                 case "Floating Island":
@@ -99,12 +97,12 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// </summary>
         /// <returns>The new spawn point.</returns>
         /// <exception cref="ArgumentException">Raised if the startBiome is invalid or not in the database.</exception>
-        public RandomiserVector GetRandomStart(string startBiome)
+        public RandomiserVector GetRandomStart(IRandomHandler rng, string startBiome)
         {
             if (startBiome.StartsWith("Vanilla"))
                 return RandomiserVector.ZERO;
             
-            BiomeRegion biome = GetBiome(startBiome);
+            BiomeRegion biome = GetBiome(rng, startBiome);
             if (!_alternateStarts.ContainsKey(biome))
             {
                 _log.Error("No information found on chosen starting biome " + biome);
@@ -116,10 +114,10 @@ namespace SubnauticaRandomiser.Logic.Modules
             do
             {
                 // Choose one of the possible spawning boxes within the biome.
-                float[] box = _random.Choice(_alternateStarts[biome]);
+                float[] box = rng.Choice(_alternateStarts[biome]);
                 // Choose the specific spawn point within the box.
-                int x = _random.Next((int)box[0], (int)box[2] + 1);
-                int z = _random.Next((int)box[3], (int)box[1] + 1);
+                int x = rng.Next((int)box[0], (int)box[2] + 1);
+                int z = rng.Next((int)box[3], (int)box[1] + 1);
                 spawn = new Vector3(x, 0, z);
             } while (!IsValidStart(spawn));
 

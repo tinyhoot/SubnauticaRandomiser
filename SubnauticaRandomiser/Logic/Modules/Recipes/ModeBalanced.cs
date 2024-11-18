@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using UnityEngine;
@@ -16,7 +17,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
     {
         private HashSet<LogicEntity> _validIngredients => _recipeLogic.ValidIngredients;
 
-        public ModeBalanced(CoreLogic coreLogic, RecipeLogic recipeLogic) : base(coreLogic, recipeLogic) { }
+        public ModeBalanced(CoreLogic coreLogic, RecipeLogic recipeLogic, IRandomHandler rng) : base(coreLogic, recipeLogic, rng) { }
         
         protected override IEnumerable<(LogicEntity, int)> YieldRandomIngredients(LogicEntity recipe,
             ReadOnlyCollection<RandomiserIngredient> ingredients, Func<TechType, bool> isDuplicate)
@@ -62,7 +63,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                 return _baseTheme.GetBaseTheme().TechType;
 
             var options = _entityHandler.GetAllRawMaterials();
-            return _random.Choice(options).TechType;
+            return _rng.Choice(options).TechType;
         }
 
         /// <summary>
@@ -82,7 +83,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             if (pIngredientCandidates.Count == 0)
                 pIngredientCandidates.Add(GetRandom(_validIngredients));
 
-            LogicEntity primaryIngredient = _random.Choice(pIngredientCandidates);
+            LogicEntity primaryIngredient = _rng.Choice(pIngredientCandidates);
 
             return primaryIngredient;
         }
@@ -100,7 +101,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             // What's the maximum number of this ingredient the recipe can still sustain?
             int max = FindMaximum(ingredient, entity.Value, currentValue);
             // Figure out how many to actually use.
-            int number = _random.Next(1, max + 1, _distribution);
+            int number = _rng.Next(1, max + 1, _distribution);
 
             return (ingredient, number);
         }
@@ -119,7 +120,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
         protected override int GetBaseThemeIngredientNumber(LogicEntity baseTheme)
         {
-            return _random.Next(1, (int)Mathf.Ceil(_config.MaxNumberPerIngredient.Value / 2f), _distribution);
+            return _rng.Next(1, (int)Mathf.Ceil(_config.MaxNumberPerIngredient.Value / 2f), _distribution);
         }
         
         /// <summary>
@@ -155,7 +156,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             if (betterOptions.Count == 0)
                 betterOptions.AddRange(_validIngredients.Where(x => x.Category.Equals(TechTypeCategory.RawMaterials)));
 
-            return _random.Choice(betterOptions);
+            return _rng.Choice(betterOptions);
         }
     }
 }

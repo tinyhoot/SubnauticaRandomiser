@@ -25,7 +25,7 @@ namespace SubnauticaRandomiser.Logic
         
         internal Config _Config { get; private set; }
         public EntityHandler EntityHandler { get; private set; }
-        public IRandomHandler Random { get; private set; }
+        private IRandomHandler _rng { get; set; }
         
         private ILogHandler _log;
         private ProgressionManager _manager;
@@ -86,7 +86,7 @@ namespace SubnauticaRandomiser.Logic
 
         internal void Initialise(SaveData saveData)
         {
-            Random = new RandomHandler(GetSeedFromConfig());
+            _rng = new RandomHandler(GetSeedFromConfig());
             StartCoroutine(Hootils.WrapCoroutine(Randomise(saveData), Initialiser.FatalError));
         }
         
@@ -151,7 +151,7 @@ namespace SubnauticaRandomiser.Logic
             PreLoopRandomising?.Invoke(this, EventArgs.Empty);
             foreach (ILogicModule module in Bootstrap.Main.Modules)
             {
-                module.RandomiseOutOfLoop(Bootstrap.SaveData);
+                module.RandomiseOutOfLoop(_rng, Bootstrap.SaveData);
             }
         }
         
@@ -196,7 +196,7 @@ namespace SubnauticaRandomiser.Logic
                 }
 
                 // Let the module handle randomisation and report back.
-                bool success = handler.RandomiseEntity(ref nextEntity);
+                bool success = handler.RandomiseEntity(_rng, ref nextEntity);
                 if (success)
                 {
                     notRandomised.Remove(nextEntity);
@@ -266,18 +266,29 @@ namespace SubnauticaRandomiser.Logic
                 _priorityEntities.RemoveAt(0);
                 next.IsPriority = true;
             }
-            next ??= Random.Choice(notRandomised);
+            next ??= _rng.Choice(notRandomised);
             while (HasRandomised(next))
             {
                 _log.Debug($"Found duplicate entity in main loop, removing: {next}");
                 notRandomised.Remove(next);
-                next = Random.Choice(notRandomised);
+                next = _rng.Choice(notRandomised);
             }
 
             // Invoke the associated event.
             EntityChosen?.Invoke(this, new EntityEventArgs(next));
 
             return next;
+        }
+
+        /// <summary>
+        /// Gets the random number generator for the current seed.
+        /// </summary>
+        /// <exception cref="NullReferenceException">Thrown if the RNG is currently null.</exception>
+        public IRandomHandler GetRNG()
+        {
+            if (_rng is null)
+                throw new NullReferenceException("RNG is not ready!");
+            return _rng;
         }
 
         /// <summary>

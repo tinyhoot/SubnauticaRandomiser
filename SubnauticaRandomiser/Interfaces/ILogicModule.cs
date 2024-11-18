@@ -30,20 +30,23 @@ namespace SubnauticaRandomiser.Interfaces
         /// or loading a saved state.
         /// </summary>
         public void ApplySerializedChanges(SaveData saveData);
-        
+
         /// <summary>
         /// Randomise anything which does not require use of the main loop. This method is called before the main loop
         /// is run.
         /// </summary>
+        /// <param name="rng">The random number generator of this seed.</param>
         /// <param name="saveData">The save data used for this seed.</param>
-        public void RandomiseOutOfLoop(SaveData saveData);
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData);
         
         /// <summary>
         /// Attempt to randomise the given entity. The implementing class will only receive entities of the type(s)
         /// for which it registered itself as handler. If no handler was registered, this method is never called.
         /// </summary>
+        /// <param name="rng">The random number generator of this seed.</param>
+        /// <param name="entity">The entity to be randomised.</param>
         /// <returns>True if successful, false if not.</returns>
-        public bool RandomiseEntity(ref LogicEntity entity);
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity);
         
         /// <summary>
         /// If the module needs to register any patches with Harmony, do it in this method.

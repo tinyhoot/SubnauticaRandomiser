@@ -214,7 +214,7 @@ namespace SubnauticaRandomiser.Logic
                     // Only ever prioritise one of the electives. If one is already in logic, skip all others.
                     if (techTypes.Length > 0 && techTypes.All(t => !_coreLogic.HasRandomised(t)))
                     {
-                        TechType choice = _coreLogic.Random.Choice(techTypes);
+                        TechType choice = _coreLogic.GetRNG().Choice(techTypes);
                         yield return choice;
                     }
                 }

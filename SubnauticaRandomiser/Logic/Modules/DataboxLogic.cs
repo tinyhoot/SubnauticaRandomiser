@@ -25,14 +25,12 @@ namespace SubnauticaRandomiser.Logic.Modules
         private CoreLogic _coreLogic;
         private List<Databox> _databoxes;
         private ILogHandler _log;
-        private IRandomHandler _random;
         private DataboxSaveData _saveData;
 
         public void Awake()
         {
             _coreLogic = GetComponent<CoreLogic>();
             _log = PrefixLogHandler.Get("[D]");
-            _random = _coreLogic.Random;
             
             // Register this module as a handler for databox entities.
             _coreLogic.RegisterEntityHandler(EntityType.Databox, this);
@@ -56,14 +54,14 @@ namespace SubnauticaRandomiser.Logic.Modules
             // TODO: Move blueprints and linking into here.
         }
 
-        public void RandomiseOutOfLoop(SaveData saveData)
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
         {
-            RandomiseDataboxes();
+            RandomiseDataboxes(rng);
             UpdateBlueprints(_coreLogic.EntityHandler.GetAllEntities());
             LinkCyclopsHullModules(_coreLogic.EntityHandler);
         }
 
-        public bool RandomiseEntity(ref LogicEntity entity)
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             throw new NotImplementedException();
         }
@@ -183,7 +181,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// Randomise (shuffle) the blueprints found inside databoxes.
         /// </summary>
         /// <returns>The list of newly randomised databoxes.</returns>
-        public List<Databox> RandomiseDataboxes()
+        public List<Databox> RandomiseDataboxes(IRandomHandler rng)
         {
             List<Databox> randomDataboxes = new List<Databox>();
             List<Vector3> toBeRandomised = new List<Vector3>();
@@ -195,7 +193,7 @@ namespace SubnauticaRandomiser.Logic.Modules
 
             foreach (Databox originalBox in _databoxes)
             {
-                Vector3 next = _random.Choice(toBeRandomised);
+                Vector3 next = rng.Choice(toBeRandomised);
                 Databox replacementBox = _databoxes.Find(x => x.Coordinates.Equals(next));
 
                 randomDataboxes.Add(new Databox(originalBox.TechType, next, replacementBox.Wreck, 

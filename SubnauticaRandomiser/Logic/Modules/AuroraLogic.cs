@@ -25,7 +25,6 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         private Config _config => _coreLogic._Config;
         private ILogHandler _log;
-        private IRandomHandler _random => _coreLogic.Random;
 
         public static readonly Dictionary<string, string> KeypadPrefabClassIds = new Dictionary<string, string>
         {
@@ -53,15 +52,15 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         public void ApplySerializedChanges(SaveData saveData) { }
 
-        public void RandomiseOutOfLoop(SaveData saveData)
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
         {
             if (_config.RandomiseDoorCodes.Value)
-                saveData.AddModuleData(RandomiseDoorCodes());
+                saveData.AddModuleData(RandomiseDoorCodes(rng));
             if (_config.RandomiseSupplyBoxes.Value)
                 saveData.AddModuleData(RandomiseSupplyBoxes());
         }
 
-        public bool RandomiseEntity(ref LogicEntity entity)
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             // This module randomises no entities.
             throw new NotImplementedException();
@@ -81,7 +80,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <summary>
         /// Randomise the access codes for all doors in the Aurora.
         /// </summary>
-        private DoorSaveData RandomiseDoorCodes()
+        private DoorSaveData RandomiseDoorCodes(IRandomHandler rng)
         {
             Dictionary<string, string> keyCodes = new Dictionary<string, string>();
             foreach (string classId in KeypadPrefabClassIds.Keys)
@@ -90,7 +89,7 @@ namespace SubnauticaRandomiser.Logic.Modules
                 // Keypads only have numbers 1-9, zeroes cannot be entered at all.
                 while (code.Contains("0"))
                 {
-                    code = _random.Next(1111, 9999).ToString();
+                    code = rng.Next(1111, 9999).ToString();
                 }
                 _log.Debug($"Assigning accessCode {code} to {classId}");
                 keyCodes.Add(classId, code);

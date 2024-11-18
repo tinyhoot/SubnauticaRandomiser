@@ -22,8 +22,8 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         protected readonly RecipeLogic _recipeLogic;
         protected Config _config => _coreLogic._Config;
         protected EntityHandler _entityHandler => _coreLogic.EntityHandler;
-        protected IRandomHandler _random => _coreLogic.Random;
         protected ILogHandler _log;
+        protected IRandomHandler _rng;
 
         protected List<TechType> _blacklist = new List<TechType>();
         protected List<TechTypeCategory> _categoryBlacklist = new List<TechTypeCategory>();
@@ -31,14 +31,15 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         private int _basicOutpostSize;
         protected RandomDistribution _distribution;
 
-        protected Mode(CoreLogic coreLogic, RecipeLogic recipeLogic)
+        protected Mode(CoreLogic coreLogic, RecipeLogic recipeLogic, IRandomHandler rng)
         {
             _coreLogic = coreLogic;
             _recipeLogic = recipeLogic;
             _log = PrefixLogHandler.Get("[R]");
+            _rng = rng;
 
             if (_config.BaseTheming.Value)
-                _baseTheme = new BaseTheme(_entityHandler, _log, _random);
+                _baseTheme = new BaseTheme(_entityHandler, _log, _rng);
             _distribution = _config.DistributionWeighting.Value;
         }
 
@@ -221,7 +222,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             LogicEntity randomEntity;
             while (true)
             {
-                randomEntity = _random.Choice(list);
+                randomEntity = _rng.Choice(list);
                 if (IsBlacklisted(randomEntity))
                     continue;
                 

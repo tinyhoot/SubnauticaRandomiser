@@ -45,20 +45,6 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             _log = PrefixLogHandler.Get("[R]");
             ValidIngredients = new HashSet<LogicEntity>(new LogicEntityEqualityComparer());
             
-            // Decide which recipe mode will be used.
-            switch (_config.RecipeMode.Value)
-            {
-                case (RecipeDifficultyMode.Balanced):
-                    _mode = new ModeBalanced(_coreLogic, this);
-                    break;
-                case (RecipeDifficultyMode.Chaotic):
-                    _mode = new ModeRandom(_coreLogic, this);
-                    break;
-                default:
-                    _log.Error("Invalid recipe mode: " + _config.RecipeMode.Value);
-                    break;
-            }
-            
             // Register events.
             _coreLogic.EntityCollecting += OnEntityCollecting;
             _coreLogic.SetupBeginning += OnSetupBeginning;
@@ -97,7 +83,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             ChangeScrapMetalResult(recipeSave.ScrapMetalResult);
         }
 
-        public void RandomiseOutOfLoop(SaveData saveData)
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
         {
             _mode.ChooseBaseTheme(100, _config.UseFish.Value);
             saveData.GetModuleData<RecipeSaveData>().ScrapMetalResult = _mode.GetScrapMetalReplacement();
@@ -107,7 +93,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// Randomise a recipe entity.
         /// </summary>
         /// <returns>True if successful, false if something went wrong.</returns>
-        public bool RandomiseEntity(ref LogicEntity entity)
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             // Does this recipe have all of its prerequisites fulfilled? Skip this check if the recipe is a priority.
             if (!(entity.IsPriority
@@ -161,6 +147,20 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
         private void OnSetupBeginning(object sender, EventArgs args)
         {
+            // Decide which recipe mode will be used.
+            switch (_config.RecipeMode.Value)
+            {
+                case (RecipeDifficultyMode.Balanced):
+                    _mode = new ModeBalanced(_coreLogic, this, _coreLogic.GetRNG());
+                    break;
+                case (RecipeDifficultyMode.Chaotic):
+                    _mode = new ModeRandom(_coreLogic, this, _coreLogic.GetRNG());
+                    break;
+                default:
+                    _log.Error("Invalid recipe mode: " + _config.RecipeMode.Value);
+                    break;
+            }
+            
             // Assemble a dictionary of what is considered basic outpost pieces which together should not exceed
             // the total cost defined in the config.
             BasicOutpostPieces = new Dictionary<TechType, int>

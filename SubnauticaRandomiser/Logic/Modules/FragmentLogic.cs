@@ -31,7 +31,6 @@ namespace SubnauticaRandomiser.Logic.Modules
         private ProgressionManager _manager;
         private Config _config;
         private ILogHandler _log;
-        private IRandomHandler _random;
         
         private static Dictionary<TechType, List<string>> _classIdDatabase;
         private List<Biome> _allBiomes;
@@ -78,7 +77,6 @@ namespace SubnauticaRandomiser.Logic.Modules
             _manager = GetComponent<ProgressionManager>();
             _config = _coreLogic._Config;
             _log = PrefixLogHandler.Get("[F]");
-            _random = _coreLogic.Random;
 
             // Register events.
             _manager.SetupPriority += OnSetupPriorityEntities;
@@ -134,18 +132,18 @@ namespace SubnauticaRandomiser.Logic.Modules
             }
         }
 
-        public void RandomiseOutOfLoop(SaveData saveData)
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
         {
             FragmentSaveData fragmentSaveData = saveData.GetModuleData<FragmentSaveData>();
             
             if (_config.RandomiseNumFragments.Value)
-                RandomiseNumFragments(_coreLogic.EntityHandler.GetAllFragments(), fragmentSaveData);
+                RandomiseNumFragments(rng, _coreLogic.EntityHandler.GetAllFragments(), fragmentSaveData);
             // Randomise duplicate scan rewards.
             if (_config.RandomiseDuplicateScans.Value)
-                fragmentSaveData.FragmentMaterialYield = CreateDuplicateScanYieldDict();
+                fragmentSaveData.FragmentMaterialYield = CreateDuplicateScanYieldDict(rng);
         }
 
-        public bool RandomiseEntity(ref LogicEntity entity)
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList))
                 throw new ArgumentException($"Failed to find fragment '{entity}' in classId database!");
@@ -161,16 +159,16 @@ namespace SubnauticaRandomiser.Logic.Modules
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
-            int biomeCount = _random.Next(3, _config.MaxBiomesPerFragment.Value + 1);
+            int biomeCount = rng.Next(3, _config.MaxBiomesPerFragment.Value + 1);
 
             for (int i = 0; i < biomeCount; i++)
             {
                 // Choose a random biome.
-                Biome biome = ChooseBiome(spawnList, _manager.ReachableDepth);
+                Biome biome = ChooseBiome(rng, spawnList, _manager.ReachableDepth);
                 
                 // Calculate spawn rate.
-                float spawnRate = CalcFragmentSpawnRate(biome);
-                float[] splitRates = SplitFragmentSpawnRate(spawnRate, idList.Count);
+                float spawnRate = CalcFragmentSpawnRate(rng, biome);
+                float[] splitRates = SplitFragmentSpawnRate(rng, spawnRate, idList.Count);
 
                 // Split the spawn rate among each variation (prefab) of the fragment.
                 for (int j = 0; j < idList.Count; j++)
@@ -315,12 +313,11 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <summary>
         /// Calculate the spawn rate for an entity in the given biome.
         /// </summary>
-        /// <param name="biome">The biome.</param>
         /// <returns>The spawn rate.</returns>
-        private float CalcFragmentSpawnRate(Biome biome)
+        private float CalcFragmentSpawnRate(IRandomHandler rng, Biome biome)
         {
             // Choose a percentage of the biome's combined original spawn rates.
-            float percentage = _config.FragmentSpawnChanceMult.Value + (float)_random.NextDouble();
+            float percentage = _config.FragmentSpawnChanceMult.Value + (float)rng.NextDouble();
             // If the number of scans needed per fragment is very high, increase the spawn rate proportionally.
             int maxFragments = (int)_config.MaxFragmentsToUnlock.Entry.DefaultValue;
             if (_config.MaxFragmentsToUnlock.Value > maxFragments)
@@ -332,14 +329,15 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <summary>
         /// Change the number of fragments needed to unlock the blueprint to the given entity.
         /// </summary>
+        /// <param name="rng">The random number generator of this seed.</param>
         /// <param name="entity">The entity that is unlocked on scan completion.</param>
         /// <param name="saveData">The save data to save the result to.</param>
-        private void ChangeNumFragmentsToUnlock(LogicEntity entity, FragmentSaveData saveData)
+        private void ChangeNumFragmentsToUnlock(IRandomHandler rng, LogicEntity entity, FragmentSaveData saveData)
         {
             if (!_config.RandomiseNumFragments.Value)
                 return;
             
-            int numFragments = _random.Next(_config.MinFragmentsToUnlock.Value, _config.MaxFragmentsToUnlock.Value + 1);
+            int numFragments = rng.Next(_config.MinFragmentsToUnlock.Value, _config.MaxFragmentsToUnlock.Value + 1);
             _log.Debug($"New number of fragments required for {entity}: {numFragments}");
             saveData.AddFragmentUnlockNum(entity.TechType, numFragments);
         }
@@ -347,10 +345,11 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <summary>
         /// Choose a suitable biome which is also accessible at this depth, and has not been chosen before.
         /// </summary>
+        /// <param name="rng">The random number generator of this seed.</param>
         /// <param name="previousChoices">The list of SpawnData resulting from previously chosen biomes.</param>
         /// <param name="depth">The maximum depth to consider.</param>
         /// <returns>The chosen biome.</returns>
-        private Biome ChooseBiome(List<SpawnData> previousChoices, int depth)
+        private Biome ChooseBiome(IRandomHandler rng, List<SpawnData> previousChoices, int depth)
         {
             List<Biome> choices = _availableBiomes.FindAll(bio =>
                 bio.AverageDepth <= depth && !previousChoices.Any(sd => sd.ContainsBiome(bio.Variant)));
@@ -364,7 +363,7 @@ namespace SubnauticaRandomiser.Logic.Modules
                     throw new RandomisationException("No valid biome options for depth " + depth);
             }
 
-            Biome biome = _random.Choice(choices);
+            Biome biome = rng.Choice(choices);
             biome.Used++;
 
             // Remove the biome from the pool if it gets too populated.
@@ -377,7 +376,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <summary>
         /// Set up the dictionary of possible rewards for scanning an already unlocked fragment.
         /// </summary>
-        private LootTable<TechType> CreateDuplicateScanYieldDict()
+        private LootTable<TechType> CreateDuplicateScanYieldDict(IRandomHandler rng)
         {
             LootTable<TechType> loot = new LootTable<TechType>();
             var materials = _coreLogic.EntityHandler.GetAllRawMaterials(50);
@@ -387,7 +386,7 @@ namespace SubnauticaRandomiser.Logic.Modules
             foreach (LogicEntity entity in materials)
             {
                 // Two random calls will tend to produce less extreme and more evenly distributed values.
-                double weight = _random.NextDouble() + _random.NextDouble();
+                double weight = rng.NextDouble() + rng.NextDouble();
                 loot.Add(entity.TechType, weight);
             }
             
@@ -456,13 +455,14 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <summary>
         /// Change the number of scans required to unlock the blueprint for all fragments.
         /// </summary>
+        /// <param name="rng">The random number generator of this seed.</param>
         /// <param name="fragments">The list of fragments to change scan numbers for.</param>
         /// <param name="saveData">The save data to save the changes to.</param>
-        private void RandomiseNumFragments(List<LogicEntity> fragments, FragmentSaveData saveData)
+        private void RandomiseNumFragments(IRandomHandler rng, List<LogicEntity> fragments, FragmentSaveData saveData)
         {
             foreach (LogicEntity entity in fragments)
             {
-                ChangeNumFragmentsToUnlock(entity, saveData);
+                ChangeNumFragmentsToUnlock(rng, entity, saveData);
             }
         }
         
@@ -527,11 +527,12 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <summary>
         /// Split a fragment's spawn rate into a number of randomly sized parts.
         /// </summary>
+        /// <param name="rng">The random number generator of this seed.</param>
         /// <param name="spawnRate">The spawn rate.</param>
         /// <param name="parts">The number of parts to split into.</param>
         /// <returns>An array containing each part's spawn rate.</returns>
         /// <exception cref="ArgumentException">Raised if parts is smaller than 1.</exception>
-        private float[] SplitFragmentSpawnRate(float spawnRate, int parts)
+        private float[] SplitFragmentSpawnRate(IRandomHandler rng, float spawnRate, int parts)
         {
             if (parts < 1)
                 throw new ArgumentException("Cannot split spawn rate into less than one pieces!");
@@ -542,7 +543,7 @@ namespace SubnauticaRandomiser.Logic.Modules
             float[] result = new float[parts];
             for (int i = 0; i < result.Length; i++)
             {
-                result[i] = (float)_random.NextDouble();
+                result[i] = (float)rng.NextDouble();
             }
 
             // Adjust the values so they sum up to spawnRate.
