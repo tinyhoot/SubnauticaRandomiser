@@ -110,7 +110,7 @@
         <Content Include="Assets.targets" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Subnautica.Nautilus" Version="1.0.0-pre.29" PrivateAssets="all" />
+        <PackageReference Include="Subnautica.Nautilus" Version="1.0.0-pre.33" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
         <Reference Include="System" />
