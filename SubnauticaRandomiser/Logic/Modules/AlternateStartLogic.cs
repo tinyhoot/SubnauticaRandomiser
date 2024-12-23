@@ -50,6 +50,8 @@ namespace SubnauticaRandomiser.Logic.Modules
         }
 
         public void ApplySerializedChanges(SaveData saveData) { }
+        
+        public void UndoSerializedChanges(SaveData saveData) { }
 
         public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
         {

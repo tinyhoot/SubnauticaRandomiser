@@ -32,6 +32,15 @@ namespace SubnauticaRandomiser.Interfaces
         public void ApplySerializedChanges(SaveData saveData);
 
         /// <summary>
+        /// After returning to the main menu the randomiser cleans the slate for the next save. If the module previously
+        /// made any non-harmony changes to the game it must undo them here. This includes things like e.g. recipe
+        /// changes or altered language lines.
+        /// <br />
+        /// </summary>
+        /// <seealso cref="HootLib.Objects.NautilusShell"/>
+        public void UndoSerializedChanges(SaveData saveData);
+
+        /// <summary>
         /// Randomise anything which does not require use of the main loop. This method is called before the main loop
         /// is run.
         /// </summary>

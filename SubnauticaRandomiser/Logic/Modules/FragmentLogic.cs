@@ -31,6 +31,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         private ProgressionManager _manager;
         private Config _config;
         private ILogHandler _log;
+        private Dictionary<string, BiomeDataCache> _vanillaData;
         
         private static Dictionary<TechType, List<string>> _classIdDatabase;
         private List<Biome> _allBiomes;
@@ -77,6 +78,7 @@ namespace SubnauticaRandomiser.Logic.Modules
             _manager = GetComponent<ProgressionManager>();
             _config = _coreLogic._Config;
             _log = PrefixLogHandler.Get("[F]");
+            _vanillaData = new Dictionary<string, BiomeDataCache>();
 
             // Register events.
             _manager.SetupPriority += OnSetupPriorityEntities;
@@ -128,6 +130,49 @@ namespace SubnauticaRandomiser.Logic.Modules
                 foreach (TechType key in fragmentSave.NumFragmentsToUnlock.Keys)
                 {
                     PDAHandler.EditFragmentsToScan(key, fragmentSave.NumFragmentsToUnlock[key]);
+                }
+            }
+        }
+        
+        public void UndoSerializedChanges(SaveData saveData)
+        {
+            _log.Debug("Undoing fragment changes.");
+            
+            FragmentSaveData fragmentSave = saveData.GetModuleData<FragmentSaveData>();
+            if (fragmentSave.SpawnDataDict?.Count > 0)
+            {
+                // First, delete all the new spawn chances.
+                foreach (TechType key in fragmentSave.SpawnDataDict.Keys)
+                {
+                    foreach (SpawnData spawnData in fragmentSave.SpawnDataDict[key])
+                    {
+                        foreach (RandomiserBiomeData biomeData in spawnData.BiomeDataList)
+                        {
+                            LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, biomeData.Biome, 0f, 0);
+                        }
+                    }
+                }
+                
+                // Then, overwrite the clean slate with the cached vanilla data.
+                foreach ((string key, BiomeDataCache cache) in _vanillaData.Select(kvpair => (kvpair.Key, kvpair.Value)))
+                {
+                    LootDistributionHandler.EditLootDistributionData(key, cache.biome, cache.probability, cache.count);
+                }
+            }
+            
+            if (fragmentSave.NumFragmentsToUnlock?.Count > 0)
+            {
+                // For some reason the game keeps two copies of PDAData active, one of which is never modified.
+                // Grab the vanilla game state from the unmodified copy.
+                var vanillaScans = new Dictionary<TechType, int>();
+                foreach (var entry in Player.main.pdaData.scanner)
+                {
+                    vanillaScans[entry.key] = entry.totalFragments;
+                }
+                // Send the original numbers to Nautilus.
+                foreach (var key in fragmentSave.NumFragmentsToUnlock.Keys)
+                {
+                    PDAHandler.EditFragmentsToScan(key, vanillaScans[key]);
                 }
             }
         }
@@ -401,12 +446,12 @@ namespace SubnauticaRandomiser.Logic.Modules
         }
         
         /// <summary>
-        /// Force Subnautica and SMLHelper to index and cache the classIds, setup the databases, and prepare a blank
+        /// Force Subnautica and Nautilus to index and cache the classIds, setup the databases, and prepare a blank
         /// slate by removing all existing fragment spawns from the game.
         /// </summary>
-        private static void Init()
+        private void Init()
         {
-            // This forces SMLHelper (and the game) to cache the classIds.
+            // This forces Nautilus (and the game) to cache the classIds.
             // Without this, anything below will fail.
             _ = CraftData.GetClassIdForTechType(TechType.Titanium);
 
@@ -426,7 +471,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <summary>
         /// Assemble a dictionary of all relevant prefabs with their unique classId identifier.
         /// </summary>
-        private static void PrepareClassIdDatabase()
+        private void PrepareClassIdDatabase()
         {
             _classIdDatabase = new Dictionary<TechType, List<string>>();
 
@@ -470,7 +515,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// Go through all the BiomeData in the game and reset any fragment spawn rates to 0.0f, effectively "deleting"
         /// them from the game until the randomiser has decided on a new distribution.
         /// </summary>
-        private static void ResetFragmentSpawns()
+        private void ResetFragmentSpawns()
         {
             //_log.Debug("---Resetting vanilla fragment spawn rates---");
 
@@ -492,6 +537,8 @@ namespace SubnauticaRandomiser.Logic.Modules
                     // Ensure the prefab is actually a fragment.
                     if (fragmentDatabase.ContainsKey(prefab.classId))
                     {
+                        // Save the vanilla spawn rates.
+                        _vanillaData[prefab.classId] = new BiomeDataCache(biome, prefab.probability, prefab.count);
                         // Whatever spawn chance there was before, set it to 0.
                         LootDistributionHandler.EditLootDistributionData(prefab.classId, biome, 0f, 0);
                     }
@@ -504,7 +551,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// Reverse the classId dictionary to allow for ID to TechType matching.
         /// </summary>
         /// <returns>The inverted dictionary.</returns>
-        private static Dictionary<string, TechType> ReverseClassIdDatabase()
+        private Dictionary<string, TechType> ReverseClassIdDatabase()
         {
             Dictionary<string, TechType> database = new Dictionary<string, TechType>();
 
@@ -554,6 +601,20 @@ namespace SubnauticaRandomiser.Logic.Modules
             }
 
             return result;
+        }
+
+        private class BiomeDataCache
+        {
+            public BiomeType biome;
+            public float probability;
+            public int count;
+
+            public BiomeDataCache(BiomeType biome, float probability, int count)
+            {
+                this.biome = biome;
+                this.probability = probability;
+                this.count = count;
+            }
         }
     }
 }

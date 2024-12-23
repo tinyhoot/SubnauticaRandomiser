@@ -56,23 +56,21 @@ namespace SubnauticaRandomiser.Objects
         private void CopyLinkedData()
         {
             RecipeData techdata = CraftDataHandler.GetRecipeData(TechType);
-            if (techdata != null)
+            if (techdata == null)
+                return;
+            
+            if (techdata.Ingredients != null && techdata.ingredientCount > 0)
             {
-                if (techdata.Ingredients != null && techdata.ingredientCount > 0)
+                foreach (CraftData.Ingredient i in techdata.Ingredients)
                 {
-                    foreach (CraftData.Ingredient i in techdata.Ingredients)
-                    {
-                        Ingredients.Add(new RandomiserIngredient(i.techType, i.amount));
-                    }
+                    Ingredients.Add(new RandomiserIngredient(i.techType, i.amount));
                 }
-
-                if (techdata.LinkedItems != null && techdata.linkedItemCount > 0)
-                {
-                    LinkedIngredients = techdata.LinkedItems;
-                }
-
-                CraftAmount = techdata.craftAmount;
             }
+
+            if (techdata.LinkedItems != null && techdata.linkedItemCount > 0)
+                LinkedIngredients = techdata.LinkedItems;
+
+            CraftAmount = techdata.craftAmount;
         }
 
         public IIngredient GetIngredient(int index)

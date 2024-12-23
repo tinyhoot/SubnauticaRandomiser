@@ -40,6 +40,8 @@ namespace SubnauticaRandomiser.Logic.Modules
         }
 
         public void ApplySerializedChanges(SaveData saveData) { }
+        
+        public void UndoSerializedChanges(SaveData saveData) { }
 
         public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData) { }
 
@@ -52,7 +54,7 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         public void SetupHarmonyPatches(Harmony harmony, SaveData saveData)
         {
-            if (saveData.GetModuleData<RecipeSaveData>().DiscoverEggs)
+            if (saveData.TryGetModuleData(out RecipeSaveData recipeData) && recipeData.DiscoverEggs)
                 harmony.PatchAll(typeof(EggPatcher));
         }
     }

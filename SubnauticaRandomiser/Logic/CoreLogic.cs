@@ -124,7 +124,7 @@ namespace SubnauticaRandomiser.Logic
             
             Bootstrap.Main.SyncGameState();
             
-            _log.InGameMessage("Finished randomising! Please restart your game for all changes to take effect.");
+            _log.InGameMessage("Finished randomising!");
         }
 
         /// <summary>

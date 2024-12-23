@@ -54,6 +54,8 @@ namespace SubnauticaRandomiser.Logic.Modules
             // TODO: Move blueprints and linking into here.
         }
 
+        public void UndoSerializedChanges(SaveData saveData) { }
+
         public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
         {
             RandomiseDataboxes(rng);

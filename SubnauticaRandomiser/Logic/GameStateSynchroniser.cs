@@ -70,6 +70,8 @@ namespace SubnauticaRandomiser.Logic
             {
                 module.SetupHarmonyPatches(_harmony, saveData);
             }
+            // Ensure we get access to granular hooks into the game logic.
+            _harmony.PatchAll(typeof(Hooking));
             // Always apply bugfixes.
             _harmony.PatchAll(typeof(VanillaBugfixes));
         }
@@ -77,8 +79,13 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Undo any changes and restore the vanilla game state.
         /// </summary>
-        public void Teardown()
+        public void Teardown(SaveData saveData)
         {
+            foreach (ILogicModule module in Bootstrap.Main.Modules)
+            {
+                module.UndoSerializedChanges(saveData);
+            }
+            saveData.Reset();
             _harmony.UnpatchSelf();
         }
     }

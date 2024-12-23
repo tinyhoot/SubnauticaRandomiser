@@ -69,5 +69,17 @@ namespace SubnauticaRandomiser.Serialization
         {
             _enabledModules = modules.ToList();
         }
+        
+        /// <summary>
+        /// Work around an issue in Nautilus/Newtonsoft(?) where the JSON fails to populate fields that already have
+        /// values in them. By resetting these we ensure the save games of successive games are loaded properly.
+        /// </summary>
+        public void Reset()
+        {
+            PrefixLogHandler.Get("[SaveData]").Debug("Flushing save data from memory for the next save.");
+            _enabledModules.Clear();
+            _moduleSaveData.Clear();
+            SaveVersion = -1;
+        }
     }
 }

@@ -12,11 +12,13 @@ using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Modules;
 using SubnauticaRandomiser.Logic.Modules.Recipes;
+using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using UWE;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
+using Object = UnityEngine.Object;
 using Task = System.Threading.Tasks.Task;
 
 namespace SubnauticaRandomiser.Logic
@@ -49,6 +51,8 @@ namespace SubnauticaRandomiser.Logic
             // Register the save data file. Whether empty or populated, it will kick things off once loaded.
             SaveData = SaveDataHandler.RegisterSaveDataCache<SaveData>();
             SaveData.OnFinishedLoading += OnSaveDataLoaded;
+            // Undo all changes to the game when the user quits back to the main menu.
+            Hooking.OnQuitToMainMenu += Teardown;
         }
 
         /// <summary>
@@ -174,6 +178,20 @@ namespace SubnauticaRandomiser.Logic
         {
             _sync ??= new GameStateSynchroniser(Initialiser.GUID);
             _sync.SyncGameState(SaveData);
+        }
+
+        /// <summary>
+        /// Undo all changes to the game and return to a blank slate, ready for the next seed.
+        /// </summary>
+        private void Teardown()
+        {
+            _log.Info("Returning to menu, undoing all modifications.");
+            // Let all modules handle undoing their changes first.
+            _sync.Teardown(SaveData);
+            _modules.Clear();
+            // Then destroy the central logic object in preparation for the next fresh save.
+            _log.Debug("Destroying logic object.");
+            Object.Destroy(_logicObject);
         }
 
         /// <summary>

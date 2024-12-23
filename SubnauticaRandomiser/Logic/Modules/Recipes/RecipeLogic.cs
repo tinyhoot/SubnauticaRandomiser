@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
+using HootLib.Objects;
 using JetBrains.Annotations;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
@@ -31,6 +32,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         private ILogHandler _log;
         private EntityHandler _entityHandler;
         private Mode _mode;
+        private NautilusShell<TechType, ITechData> _recipeCache;
 
         public Dictionary<TechType, int> BasicOutpostPieces { get; private set; }
         public Dictionary<TechType, TechType> UpgradeChains { get; private set; }
@@ -43,6 +45,9 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             _config = _coreLogic._Config;
             _entityHandler = _coreLogic.EntityHandler;
             _log = PrefixLogHandler.Get("[R]");
+            _recipeCache = new NautilusShell<TechType, ITechData>(
+                CraftDataHandler.SetRecipeData,
+                CraftDataHandler.GetRecipeData);
             ValidIngredients = new HashSet<LogicEntity>(new LogicEntityEqualityComparer());
             
             // Register events.
@@ -77,10 +82,20 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             
             foreach (TechType key in recipeSave.RecipeDict.Keys)
             {
-                CraftDataHandler.SetRecipeData(key, recipeSave.RecipeDict[key]);
+                _recipeCache.SendChanges(key, recipeSave.RecipeDict[key]);
             }
             
             ChangeScrapMetalResult(recipeSave.ScrapMetalResult);
+        }
+
+        public void UndoSerializedChanges(SaveData saveData)
+        {
+            _recipeCache.UndoChanges();
+            
+            RecipeSaveData recipeSave = saveData.GetModuleData<RecipeSaveData>();
+            if (recipeSave.RecipeDict is null || recipeSave.RecipeDict.Count == 0)
+                return;
+            ChangeScrapMetalResult(TechType.Titanium, recipeSave.ScrapMetalResult);
         }
 
         public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
@@ -296,10 +311,11 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// Changes what kind of material scrap metal can be turned into.
         /// </summary>
         /// <param name="techType">The new material to get from scrap metal.</param>
+        /// <param name="oldResult">The old outcome of the recipe. Needed to properly delete and clean up.</param>
         /// <returns>The resulting Recipe, or null if the given TechType wasn't usable.</returns>
-        private Recipe ChangeScrapMetalResult(TechType techType)
+        private Recipe ChangeScrapMetalResult(TechType techType, TechType oldResult = TechType.Titanium)
         {
-            if (techType.Equals(TechType.Titanium) || techType.Equals(TechType.None))
+            if (techType.Equals(TechType.None))
                 return null;
             
             // Create the new recipe.
@@ -312,9 +328,12 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             recipe.CraftAmount = Math.Max(1, (int)Math.Floor(4f / size));
             CraftDataHandler.SetRecipeData(techType, recipe);
 
-            // Remove the vanilla recipe from the fabricator and PDA.
-            CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "BasicMaterials", "Titanium");
+            // Delete the old recipe and remove it from the fabricator and PDA.
+            // CraftDataHandler.SetRecipeData(oldResult, null);
+            CraftTreeHandler.RemoveNode(CraftTree.Type.Fabricator, "Resources", "BasicMaterials", oldResult.AsString());
             CraftDataHandler.RemoveFromGroup(TechGroup.Resources, TechCategory.BasicMaterials, TechType.Titanium);
+            KnownTechHandler.RemoveDefaultUnlock(oldResult);
+            
             // Add the replacement recipe in its stead.
             CraftTreeHandler.AddCraftingNode(CraftTree.Type.Fabricator, techType, "Resources", "BasicMaterials");
             CraftDataHandler.AddToGroup(TechGroup.Resources, TechCategory.BasicMaterials, techType);

@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HarmonyLib;
+using HootLib.Objects;
+using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
@@ -25,6 +28,7 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         private Config _config => _coreLogic._Config;
         private ILogHandler _log;
+        private NautilusShell<string, string> _languageCache;
 
         public static readonly Dictionary<string, string> KeypadPrefabClassIds = new Dictionary<string, string>
         {
@@ -50,7 +54,39 @@ namespace SubnauticaRandomiser.Logic.Modules
             return null;
         }
 
-        public void ApplySerializedChanges(SaveData saveData) { }
+        public void ApplySerializedChanges(SaveData saveData)
+        {
+            if (saveData.TryGetModuleData(out DoorSaveData doorData))
+            {
+                // This ensures the replacement works no matter what language the user uses.
+                // However, it won't persist to a different one if the language is changed mid-game.
+                string language = Language.main.currentLanguage;
+                _languageCache = new NautilusShell<string, string>(
+                    (key, text) => LanguageHandler.SetLanguageLine(key, text, language), Language.main.Get);
+                PatchAccessCodeEntries(doorData);
+            }
+        }
+        
+        /// <summary>
+        /// Edit the description of the PDA logs on door access codes to reflect the codes they were randomised to.
+        /// </summary>
+        public void PatchAccessCodeEntries(DoorSaveData saveData)
+        {
+            foreach (var kv in saveData.DoorKeyCodes)
+            {
+                string descId = KeypadPrefabClassIds[kv.Key];
+                string originalDesc = Language.main.Get(descId);
+                // Search for four numbers in a row and replace them with the randomised ones.
+                string newDesc = Regex.Replace(originalDesc, "[0-9]{4}", kv.Value, RegexOptions.CultureInvariant);
+                _languageCache.SendChanges(descId, newDesc);
+            }
+        }
+
+        public void UndoSerializedChanges(SaveData saveData)
+        {
+            if (saveData.Contains<DoorSaveData>())
+                _languageCache?.UndoChanges();
+        }
 
         public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
         {
@@ -71,7 +107,6 @@ namespace SubnauticaRandomiser.Logic.Modules
             if (saveData.Contains<DoorSaveData>())
             {
                 harmony.PatchAll(typeof(AuroraPatcher_KeyCodes));
-                harmony.PatchAll(typeof(LanguagePatcher));
             }
             if (saveData.Contains<SupplyBoxSaveData>())
                 harmony.PatchAll(typeof(AuroraPatcher_SupplyBoxes));
