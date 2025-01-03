@@ -162,6 +162,8 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
         private void OnSetupBeginning(object sender, EventArgs args)
         {
+            _entityHandler.UpdateEntityValues(_config.RecipeValueMult.Value);
+            
             // Decide which recipe mode will be used.
             switch (_config.RecipeMode.Value)
             {
