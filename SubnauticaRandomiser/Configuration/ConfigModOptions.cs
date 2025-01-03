@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using HootLib;
+using System.Linq;
+using System.Text;
 using HootLib.Configuration;
 using Nautilus.Options;
-using TMPro;
+using SubnauticaRandomiser.Logic;
 using UnityEngine;
-using UnityEngine.UI;
-using Random = System.Random;
 
 namespace SubnauticaRandomiser.Configuration
 {
@@ -14,7 +13,7 @@ namespace SubnauticaRandomiser.Configuration
     /// </summary>
     internal class ConfigModOptions : HootModOptions
     {
-        public ConfigModOptions(string name, Config config) : base(name, config) { }
+        public ConfigModOptions(string name, Config config, Transform persistentParent) : base(name, config, persistentParent) { }
 
         public override void BuildModOptions(uGUI_TabbedControlsPanel panel, int modsTabIndex,
             IReadOnlyCollection<OptionItem> options)
@@ -23,12 +22,35 @@ namespace SubnauticaRandomiser.Configuration
             // The menu should never be accessible from in-game.
             if (!IsMainMenu(panel))
             {
+                Transform optionsPane = FindModOptionsPane(panel, modsTabIndex);
+                
                 panel.AddHeading(modsTabIndex, Initialiser.NAME);
-                AddText("The settings for this mod can only be accessed from the main menu.");
+                new TextDecorator("The settings for this mod can only be accessed from the main menu.").AddToPanel(optionsPane);
+                new TextDecorator($"Loaded modules:\n{CreateLoadedModuleList()}").AddToPanel(optionsPane);
                 return;
             }
 
             base.BuildModOptions(panel, modsTabIndex, options);
+        }
+
+        /// <summary>
+        /// Create a bullet point list of all currently active modules for display in a running game.
+        /// </summary>
+        private string CreateLoadedModuleList()
+        {
+            // Get the names of all loaded modules and sort them alphabetically.
+            var modules = Bootstrap.Main.GetActiveModuleTypes()
+                .Select(type => type.Name)
+                .OrderBy(str => str);
+            StringBuilder sb = new StringBuilder();
+            foreach (var module in modules)
+            {
+                // Add a bullet point to the beginning of the line.
+                sb.Append(" \u2022  ");
+                sb.AppendLine(module);
+            }
+
+            return sb.ToString();
         }
     }
 }
