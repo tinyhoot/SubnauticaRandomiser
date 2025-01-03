@@ -90,7 +90,7 @@ namespace SubnauticaRandomiser.Patches
 
             RandomHandler rand = new RandomHandler();
             TechType type = GetRandomMaterial(rand, saveData);
-            int number = rand.Next(1, Initialiser._Config?.MaxDuplicateScanYield.Value + 1 ?? 4);
+            int number = rand.Next(1, saveData.MaxMaterialYield);
             _log.Debug($"Replacing duplicate fragment scan yield of target {target} with {type}");
             CraftData.AddToInventory(type, number, false, true);
         }

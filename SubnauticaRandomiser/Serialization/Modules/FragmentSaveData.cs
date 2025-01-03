@@ -7,6 +7,7 @@ namespace SubnauticaRandomiser.Serialization.Modules
     internal class FragmentSaveData : BaseModuleSaveData
     {
         public LootTable<TechType> FragmentMaterialYield = new LootTable<TechType>();
+        public int MaxMaterialYield = 2;
         public Dictionary<TechType, int> NumFragmentsToUnlock = new Dictionary<TechType, int>();
         public Dictionary<TechType, List<SpawnData>> SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
         

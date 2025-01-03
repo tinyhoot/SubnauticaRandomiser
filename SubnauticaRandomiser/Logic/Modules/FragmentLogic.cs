@@ -103,7 +103,10 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         public BaseModuleSaveData SetupSaveData()
         {
-            return new FragmentSaveData();
+            return new FragmentSaveData
+            {
+                MaxMaterialYield = _config.MaxDuplicateScanYield.Value
+            };
         }
 
         /// <summary>
