@@ -1,8 +1,11 @@
+using System;
 using BepInEx;
 using BepInEx.Configuration;
 using HootLib.Configuration;
+using Nautilus.Options;
 using SubnauticaRandomiser.Objects.Enums;
 using TMPro;
+using UnityEngine;
 
 namespace SubnauticaRandomiser.Configuration
 {
@@ -76,6 +79,9 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntryWrapper<double> PrimaryIngredientValue;
         public ConfigEntryWrapper<double> RecipeValueVariance;
 
+        // Used for the shared settings import/export.
+        private TextInputDecorator _textInputDecorator;
+        
         public Config(string path, BepInPlugin metadata) : base(path, metadata) { }
 
         protected override void RegisterOptions()
@@ -93,7 +99,7 @@ namespace SubnauticaRandomiser.Configuration
                 key: nameof(Seed),
                 defaultValue: "",
                 description: "The seed used to generate a random game state."
-            );
+            ).WithDescription(null, "Leave empty for a random seed.");
             // General Advanced
             DepthSearchTime = RegisterEntry(
                 section: SectionGeneralAdvanced,
@@ -554,6 +560,14 @@ namespace SubnauticaRandomiser.Configuration
             modOptions.AddItem(Seed.ToTextInputModOption("Leave empty for random seed", TMP_InputField.ContentType.IntegerNumber));
             
             modOptions.AddSeparator();
+            modOptions.AddText("If you want to import a settings preset, paste it into the box below and press 'import'."
+                               + "\nPressing 'export' populates your clipboard with a preset of your current settings.");
+            _textInputDecorator = new TextInputDecorator("Enter options preset to import", null, TMP_InputField.ContentType.Standard);
+            modOptions.AddDecorator(_textInputDecorator);
+            modOptions.AddItem(ModButtonOption.Create("settingsImport", "Import Settings", OnImportButtonClicked));
+            modOptions.AddItem(ModButtonOption.Create("settingsClipboard", "Export to Clipboard", OnCopyToClipboardButtonClicked));
+            
+            modOptions.AddSeparator();
             modOptions.AddItem(EnableAlternateStartModule.ToModToggleOption());
             modOptions.AddItem(SpawnPoint.ToModChoiceOption());
             modOptions.AddItem(AllowRadiatedStarts.ToModToggleOption());
@@ -589,6 +603,39 @@ namespace SubnauticaRandomiser.Configuration
             modOptions.AddItem(MaxNumberPerIngredient.ToModSliderOption(1, 10));
             modOptions.AddItem(MaxIngredientsPerRecipe.ToModSliderOption(1, 10));
             modOptions.AddItem(MaxInventorySizePerRecipe.ToModSliderOption(4, 40));
+        }
+
+        private void OnImportButtonClicked(ButtonClickedEventArgs args)
+        {
+            string json = _textInputDecorator.GetContent();
+            if (string.IsNullOrEmpty(json))
+            {
+                Initialiser._Log.InGameMessage("Cannot import settings from an empty box.");
+                return;
+            }
+            
+            try
+            {
+                FromJson(json);
+                ModOptions.Validate();
+            }
+            catch (Exception ex)
+            {
+                Initialiser._Log.InGameMessage("Failed to import settings! Ensure the import string is valid and not "
+                                               + "missing any pieces."
+                                               + $"\nError: {ex.Message}", true);
+                Initialiser._Log.Error(ex.StackTrace);
+                return;
+            }
+
+            Initialiser._Log.InGameMessage("Imported settings.");
+        }
+
+        private void OnCopyToClipboardButtonClicked(ButtonClickedEventArgs args)
+        {
+            // It is surprising how easy modifying the clipboard is.
+            GUIUtility.systemCopyBuffer = ToJson();
+            Initialiser._Log.InGameMessage("Copied to clipboard!");
         }
     }
 }
