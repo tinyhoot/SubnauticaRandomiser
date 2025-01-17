@@ -13,6 +13,9 @@ namespace SubnauticaRandomiser.Patches
     internal class DataboxPatcher
     {
         private static ILogHandler _log => PrefixLogHandler.Get("[D]");
+        // The maximum squared distance a databox's saved coordinates can be from its actual spawned coordinates
+        // for it to be considered equal.
+        private const float MaxSqrDistance = 3 * 3;
         
         [HarmonyPrefix]
         [HarmonyPatch(typeof(BlueprintHandTarget), nameof(BlueprintHandTarget.Start))]
@@ -40,7 +43,8 @@ namespace SubnauticaRandomiser.Patches
         {
             if (!Bootstrap.SaveData.TryGetModuleData(out DataboxSaveData saveData))
                 return TechType.None;
-            Databox replacement = saveData.Databoxes.FirstOrDefault(box => box.Coordinates.Equals(position));
+            // Take the square magnitude for distance to allow for some imperfection in the recorded databox data.
+            Databox replacement = saveData.Databoxes.FirstOrDefault(box => (box.Coordinates - position).sqrMagnitude <= MaxSqrDistance);
             if (replacement != null)
                 return replacement.TechType;
 
