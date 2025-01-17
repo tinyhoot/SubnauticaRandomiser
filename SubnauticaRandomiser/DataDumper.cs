@@ -1,4 +1,9 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using HarmonyLib;
+using HootLib;
 using UnityEngine;
 
 namespace SubnauticaRandomiser
@@ -99,5 +104,85 @@ namespace SubnauticaRandomiser
                 }
             }
         }
+
+        public static IEnumerator LogDataboxes()
+        {
+            var task = CSVReader.ParseDataFileAsync(Initialiser._WreckageFile, CSVReader.ParseWreckageLine);
+            yield return new WaitUntil(() => task.IsCompleted);
+
+            // Temporarily patch into the databox spawner while the chain teleport explores all relevant locations.
+            Harmony harmony = new Harmony(Initialiser.GUID);
+            harmony.Patch(AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start)),
+                postfix: new HarmonyMethod(AccessTools.Method(typeof(DataDumper), nameof(DataDumper.PatchLogDatabox))));
+
+            yield return ChainTeleport(task.Result.Select(box => box.Coordinates).ToList());
+            
+            harmony.Unpatch(AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start)),
+                AccessTools.Method(typeof(DataDumper), nameof(DataDumper.PatchLogDatabox)));
+        }
+
+        private static IEnumerator PatchLogDatabox(IEnumerator passthrough, DataboxSpawner __instance)
+        {
+            Initialiser._Log.Debug($"Other components: {__instance.GetComponents(typeof(Component)).Select(x => x.GetType()).ElementsToString()}");
+            // Let the spawner set up the spawning process for the actual databox.
+            passthrough.MoveNext();
+            if (passthrough.Current is CoroutineTask<GameObject> task)
+            {
+                // Let the actual databox load in.
+                yield return task;
+                // This extra delay seems necessary to guarantee the PrefabIdentifier on the freshly spawned box exists.
+                yield return null;
+                var spawnerpid = __instance.GetComponent<PrefabIdentifier>();
+                var spawnerId = spawnerpid == null ? "NULL" : spawnerpid.id;
+                var boxId = task.GetResult().GetComponent<PrefabIdentifier>();
+                // Spawners often seem to have no individual id, making identification by id impossible.
+                // The boxes do have their own ids, but these are not consistent from save to save.
+                Initialiser._Log.Debug($"Databox: {__instance.spawnTechType} at {__instance.transform.position}, spawner Id: {spawnerId}, box Id: {boxId?.id}");
+            }
+            else
+            {
+                Initialiser._Log.Debug($"Spawning passthrough came up null for {__instance.spawnTechType} at {__instance.transform.position}");
+            }
+
+            // Let the rest of the vanilla method complete as intended.
+            yield return passthrough;
+        }
+
+        #region Utility
+
+        /// <summary>
+        /// Teleport to multiple locations in a row with a small delay in between.
+        /// </summary>
+        public static IEnumerator ChainTeleport(List<Vector3> positions)
+        {
+            Initialiser._Log.Debug("Starting chain teleport exploration.");
+            int count = 0;
+            foreach (Vector3 position in positions)
+            {
+                yield return TeleportExplore(position);
+                // Wait a few extra frames at the fully loaded location.
+                yield return null;
+                yield return null;
+                yield return null;
+                
+                count++;
+                if (count % 5 == 0)
+                    Initialiser._Log.InGameMessage($"Explored {count}/{positions.Count} locations.");
+            }
+            Initialiser._Log.InGameMessage("Chain exploration done!");
+        }
+
+        /// <summary>
+        /// Teleport to a new area and wait until the area has fully loaded in.
+        /// </summary>
+        private static IEnumerator TeleportExplore(Vector3 position)
+        {
+            // Instantly go to the desired position.
+            yield return GotoConsoleCommand.main.GotoLocation(position, true);
+            // Wait until the teleport is done and the game is no longer loading in terrain at the new location.
+            yield return new WaitUntil(() => !GotoConsoleCommand.main.movingPlayer && LargeWorldStreamer.main.IsWorldSettled());
+        }
+        
+        #endregion Utility
     }
 }
