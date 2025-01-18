@@ -7,9 +7,9 @@
 
 A Subnautica Mod that randomises many aspects of the game for replayability, originally based on [the first Subnautica randomizer](https://github.com/stephenengland/SubnauticaRandomizer). Over time, this project grew to become completely independent and today no longer shares any code with the original. 
 
-On first startup, the mod will randomise using recommended settings. You can either start playing immediately, or customise your experience in the mod options menu. Note that, should you choose to re-randomise from the mod options menu, you must _**restart your game**_ for all changes to properly take effect.
+If you do not change any of the options in the mod options menu the mod will randomise using recommended settings. You can either start playing immediately, or customise your experience in the mod options menu.
 
-The randomisation persists between play sessions and save games. This means you don't have to play it all through in one sitting, but also that you cannot have different save files with different seeds.
+The randomisation persists between play sessions and within save games. This means you don't have to play it all through in one sitting, and that you can swap between different save files with different seeds as you like. However, you **cannot** change any options of an ongoing game.
 
 #### This mod randomises:
 * Recipes for most craftable things in the game, excluding decorative base pieces and food/water.
@@ -33,22 +33,19 @@ The randomisation persists between play sessions and save games. This means you 
 ## How to Use
 1. Install [BepInEx](https://www.nexusmods.com/subnautica/mods/1108)
 2. Install [Nautilus](https://www.nexusmods.com/subnautica/mods/1262)
-3. Extract this mod into your Subnautica/BepInEx/plugins folder
+3. Extract this mod into your `Subnautica/BepInEx/plugins` folder
    * (Optional) Edit the config in the in-game options menu to your liking
-   * Press the "Randomise!" button
-   * Restart the game to apply your changes
-4. Enjoy!
+4. Start a new game
+5. Enjoy!
 
 ## How to Build
-* `git clone`
-* Add a SUBNAUTICA_DIR variable to your PATH pointing to your install directory of Subnautica
-* Install BepInEx and Nautilus
-* Copy all dependencies to the project's empty `Dependencies` folder. This includes:
-  * BepInEx
-  * Nautilus
-  * Several Unity assemblies from the game folder
-  * Publicised versions of Subnautica's `Assembly-CSharp.dll`. Start the game once using [the BepinEx publiciser](https://github.com/MrPurple6411/Bepinex-Tools/releases/) to generate them.
-* Building in the Release configuration should leave you with a `SubnauticaRandomiser.dll` in `SubnauticaRandomiser/bin/Release/` and automatically update the installed version in `$SUBNAUTICA_DIR/BepInEx/plugins`
+* `git clone --recurse-submodules`
+* NuGet should automatically download all dependencies for you. If it does not, perform a NuGet restore.
+  * (Optional) Create a `GameDirectory.targets` file in the same folder as the freshly cloned `SubnauticaRandomiser.csproj` and add the path to your
+    local Subnautica install directory to it. An example file can be found [here](https://github.com/tinyhoot/HootLib-Subnautica/blob/main/HootLib/Example_GameDirectory.targets).
+* Building the project will leave you with a `SubnauticaRandomiser.dll` in the default build directory. If you created a 
+  `GameDirectory.targets` file it will also automatically copy all necessary mod files to your 
+  `Subnautica/BepInEx/plugins` directory for quick testing.
 
 ## How Does It Work?
 Under the hood, the randomiser creates a new Unity GameObject for storing all randomisation logic. It then attaches Components as needed, depending on which config options are set. Only those Components which are actually needed are attached to the GameObject. Components primarily communicate via events, which means they do not rely on each other and can be individually turned on/off with no repercussions.
