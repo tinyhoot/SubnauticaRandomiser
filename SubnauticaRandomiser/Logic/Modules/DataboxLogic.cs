@@ -9,10 +9,12 @@ using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
 using SubnauticaRandomiser.Patches;
+using SubnauticaRandomiser.Serialization;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
-using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Modules
 {
     /// <summary>
     /// Handles everything related to randomising databoxes.
@@ -23,37 +25,50 @@ namespace SubnauticaRandomiser.Logic
         private CoreLogic _coreLogic;
         private List<Databox> _databoxes;
         private ILogHandler _log;
-        private IRandomHandler _random;
+        private DataboxSaveData _saveData;
 
         public void Awake()
         {
             _coreLogic = GetComponent<CoreLogic>();
-            _log = _coreLogic._Log;
-            _random = _coreLogic.Random;
+            _log = PrefixLogHandler.Get("[D]");
             
             // Register this module as a handler for databox entities.
             _coreLogic.RegisterEntityHandler(EntityType.Databox, this);
             // Register events.
             _coreLogic.EntityCollecting += OnCollectDataboxes;
-
-            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
+        }
+        
+        public IEnumerable<Task> LoadFiles()
+        {
+            return new[] { ParseDataFileAsync() };
         }
 
-        public void ApplySerializedChanges(EntitySerializer serializer) { }
-
-        public void RandomiseOutOfLoop(EntitySerializer serializer)
+        public BaseModuleSaveData SetupSaveData()
         {
-            RandomiseDataboxes(serializer);
+            _saveData = new DataboxSaveData();
+            return _saveData;
+        }
+
+        public void ApplySerializedChanges(SaveData saveData)
+        {
+            // TODO: Move blueprints and linking into here.
+        }
+
+        public void UndoSerializedChanges(SaveData saveData) { }
+
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
+        {
+            RandomiseDataboxes(rng);
             UpdateBlueprints(_coreLogic.EntityHandler.GetAllEntities());
             LinkCyclopsHullModules(_coreLogic.EntityHandler);
         }
 
-        public bool RandomiseEntity(ref LogicEntity entity)
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             throw new NotImplementedException();
         }
 
-        public void SetupHarmonyPatches(Harmony harmony)
+        public void SetupHarmonyPatches(Harmony harmony, SaveData _)
         {
             harmony.PatchAll(typeof(DataboxPatcher));
         }
@@ -168,9 +183,8 @@ namespace SubnauticaRandomiser.Logic
         /// Randomise (shuffle) the blueprints found inside databoxes.
         /// </summary>
         /// <returns>The list of newly randomised databoxes.</returns>
-        public List<Databox> RandomiseDataboxes(EntitySerializer serializer)
+        public List<Databox> RandomiseDataboxes(IRandomHandler rng)
         {
-            serializer.Databoxes = new Dictionary<RandomiserVector, TechType>();
             List<Databox> randomDataboxes = new List<Databox>();
             List<Vector3> toBeRandomised = new List<Vector3>();
 
@@ -181,18 +195,18 @@ namespace SubnauticaRandomiser.Logic
 
             foreach (Databox originalBox in _databoxes)
             {
-                Vector3 next = _random.Choice(toBeRandomised);
+                Vector3 next = rng.Choice(toBeRandomised);
                 Databox replacementBox = _databoxes.Find(x => x.Coordinates.Equals(next));
 
                 randomDataboxes.Add(new Databox(originalBox.TechType, next, replacementBox.Wreck, 
                     replacementBox.RequiresLaserCutter, replacementBox.RequiresPropulsionCannon));
-                serializer.Databoxes.Add(new RandomiserVector(next), originalBox.TechType);
-                _log.Debug($"[D] Databox {next.ToString()} with {replacementBox}"
+                _log.Debug($"Databox {next.ToString()} with {replacementBox}"
                            + " now contains " + originalBox);
                 toBeRandomised.Remove(next);
             }
 
             _databoxes = randomDataboxes;
+            _saveData.Databoxes = randomDataboxes;
             return randomDataboxes;
         }
 
@@ -239,7 +253,7 @@ namespace SubnauticaRandomiser.Logic
                     entity.Blueprint.UnlockConditions.Add(TechType.PropulsionCannon);
             }
             
-            _log.Debug($"[D] Updated unlock requirements for {_databoxes.Count} databoxes.");
+            _log.Debug($"Updated unlock requirements for {_databoxes.Count} databoxes.");
         }
     }
 }

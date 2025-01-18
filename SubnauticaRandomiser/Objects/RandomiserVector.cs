@@ -59,10 +59,10 @@ namespace SubnauticaRandomiser.Objects
 
         public static bool operator !=(RandomiserVector vec1, RandomiserVector vec2) => !(vec1 == vec2);
 
-        public override string ToString()
-        {
-            return x + ", " + y + ", " + z;
-        }
+        // public override string ToString()
+        // {
+        //     return x + ", " + y + ", " + z;
+        // }
 
         public Vector3 ToUnityVector() => new Vector3(x, y, z);
     }

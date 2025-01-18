@@ -1,16 +1,18 @@
-using System.Collections.Generic;
-using System.Linq;
+using System;
+using BepInEx;
 using BepInEx.Configuration;
-using HarmonyLib;
+using HootLib.Configuration;
+using Nautilus.Options;
 using SubnauticaRandomiser.Objects.Enums;
-using SubnauticaRandomiser.Objects.Exceptions;
+using TMPro;
+using UnityEngine;
 
 namespace SubnauticaRandomiser.Configuration
 {
     /// <summary>
     /// Holds all configurable parameters and handles the configfile itself.
     /// </summary>
-    internal class Config
+    internal class Config : HootConfig
     {
         // These are intentionally 'static readonly' instead of constants to enable equality checking by reference.
         private static readonly string SectionGeneral = "General";
@@ -23,10 +25,9 @@ namespace SubnauticaRandomiser.Configuration
         private static readonly string SectionRecipes = "Recipes";
         private static readonly string SectionRecipesAdvanced = "Recipes.Advanced";
         
-        public ConfigEntryWrapper<int> Seed;
+        public ConfigEntryWrapper<string> Seed;
         public ConfigEntryWrapper<int> DepthSearchTime;
         public ConfigEntryWrapper<int> MaxDepthWithoutVehicle;
-        public ConfigEntryWrapper<bool> DebugForceRandomise;
 
         // Alternate Start
         public ConfigEntryWrapper<bool> EnableAlternateStartModule;
@@ -78,14 +79,12 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntryWrapper<double> PrimaryIngredientValue;
         public ConfigEntryWrapper<double> RecipeValueVariance;
 
-        public ConfigFile ConfigFile { get; }
+        // Used for the shared settings import/export.
+        private TextInputDecorator _textInputDecorator;
+        
+        public Config(string path, BepInPlugin metadata) : base(path, metadata) { }
 
-        public Config(ConfigFile configFile)
-        {
-            ConfigFile = configFile;
-        }
-
-        public void RegisterOptions()
+        protected override void RegisterOptions()
         {
             ConfigFile.Bind("_Welcome", "Welcome", true,
                 "Welcome to the config file! A word before you edit anything.\n"
@@ -95,24 +94,14 @@ namespace SubnauticaRandomiser.Configuration
                 + "They are meant for advanced users, and changing them may greatly impact your experience. "
                 + "Extreme values may even softlock you. Proceed with caution."
             );
-            
-            Seed = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            Seed = RegisterEntry(
                 section: SectionGeneral,
                 key: nameof(Seed),
-                defaultValue: 0,
-                description: "The random seed used to generate a game state."
-            );
+                defaultValue: "",
+                description: "The seed used to generate a random game state."
+            ).WithDescription(null, "Leave empty for a random seed.");
             // General Advanced
-            DebugForceRandomise = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
-                section: SectionGeneralAdvanced,
-                key: nameof(DebugForceRandomise),
-                defaultValue: false,
-                description: "Forces a new seed and re-randomisation on every game startup."
-            );
-            DepthSearchTime = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            DepthSearchTime = RegisterEntry(
                 section: SectionGeneralAdvanced,
                 key: nameof(DepthSearchTime),
                 defaultValue: 15,
@@ -122,8 +111,7 @@ namespace SubnauticaRandomiser.Configuration
                              + "since that is your maximum at the beginning of the game, without any tanks.",
                 acceptableValues: new AcceptableValueRange<int>(0, 45)
             );
-            MaxDepthWithoutVehicle = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MaxDepthWithoutVehicle = RegisterEntry(
                 section: SectionGeneralAdvanced,
                 key: nameof(MaxDepthWithoutVehicle),
                 defaultValue: 200,
@@ -135,8 +123,7 @@ namespace SubnauticaRandomiser.Configuration
             );
             
             // Alternate Start
-            EnableAlternateStartModule = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            EnableAlternateStartModule = RegisterEntry(
                 section: SectionAlternateStart,
                 key: nameof(EnableAlternateStartModule),
                 defaultValue: false,
@@ -145,8 +132,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Enable Spawning Module",
                 null
             );
-            SpawnPoint = new ConfigEntryWrapper<string>(
-                configFile: ConfigFile,
+            SpawnPoint = RegisterEntry(
                 section: SectionAlternateStart,
                 key: nameof(SpawnPoint),
                 defaultValue: "Vanilla",
@@ -160,8 +146,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Spawnpoint biome",
                 "Random is limited to early game biomes, Chaotic Random chooses from ALL available biomes."
             );
-            AllowRadiatedStarts = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            AllowRadiatedStarts = RegisterEntry(
                 section: SectionAlternateStart,
                 key: nameof(AllowRadiatedStarts),
                 defaultValue: false,
@@ -174,8 +159,7 @@ namespace SubnauticaRandomiser.Configuration
             );
 
             // Aurora
-            RandomiseDoorCodes = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            RandomiseDoorCodes = RegisterEntry(
                 section: SectionAurora,
                 key: nameof(RandomiseDoorCodes),
                 defaultValue: true,
@@ -184,8 +168,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Randomise Aurora door codes?",
                 null
             );
-            RandomiseSupplyBoxes = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            RandomiseSupplyBoxes = RegisterEntry(
                 section: SectionAurora,
                 key: nameof(RandomiseSupplyBoxes),
                 defaultValue: true,
@@ -196,8 +179,7 @@ namespace SubnauticaRandomiser.Configuration
             );
 
             // Databoxes
-            RandomiseDataboxes = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            RandomiseDataboxes = RegisterEntry(
                 section: SectionDataboxes,
                 key: nameof(RandomiseDataboxes),
                 defaultValue: true,
@@ -209,8 +191,7 @@ namespace SubnauticaRandomiser.Configuration
             );
             
             // Fragments
-            EnableFragmentModule = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            EnableFragmentModule = RegisterEntry(
                 section: SectionFragments,
                 key: nameof(EnableFragmentModule),
                 defaultValue: true,
@@ -219,8 +200,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Enable Fragment Module",
                 null
             );
-            RandomiseFragments = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            RandomiseFragments = RegisterEntry(
                 section: SectionFragments,
                 key: nameof(RandomiseFragments),
                 defaultValue: true,
@@ -229,8 +209,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Randomise fragment locations?",
                 null
             );
-            RandomiseNumFragments = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            RandomiseNumFragments = RegisterEntry(
                 section: SectionFragments,
                 key: nameof(RandomiseNumFragments),
                 defaultValue: true,
@@ -239,8 +218,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Randomise number of fragments needed?",
                 null
             );
-            MaxFragmentsToUnlock = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MaxFragmentsToUnlock = RegisterEntry(
                 section: SectionFragments,
                 key: nameof(MaxFragmentsToUnlock),
                 defaultValue: 5,
@@ -250,8 +228,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Max number of fragments needed",
                 null
             );
-            MaxBiomesPerFragment = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MaxBiomesPerFragment = RegisterEntry(
                 section: SectionFragments,
                 key: nameof(MaxBiomesPerFragment),
                 defaultValue: 5,
@@ -262,8 +239,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Max biomes to spawn each fragment in",
                 "Use with caution. Very low/high values can make it difficult to find enough fragments."
             );
-            RandomiseDuplicateScans = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            RandomiseDuplicateScans = RegisterEntry(
                 section: SectionFragments,
                 key: nameof(RandomiseDuplicateScans),
                 defaultValue: true,
@@ -274,8 +250,7 @@ namespace SubnauticaRandomiser.Configuration
                 null
             );
             // Fragments Advanced
-            MaxDuplicateScanYield = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MaxDuplicateScanYield = RegisterEntry(
                 section: SectionFragmentsAdvanced,
                 key: nameof(MaxDuplicateScanYield),
                 defaultValue: 2,
@@ -283,8 +258,7 @@ namespace SubnauticaRandomiser.Configuration
                              + "already known. Setting this number too high will quickly clutter your inventory.",
                 acceptableValues: new AcceptableValueRange<int>(1, 10)
             );
-            MaxFragmentTypesPerBiome = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MaxFragmentTypesPerBiome = RegisterEntry(
                 section: SectionFragmentsAdvanced,
                 key: nameof(MaxFragmentTypesPerBiome),
                 defaultValue: 4,
@@ -293,16 +267,14 @@ namespace SubnauticaRandomiser.Configuration
                              + "will not have enough biomes to actually place fragments in.",
                 acceptableValues: new AcceptableValueRange<int>(1, 10)
             );
-            MinFragmentsToUnlock = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MinFragmentsToUnlock = RegisterEntry(
                 section: SectionFragmentsAdvanced,
                 key: nameof(MinFragmentsToUnlock),
                 defaultValue: 2,
                 description: "The number of fragment scans needed to unlock a blueprint will never undercut this value.",
                 acceptableValues: new AcceptableValueRange<int>(1, 30)
             );
-            FragmentSpawnChanceMult = new ConfigEntryWrapper<float>(
-                configFile: ConfigFile,
+            FragmentSpawnChanceMult = RegisterEntry(
                 section: SectionFragmentsAdvanced,
                 key: nameof(FragmentSpawnChanceMult),
                 defaultValue: 0.7f,
@@ -313,8 +285,7 @@ namespace SubnauticaRandomiser.Configuration
                              + "with the maximum number of fragments allowed to spawn in a single biome.",
                 acceptableValues: new AcceptableValueRange<float>(0.01f, 10.0f)
             );
-            RareDropChance = new ConfigEntryWrapper<double>(
-                configFile: ConfigFile,
+            RareDropChance = RegisterEntry(
                 section: SectionFragmentsAdvanced,
                 key: nameof(RareDropChance),
                 defaultValue: 0.0025,
@@ -324,8 +295,7 @@ namespace SubnauticaRandomiser.Configuration
             );
             
             // Recipes
-            EnableRecipeModule = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            EnableRecipeModule = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(EnableRecipeModule),
                 defaultValue: true,
@@ -334,8 +304,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Enable Recipe Module",
                 null
             );
-            RandomiseRecipes = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            RandomiseRecipes = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(RandomiseRecipes),
                 defaultValue: true,
@@ -344,8 +313,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Randomise recipes?",
                 null
             );
-            RecipeMode = new ConfigEntryWrapper<RecipeDifficultyMode>(
-                configFile: ConfigFile,
+            RecipeMode = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(RecipeMode),
                 defaultValue: RecipeDifficultyMode.Balanced,
@@ -356,8 +324,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Balanced tries to stick to standard expectations of what should be expensive and what "
                 + "shouldn't. Chaotic is almost purely random."
             );
-            RecipeValueMult = new ConfigEntryWrapper<float>(
-                configFile: ConfigFile,
+            RecipeValueMult = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(RecipeValueMult),
                 defaultValue: 1.0F,
@@ -371,8 +338,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Recipe expensiveness",
                 "Higher values will allow recipes to become more expensive and require more materials."
             );
-            UseFish = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            UseFish = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(UseFish),
                 defaultValue: true,
@@ -381,8 +347,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Use fish as ingredients?",
                 null
             );
-            UseEggs = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            UseEggs = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(UseEggs),
                 defaultValue: false,
@@ -391,8 +356,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Use eggs as ingredients?",
                 null
             );
-            DiscoverEggs = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            DiscoverEggs = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(DiscoverEggs),
                 defaultValue: false,
@@ -401,8 +365,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Auto-discover all eggs?",
                 "This skips having to build an ACU before using eggs."
             );
-            UseSeeds = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            UseSeeds = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(UseSeeds),
                 defaultValue: true,
@@ -411,8 +374,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Use seeds as ingredients?",
                 null
             );
-            EquipmentAsIngredients = new ConfigEntryWrapper<IngredientInclusionLevel>(
-                configFile: ConfigFile,
+            EquipmentAsIngredients = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(EquipmentAsIngredients),
                 defaultValue: IngredientInclusionLevel.Never,
@@ -425,8 +387,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Include equipment as ingredients?",
                 "Top-level recipes are recipes which cannot be re-used as ingredients, such as base pieces."
             );
-            ToolsAsIngredients = new ConfigEntryWrapper<IngredientInclusionLevel>(
-                configFile: ConfigFile,
+            ToolsAsIngredients = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(ToolsAsIngredients),
                 defaultValue: IngredientInclusionLevel.Never,
@@ -439,8 +400,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Include tools as ingredients?",
                 "Top-level recipes are recipes which cannot be re-used as ingredients, such as base pieces."
             );
-            UpgradesAsIngredients = new ConfigEntryWrapper<IngredientInclusionLevel>(
-                configFile: ConfigFile,
+            UpgradesAsIngredients = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(UpgradesAsIngredients),
                 defaultValue: IngredientInclusionLevel.TopLevelOnly,
@@ -453,8 +413,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Include upgrades as ingredients?",
                 "Top-level recipes are recipes which cannot be re-used as ingredients, such as base pieces."
             );
-            VanillaUpgradeChains = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            VanillaUpgradeChains = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(VanillaUpgradeChains),
                 defaultValue: false,
@@ -464,8 +423,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Enforce vanilla upgrade chains?",
                 "If enabled, forces upgrades to be sequential. E.g. vehicle depth upgrade 3 will always require upgrade 2 first."
             );
-            BaseTheming = new ConfigEntryWrapper<bool>(
-                configFile: ConfigFile,
+            BaseTheming = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(BaseTheming),
                 defaultValue: false,
@@ -475,8 +433,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Theme base parts around a common ingredient?",
                 "If enabled, every base part will require the same random ingredient in addition to its other ingredients."
             );
-            DistributionWeighting = new ConfigEntryWrapper<RandomDistribution>(
-                configFile: ConfigFile,
+            DistributionWeighting = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(DistributionWeighting),
                 defaultValue: RandomDistribution.Normal,
@@ -494,8 +451,7 @@ namespace SubnauticaRandomiser.Configuration
                 + "PreferHigh: Stronger weighting is applied to higher values, resulting in more expensive recipes.\n"
                 + "PreferExtremes: Recipes will be either very cheap or very expensive, rarely anything in between."
             );
-            MaxNumberPerIngredient = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MaxNumberPerIngredient = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(MaxNumberPerIngredient),
                 defaultValue: 5,
@@ -506,8 +462,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Max number of a single ingredient",
                 "Recipes cannot require more than this many of a single ingredient at once, e.g. no more than 5 titanium."
             );
-            MaxIngredientsPerRecipe = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MaxIngredientsPerRecipe = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(MaxIngredientsPerRecipe),
                 defaultValue: 7,
@@ -518,8 +473,7 @@ namespace SubnauticaRandomiser.Configuration
                 "Max ingredient types per recipe",
                 "Recipes cannot require more than this many different ingredients."
             );
-            MaxInventorySizePerRecipe = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MaxInventorySizePerRecipe = RegisterEntry(
                 section: SectionRecipes,
                 key: nameof(MaxInventorySizePerRecipe),
                 defaultValue: 24,
@@ -538,8 +492,7 @@ namespace SubnauticaRandomiser.Configuration
                 + "softlocks from recipes larger than your inventory. The vanilla inventory contains 48 slots."
             );
             // Recipes Advanced
-            MaxBasicOutpostSize = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MaxBasicOutpostSize = RegisterEntry(
                 section: SectionRecipesAdvanced,
                 key: nameof(MaxBasicOutpostSize),
                 defaultValue: 24,
@@ -548,8 +501,7 @@ namespace SubnauticaRandomiser.Configuration
                              + "affects I-corridors, hatches, scanner rooms, windows, solar panels, and beacons.",
                 acceptableValues: new AcceptableValueRange<int>(4, 48)
             );
-            MaxEggsAsSingleIngredient = new ConfigEntryWrapper<int>(
-                configFile: ConfigFile,
+            MaxEggsAsSingleIngredient = RegisterEntry(
                 section: SectionRecipesAdvanced,
                 key: nameof(MaxEggsAsSingleIngredient),
                 defaultValue: 1,
@@ -559,8 +511,7 @@ namespace SubnauticaRandomiser.Configuration
                              + "bred from them are affected.",
                 acceptableValues: new AcceptableValueRange<int>(1, 10)
             );
-            PrimaryIngredientValue = new ConfigEntryWrapper<double>(
-                configFile: ConfigFile,
+            PrimaryIngredientValue = RegisterEntry(
                 section: SectionRecipesAdvanced,
                 key: nameof(PrimaryIngredientValue),
                 defaultValue: 0.45,
@@ -574,8 +525,7 @@ namespace SubnauticaRandomiser.Configuration
                              + "Set to 0.0 to disable this behaviour.",
                 acceptableValues: new AcceptableValueRange<double>(0.0, 1.0)
             );
-            RecipeValueVariance = new ConfigEntryWrapper<double>(
-                configFile: ConfigFile,
+            RecipeValueVariance = RegisterEntry(
                 section: SectionRecipesAdvanced,
                 key: nameof(RecipeValueVariance),
                 defaultValue: 0.2,
@@ -590,15 +540,12 @@ namespace SubnauticaRandomiser.Configuration
                              + "values of this setting thus lead to a much more random experience.",
                 acceptableValues: new AcceptableValueRange<double>(0.0, 1.0)
             );
-
-            RegisterControllingOptions();
-            UpdateOptionParentCounts();
         }
 
         /// <summary>
         /// Set up all options that can toggle the display of other options in the mod menu.
         /// </summary>
-        private void RegisterControllingOptions()
+        protected override void RegisterControllingOptions()
         {
             EnableAlternateStartModule.WithConditionalOptions(true, SectionAlternateStart);
             EnableFragmentModule.WithConditionalOptions(true, SectionFragments);
@@ -606,71 +553,89 @@ namespace SubnauticaRandomiser.Configuration
             RecipeMode.WithConditionalOptions(RecipeDifficultyMode.Balanced, RecipeValueMult);
         }
 
-        /// <summary>
-        /// Update all option labels based on how many controlling parents they have.
-        /// </summary>
-        private void UpdateOptionParentCounts()
+        protected override void RegisterModOptions(HootModOptions modOptions)
         {
-            Dictionary<string, int> parentCount = new Dictionary<string, int>();
-            List<ConfigEntryWrapperBase> entries = GetConfigEntries().ToList();
-            // First, count the exact number of parents and children.
-            foreach (var wrapper in entries)
+            modOptions.AddText("These options automatically apply when starting a new game. You cannot change the "
+                               + "settings of an ongoing save.");
+            modOptions.AddItem(Seed.ToTextInputModOption("Leave empty for random seed", TMP_InputField.ContentType.IntegerNumber));
+            
+            modOptions.AddSeparator();
+            modOptions.AddText("If you want to import a settings preset, paste it into the box below and press 'import'."
+                               + "\nPressing 'export' populates your clipboard with a preset of your current settings.");
+            _textInputDecorator = new TextInputDecorator("Enter options preset to import", null, TMP_InputField.ContentType.Standard);
+            modOptions.AddDecorator(_textInputDecorator);
+            modOptions.AddItem(ModButtonOption.Create("settingsImport", "Import Settings", OnImportButtonClicked));
+            modOptions.AddItem(ModButtonOption.Create("settingsClipboard", "Export to Clipboard", OnCopyToClipboardButtonClicked));
+            
+            modOptions.AddSeparator();
+            modOptions.AddItem(EnableAlternateStartModule.ToModToggleOption());
+            modOptions.AddItem(SpawnPoint.ToModChoiceOption());
+            modOptions.AddItem(AllowRadiatedStarts.ToModToggleOption());
+
+            modOptions.AddSeparator();
+            modOptions.AddItem(RandomiseDataboxes.ToModToggleOption());
+            modOptions.AddItem(RandomiseDoorCodes.ToModToggleOption());
+            modOptions.AddItem(RandomiseSupplyBoxes.ToModToggleOption());
+
+            modOptions.AddSeparator();
+            modOptions.AddItem(EnableFragmentModule.ToModToggleOption());
+            modOptions.AddItem(RandomiseFragments.ToModToggleOption());
+            modOptions.AddItem(RandomiseNumFragments.ToModToggleOption());
+            modOptions.AddItem(MaxFragmentsToUnlock.ToModSliderOption(1, 20));
+            modOptions.AddItem(MaxBiomesPerFragment.ToModSliderOption(3, 10));
+            modOptions.AddItem(RandomiseDuplicateScans.ToModToggleOption());
+
+            modOptions.AddSeparator();
+            modOptions.AddItem(EnableRecipeModule.ToModToggleOption());
+            modOptions.AddItem(RandomiseRecipes.ToModToggleOption());
+            modOptions.AddItem(RecipeMode.ToModChoiceOption());
+            modOptions.AddItem(RecipeValueMult.ToModSliderOption(0.1f, 3.0f, stepSize: 0.01f));
+            modOptions.AddItem(UseFish.ToModToggleOption());
+            modOptions.AddItem(UseSeeds.ToModToggleOption());
+            modOptions.AddItem(UseEggs.ToModToggleOption());
+            modOptions.AddItem(DiscoverEggs.ToModToggleOption());
+            modOptions.AddItem(EquipmentAsIngredients.ToModChoiceOption());
+            modOptions.AddItem(ToolsAsIngredients.ToModChoiceOption());
+            modOptions.AddItem(UpgradesAsIngredients.ToModChoiceOption());
+            modOptions.AddItem(VanillaUpgradeChains.ToModToggleOption());
+            modOptions.AddItem(BaseTheming.ToModToggleOption());
+            modOptions.AddItem(DistributionWeighting.ToModChoiceOption());
+            modOptions.AddItem(MaxNumberPerIngredient.ToModSliderOption(1, 10));
+            modOptions.AddItem(MaxIngredientsPerRecipe.ToModSliderOption(1, 10));
+            modOptions.AddItem(MaxInventorySizePerRecipe.ToModSliderOption(4, 40));
+        }
+
+        private void OnImportButtonClicked(ButtonClickedEventArgs args)
+        {
+            string json = _textInputDecorator.GetContent();
+            if (string.IsNullOrEmpty(json))
             {
-                foreach (var child in (wrapper.ControlledOptionIds ?? Enumerable.Empty<string>()))
-                {
-                    parentCount[child] = parentCount.GetOrDefault(child, 0) + 1;
-                }
+                Initialiser._Log.InGameMessage("Cannot import settings from an empty box.");
+                return;
             }
             
-            // Second, relay this information to each child.
-            foreach (var wrapper in entries)
+            try
             {
-                wrapper.NumControllingParents = parentCount.GetOrDefault(wrapper.GetId(), 0);
+                FromJson(json);
+                ModOptions.Validate();
             }
-        }
-
-        private IEnumerable<ConfigEntryWrapperBase> GetConfigEntries()
-        {
-            foreach (var field in AccessTools.GetDeclaredFields(this.GetType()))
+            catch (Exception ex)
             {
-                if (!(field.GetValue(this) is ConfigEntryWrapperBase wrapper))
-                    continue;
-                yield return wrapper;
+                Initialiser._Log.InGameMessage("Failed to import settings! Ensure the import string is valid and not "
+                                               + "missing any pieces."
+                                               + $"\nError: {ex.Message}", true);
+                Initialiser._Log.Error(ex.StackTrace);
+                return;
             }
+
+            Initialiser._Log.InGameMessage("Imported settings.");
         }
 
-        /// <summary>
-        /// Get a config entry by its id.
-        /// </summary>
-        /// <exception cref="ConfigFieldException">Thrown if the id does not correspond to a config entry.</exception>
-        public ConfigEntryWrapperBase GetEntryById(string id)
+        private void OnCopyToClipboardButtonClicked(ButtonClickedEventArgs args)
         {
-            // With the specific way config entries are set up, taking everything past the underscore should
-            // result in the name of the variable holding the entry.
-            string fieldName = id.Substring(id.IndexOf('_') + 1);
-            var entry = Traverse.Create(this).Field(fieldName).GetValue<ConfigEntryWrapperBase>();
-            if (entry is null)
-                throw new ConfigFieldException($"Invalid config entry id: {id}");
-
-            return entry;
-        }
-
-        /// <summary>
-        /// Get all config entries of the specified section.
-        /// </summary>
-        public IEnumerable<ConfigEntryWrapperBase> GetSectionEntries(string section)
-        {
-            return GetConfigEntries().Where(wrapper => wrapper.GetSection().Equals(section));
-        }
-        
-        public void Reload()
-        {
-            ConfigFile.Reload();
-        }
-        
-        public void Save()
-        {
-            ConfigFile.Save();
+            // It is surprising how easy modifying the clipboard is.
+            GUIUtility.systemCopyBuffer = ToJson();
+            Initialiser._Log.InGameMessage("Copied to clipboard!");
         }
     }
 }

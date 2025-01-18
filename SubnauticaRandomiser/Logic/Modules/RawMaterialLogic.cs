@@ -1,11 +1,16 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using HarmonyLib;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Patches;
+using SubnauticaRandomiser.Serialization;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Modules
 {
     /// <summary>
     /// Rudimentary module to handle raw materials like eggs in the logic.
@@ -23,23 +28,33 @@ namespace SubnauticaRandomiser.Logic
 
             _coreLogic.RegisterEntityHandler(EntityType.RawMaterial, this);
         }
+        
+        public IEnumerable<Task> LoadFiles()
+        {
+            return Enumerable.Empty<Task>();
+        }
 
-        public void ApplySerializedChanges(EntitySerializer serializer) { }
+        public BaseModuleSaveData SetupSaveData()
+        {
+            return null;
+        }
 
-        public void RandomiseOutOfLoop(EntitySerializer serializer) { }
+        public void ApplySerializedChanges(SaveData saveData) { }
+        
+        public void UndoSerializedChanges(SaveData saveData) { }
 
-        public bool RandomiseEntity(ref LogicEntity entity)
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData) { }
+
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             // Simply add this into the logic if prerequisites and depth check out.
             return entity.CheckReady(_coreLogic, _manager.ReachableDepth)
                    && entity.AccessibleDepth <= _manager.ReachableDepth;
         }
 
-        public void SetupHarmonyPatches(Harmony harmony)
+        public void SetupHarmonyPatches(Harmony harmony, SaveData saveData)
         {
-            // This one is an exception and *can* rely on config values because the patch only has to be applied once
-            // on game start, and the saved data will carry over from then on.
-            if (CoreLogic._Serializer.DiscoverEggs)
+            if (saveData.TryGetModuleData(out RecipeSaveData recipeData) && recipeData.DiscoverEggs)
                 harmony.PatchAll(typeof(EggPatcher));
         }
     }

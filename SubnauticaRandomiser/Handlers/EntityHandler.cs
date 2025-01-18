@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HootLib.Interfaces;
 using JetBrains.Annotations;
-using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
@@ -20,11 +20,11 @@ namespace SubnauticaRandomiser.Handlers
         private readonly HashSet<LogicEntity> _inLogic;
         private readonly ILogHandler _log;
 
-        public EntityHandler(ILogHandler logger)
+        public EntityHandler()
         {
             // Use a custom comparer to make that hash work properly for these otherwise mutable entities.
             _inLogic = new HashSet<LogicEntity>(new LogicEntityEqualityComparer());
-            _log = logger;
+            _log = PrefixLogHandler.Get("[Entity]");
         }
 
         public event EventHandler<EntityEventArgs> EntityEnteredLogic;
@@ -289,13 +289,12 @@ namespace SubnauticaRandomiser.Handlers
         {
             _allEntities = await CSVReader.ParseDataFileAsync(fileName, CSVReader.ParseRecipeLine);
             AddBaseBuilderPrerequisite();
-            UpdateEntityValues(Initialiser._Config.RecipeValueMult.Value);
         }
 
         /// <summary>
         /// Multiply all entities' value by a multiplier.
         /// </summary>
-        private void UpdateEntityValues(float multiplier)
+        public void UpdateEntityValues(float multiplier)
         {
             _allEntities.ForEach(entity => entity.Value = (int)(entity.Value * multiplier));
         }

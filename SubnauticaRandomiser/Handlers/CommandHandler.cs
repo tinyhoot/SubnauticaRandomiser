@@ -14,6 +14,7 @@ namespace SubnauticaRandomiser.Handlers
         {
 #if DEBUG
             DevConsole.RegisterConsoleCommand(this, "dumpBiomes");
+            DevConsole.RegisterConsoleCommand(this, "dumpDataboxes");
             DevConsole.RegisterConsoleCommand(this, "dumpKnownTech");
             DevConsole.RegisterConsoleCommand(this, "dumpEncyclopedia");
             DevConsole.RegisterConsoleCommand(this, "dumpPrefabs");
@@ -25,6 +26,11 @@ namespace SubnauticaRandomiser.Handlers
         {
             Initialiser._Log.InGameMessage("Dumping biomes");
             DataDumper.LogBiomes();
+        }
+
+        private void OnConsoleCommand_dumpDataboxes(NotificationCenter.Notification n)
+        {
+            StartCoroutine(DataDumper.LogDataboxes());
         }
 
         private void OnConsoleCommand_dumpEncyclopedia(NotificationCenter.Notification n)

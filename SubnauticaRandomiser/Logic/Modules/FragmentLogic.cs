@@ -6,17 +6,20 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
 using SubnauticaRandomiser.Objects.Exceptions;
 using SubnauticaRandomiser.Patches;
+using SubnauticaRandomiser.Serialization;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using static LootDistributionData;
-using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Modules
 {
     /// <summary>
     /// Handles everything related to randomising fragments.
@@ -28,8 +31,7 @@ namespace SubnauticaRandomiser.Logic
         private ProgressionManager _manager;
         private Config _config;
         private ILogHandler _log;
-        private EntitySerializer _serializer => CoreLogic._Serializer;
-        private IRandomHandler _random;
+        private Dictionary<string, BiomeDataCache> _vanillaData;
         
         private static Dictionary<TechType, List<string>> _classIdDatabase;
         private List<Biome> _allBiomes;
@@ -75,8 +77,8 @@ namespace SubnauticaRandomiser.Logic
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
             _config = _coreLogic._Config;
-            _log = _coreLogic._Log;
-            _random = _coreLogic.Random;
+            _log = PrefixLogHandler.Get("[F]");
+            _vanillaData = new Dictionary<string, BiomeDataCache>();
 
             // Register events.
             _manager.SetupPriority += OnSetupPriorityEntities;
@@ -92,47 +94,104 @@ namespace SubnauticaRandomiser.Logic
                 // Reset all existing fragment spawns.
                 Init();
             }
-            
-            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
         }
         
+        public IEnumerable<Task> LoadFiles()
+        {
+            return new[] { ParseDataFileAsync() };
+        }
+
+        public BaseModuleSaveData SetupSaveData()
+        {
+            return new FragmentSaveData
+            {
+                MaxMaterialYield = _config.MaxDuplicateScanYield.Value
+            };
+        }
+
         /// <summary>
         /// Re-apply spawnList from a saved game. This will fail to catch all existing fragment spawns if called in a
         /// previously randomised game.
         /// </summary>
-        public void ApplySerializedChanges(EntitySerializer serializer)
+        public void ApplySerializedChanges(SaveData saveData)
         {
-            if (serializer.SpawnDataDict?.Count > 0)
+            FragmentSaveData fragmentSave = saveData.GetModuleData<FragmentSaveData>();
+            if (fragmentSave.SpawnDataDict?.Count > 0)
             {
                 Init();
-                foreach (TechType key in serializer.SpawnDataDict.Keys)
+                foreach (TechType key in fragmentSave.SpawnDataDict.Keys)
                 {
-                    foreach (SpawnData spawnData in serializer.SpawnDataDict[key])
+                    foreach (SpawnData spawnData in fragmentSave.SpawnDataDict[key])
                     {
                         LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, spawnData.GetBaseBiomeData());
                     }
                 }
             }
 
-            if (serializer.NumFragmentsToUnlock?.Count > 0)
+            if (fragmentSave.NumFragmentsToUnlock?.Count > 0)
             {
-                foreach (TechType key in serializer.NumFragmentsToUnlock.Keys)
+                foreach (TechType key in fragmentSave.NumFragmentsToUnlock.Keys)
                 {
-                    PDAHandler.EditFragmentsToScan(key, serializer.NumFragmentsToUnlock[key]);
+                    PDAHandler.EditFragmentsToScan(key, fragmentSave.NumFragmentsToUnlock[key]);
+                }
+            }
+        }
+        
+        public void UndoSerializedChanges(SaveData saveData)
+        {
+            _log.Debug("Undoing fragment changes.");
+            
+            FragmentSaveData fragmentSave = saveData.GetModuleData<FragmentSaveData>();
+            if (fragmentSave.SpawnDataDict?.Count > 0)
+            {
+                // First, delete all the new spawn chances.
+                foreach (TechType key in fragmentSave.SpawnDataDict.Keys)
+                {
+                    foreach (SpawnData spawnData in fragmentSave.SpawnDataDict[key])
+                    {
+                        foreach (RandomiserBiomeData biomeData in spawnData.BiomeDataList)
+                        {
+                            LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, biomeData.Biome, 0f, 0);
+                        }
+                    }
+                }
+                
+                // Then, overwrite the clean slate with the cached vanilla data.
+                foreach ((string key, BiomeDataCache cache) in _vanillaData.Select(kvpair => (kvpair.Key, kvpair.Value)))
+                {
+                    LootDistributionHandler.EditLootDistributionData(key, cache.biome, cache.probability, cache.count);
+                }
+            }
+            
+            if (fragmentSave.NumFragmentsToUnlock?.Count > 0)
+            {
+                // For some reason the game keeps two copies of PDAData active, one of which is never modified.
+                // Grab the vanilla game state from the unmodified copy.
+                var vanillaScans = new Dictionary<TechType, int>();
+                foreach (var entry in Player.main.pdaData.scanner)
+                {
+                    vanillaScans[entry.key] = entry.totalFragments;
+                }
+                // Send the original numbers to Nautilus.
+                foreach (var key in fragmentSave.NumFragmentsToUnlock.Keys)
+                {
+                    PDAHandler.EditFragmentsToScan(key, vanillaScans[key]);
                 }
             }
         }
 
-        public void RandomiseOutOfLoop(EntitySerializer serializer)
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
         {
+            FragmentSaveData fragmentSaveData = saveData.GetModuleData<FragmentSaveData>();
+            
             if (_config.RandomiseNumFragments.Value)
-                RandomiseNumFragments(_coreLogic.EntityHandler.GetAllFragments());
+                RandomiseNumFragments(rng, _coreLogic.EntityHandler.GetAllFragments(), fragmentSaveData);
             // Randomise duplicate scan rewards.
             if (_config.RandomiseDuplicateScans.Value)
-                CreateDuplicateScanYieldDict();
+                fragmentSaveData.FragmentMaterialYield = CreateDuplicateScanYieldDict(rng);
         }
 
-        public bool RandomiseEntity(ref LogicEntity entity)
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             if (!_classIdDatabase.TryGetValue(entity.TechType, out List<string> idList))
                 throw new ArgumentException($"Failed to find fragment '{entity}' in classId database!");
@@ -140,24 +199,24 @@ namespace SubnauticaRandomiser.Logic
             // Check whether the fragment fulfills its prerequisites.
             if (!entity.IsPriority && entity.AccessibleDepth > _manager.ReachableDepth)
             {
-                _log.Debug($"[F] --- Fragment [{entity}] did not fulfill requirements, skipping.");
+                _log.Debug($"--- Fragment [{entity}] did not fulfill requirements, skipping.");
                 return false;
             }
             
-            _log.Debug($"[F] Randomising fragment {entity} for depth {_manager.ReachableDepth}");
+            _log.Debug($"Randomising fragment {entity} for depth {_manager.ReachableDepth}");
             List<SpawnData> spawnList = new List<SpawnData>();
 
             // Determine how many different biomes the fragment should spawn in.
-            int biomeCount = _random.Next(3, _config.MaxBiomesPerFragment.Value + 1);
+            int biomeCount = rng.Next(3, _config.MaxBiomesPerFragment.Value + 1);
 
             for (int i = 0; i < biomeCount; i++)
             {
                 // Choose a random biome.
-                Biome biome = ChooseBiome(spawnList, _manager.ReachableDepth);
+                Biome biome = ChooseBiome(rng, spawnList, _manager.ReachableDepth);
                 
                 // Calculate spawn rate.
-                float spawnRate = CalcFragmentSpawnRate(biome);
-                float[] splitRates = SplitFragmentSpawnRate(spawnRate, idList.Count);
+                float spawnRate = CalcFragmentSpawnRate(rng, biome);
+                float[] splitRates = SplitFragmentSpawnRate(rng, spawnRate, idList.Count);
 
                 // Split the spawn rate among each variation (prefab) of the fragment.
                 for (int j = 0; j < idList.Count; j++)
@@ -176,16 +235,17 @@ namespace SubnauticaRandomiser.Logic
                     spawnList.Add(spawnData);
                 }
 
-                _log.Debug($"[F] + Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
+                _log.Debug($"+ Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
             }
-
-            ApplyRandomisedFragment(entity, spawnList);
+            
+            entity.SpawnData = spawnList;
+            Bootstrap.SaveData.GetModuleData<FragmentSaveData>().AddSpawnData(entity.TechType, spawnList);
             return true;
         }
 
-        public void SetupHarmonyPatches(Harmony harmony)
+        public void SetupHarmonyPatches(Harmony harmony, SaveData saveData)
         {
-            if (CoreLogic._Serializer?.FragmentMaterialYield?.Count > 0)
+            if (saveData.GetModuleData<FragmentSaveData>().FragmentMaterialYield?.Count > 0)
                 harmony.PatchAll(typeof(FragmentPatcher));
         }
 
@@ -301,12 +361,11 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Calculate the spawn rate for an entity in the given biome.
         /// </summary>
-        /// <param name="biome">The biome.</param>
         /// <returns>The spawn rate.</returns>
-        private float CalcFragmentSpawnRate(Biome biome)
+        private float CalcFragmentSpawnRate(IRandomHandler rng, Biome biome)
         {
             // Choose a percentage of the biome's combined original spawn rates.
-            float percentage = _config.FragmentSpawnChanceMult.Value + (float)_random.NextDouble();
+            float percentage = _config.FragmentSpawnChanceMult.Value + (float)rng.NextDouble();
             // If the number of scans needed per fragment is very high, increase the spawn rate proportionally.
             int maxFragments = (int)_config.MaxFragmentsToUnlock.Entry.DefaultValue;
             if (_config.MaxFragmentsToUnlock.Value > maxFragments)
@@ -318,24 +377,27 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Change the number of fragments needed to unlock the blueprint to the given entity.
         /// </summary>
+        /// <param name="rng">The random number generator of this seed.</param>
         /// <param name="entity">The entity that is unlocked on scan completion.</param>
-        private void ChangeNumFragmentsToUnlock(LogicEntity entity)
+        /// <param name="saveData">The save data to save the result to.</param>
+        private void ChangeNumFragmentsToUnlock(IRandomHandler rng, LogicEntity entity, FragmentSaveData saveData)
         {
             if (!_config.RandomiseNumFragments.Value)
                 return;
             
-            int numFragments = _random.Next(_config.MinFragmentsToUnlock.Value, _config.MaxFragmentsToUnlock.Value + 1);
-            _log.Debug($"[F] New number of fragments required for {entity}: {numFragments}");
-            _serializer.AddFragmentUnlockNum(entity.TechType, numFragments);
+            int numFragments = rng.Next(_config.MinFragmentsToUnlock.Value, _config.MaxFragmentsToUnlock.Value + 1);
+            _log.Debug($"New number of fragments required for {entity}: {numFragments}");
+            saveData.AddFragmentUnlockNum(entity.TechType, numFragments);
         }
 
         /// <summary>
         /// Choose a suitable biome which is also accessible at this depth, and has not been chosen before.
         /// </summary>
+        /// <param name="rng">The random number generator of this seed.</param>
         /// <param name="previousChoices">The list of SpawnData resulting from previously chosen biomes.</param>
         /// <param name="depth">The maximum depth to consider.</param>
         /// <returns>The chosen biome.</returns>
-        private Biome ChooseBiome(List<SpawnData> previousChoices, int depth)
+        private Biome ChooseBiome(IRandomHandler rng, List<SpawnData> previousChoices, int depth)
         {
             List<Biome> choices = _availableBiomes.FindAll(bio =>
                 bio.AverageDepth <= depth && !previousChoices.Any(sd => sd.ContainsBiome(bio.Variant)));
@@ -343,13 +405,13 @@ namespace SubnauticaRandomiser.Logic
             // In case no good biome is available, ignore overpopulation restrictions and choose any.
             if (choices.Count == 0)
             {
-                _log.Debug("[F] ! No valid biome choices, using fallback");
+                _log.Debug("! No valid biome choices, using fallback");
                 choices = _allBiomes.FindAll(x => x.AverageDepth <= depth);
                 if (choices.Count == 0)
                     throw new RandomisationException("No valid biome options for depth " + depth);
             }
 
-            Biome biome = _random.Choice(choices);
+            Biome biome = rng.Choice(choices);
             biome.Used++;
 
             // Remove the biome from the pool if it gets too populated.
@@ -362,7 +424,7 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Set up the dictionary of possible rewards for scanning an already unlocked fragment.
         /// </summary>
-        private void CreateDuplicateScanYieldDict()
+        private LootTable<TechType> CreateDuplicateScanYieldDict(IRandomHandler rng)
         {
             LootTable<TechType> loot = new LootTable<TechType>();
             var materials = _coreLogic.EntityHandler.GetAllRawMaterials(50);
@@ -372,7 +434,7 @@ namespace SubnauticaRandomiser.Logic
             foreach (LogicEntity entity in materials)
             {
                 // Two random calls will tend to produce less extreme and more evenly distributed values.
-                double weight = _random.NextDouble() + _random.NextDouble();
+                double weight = rng.NextDouble() + rng.NextDouble();
                 loot.Add(entity.TechType, weight);
             }
             
@@ -383,16 +445,16 @@ namespace SubnauticaRandomiser.Logic
             loot.Add(TechType.ExosuitJetUpgradeModule, rareWeight);
             loot.Add(TechType.PrecursorIonCrystal, rareWeight * 2);
 
-            _serializer.FragmentMaterialYield = loot;
+            return loot;
         }
         
         /// <summary>
-        /// Force Subnautica and SMLHelper to index and cache the classIds, setup the databases, and prepare a blank
+        /// Force Subnautica and Nautilus to index and cache the classIds, setup the databases, and prepare a blank
         /// slate by removing all existing fragment spawns from the game.
         /// </summary>
-        private static void Init()
+        private void Init()
         {
-            // This forces SMLHelper (and the game) to cache the classIds.
+            // This forces Nautilus (and the game) to cache the classIds.
             // Without this, anything below will fail.
             _ = CraftData.GetClassIdForTechType(TechType.Titanium);
 
@@ -412,7 +474,7 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Assemble a dictionary of all relevant prefabs with their unique classId identifier.
         /// </summary>
-        private static void PrepareClassIdDatabase()
+        private void PrepareClassIdDatabase()
         {
             _classIdDatabase = new Dictionary<TechType, List<string>>();
 
@@ -441,12 +503,14 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Change the number of scans required to unlock the blueprint for all fragments.
         /// </summary>
+        /// <param name="rng">The random number generator of this seed.</param>
         /// <param name="fragments">The list of fragments to change scan numbers for.</param>
-        private void RandomiseNumFragments(List<LogicEntity> fragments)
+        /// <param name="saveData">The save data to save the changes to.</param>
+        private void RandomiseNumFragments(IRandomHandler rng, List<LogicEntity> fragments, FragmentSaveData saveData)
         {
             foreach (LogicEntity entity in fragments)
             {
-                ChangeNumFragmentsToUnlock(entity);
+                ChangeNumFragmentsToUnlock(rng, entity, saveData);
             }
         }
         
@@ -454,7 +518,7 @@ namespace SubnauticaRandomiser.Logic
         /// Go through all the BiomeData in the game and reset any fragment spawn rates to 0.0f, effectively "deleting"
         /// them from the game until the randomiser has decided on a new distribution.
         /// </summary>
-        private static void ResetFragmentSpawns()
+        private void ResetFragmentSpawns()
         {
             //_log.Debug("---Resetting vanilla fragment spawn rates---");
 
@@ -476,6 +540,8 @@ namespace SubnauticaRandomiser.Logic
                     // Ensure the prefab is actually a fragment.
                     if (fragmentDatabase.ContainsKey(prefab.classId))
                     {
+                        // Save the vanilla spawn rates.
+                        _vanillaData[prefab.classId] = new BiomeDataCache(biome, prefab.probability, prefab.count);
                         // Whatever spawn chance there was before, set it to 0.
                         LootDistributionHandler.EditLootDistributionData(prefab.classId, biome, 0f, 0);
                     }
@@ -488,7 +554,7 @@ namespace SubnauticaRandomiser.Logic
         /// Reverse the classId dictionary to allow for ID to TechType matching.
         /// </summary>
         /// <returns>The inverted dictionary.</returns>
-        private static Dictionary<string, TechType> ReverseClassIdDatabase()
+        private Dictionary<string, TechType> ReverseClassIdDatabase()
         {
             Dictionary<string, TechType> database = new Dictionary<string, TechType>();
 
@@ -511,11 +577,12 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Split a fragment's spawn rate into a number of randomly sized parts.
         /// </summary>
+        /// <param name="rng">The random number generator of this seed.</param>
         /// <param name="spawnRate">The spawn rate.</param>
         /// <param name="parts">The number of parts to split into.</param>
         /// <returns>An array containing each part's spawn rate.</returns>
         /// <exception cref="ArgumentException">Raised if parts is smaller than 1.</exception>
-        private float[] SplitFragmentSpawnRate(float spawnRate, int parts)
+        private float[] SplitFragmentSpawnRate(IRandomHandler rng, float spawnRate, int parts)
         {
             if (parts < 1)
                 throw new ArgumentException("Cannot split spawn rate into less than one pieces!");
@@ -526,7 +593,7 @@ namespace SubnauticaRandomiser.Logic
             float[] result = new float[parts];
             for (int i = 0; i < result.Length; i++)
             {
-                result[i] = (float)_random.NextDouble();
+                result[i] = (float)rng.NextDouble();
             }
 
             // Adjust the values so they sum up to spawnRate.
@@ -539,15 +606,18 @@ namespace SubnauticaRandomiser.Logic
             return result;
         }
 
-        /// <summary>
-        /// Add modified SpawnData to the game and any place it needs to go to be stored for later use.
-        /// </summary>
-        /// <param name="entity">The entity to modify spawn rates for.</param>
-        /// <param name="spawnList">The list of modified SpawnData to use.</param>
-        private void ApplyRandomisedFragment(LogicEntity entity, List<SpawnData> spawnList)
+        private class BiomeDataCache
         {
-            entity.SpawnData = spawnList;
-            _serializer.AddSpawnData(entity.TechType, spawnList);
+            public BiomeType biome;
+            public float probability;
+            public int count;
+
+            public BiomeDataCache(BiomeType biome, float probability, int count)
+            {
+                this.biome = biome;
+                this.probability = probability;
+                this.count = count;
+            }
         }
     }
 }

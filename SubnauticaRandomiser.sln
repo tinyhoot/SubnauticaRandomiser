@@ -7,13 +7,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		DevNotes.txt = DevNotes.txt
 		ReadMe-Documentation.txt = ReadMe-Documentation.txt
-		DataFiles\biomeSlots.csv = DataFiles\biomeSlots.csv
-		DataFiles\alternateStarts.csv = DataFiles\alternateStarts.csv
-		DataFiles\recipeInformation.csv = DataFiles\recipeInformation.csv
-		DataFiles\wreckInformation.csv = DataFiles\wreckInformation.csv
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{04F771FE-CA90-4C9D-B633-6366DE6855E5}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HootLib", "HootLib-Subnautica\HootLib\HootLib.shproj", "{A1EF0757-EDA8-41DC-89D4-C41D81427D00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

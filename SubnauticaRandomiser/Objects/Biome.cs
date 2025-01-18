@@ -1,5 +1,4 @@
-﻿using System;
-using SubnauticaRandomiser.Handlers;
+﻿using HootLib;
 using SubnauticaRandomiser.Objects.Enums;
 
 namespace SubnauticaRandomiser.Objects
@@ -25,7 +24,7 @@ namespace SubnauticaRandomiser.Objects
         {
             Name = name;
             Region = biomeRegion;
-            Variant = EnumHandler.Parse<BiomeType>(name);
+            Variant = Hootils.ParseEnum<BiomeType>(name);
 
             CreatureSlots = creatureSlots;
             MediumSlots = mediumSlots;

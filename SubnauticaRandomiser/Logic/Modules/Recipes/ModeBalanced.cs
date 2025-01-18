@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using UnityEngine;
 
-namespace SubnauticaRandomiser.Logic.Recipes
+namespace SubnauticaRandomiser.Logic.Modules.Recipes
 {
     /// <summary>
     /// Aims to provide a balanced, curated, sane approach to recipe randomisation. Has many checks and balances in
@@ -16,7 +17,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
     {
         private HashSet<LogicEntity> _validIngredients => _recipeLogic.ValidIngredients;
 
-        public ModeBalanced(CoreLogic coreLogic, RecipeLogic recipeLogic) : base(coreLogic, recipeLogic) { }
+        public ModeBalanced(CoreLogic coreLogic, RecipeLogic recipeLogic, IRandomHandler rng) : base(coreLogic, recipeLogic, rng) { }
         
         protected override IEnumerable<(LogicEntity, int)> YieldRandomIngredients(LogicEntity recipe,
             ReadOnlyCollection<RandomiserIngredient> ingredients, Func<TechType, bool> isDuplicate)
@@ -38,7 +39,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 LogicEntity primaryIngredient = ChoosePrimaryIngredient(recipe);
                 yield return (primaryIngredient, 1);
                 currentValue += primaryIngredient.Value;
-                _log.Debug("[R] > Adding primary ingredient " + primaryIngredient);
+                _log.Debug("> Adding primary ingredient " + primaryIngredient);
             }
 
             // Now fill up with random materials until the value threshold is more or less met, as defined by fuzziness.
@@ -52,7 +53,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 currentValue += ingredient.Value * number;
             }
 
-            _log.Debug($"[R] > Recipe is now valued {currentValue} out of {recipe.Value}");
+            _log.Debug($"> Recipe is now valued {currentValue} out of {recipe.Value}");
             recipe.Value = currentValue;
         }
 
@@ -62,7 +63,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
                 return _baseTheme.GetBaseTheme().TechType;
 
             var options = _entityHandler.GetAllRawMaterials();
-            return _random.Choice(options).TechType;
+            return _rng.Choice(options).TechType;
         }
 
         /// <summary>
@@ -82,7 +83,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (pIngredientCandidates.Count == 0)
                 pIngredientCandidates.Add(GetRandom(_validIngredients));
 
-            LogicEntity primaryIngredient = _random.Choice(pIngredientCandidates);
+            LogicEntity primaryIngredient = _rng.Choice(pIngredientCandidates);
 
             return primaryIngredient;
         }
@@ -100,7 +101,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             // What's the maximum number of this ingredient the recipe can still sustain?
             int max = FindMaximum(ingredient, entity.Value, currentValue);
             // Figure out how many to actually use.
-            int number = _random.Next(1, max + 1, _distribution);
+            int number = _rng.Next(1, max + 1, _distribution);
 
             return (ingredient, number);
         }
@@ -119,7 +120,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
 
         protected override int GetBaseThemeIngredientNumber(LogicEntity baseTheme)
         {
-            return _random.Next(1, (int)Mathf.Ceil(_config.MaxNumberPerIngredient.Value / 2f), _distribution);
+            return _rng.Next(1, (int)Mathf.Ceil(_config.MaxNumberPerIngredient.Value / 2f), _distribution);
         }
         
         /// <summary>
@@ -134,7 +135,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             double range = 0.1;
 
             List<LogicEntity> betterOptions = new List<LogicEntity>();
-            _log.Debug("[R] Replacing undesirable ingredient " + undesirable);
+            _log.Debug("Replacing undesirable ingredient " + undesirable);
 
             // Progressively increase the search radius if no replacement is found,
             // but stop before it gets out of hand.
@@ -155,7 +156,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             if (betterOptions.Count == 0)
                 betterOptions.AddRange(_validIngredients.Where(x => x.Category.Equals(TechTypeCategory.RawMaterials)));
 
-            return _random.Choice(betterOptions);
+            return _rng.Choice(betterOptions);
         }
     }
 }

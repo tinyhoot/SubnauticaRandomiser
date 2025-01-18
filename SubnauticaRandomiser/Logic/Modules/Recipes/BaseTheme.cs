@@ -1,11 +1,12 @@
 using System;
+using HootLib.Interfaces;
 using JetBrains.Annotations;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 
-namespace SubnauticaRandomiser.Logic.Recipes
+namespace SubnauticaRandomiser.Logic.Modules.Recipes
 {
     /// <summary>
     /// Responsible for choosing and providing a primary ingredient to base all base pieces on.
@@ -49,7 +50,7 @@ namespace SubnauticaRandomiser.Logic.Recipes
             }
 
             _baseTheme = _random.Choice(options);
-            _log.Debug($"[R] Chose {_baseTheme} as base theme.");
+            _log.Debug($"Chose {_baseTheme} as base theme.");
             return _baseTheme;
         }
 

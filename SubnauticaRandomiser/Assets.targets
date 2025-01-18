@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<!-- Define which extra files to copy during testing / in the release zip. Copy this file to your own project directory and edit to your liking. -->
+    <ItemGroup>
+        <Assets Include="Assets\*" />
+    </ItemGroup>
+</Project>

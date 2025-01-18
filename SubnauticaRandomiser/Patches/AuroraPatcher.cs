@@ -1,12 +1,16 @@
 using HarmonyLib;
+using HootLib.Interfaces;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
+using SubnauticaRandomiser.Serialization.Modules;
 
 namespace SubnauticaRandomiser.Patches
 {
     [HarmonyPatch]
     internal class AuroraPatcher_KeyCodes
     {
+        private static ILogHandler _log => PrefixLogHandler.Get("[Aurora]");
+        
         [HarmonyPostfix]
         [HarmonyPatch(typeof(KeypadDoorConsole), nameof(KeypadDoorConsole.Start))]
         public static void ChangeDoorCodes(ref KeypadDoorConsole __instance)
@@ -15,16 +19,17 @@ namespace SubnauticaRandomiser.Patches
             // The Lab and Cargo room have multiple keypads organised under the same parent gameObject. Account for
             // that structure here.
             id ??= __instance.transform.parent.GetComponent<PrefabIdentifier>();
-            Initialiser._Log.Debug($"Found door with code {__instance.accessCode} and identifier {id}");
-            // Initialiser._Log.Debug($"Code: {__instance.accessCode} key: {id.prefabKey}, id: {id.id}, "
+            _log.Debug($"Found door with code {__instance.accessCode} and identifier {id}");
+            // _log.Debug($"Code: {__instance.accessCode} key: {id.prefabKey}, id: {id.id}, "
             //                        + $"classId: {id.classId}");
-            if (!CoreLogic._Serializer.DoorKeyCodes.ContainsKey(id.classId))
+            DoorSaveData saveData = Bootstrap.SaveData.GetModuleData<DoorSaveData>();
+            if (!saveData.DoorKeyCodes.ContainsKey(id.classId))
             {
-                Initialiser._Log.Warn($"Found keypad for door which is not in logic: {id}");
+                _log.Warn($"Found keypad for door which is not in logic: {id}");
                 return;
             }
 
-            __instance.accessCode = CoreLogic._Serializer.DoorKeyCodes[id.classId];
+            __instance.accessCode = saveData.DoorKeyCodes[id.classId];
         }
     }
 
@@ -39,7 +44,7 @@ namespace SubnauticaRandomiser.Patches
                 return;
 
             RandomHandler rand = new RandomHandler();
-            TechType content = CoreLogic._Serializer.SupplyBoxContents.Drop(rand);
+            TechType content = Bootstrap.SaveData.GetModuleData<SupplyBoxSaveData>().LootTable.Drop(rand);
             // It is not enough to change a techtype, the box must load and spawn the correct prefab for its contents.
             PrefabPlaceholdersGroup group = __instance.gameObject.EnsureComponent<PrefabPlaceholdersGroup>();
             group.prefabPlaceholders[0].prefabClassId = CraftData.GetClassIdForTechType(content);

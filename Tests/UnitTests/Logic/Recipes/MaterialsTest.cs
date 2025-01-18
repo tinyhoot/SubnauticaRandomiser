@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using SubnauticaRandomiser.Handlers;
-using SubnauticaRandomiser.Logic.Recipes;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using Tests.Mocks;

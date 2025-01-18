@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
+using HootLib;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Patches;
+using SubnauticaRandomiser.Serialization;
+using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
-using ILogHandler = SubnauticaRandomiser.Interfaces.ILogHandler;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser.Logic
+namespace SubnauticaRandomiser.Logic.Modules
 {
     /// <summary>
     /// Provides a random starting location for the lifepod.
@@ -23,7 +26,6 @@ namespace SubnauticaRandomiser.Logic
         private CoreLogic _coreLogic;
         private Config _config;
         private ILogHandler _log;
-        private IRandomHandler _random;
         
         private Dictionary<BiomeRegion, List<float[]>> _alternateStarts;
         private readonly Vector3 _radiationCentre = new Vector3(1038, -3, -163);
@@ -34,27 +36,35 @@ namespace SubnauticaRandomiser.Logic
         {
             _coreLogic = GetComponent<CoreLogic>();
             _config = _coreLogic._Config;
-            _log = _coreLogic._Log;
-            _random = _coreLogic.Random;
-
-            // Parse the list of valid alternate starts from a file.
-            _coreLogic.RegisterFileLoadTask(ParseDataFileAsync());
+            _log = PrefixLogHandler.Get("[AS]");
         }
-        
-        public void ApplySerializedChanges(EntitySerializer serializer) { }
 
-        public void RandomiseOutOfLoop(EntitySerializer serializer)
+        public IEnumerable<Task> LoadFiles()
         {
-            serializer.StartPoint = GetRandomStart(_config.SpawnPoint.Value);
+            return new[] { ParseDataFileAsync() };
         }
 
-        public bool RandomiseEntity(ref LogicEntity entity)
+        public BaseModuleSaveData SetupSaveData()
+        {
+            return new AlternateStartSaveData();
+        }
+
+        public void ApplySerializedChanges(SaveData saveData) { }
+        
+        public void UndoSerializedChanges(SaveData saveData) { }
+
+        public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
+        {
+            saveData.GetModuleData<AlternateStartSaveData>().StartPoint = GetRandomStart(rng, _config.SpawnPoint.Value);
+        }
+
+        public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             // This module does not handle any entity types in the main loop.
             throw new NotImplementedException();
         }
 
-        public void SetupHarmonyPatches(Harmony harmony)
+        public void SetupHarmonyPatches(Harmony harmony, SaveData _)
         {
             harmony.PatchAll(typeof(AlternateStart));
         }
@@ -63,16 +73,16 @@ namespace SubnauticaRandomiser.Logic
         /// Convert the config value to a usable biome.
         /// </summary>
         /// <returns>The biome.</returns>
-        private BiomeRegion GetBiome(string startBiome)
+        private BiomeRegion GetBiome(IRandomHandler rng, string startBiome)
         {
             switch (startBiome)
             {
                 case "Random":
                     // Only use starts where you can actually reach the ground.
-                    return _random.Choice(_alternateStarts.Keys.ToList()
+                    return rng.Choice(_alternateStarts.Keys.ToList()
                         .FindAll(biome => !biome.Equals(BiomeRegion.None) && biome.GetAccessibleDepth() <= 100));
                 case "Chaotic Random":
-                    return _random.Choice(_alternateStarts.Keys);
+                    return rng.Choice(_alternateStarts.Keys);
                 case "BulbZone":
                     return BiomeRegion.KooshZone;
                 case "Floating Island":
@@ -81,7 +91,7 @@ namespace SubnauticaRandomiser.Logic
                     return BiomeRegion.None;
             }
 
-            return EnumHandler.Parse<BiomeRegion>(startBiome);
+            return Hootils.ParseEnum<BiomeRegion>(startBiome);
         }
 
         /// <summary>
@@ -89,15 +99,15 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         /// <returns>The new spawn point.</returns>
         /// <exception cref="ArgumentException">Raised if the startBiome is invalid or not in the database.</exception>
-        public RandomiserVector GetRandomStart(string startBiome)
+        public RandomiserVector GetRandomStart(IRandomHandler rng, string startBiome)
         {
             if (startBiome.StartsWith("Vanilla"))
                 return RandomiserVector.ZERO;
             
-            BiomeRegion biome = GetBiome(startBiome);
+            BiomeRegion biome = GetBiome(rng, startBiome);
             if (!_alternateStarts.ContainsKey(biome))
             {
-                _log.Error("[AS] No information found on chosen starting biome " + biome);
+                _log.Error("No information found on chosen starting biome " + biome);
                 throw new ArgumentException($"Starting biome '{startBiome}' is invalid!");
             }
 
@@ -106,14 +116,14 @@ namespace SubnauticaRandomiser.Logic
             do
             {
                 // Choose one of the possible spawning boxes within the biome.
-                float[] box = _random.Choice(_alternateStarts[biome]);
+                float[] box = rng.Choice(_alternateStarts[biome]);
                 // Choose the specific spawn point within the box.
-                int x = _random.Next((int)box[0], (int)box[2] + 1);
-                int z = _random.Next((int)box[3], (int)box[1] + 1);
+                int x = rng.Next((int)box[0], (int)box[2] + 1);
+                int z = rng.Next((int)box[3], (int)box[1] + 1);
                 spawn = new Vector3(x, 0, z);
             } while (!IsValidStart(spawn));
 
-            _log.Debug("[AS] Chosen new lifepod spawnpoint at x:" + spawn.x + " y:0" + " z:" + spawn.z);
+            _log.Debug("Chosen new lifepod spawnpoint at x:" + spawn.x + " y:0" + " z:" + spawn.z);
             return new RandomiserVector(spawn);
         }
 
@@ -130,6 +140,9 @@ namespace SubnauticaRandomiser.Logic
             return spawn.DistanceSqrXZ(_radiationCentre) > Math.Pow(_radiationMaxRadius, 2);
         }
 
+        /// <summary>
+        /// Parse the list of valid start locations from a separate file.
+        /// </summary>
         private async Task ParseDataFileAsync()
         {
             _alternateStarts = await CSVReader.ParseAlternateStartAsync(Initialiser._AlternateStartFile);
