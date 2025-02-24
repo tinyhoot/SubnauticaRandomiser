@@ -131,8 +131,8 @@ namespace SubnauticaRandomiser.Objects
     [Serializable]
     public struct LootTableEntry<T>
     {
-        public readonly T Item;
-        public readonly double DropRate;
+        public T Item;
+        public double DropRate;
 
         public LootTableEntry(T item, double odds)
         {
