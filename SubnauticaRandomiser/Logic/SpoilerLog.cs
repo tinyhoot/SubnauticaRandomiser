@@ -46,13 +46,23 @@ namespace SubnauticaRandomiser.Logic
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
             _log = PrefixLogHandler.Get("[Spoiler]");
-            _spoilerDirectory = Path.Combine(Hootils.GetModDirectory(), _DirName);
+            _spoilerDirectory = GetSpoilerDirectory();
             PrepareStrings();
 
             // Register events.
             _coreLogic.MainLoopCompleted += OnMainLoopCompleted;
             _manager.DepthIncreased += OnDepthIncrease;
             _manager.HasProgressed += OnProgression;
+        }
+
+        /// <summary>
+        /// Get a unique directory for the spoiler logs to avoid accidentally overwriting previous ones.
+        /// </summary>
+        private string GetSpoilerDirectory()
+        {
+            // Create a subdirectory with the current date and time as its name.
+            string dateTime = DateTime.Now.ToString("yyyy-MM-dd---HH-mm-ss");
+            return Path.Combine(Hootils.GetModDirectory(), _DirName, dateTime);
         }
 
         /// <summary>
