@@ -14,14 +14,10 @@ namespace SubnauticaRandomiser.Objects
     [Serializable]
     internal class LootTable<T> : ICollection<LootTableEntry<T>>
     {
-        private readonly List<LootTableEntry<T>> _entries;
+        // This is not a dictionary because T isn't necessarily easily hashable, i.e. may not be suitable as a key.
+        private readonly List<LootTableEntry<T>> _entries = new List<LootTableEntry<T>>();
         public int Count => _entries.Count;
         public bool IsReadOnly => false;
-
-        public LootTable()
-        {
-            _entries = new List<LootTableEntry<T>>();
-        }
 
         public IEnumerator<LootTableEntry<T>> GetEnumerator()
         {
@@ -105,13 +101,17 @@ namespace SubnauticaRandomiser.Objects
         /// </summary>
         public bool Remove(T item)
         {
-            var entry = _entries.Find(entry => entry.Item.Equals(item));
-            return _entries.Remove(entry);
+            int idx = _entries.FindIndex(entry => entry.Item.Equals(item));
+            if (idx < 0)
+                return false;
+            
+            _entries.RemoveAt(idx);
+            return true;
         }
 
         public bool Remove(LootTableEntry<T> item)
         {
-            return _entries.Remove(item);
+            return Remove(item.Item);
         }
 
         /// <summary>
