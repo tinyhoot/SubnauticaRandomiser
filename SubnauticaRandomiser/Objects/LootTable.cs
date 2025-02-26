@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using SubnauticaRandomiser.Interfaces;
 
 namespace SubnauticaRandomiser.Objects
@@ -131,8 +132,8 @@ namespace SubnauticaRandomiser.Objects
     [Serializable]
     public struct LootTableEntry<T>
     {
-        public readonly T Item;
-        public readonly double DropRate;
+        [JsonProperty] public readonly T Item;
+        [JsonProperty] public readonly double DropRate;
 
         public LootTableEntry(T item, double odds)
         {
