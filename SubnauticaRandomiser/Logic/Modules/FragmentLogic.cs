@@ -225,7 +225,11 @@ namespace SubnauticaRandomiser.Logic.Modules
                 {
                     // Add to an existing entry if it already exists from a previous loop.
                     SpawnData spawnData = spawnList.Find(x => x.ClassId.Equals(idList[j]));
-                    spawnData ??= new SpawnData(idList[j]);
+                    if (spawnData is null)
+                    {
+                        spawnData = new SpawnData(idList[j]);
+                        spawnList.Add(spawnData);
+                    }
                     
                     RandomiserBiomeData data = new RandomiserBiomeData
                     {
@@ -234,7 +238,6 @@ namespace SubnauticaRandomiser.Logic.Modules
                         Probability = splitRates[j]
                     };
                     spawnData.AddBiomeData(data);
-                    spawnList.Add(spawnData);
                 }
 
                 _log.Debug($"+ Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");
