@@ -18,6 +18,19 @@ namespace SubnauticaRandomiser.Objects
         private readonly List<LootTableEntry<T>> _entries = new List<LootTableEntry<T>>();
         public int Count => _entries.Count;
         public bool IsReadOnly => false;
+        private double _totalWeights = -1.0;
+
+        public double TotalWeights
+        {
+            get
+            {
+                if (_totalWeights >= 0.0)
+                    return _totalWeights;
+                
+                _totalWeights = CalcTotalWeights();
+                return _totalWeights;
+            }
+        }
 
         public IEnumerator<LootTableEntry<T>> GetEnumerator()
         {
@@ -39,6 +52,7 @@ namespace SubnauticaRandomiser.Objects
             if (Contains(item))
                 return;
             _entries.Add(new LootTableEntry<T>(item, odds));
+            SetWeightsDirty();
         }
 
         /// <summary>
@@ -49,11 +63,13 @@ namespace SubnauticaRandomiser.Objects
             if (Contains(item))
                 return;
             _entries.Add(item);
+            SetWeightsDirty();
         }
 
         public void Clear()
         {
             _entries.Clear();
+            SetWeightsDirty();
         }
 
         public bool Contains(T item)
@@ -69,6 +85,7 @@ namespace SubnauticaRandomiser.Objects
         public void CopyTo(LootTableEntry<T>[] array, int arrayIndex)
         {
             _entries.CopyTo(array, arrayIndex);
+            SetWeightsDirty();
         }
 
         /// <summary>
@@ -81,8 +98,7 @@ namespace SubnauticaRandomiser.Objects
             if (_entries.Count == 0)
                 throw new IndexOutOfRangeException("Cannot drop from a table with no entries!");
             
-            double total = TotalWeights();
-            double chosenWeight = total * random.NextDouble();
+            double chosenWeight = TotalWeights * random.NextDouble();
             double currentWeight = 0;
             // Add up the weights of the entries until the random value is exceeded, and then choose the last one.
             foreach (var entry in _entries)
@@ -106,6 +122,7 @@ namespace SubnauticaRandomiser.Objects
                 return false;
             
             _entries.RemoveAt(idx);
+            SetWeightsDirty();
             return true;
         }
 
@@ -117,15 +134,23 @@ namespace SubnauticaRandomiser.Objects
         /// <summary>
         /// Calculates the total of all drop rates summed together.
         /// </summary>
-        public double TotalWeights()
+        private double CalcTotalWeights()
         {
             double total = 0;
             foreach (var entry in _entries)
             {
                 total += entry.DropRate;
             }
-
+            
             return total;
+        }
+
+        /// <summary>
+        /// Reset the calculated total weights.
+        /// </summary>
+        private void SetWeightsDirty()
+        {
+            _totalWeights = -1.0;
         }
     }
 

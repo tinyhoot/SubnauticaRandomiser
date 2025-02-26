@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using HarmonyLib;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
@@ -16,8 +15,11 @@ using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
+using UWE;
 using static LootDistributionData;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
+using Math = System.Math;
+using Task = System.Threading.Tasks.Task;
 
 namespace SubnauticaRandomiser.Logic.Modules
 {
@@ -439,7 +441,7 @@ namespace SubnauticaRandomiser.Logic.Modules
             }
             
             // Additionally, add some spicy rare rewards.
-            double rareWeight = Math.Max(loot.TotalWeights() * _config.RareDropChance.Value, 0.01);
+            double rareWeight = Math.Max(loot.TotalWeights * _config.RareDropChance.Value, 0.01);
             loot.Add(TechType.SeamothTorpedoModule, rareWeight);
             loot.Add(TechType.VehicleStorageModule, rareWeight);
             loot.Add(TechType.ExosuitJetUpgradeModule, rareWeight);
@@ -480,11 +482,11 @@ namespace SubnauticaRandomiser.Logic.Modules
 
             // Get the unique identifier of every single prefab currently loaded
             // by the game.
-            var keys = UWE.PrefabDatabase.prefabFiles.Keys;
+            var keys = PrefabDatabase.prefabFiles.Keys;
 
             foreach (string classId in keys)
             {
-                string dataPath = UWE.PrefabDatabase.prefabFiles[classId];
+                string dataPath = PrefabDatabase.prefabFiles[classId];
                 //InitMod._log.Debug($"KEY: {classId}, VALUE: {UWE.PrefabDatabase.prefabFiles[classId]}");
 
                 // If the prefab is not part of the predefined dictionary of fragments,
@@ -528,7 +530,7 @@ namespace SubnauticaRandomiser.Logic.Modules
 
             // Grab a copy of all vanilla BiomeData. This loads it fresh from disk
             // and will thus be unaffected by any existing randomisation.
-            LootDistributionData loot = LootDistributionData.Load(LootDistributionData.dataPath);
+            LootDistributionData loot = Load(dataPath);
 
             foreach (KeyValuePair<BiomeType, DstData> keyValuePair in loot.dstDistribution)
             {
