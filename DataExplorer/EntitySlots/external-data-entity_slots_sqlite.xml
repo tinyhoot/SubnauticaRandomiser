@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+  <object-set>
+    <schema path="main">
+      <view name="duplicates" query="SELECT *, COUNT(*)&#xa;FROM EntitySlots&#xa;GROUP BY WorldPos&#xa;HAVING COUNT(*) &gt; 1"/>
+      <view name="slotcount_per_biome" query="SELECT Biome, SlotType, COUNT(DISTINCT WorldPos)&#xa;FROM EntitySlots&#xa;GROUP BY Biome, SlotType&#xa;ORDER BY Biome"/>
+      <view name="slotcount_per_cell" query="SELECT Batch, Cell, Biome, SlotType, COUNT(DISTINCT WorldPos)&#xa;FROM EntitySlots&#xa;GROUP BY Batch, Cell, Biome, SlotType&#xa;ORDER BY Biome"/>
+    </schema>
+  </object-set>
+</data>
