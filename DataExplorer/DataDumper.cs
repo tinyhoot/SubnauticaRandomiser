@@ -3,10 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
-using HootLib;
 using UnityEngine;
+using UWE;
 
-namespace SubnauticaRandomiser
+namespace DataExplorer
 {
     /// <summary>
     /// Capable of dumping internal data to log files for an easy overview of what's happening.
@@ -19,7 +19,7 @@ namespace SubnauticaRandomiser
             // and will thus be unaffected by any existing randomisation.
             LootDistributionData loot = LootDistributionData.Load(LootDistributionData.dataPath);
 
-            Initialiser._Log.Debug("---Dumping Biomes");
+            Initialiser._Log.LogDebug("---Dumping Biomes");
             BiomeType[] biomes = (BiomeType[])Enum.GetValues(typeof(BiomeType));
             foreach (BiomeType biome in biomes)
             {
@@ -37,7 +37,7 @@ namespace SubnauticaRandomiser
                         valid++;
                         sum += prefab.probability;
 
-                        if (UWE.WorldEntityDatabase.TryGetInfo(prefab.classId, out UWE.WorldEntityInfo info)){
+                        if (WorldEntityDatabase.TryGetInfo(prefab.classId, out WorldEntityInfo info)){
                             if (info != null && !info.techType.Equals(TechType.None) && info.techType.AsString().ToLower().Contains("fragment"))
                             {
                                 validFragments++;
@@ -45,12 +45,12 @@ namespace SubnauticaRandomiser
                             }
                         }
                     }
-                    Initialiser._Log.Debug(
+                    Initialiser._Log.LogDebug(
                         $"{biome.AsString()}\t{valid} entries\t{validFragments} fragments\t{sum} totalspawnrate\t{sumFragments} totalfragmentrate");
                 }
                 else
                 {
-                    Initialiser._Log.Debug($"{biome.AsString()}\tNONE\t\t");
+                    Initialiser._Log.LogDebug($"{biome.AsString()}\tNONE\t\t");
                 }
             }
         }
@@ -59,15 +59,15 @@ namespace SubnauticaRandomiser
         {
             foreach (var tech in KnownTech.compoundTech)
             {
-                Initialiser._Log.Debug($"Compound: {tech.techType}, {tech.dependencies}");
+                Initialiser._Log.LogDebug($"Compound: {tech.techType}, {tech.dependencies}");
             }
 
             foreach (var tech in KnownTech.analysisTech)
             {
-                Initialiser._Log.Debug($"Scanning {tech.techType} unlocks:");
+                Initialiser._Log.LogDebug($"Scanning {tech.techType} unlocks:");
                 foreach (var unlock in tech.unlockTechTypes)
                 {
-                    Initialiser._Log.Debug($"-- {unlock}");
+                    Initialiser._Log.LogDebug($"-- {unlock}");
                 }
             }
         }
@@ -76,8 +76,8 @@ namespace SubnauticaRandomiser
         {
             foreach (var kvpair in PDAEncyclopedia.mapping)
             {
-                Initialiser._Log.Debug($"Key: {kvpair.Key}, Path: {kvpair.Value.path}");
-                Initialiser._Log.Debug(Language.main.Get("EncyDesc_" + kvpair.Key));
+                Initialiser._Log.LogDebug($"Key: {kvpair.Key}, Path: {kvpair.Value.path}");
+                Initialiser._Log.LogDebug(Language.main.Get("EncyDesc_" + kvpair.Key));
             }
         }
 
@@ -85,10 +85,10 @@ namespace SubnauticaRandomiser
         {
             // Cache the ids, otherwise this logs nothing.
             _ = CraftData.GetClassIdForTechType(TechType.Titanium);
-            var keys = UWE.PrefabDatabase.prefabFiles.Keys;
+            var keys = PrefabDatabase.prefabFiles.Keys;
             foreach (string classId in keys)
             {
-                Initialiser._Log.Debug($"classId: {classId}, prefab: {UWE.PrefabDatabase.prefabFiles[classId]}");
+                Initialiser._Log.LogDebug($"classId: {classId}, prefab: {PrefabDatabase.prefabFiles[classId]}");
             }
         }
 
@@ -96,34 +96,36 @@ namespace SubnauticaRandomiser
         {
             foreach (var bundle in AssetBundle.GetAllLoadedAssetBundles())
             {
-                Initialiser._Log.Debug($"Bundle: {bundle.name}");
+                Initialiser._Log.LogDebug($"Bundle: {bundle.name}");
                 
                 foreach (var path in bundle.GetAllAssetNames())
                 {
-                    Initialiser._Log.Debug($"> {path}");
+                    Initialiser._Log.LogDebug($"> {path}");
                 }
             }
         }
 
         public static IEnumerator LogDataboxes()
         {
-            var task = CSVReader.ParseDataFileAsync(Initialiser._WreckageFile, CSVReader.ParseWreckageLine);
-            yield return new WaitUntil(() => task.IsCompleted);
+            ErrorMessage.AddMessage("Logging databoxes is defunct without access to csv data.");
+            yield break;
+            // var task = CSVReader.ParseDataFileAsync(Initialiser._WreckageFile, CSVReader.ParseWreckageLine);
+            // yield return new WaitUntil(() => task.IsCompleted);
 
             // Temporarily patch into the databox spawner while the chain teleport explores all relevant locations.
-            Harmony harmony = new Harmony(Initialiser.GUID);
-            harmony.Patch(AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start)),
-                postfix: new HarmonyMethod(AccessTools.Method(typeof(DataDumper), nameof(DataDumper.PatchLogDatabox))));
-
-            yield return ChainTeleport(task.Result.Select(box => box.Coordinates).ToList());
-            
-            harmony.Unpatch(AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start)),
-                AccessTools.Method(typeof(DataDumper), nameof(DataDumper.PatchLogDatabox)));
+            // Harmony harmony = new Harmony(Initialiser.GUID);
+            // harmony.Patch(AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start)),
+            //     postfix: new HarmonyMethod(AccessTools.Method(typeof(DataDumper), nameof(DataDumper.PatchLogDatabox))));
+            //
+            // yield return ChainTeleport(Enumerable.ToList<Vector3>(task.Result.Select(box => box.Coordinates)));
+            //
+            // harmony.Unpatch(AccessTools.Method(typeof(DataboxSpawner), nameof(DataboxSpawner.Start)),
+            //     AccessTools.Method(typeof(DataDumper), nameof(DataDumper.PatchLogDatabox)));
         }
 
         private static IEnumerator PatchLogDatabox(IEnumerator passthrough, DataboxSpawner __instance)
         {
-            Initialiser._Log.Debug($"Other components: {__instance.GetComponents(typeof(Component)).Select(x => x.GetType()).ElementsToString()}");
+            Initialiser._Log.LogDebug($"Other components: {__instance.GetComponents(typeof(Component)).Select(x => x.GetType()).Join()}");
             // Let the spawner set up the spawning process for the actual databox.
             passthrough.MoveNext();
             if (passthrough.Current is CoroutineTask<GameObject> task)
@@ -137,11 +139,11 @@ namespace SubnauticaRandomiser
                 var boxId = task.GetResult().GetComponent<PrefabIdentifier>();
                 // Spawners often seem to have no individual id, making identification by id impossible.
                 // The boxes do have their own ids, but these are not consistent from save to save.
-                Initialiser._Log.Debug($"Databox: {__instance.spawnTechType} at {__instance.transform.position}, spawner Id: {spawnerId}, box Id: {boxId?.id}");
+                Initialiser._Log.LogDebug($"Databox: {__instance.spawnTechType} at {__instance.transform.position}, spawner Id: {spawnerId}, box Id: {boxId?.id}");
             }
             else
             {
-                Initialiser._Log.Debug($"Spawning passthrough came up null for {__instance.spawnTechType} at {__instance.transform.position}");
+                Initialiser._Log.LogDebug($"Spawning passthrough came up null for {__instance.spawnTechType} at {__instance.transform.position}");
             }
 
             // Let the rest of the vanilla method complete as intended.
@@ -155,7 +157,7 @@ namespace SubnauticaRandomiser
         /// </summary>
         public static IEnumerator ChainTeleport(List<Vector3> positions)
         {
-            Initialiser._Log.Debug("Starting chain teleport exploration.");
+            Initialiser._Log.LogDebug("Starting chain teleport exploration.");
             int count = 0;
             foreach (Vector3 position in positions)
             {
@@ -167,9 +169,9 @@ namespace SubnauticaRandomiser
                 
                 count++;
                 if (count % 5 == 0)
-                    Initialiser._Log.InGameMessage($"Explored {count}/{positions.Count} locations.");
+                    ErrorMessage.AddMessage($"Explored {count}/{positions.Count} locations.");
             }
-            Initialiser._Log.InGameMessage("Chain exploration done!");
+            ErrorMessage.AddMessage("Chain exploration done!");
         }
 
         /// <summary>
