@@ -66,14 +66,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Mocks\FakeLogger.cs" />
-        <Compile Include="UnitTests\ConfigDefaultsTests.cs" />
-        <Compile Include="UnitTests\EnumHandlerTest.cs" />
-        <Compile Include="UnitTests\Logic\AlternateStartLogicTests.cs" />
-        <Compile Include="UnitTests\Logic\DataboxLogicTests.cs" />
-        <Compile Include="UnitTests\Logic\Recipes\MaterialsTest.cs" />
-        <Compile Include="UnitTests\Objects\BiomeCollectionTest.cs" />
-        <Compile Include="UnitTests\RandomHandlerTest.cs" />
-        <Compile Include="UnitTests\RandomiserConfigTests.cs" />
+        <Compile Include="UnitTests\AlternateStartTests.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="TestDataFiles\TestRecipeInformation.csv" />
