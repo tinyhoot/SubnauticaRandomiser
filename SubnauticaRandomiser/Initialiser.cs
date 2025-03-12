@@ -19,7 +19,6 @@ namespace SubnauticaRandomiser
         
         // Files and structure.
         internal static Config _Config;
-        public const string _AlternateStartFile = "alternateStarts.csv";
         public const string _BiomeFile = "biomeSlots.csv";
         public const string _RecipeFile = "recipeInformation.csv";
         public const string _WreckageFile = "wreckInformation.csv";

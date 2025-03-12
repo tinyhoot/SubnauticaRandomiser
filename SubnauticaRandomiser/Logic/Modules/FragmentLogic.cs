@@ -5,6 +5,7 @@ using System.Linq;
 using HarmonyLib;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
+using SubnauticaRandomiser.CsvReader;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;

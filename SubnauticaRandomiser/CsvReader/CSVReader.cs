@@ -15,7 +15,7 @@ using UnityEngine;
 using Blueprint = SubnauticaRandomiser.Objects.Blueprint;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
-namespace SubnauticaRandomiser
+namespace SubnauticaRandomiser.CsvReader
 {
     /// <summary>
     /// Utilities and parsers for reading crucial data files from disk.
@@ -24,6 +24,53 @@ namespace SubnauticaRandomiser
     {
         private static readonly CultureInfo _culture = CultureInfo.InvariantCulture;
         private static ILogHandler _log => PrefixLogHandler.Get("[CSV]");
+
+        private static async Task<List<string>> ReadLineAsync(StreamReader reader)
+        {
+            string line = await reader.ReadLineAsync();
+            return SplitLine(line);
+        }
+
+        internal static List<string> SplitLine(string line)
+        {
+            List<string> cells = new List<string>();
+            int lastCellIdx = 0;
+            bool isEscaped = false;
+            for (int i = 0; i < line.Length; i++)
+            {
+                char c = line[i];
+                switch (c)
+                {
+                    case '"':
+                        isEscaped = !isEscaped;
+                        break;
+                    case ',':
+                        // Do not interpret commas as separators when wrapped in quotes.
+                        if (isEscaped)
+                            continue;
+                        // Grab the content of the current cell and trim off whitespace and escape quotes.
+                        string sub = line.Substring(lastCellIdx, i - lastCellIdx).Trim(' ', '"');
+                        cells.Add(sub);
+                        lastCellIdx = i + 1;
+                        break;
+                }
+
+                // Do not forget to add the last cell, which will not end on a comma.
+                if (i == line.Length - 1)
+                    cells.Add(line.Substring(lastCellIdx, line.Length - lastCellIdx).Trim(' ', '"'));
+            }
+
+            if (isEscaped)
+                throw new FormatException($"Found escaped cell "
+                                          + $"'{line.Substring(lastCellIdx, line.Length - lastCellIdx)}' "
+                                          + $"which does not close its quotation marks!");
+
+            return cells;
+        }
+        
+        
+        
+        #region old
 
         /// <summary>
         /// Wow I wish this could be an async enumerator but NO WE'RE STUCK ON 4.7.2
@@ -404,8 +451,7 @@ namespace SubnauticaRandomiser
         /// <returns>The absolute path.</returns>
         private static string GetDataPath(string fileName)
         {
-            string dataFolder = Path.Combine(Hootils.GetModDirectory(), "Assets");
-            return Path.Combine(dataFolder, fileName);
+            return Path.Combine(Hootils.GetModDirectory(), "Assets", fileName);
         }
 
         /// <summary>
@@ -512,5 +558,7 @@ namespace SubnauticaRandomiser
 
             return output;
         }
+        
+        #endregion old
     }
 }
