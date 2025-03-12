@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
@@ -23,6 +25,8 @@ namespace SubnauticaRandomiser.Logic.Modules
     [RequireComponent(typeof(CoreLogic))]
     internal class AlternateStartLogic : MonoBehaviour, ILogicModule
     {
+        private const string _AlternateStartFile = "alternateStarts.csv";
+        
         private CoreLogic _coreLogic;
         private Config _config;
         private ILogHandler _log;
@@ -41,7 +45,7 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         public IEnumerable<Task> LoadFiles()
         {
-            return new[] { ParseDataFileAsync() };
+            return new[] { ParseDataFileAsync(Path.Combine(Hootils.GetModDirectory(), "Assets", _AlternateStartFile)) };
         }
 
         public BaseModuleSaveData SetupSaveData()
@@ -143,9 +147,53 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <summary>
         /// Parse the list of valid start locations from a separate file.
         /// </summary>
-        private async Task ParseDataFileAsync()
+        private async Task ParseDataFileAsync(string filePath)
         {
-            _alternateStarts = await CSVReader.ParseAlternateStartAsync(Initialiser._AlternateStartFile);
+            CsvParser parser = new CsvParser(filePath);
+            var lines = await parser.ParseAllLinesAsync<AlternateStartCsvData>();
+            lines.ForEach(line => _log.Debug($"Registered start: {line.Biome} bounded at {line.Boundaries.ElementsToString()}"));
+            _alternateStarts = lines.ToDictionary(data => data.Biome, data => data.Boundaries);
+        }
+        
+        /// <summary>
+        /// A data class to deserialise each line of the file holding data on valid random starts into.
+        /// </summary>
+        private class AlternateStartCsvData
+        {
+            public readonly BiomeRegion Biome;
+            public readonly List<float[]> Boundaries;
+
+            public AlternateStartCsvData(BiomeRegion biome, string boundaries)
+            {
+                Biome = biome;
+                Boundaries = ParseBoundaries(boundaries);
+            }
+
+            private List<float[]> ParseBoundaries(string boundaries)
+            {
+                List<float[]> starts = new List<float[]>();
+                string[] cells = CsvParser.Split(boundaries, ';');
+                
+                foreach (string cell in cells)
+                {
+                    if (string.IsNullOrEmpty(cell))
+                        continue;
+
+                    string[] rawCoords = CsvParser.Split(cell, '/');
+                    if (rawCoords.Length != 4)
+                        throw new FormatException("Invalid number of coordinates: " + rawCoords.Length);
+
+                    float[] parsedCoords = new float[4];
+                    for (int i = 0; i < 4; i++)
+                    {
+                        parsedCoords[i] = float.Parse(rawCoords[i], CultureInfo.InvariantCulture);
+                    }
+
+                    starts.Add(parsedCoords);
+                }
+
+                return starts;
+            }
         }
     }
 }

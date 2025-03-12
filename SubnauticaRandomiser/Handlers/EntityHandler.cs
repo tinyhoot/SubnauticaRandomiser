@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HootLib.Interfaces;
 using JetBrains.Annotations;
+using SubnauticaRandomiser.CsvReader;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
