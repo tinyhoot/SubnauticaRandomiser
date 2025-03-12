@@ -1,4 +1,4 @@
-using SubnauticaRandomiser.Interfaces;
+using HootLib.Interfaces;
 
 namespace Tests.Mocks
 {
