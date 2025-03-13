@@ -37,15 +37,18 @@ namespace DataExplorer.EntitySlots
             yield return DataDumper.ChainTeleport(GetTeleportLocations());
         }
 
-        private void Insert(Int3 batch, Int3 cell, Vector3 worldPos, BiomeType biome, IEnumerable<EntitySlot.Type> slotTypes)
+        private void Insert(Int3 batch, Int3 cell, Vector3 worldPos, BiomeType biome,
+            IEnumerable<EntitySlot.Type> slotTypes, double density, int id)
         {
-            _db.Insert(batch.ToString(), cell.ToString(), worldPos.ToString(), biome.ToString(), 
-                slotTypes.OrderBy(t => t).Join(t => t.ToString()), false);
+            _db.Insert(batch.ToString(), cell.ToString(), worldPos.ToString(), biome.ToString(),
+                slotTypes.OrderBy(t => t).Join(t => t.ToString()), false, density, id);
         }
 
-        private void Insert(Int3 batch, Int3 cell, Vector3 worldPos, BiomeType biome, EntitySlotData.EntitySlotType slotType)
+        private void Insert(Int3 batch, Int3 cell, Vector3 worldPos, BiomeType biome,
+            EntitySlotData.EntitySlotType slotType, double density, int id)
         {
-            _db.Insert(batch.ToString(), cell.ToString(), worldPos.ToString(), biome.ToString(), slotType.ToString(), true);
+            _db.Insert(batch.ToString(), cell.ToString(), worldPos.ToString(), biome.ToString(), slotType.ToString(),
+                true, density, id);
         }
         
         /// <summary>
@@ -91,7 +94,9 @@ namespace DataExplorer.EntitySlots
         {
             var streamer = LargeWorldStreamer.main;
             var pos = __instance.transform.position;
-            _main.Insert(streamer.GetContainingBatch(pos), GetCellId(pos), pos, __instance.biomeType, __instance.allowedTypes);
+
+            _main.Insert(streamer.GetContainingBatch(pos), GetCellId(pos), pos, __instance.biomeType,
+                __instance.allowedTypes, __instance.density, __instance.GetInstanceID());
         }
         
         [HarmonyPrefix]
@@ -104,14 +109,16 @@ namespace DataExplorer.EntitySlots
             foreach (var slot in __instance.slotsData)
             {
                 var pos = __instance.transform.position + slot.localPosition;
-                _main.Insert(streamer.GetContainingBatch(pos), GetCellId(pos), pos, slot.biomeType, slot.allowedTypes);
+                _main.Insert(streamer.GetContainingBatch(pos), GetCellId(pos), pos, slot.biomeType, slot.allowedTypes,
+                    slot.density, __instance.GetInstanceID());
             }
-            _main._db.CommitTransaciton();
+            _main._db.CommitTransaction();
         }
 
         private static Int3 GetCellId(Vector3 pos)
         {
             var streamer = LargeWorldStreamer.main;
+            // One "block" is one cubic metre in world space.
             Int3 block = streamer.GetBlock(pos);
             Int3 cellId = (block % streamer.blocksPerBatch) / _cellSize;
             return cellId;
