@@ -111,7 +111,11 @@ namespace SubnauticaRandomiser.Logic
             if (_config.EnableFragmentModule.Value &&
                 (_config.RandomiseFragments.Value || _config.RandomiseNumFragments.Value
                                                   || _config.RandomiseDuplicateScans.Value))
+            {
                 RegisterModule<FragmentLogic>();
+                RegisterModule<EntitySlotsTracker>();
+            }
+
             if (_config.EnableRecipeModule.Value && _config.RandomiseRecipes.Value)
             {
                 RegisterModule<RawMaterialLogic>();
