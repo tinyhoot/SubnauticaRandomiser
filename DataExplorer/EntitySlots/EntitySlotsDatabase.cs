@@ -21,7 +21,9 @@ namespace DataExplorer.EntitySlots
                     WorldPos TEXT NOT NULL,
                     Biome TEXT NOT NULL,
                     SlotType TEXT NOT NULL,
-                    IsPlaceholder INTEGER NOT NULL
+                    IsPlaceholder INTEGER NOT NULL,
+                    Density REAL NOT NULL,
+                    InstanceId INTEGER NOT NULL
                 )");
             cmd.ExecuteNonQuery();
 
@@ -29,17 +31,20 @@ namespace DataExplorer.EntitySlots
             return connection;
         }
 
-        public void Insert(string batch, string cell, string worldPos, string biome, string slotType, bool placeholder)
+        public void Insert(string batch, string cell, string worldPos, string biome, string slotType, bool placeholder,
+            double density, int instanceId)
         {
             var cmd = _connection.CreateCommand(
-                @"INSERT INTO EntitySlots (Batch, Cell, WorldPos, Biome, SlotType, IsPlaceholder)
-                          VALUES ($batch, $cell, $worldPos, $biome, $slotType, $placeholder)");
+                @"INSERT INTO EntitySlots (Batch, Cell, WorldPos, Biome, SlotType, IsPlaceholder, Density, InstanceId)
+                          VALUES ($batch, $cell, $worldPos, $biome, $slotType, $placeholder, $density, $id)");
             cmd.Bind("$batch", batch);
             cmd.Bind("$cell", cell);
             cmd.Bind("$worldPos", worldPos);
             cmd.Bind("$biome", biome);
             cmd.Bind("$slotType", slotType);
             cmd.Bind("$placeholder", placeholder);
+            cmd.Bind("$density", density);
+            cmd.Bind("$id", instanceId);
             cmd.ExecuteNonQuery();
         }
 
@@ -48,7 +53,7 @@ namespace DataExplorer.EntitySlots
             _connection.BeginTransaction();
         }
 
-        public void CommitTransaciton()
+        public void CommitTransaction()
         {
             _connection.Commit();
         }

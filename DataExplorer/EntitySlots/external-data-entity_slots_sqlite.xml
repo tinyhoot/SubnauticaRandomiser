@@ -2,9 +2,14 @@
 <data>
   <object-set>
     <schema path="main">
-      <view name="duplicates" query="SELECT *, COUNT(*)&#xa;FROM EntitySlots&#xa;GROUP BY WorldPos&#xa;HAVING COUNT(*) &gt; 1"/>
-      <view name="slotcount_per_biome" query="SELECT Biome, SlotType, COUNT(DISTINCT WorldPos)&#xa;FROM EntitySlots&#xa;GROUP BY Biome, SlotType&#xa;ORDER BY Biome"/>
-      <view name="slotcount_per_cell" query="SELECT Batch, Cell, Biome, SlotType, COUNT(DISTINCT WorldPos)&#xa;FROM EntitySlots&#xa;GROUP BY Batch, Cell, Biome, SlotType&#xa;ORDER BY Biome"/>
+      <view name="biome_slots_density" query="SELECT Biome,&#xa;       SUM(IIF(SlotType LIKE &apos;Small&apos;, 1, 0)) as Small,&#xa;       SUM(IIF(SlotType LIKE &apos;Medium&apos;, 1, 0)) as Medium,&#xa;       SUM(IIF(SlotType LIKE &apos;Small, Medium&apos;, 1, 0)) as SmallMedium,&#xa;       SUM(IIF(SlotType LIKE &apos;Medium, Large&apos;, 1, 0)) as MediumLarge,&#xa;       SUM(IIF(SlotType LIKE &apos;Creature&apos;, 1, 0)) as Creature,&#xa;       PRINTF(&quot;%.4f&quot;, AVG(Density)) as AvgDensity,&#xa;       PRINTF(&quot;%.4f&quot;, SUM(Density)) as TotalDensity&#xa;FROM distinct_entries&#xa;GROUP BY Biome&#xa;ORDER BY Biome"/>
+      <view name="biomes" query="SELECT Biome&#xa;FROM EntitySlots&#xa;GROUP BY Biome&#xa;ORDER BY Biome"/>
+      <view name="distinct_entries" query="SELECT *&#xa;FROM EntitySlots&#xa;GROUP BY InstanceId, WorldPos"/>
+      <view name="duplicates" query="SELECT *, COUNT(*)&#xa;FROM EntitySlots&#xa;GROUP BY InstanceId, WorldPos&#xa;HAVING COUNT(*) &gt; 1"/>
+      <view name="slot_names" query="SELECT DISTINCT SlotType&#xa;FROM EntitySlots"/>
+      <view name="slotcount_per_biome" query="SELECT Biome, SlotType, COUNT(*)&#xa;FROM distinct_entries&#xa;GROUP BY Biome, SlotType&#xa;ORDER BY Biome"/>
+      <view name="slotcount_per_biome_per_type" query="SELECT Biome, &#xa;       SUM(IIF(SlotType LIKE &apos;Small&apos;, 1, 0)) as Small,&#xa;       SUM(IIF(SlotType LIKE &apos;Medium&apos;, 1, 0)) as Medium,&#xa;       SUM(IIF(SlotType LIKE &apos;Small, Medium&apos;, 1, 0)) as SmallMedium,&#xa;       SUM(IIF(SlotType LIKE &apos;Medium, Large&apos;, 1, 0)) as MediumLarge,&#xa;       SUM(IIF(SlotType LIKE &apos;Creature&apos;, 1, 0)) as Creature&#xa;FROM distinct_entries&#xa;GROUP BY Biome&#xa;ORDER BY Biome"/>
+      <view name="slotcount_per_cell" query="SELECT Batch, Cell, Biome, SlotType, COUNT(*)&#xa;FROM distinct_entries&#xa;GROUP BY Batch, Cell, Biome, SlotType&#xa;ORDER BY Biome"/>
     </schema>
   </object-set>
 </data>
