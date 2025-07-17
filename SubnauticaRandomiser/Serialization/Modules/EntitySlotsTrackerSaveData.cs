@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HootLib;
 
 namespace SubnauticaRandomiser.Serialization.Modules
 {
     internal class EntitySlotsTrackerSaveData : BaseModuleSaveData
     {
         public Dictionary<BiomeType, EntitySlotCounts> SlotsData = new Dictionary<BiomeType, EntitySlotCounts>();
+        public Dictionary<TechType, int[]> MinimumSpawns = new Dictionary<TechType, int[]>();
 
         public void Setup(List<EntitySlotCounts> slotsData)
         {
@@ -31,6 +33,15 @@ namespace SubnauticaRandomiser.Serialization.Modules
             if (!SlotsData.TryGetValue(biome, out EntitySlotCounts slotCounts))
                 throw new ArgumentOutOfRangeException(nameof(biome), biome, "Invalid biome!");
             slotCounts.CountEntity(allowedTypes);
+        }
+
+        public void SetupMinimumSpawns(Dictionary<TechType, int> minSpawns)
+        {
+            // Set up with zero things spawned.
+            foreach ((TechType techType, int min) in minSpawns)
+            {
+                MinimumSpawns[techType] = new[] { 0, min };
+            }
         }
     }
 }

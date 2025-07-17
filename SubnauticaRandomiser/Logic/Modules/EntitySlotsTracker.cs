@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
 using HootLib;
@@ -35,6 +36,7 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         public BaseModuleSaveData SetupSaveData()
         {
+            GetComponent<CoreLogic>().MainLoopCompleted += OnMainLoopCompleted;
             return new EntitySlotsTrackerSaveData();
         }
 
@@ -50,6 +52,34 @@ namespace SubnauticaRandomiser.Logic.Modules
         public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
         {
             throw new NotImplementedException();
+        }
+
+        private void OnMainLoopCompleted(object sender, EventArgs args)
+        {
+            if (!Bootstrap.SaveData.TryGetModuleData<FragmentSaveData>(out FragmentSaveData saveData))
+            {
+                _log.Warn("Tracker was active despite FragmentLogic not doing anything.");
+                return;
+            }
+
+            // Make a shallow copy of the randomised fragment counts.
+            var minimumCounts = new Dictionary<TechType, int>(saveData.NumFragmentsToUnlock);
+            // Also populate the counts with fragments that have not had their unlock numbers changed.
+            foreach (TechType techType in saveData.SpawnDataDict.Keys)
+            {
+                // Vanilla fragments do not go above a maximum of 5 scans needed to unlock.
+                if (!minimumCounts.ContainsKey(techType))
+                    minimumCounts[techType] = 5;
+            }
+
+            // Set twice the number required to unlock as a minimum to allow the player to find them comfortably.
+            // Keys are put into a list, otherwise C# complains that the collection was modified during access.
+            foreach (TechType techType in minimumCounts.Keys.ToList())
+            {
+                minimumCounts[techType] *= 2;
+            }
+
+            Bootstrap.SaveData.GetModuleData<EntitySlotsTrackerSaveData>().SetupMinimumSpawns(minimumCounts);
         }
 
         public void SetupHarmonyPatches(Harmony harmony, SaveData saveData)

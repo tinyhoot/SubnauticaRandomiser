@@ -15,6 +15,8 @@ namespace SubnauticaRandomiser.Serialization.Modules
         public int MediumMax;
         public int MediumLargeMax;
         public int CreatureMax;
+        public double AvgDensity;
+        public double TotalDensity;
 
         public int SmallSpawned;
         public int SmallMediumSpawned;
@@ -22,7 +24,8 @@ namespace SubnauticaRandomiser.Serialization.Modules
         public int MediumLargeSpawned;
         public int CreatureSpawned;
             
-        public EntitySlotCounts(BiomeType biome, int small, int smallMedium, int medium, int mediumLarge, int creature)
+        public EntitySlotCounts(BiomeType biome, int small, int smallMedium, int medium, int mediumLarge, int creature,
+            double avgDensity, double totalDensity)
         {
             Biome = biome;
             SmallMax = small;
@@ -30,6 +33,8 @@ namespace SubnauticaRandomiser.Serialization.Modules
             MediumMax = medium;
             MediumLargeMax = mediumLarge;
             CreatureMax = creature;
+            AvgDensity = avgDensity;
+            TotalDensity = totalDensity;
         }
 
         public void CountEntity(EntitySlotData.EntitySlotType type)

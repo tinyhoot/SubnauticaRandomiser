@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Reflection.Emit;
 using HarmonyLib;
 using SubnauticaRandomiser.Serialization.Modules;
 
@@ -23,25 +25,80 @@ namespace SubnauticaRandomiser.Patches
             Hooking.OnQuitToMainMenu -= Teardown;
         }
         
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(EntitySlot), nameof(EntitySlot.Start))]
-        private static void RegisterEntitySlot(EntitySlot __instance)
+        // Patches are needed to:
+        // - Know which slot exactly was just processed
+        // - Influence spawn chance while having slot info
+        // - Know what actually ended up spawning and maybe force it to be different
+        
+        [HarmonyTranspiler]
+        [HarmonyPatch(typeof(EntitySlot), nameof(EntitySlot.SpawnVirtualEntities))]
+        private static IEnumerable<CodeInstruction> InjectFillerWrapper(IEnumerable<CodeInstruction> instructions)
         {
-            _saveData.AddProcessedSlot(__instance.biomeType, __instance.allowedTypes);
-            
-            // TODO: Check if spawned entity has minimum number defined in savedata, ensure good spawn curve if yes
-            // Override even if successful spawn would occur, via postfix.
+            CodeMatcher matcher = new CodeMatcher(instructions);
+            matcher.MatchForward(true, new CodeMatch(CodeInstruction.Call(typeof(EntitySlot), nameof(EntitySlot.GetFiller))));
+            if (matcher.IsInvalid)
+            {
+                Initialiser._Log.Error("Transpiler failed to find critical instruction in EntitySlot!");
+                return matcher.InstructionEnumeration();
+            }
+
+            // Replace the original call to the filler with our own wrapper.
+            matcher.SetInstruction(CodeInstruction.Call(typeof(EntitySlotsTrackerPatcher), nameof(GetFillerWrapper),
+                new[] { typeof(EntitySlot) }));
+
+            return matcher.InstructionEnumeration();
         }
         
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(EntitySlotsPlaceholder), nameof(EntitySlotsPlaceholder.Start))]
-        private static void RegisterEntitySlotPlaceholder(EntitySlotsPlaceholder __instance)
+        [HarmonyTranspiler]
+        [HarmonyPatch(typeof(EntitySlotsPlaceholder), nameof(EntitySlotsPlaceholder.Spawn))]
+        private static IEnumerable<CodeInstruction> InjectPlaceholderFillerWrapper(IEnumerable<CodeInstruction> instructions)
         {
-            // Placeholders hold all slots of an entire batch cell, often around 50.
-            foreach (var slotsData in __instance.slotsData)
+            CodeMatcher matcher = new CodeMatcher(instructions);
+            matcher.MatchForward(false,
+                new CodeMatch(CodeInstruction.LoadField(typeof(LargeWorld), nameof(LargeWorld.main))),
+                new CodeMatch(CodeInstruction.LoadField(typeof(LargeWorld), nameof(LargeWorld.streamer))),
+                new CodeMatch(CodeInstruction.LoadField(typeof(LargeWorldStreamer),
+                    nameof(LargeWorldStreamer.cellManager))),
+                new CodeMatch(OpCodes.Ldloc_1),
+                new CodeMatch(new CodeInstruction(OpCodes.Callvirt,
+                    AccessTools.Method(typeof(CellManager), nameof(CellManager.GetPrefabForSlot)))));
+            if (matcher.IsInvalid)
             {
-                _saveData.AddProcessedSlot(slotsData.biomeType, slotsData.allowedTypes);
+                Initialiser._Log.Error("Transpiler failed to find critical instruction in EntitySlotsPlaceholder!");
+                return matcher.InstructionEnumeration();
             }
+
+            // Delete the instructions grabbing the cellmanager.
+            matcher.SetAndAdvance(OpCodes.Nop, null);
+            matcher.SetAndAdvance(OpCodes.Nop, null);
+            matcher.SetAndAdvance(OpCodes.Nop, null);
+            // Keep the instruction putting EntitySlotData on the stack, we need that.
+            matcher.Advance(1);
+            // Replace the original call to the cellmanager with our own wrapper.
+            matcher.SetInstruction(CodeInstruction.Call(typeof(EntitySlotsTrackerPatcher), nameof(GetFillerWrapper),
+                new[] { typeof(EntitySlotData) }));
+
+            return matcher.InstructionEnumeration();
+        }
+
+        private static EntitySlot.Filler GetFillerWrapper(EntitySlot slot)
+        {
+            var filler = EntitySlot.GetFiller(slot);
+            // TODO: Override filler if necessary.
+            
+            _saveData.AddProcessedSlot(slot.biomeType, slot.allowedTypes);
+            // TODO: Count up slot for chosen filler.
+            return filler;
+        }
+
+        private static EntitySlot.Filler GetFillerWrapper(EntitySlotData slotData)
+        {
+            var filler = LargeWorldStreamer.main.cellManager.GetPrefabForSlot(slotData);
+            // TODO: Override filler if necessary.
+            
+            _saveData.AddProcessedSlot(slotData.biomeType, slotData.allowedTypes);
+            // TODO: Count up slot for chosen filler.
+            return filler;
         }
     }
 }
