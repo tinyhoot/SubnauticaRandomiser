@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using HootLib.Objects;
 using JetBrains.Annotations;
+using Nautilus.Crafting;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
@@ -32,7 +33,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         private ILogHandler _log;
         private EntityHandler _entityHandler;
         private Mode _mode;
-        private NautilusShell<TechType, ITechData> _recipeCache;
+        private NautilusShell<TechType, RecipeData> _recipeCache;
 
         public Dictionary<TechType, int> BasicOutpostPieces { get; private set; }
         public Dictionary<TechType, TechType> UpgradeChains { get; private set; }
@@ -45,7 +46,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             _config = _coreLogic._Config;
             _entityHandler = _coreLogic.EntityHandler;
             _log = PrefixLogHandler.Get("[R]");
-            _recipeCache = new NautilusShell<TechType, ITechData>(
+            _recipeCache = new NautilusShell<TechType, RecipeData>(
                 CraftDataHandler.SetRecipeData,
                 CraftDataHandler.GetRecipeData);
             ValidIngredients = new HashSet<LogicEntity>(new LogicEntityEqualityComparer());
@@ -82,7 +83,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             
             foreach (TechType key in recipeSave.RecipeDict.Keys)
             {
-                _recipeCache.SendChanges(key, recipeSave.RecipeDict[key]);
+                _recipeCache.SendChanges(key, recipeSave.RecipeDict[key].ToRecipeData());
             }
             
             ChangeScrapMetalResult(recipeSave.ScrapMetalResult);
@@ -325,10 +326,10 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             recipe.Ingredients = new List<RandomiserIngredient>();
             recipe.Ingredients.Add(new RandomiserIngredient(TechType.ScrapMetal, 1));
             // Always use just as many items as can fit in four slots in the inventory.
-            var itemDimensions = CraftData.GetItemSize(techType);
+            var itemDimensions = TechData.GetItemSize(techType);
             int size = itemDimensions.x * itemDimensions.y;
             recipe.CraftAmount = Math.Max(1, (int)Math.Floor(4f / size));
-            CraftDataHandler.SetRecipeData(techType, recipe);
+            CraftDataHandler.SetRecipeData(techType, recipe.ToRecipeData());
 
             // Delete the old recipe and remove it from the fabricator and PDA.
             // CraftDataHandler.SetRecipeData(oldResult, null);

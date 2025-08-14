@@ -10,7 +10,7 @@ using ILogHandler = HootLib.Interfaces.ILogHandler;
 namespace SubnauticaRandomiser
 {
     [BepInPlugin(GUID, NAME, VERSION)]
-    [BepInDependency("com.snmodding.nautilus", "1.0.0.33")]
+    [BepInDependency("com.snmodding.nautilus", "1.0.0.42")]
     internal class Initialiser : BaseUnityPlugin
     {
         public const string GUID = "com.github.tinyhoot.SubnauticaRandomiser";

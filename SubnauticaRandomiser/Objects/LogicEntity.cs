@@ -145,7 +145,7 @@ namespace SubnauticaRandomiser.Objects
         {
             int size = 0;
 
-            size = CraftData.GetItemSize(TechType).x * CraftData.GetItemSize(TechType).y;
+            size = TechData.GetItemSize(TechType).x * TechData.GetItemSize(TechType).y;
 
             return size;
         }

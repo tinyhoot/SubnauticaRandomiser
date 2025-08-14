@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Nautilus.Crafting;
 using Nautilus.Handlers;
 using Newtonsoft.Json;
@@ -10,7 +11,7 @@ namespace SubnauticaRandomiser.Objects
     /// A wrapper for the game's TechData class to make it serializable.
     /// </summary>
     [Serializable]
-    public class Recipe : ITechData
+    public class Recipe
     {
         public TechType TechType;
         public List<RandomiserIngredient> Ingredients;
@@ -61,7 +62,7 @@ namespace SubnauticaRandomiser.Objects
             
             if (techdata.Ingredients != null && techdata.ingredientCount > 0)
             {
-                foreach (CraftData.Ingredient i in techdata.Ingredients)
+                foreach (Ingredient i in techdata.Ingredients)
                 {
                     Ingredients.Add(new RandomiserIngredient(i.techType, i.amount));
                 }
@@ -73,14 +74,19 @@ namespace SubnauticaRandomiser.Objects
             CraftAmount = techdata.craftAmount;
         }
 
-        public IIngredient GetIngredient(int index)
+        public Ingredient GetIngredient(int index)
         {
-            return Ingredients[index];
+            return Ingredients[index].ToGameIngredient();
         }
 
         public TechType GetLinkedItem(int index)
         {
             return LinkedIngredients[index];
+        }
+
+        public RecipeData ToRecipeData()
+        {
+            return new RecipeData(Ingredients.Select(i => i.ToGameIngredient()).ToList());
         }
     }
 }
