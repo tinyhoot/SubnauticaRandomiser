@@ -36,7 +36,6 @@ namespace SubnauticaRandomiser.Logic
         private GameObject _logicObject;
         private CoreLogic _coreLogic;
         private GameStateSynchroniser _sync;
-        private readonly List<Task> _fileTasks = new List<Task>();
         private readonly List<ILogicModule> _modules = new List<ILogicModule>();
 
         public ReadOnlyCollection<ILogicModule> Modules => _modules.AsReadOnly();
@@ -144,14 +143,15 @@ namespace SubnauticaRandomiser.Logic
             task.Status = "Randomising - Loading info files";
             yield return null;
             
+            var fileTasks = new List<Task>();
             // The entity handler loads a file with critical information on every entity. It is always required.
-            _fileTasks.Add(_coreLogic.EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
+            fileTasks.Add(_coreLogic.EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
             foreach (ILogicModule module in Modules)
             {
-                _fileTasks.AddRange(module.LoadFiles());
+                fileTasks.AddRange(module.LoadFiles());
             }
             
-            yield return new WaitUntil(() => _fileTasks.TrueForAll(fTask => fTask.IsCompleted));
+            yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
         }
 
         /// <summary>
