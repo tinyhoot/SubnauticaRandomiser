@@ -6,7 +6,6 @@ using System.Linq;
 using BepInEx.Bootstrap;
 using HootLib;
 using Nautilus.Handlers;
-using Nautilus.Json;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
@@ -16,7 +15,6 @@ using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
-using UWE;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 using Object = UnityEngine.Object;
 using Task = System.Threading.Tasks.Task;
@@ -48,25 +46,19 @@ namespace SubnauticaRandomiser.Logic
             Main = this;
             _config = config;
 
-            // Register the save data file. Whether empty or populated, it will kick things off once loaded.
+            // Register the save data file. Doing this before the WaitScreen task guarantees it will be ready when
+            // we need it.
             SaveData = SaveDataHandler.RegisterSaveDataCache<SaveData>();
-            SaveData.OnFinishedLoading += OnSaveDataLoaded;
+            // Do setup for the current save game during the loading screen.
+            WaitScreenHandler.RegisterEarlyAsyncLoadTask(Initialiser.NAME, Initialise, "Setting up.");
             // Undo all changes to the game when the user quits back to the main menu.
             Hooking.OnQuitToMainMenu += Teardown;
         }
 
         /// <summary>
-        /// Once the save data file has loaded, everything else can kick into gear.
-        /// </summary>
-        private void OnSaveDataLoaded(object sender, JsonFileEventArgs args)
-        {
-            Initialise();
-        }
-
-        /// <summary>
         /// Prepare everything needed for a randomised game, be it randomising fresh or loading a saved game.
         /// </summary>
-        private void Initialise()
+        private IEnumerator Initialise(WaitScreenHandler.WaitScreenTask task)
         {
             _log.Debug("Setting up central GameObject.");
             SetupGameObject();
@@ -76,18 +68,19 @@ namespace SubnauticaRandomiser.Logic
             if (SaveData.SaveVersion < 0)
             {
                 _log.Info("Starting new game, randomising...");
-                EnableModules();
-                InitFileLoadTasks();
-                InitSaveData();
-                // Wait and periodically check whether all file loading has completed. Only continue once that is done.
-                CoroutineHost.StartCoroutine(WaitUntilFilesLoaded());
+                yield return EnableModules(task);
+                yield return InitSaveData(task);
+                yield return LoadRandomisationInfoFiles(task);
+                // Randomise the game and save the final state to the SaveData.
+                yield return _coreLogic.Randomise(task, SaveData);
             }
             else
             {
                 _log.Info("Loading saved game, restoring game state.");
-                EnableSavedModules();
-                SyncGameState();
+                yield return EnableSavedModules(task);
             }
+            // Using either the freshly generated or previously loaded state, apply it to the game.
+            yield return SyncGameState(task);
         }
 
         /// <summary>
@@ -104,9 +97,12 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Enable all modules for a fresh start as deemed necessary by the config.
         /// </summary>
-        private void EnableModules()
+        private IEnumerator EnableModules(WaitScreenHandler.WaitScreenTask task)
         {
             _log.Debug("Enabling modules for fresh start.");
+            task.Status = "Randomising - Registering modules";
+            yield return null;
+            
             if (_config.EnableAlternateStartModule.Value && !_config.SpawnPoint.Value.Equals("Vanilla"))
                 RegisterModule<AlternateStartLogic>();
             if (_config.RandomiseDoorCodes.Value || _config.RandomiseSupplyBoxes.Value)
@@ -128,9 +124,11 @@ namespace SubnauticaRandomiser.Logic
         /// <summary>
         /// Enable all modules that had been active in a previously saved game.
         /// </summary>
-        private void EnableSavedModules()
+        private IEnumerator EnableSavedModules(WaitScreenHandler.WaitScreenTask task)
         {
             _log.Debug("Re-enabling modules specified in saved game.");
+            task.Status = "Loading previously enabled modules";
+            yield return null;
             foreach (Type module in SaveData.EnabledModules)
             {
                 RegisterModule(module);
@@ -138,24 +136,32 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Get every module's async tasks for loading file from disks so that randomising can be delayed until they
+        /// Get every module's async tasks for loading their important files from disk and delay randomising until they
         /// have all completed.
         /// </summary>
-        private void InitFileLoadTasks()
+        private IEnumerator LoadRandomisationInfoFiles(WaitScreenHandler.WaitScreenTask task)
         {
+            task.Status = "Randomising - Loading info files";
+            yield return null;
+            
             // The entity handler loads a file with critical information on every entity. It is always required.
             _fileTasks.Add(_coreLogic.EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
             foreach (ILogicModule module in Modules)
             {
                 _fileTasks.AddRange(module.LoadFiles());
             }
+            
+            yield return new WaitUntil(() => _fileTasks.TrueForAll(fTask => fTask.IsCompleted));
         }
 
         /// <summary>
         /// Give every registered module a chance to set up its own save data.
         /// </summary>
-        private void InitSaveData()
+        private IEnumerator InitSaveData(WaitScreenHandler.WaitScreenTask task)
         {
+            task.Status = "Randomising - Initialising SaveData";
+            yield return null;
+            
             SaveData.SaveVersion = Initialiser.SaveVersion;
             foreach (ILogicModule module in Modules)
             {
@@ -165,17 +171,11 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
-        /// <summary>
-        /// Wait until all data files have finished loading and then hand off to the core logic.
-        /// </summary>
-        private IEnumerator WaitUntilFilesLoaded()
+        private IEnumerator SyncGameState(WaitScreenHandler.WaitScreenTask task)
         {
-            yield return new WaitUntil(() => _fileTasks.TrueForAll(task => task.IsCompleted));
-            _coreLogic.Initialise(SaveData);
-        }
-
-        public void SyncGameState()
-        {
+            task.Status = "Syncing game state with randomisation data";
+            yield return null;
+            
             _sync ??= new GameStateSynchroniser(Initialiser.GUID);
             _sync.SyncGameState(SaveData);
         }

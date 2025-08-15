@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using HootLib;
+using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
@@ -83,12 +84,6 @@ namespace SubnauticaRandomiser.Logic
             _manager = gameObject.EnsureComponent<ProgressionManager>();
             _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
         }
-
-        internal void Initialise(SaveData saveData)
-        {
-            _rng = new RandomHandler(GetSeedFromConfig());
-            StartCoroutine(Hootils.WrapCoroutine(Randomise(saveData), Initialiser.FatalError));
-        }
         
         /// <summary>
         /// Parse the current config settings into a numeric seed.
@@ -109,22 +104,29 @@ namespace SubnauticaRandomiser.Logic
         /// Running this as a coroutine spaces the logic out over several frames, which prevents the game from
         /// locking up / freezing.
         /// </summary>
-        private IEnumerator Randomise(SaveData saveData)
+        internal IEnumerator Randomise(WaitScreenHandler.WaitScreenTask task, SaveData saveData)
         {
+            _rng = new RandomHandler(GetSeedFromConfig());
+            
+            task.Status = "Randomising - Extras";
+            yield return null;
+            
             List<LogicEntity> mainEntities = Setup();
             RandomisePreLoop();
             
             // Force a new frame before the main loop.
+            task.Status = "Randomising - Entities";
             yield return null;
             yield return Hootils.WrapCoroutine(RandomiseMainEntities(mainEntities), Initialiser.FatalError);
-            yield return null;
             
+            task.Status = "Randomising - Saving state";
+            yield return null;
             saveData.SetEnabledModules(Bootstrap.Main.GetActiveModuleTypes());
             saveData.Save();
             
-            Bootstrap.Main.SyncGameState();
-            
-            _log.InGameMessage("Finished randomising!");
+            // This makes the loading screen longer than it needs to be but that's worth the tradeoff.
+            task.Status = "Success!";
+            yield return new WaitForSecondsRealtime(1f);
         }
 
         /// <summary>
