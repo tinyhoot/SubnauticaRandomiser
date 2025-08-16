@@ -13,28 +13,56 @@ namespace DataExplorer
         /// </summary>
         public void RegisterCommands()
         {
-            DevConsole.RegisterConsoleCommand(this, "dumpBiomes");
-            DevConsole.RegisterConsoleCommand(this, "dumpDataboxes");
-            DevConsole.RegisterConsoleCommand(this, "dumpKnownTech");
-            DevConsole.RegisterConsoleCommand(this, "dumpEncyclopedia");
-            DevConsole.RegisterConsoleCommand(this, "dumpPrefabs");
-            DevConsole.RegisterConsoleCommand(this, "prepareSlots");
-            DevConsole.RegisterConsoleCommand(this, "dumpEntitySlots");
-            DevConsole.RegisterConsoleCommand(this, "endEntitySlots");
+            DevConsole.RegisterConsoleCommand("dump", OnConsoleCommand_dump);
+            DevConsole.RegisterConsoleCommand("prepSlots", OnConsoleCommand_prepareSlots);
+            DevConsole.RegisterConsoleCommand("scrapeSlots", OnConsoleCommand_dumpEntitySlots);
+            DevConsole.RegisterConsoleCommand("endScrapeSlots", OnConsoleCommand_endEntitySlots);
         }
 
-        private void OnConsoleCommand_dumpBiomes(NotificationCenter.Notification n)
+        private void OnConsoleCommand_dump(NotificationCenter.Notification n)
+        {
+            if (n.data.Count < 2)
+            {
+                ErrorMessage.AddMessage("Options: biomes, databoxes, ency, knownTech, prefabs");
+                return;
+            }
+
+            switch (n.data[1])
+            {
+                case "biomes":
+                    DumpBiomes();
+                    break;
+                case "databoxes":
+                case "dbox":
+                    DumpDataboxes();
+                    break;
+                case "ency":
+                    DumpEncyclopedia();
+                    break;
+                case "knowntech":
+                    DumpKnownTech();
+                    break;
+                case "prefabs":
+                    DumpPrefabs();
+                    break;
+                default:
+                    ErrorMessage.AddMessage("Bad option!");
+                    break;
+            }
+        }
+
+        private void DumpBiomes()
         {
             ErrorMessage.AddMessage("Dumping biomes");
             DataDumper.LogBiomes();
         }
 
-        private void OnConsoleCommand_dumpDataboxes(NotificationCenter.Notification n)
+        private void DumpDataboxes()
         {
             StartCoroutine(DataDumper.LogDataboxes());
         }
 
-        private void OnConsoleCommand_dumpEncyclopedia(NotificationCenter.Notification n)
+        private void DumpEncyclopedia()
         {
             if (!PDAEncyclopedia.initialized)
             {
@@ -45,13 +73,13 @@ namespace DataExplorer
             DataDumper.LogPDAEncyclopedia();
         }
         
-        private void OnConsoleCommand_dumpKnownTech(NotificationCenter.Notification n)
+        private void DumpKnownTech()
         {
             ErrorMessage.AddMessage("Dumping known tech");
             DataDumper.LogKnownTech();
         }
 
-        private void OnConsoleCommand_dumpPrefabs(NotificationCenter.Notification n)
+        private void DumpPrefabs()
         {
             ErrorMessage.AddMessage("Dumping prefabs");
             DataDumper.LogPrefabs();
@@ -65,6 +93,12 @@ namespace DataExplorer
 
         private void OnConsoleCommand_dumpEntitySlots(NotificationCenter.Notification n)
         {
+            if (EntitySlotDumper._main is null)
+            {
+                ErrorMessage.AddMessage("DB is not ready! Use 'prepSlots' first");
+                return;
+            }
+            
             ErrorMessage.AddMessage("Dumping entity slots");
             StartCoroutine(EntitySlotDumper._main.ScrapeSlots());
         }
@@ -72,14 +106,6 @@ namespace DataExplorer
         private void OnConsoleCommand_endEntitySlots(NotificationCenter.Notification n)
         {
             EntitySlotDumper._main?.Teardown();
-        }
-
-        private void OnConsoleCommand_rando(NotificationCenter.Notification n)
-        {
-            DevConsole.SendConsoleCommand("oxygen");
-            DevConsole.SendConsoleCommand("nodamage");
-            DevConsole.SendConsoleCommand("item seaglide");
-            DevConsole.SendConsoleCommand("item scanner");
         }
     }
 }

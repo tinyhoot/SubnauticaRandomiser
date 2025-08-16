@@ -18,7 +18,7 @@
 
     <ItemGroup>
       <PackageReference Include="sqlite-net-pcl" Version="1.10.196-beta" />
-      <PackageReference Include="Subnautica.Nautilus" Version="1.0.0-pre.33" />
+      <PackageReference Include="Subnautica.Nautilus" Version="1.0.0-pre.42" />
     </ItemGroup>
 
 </Project>
