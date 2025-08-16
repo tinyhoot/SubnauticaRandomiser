@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HootLib", "HootLib-Subnautica\HootLib\HootLib.shproj", "{A1EF0757-EDA8-41DC-89D4-C41D81427D00}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataExplorer", "DataExplorer\DataExplorer.csproj", "{02745225-FBDA-4994-B373-18685FEFB386}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -17,5 +19,9 @@ Global
 		{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}.Debug|x64.Build.0 = Debug|Any CPU
 		{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}.Release|x64.ActiveCfg = Release|Any CPU
 		{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}.Release|x64.Build.0 = Release|Any CPU
+		{02745225-FBDA-4994-B373-18685FEFB386}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{02745225-FBDA-4994-B373-18685FEFB386}.Debug|x64.Build.0 = Debug|Any CPU
+		{02745225-FBDA-4994-B373-18685FEFB386}.Release|x64.ActiveCfg = Release|Any CPU
+		{02745225-FBDA-4994-B373-18685FEFB386}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
