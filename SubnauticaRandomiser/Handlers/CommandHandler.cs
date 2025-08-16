@@ -13,7 +13,7 @@ namespace SubnauticaRandomiser.Handlers
         public void RegisterCommands()
         {
 #if DEBUG
-            DevConsole.RegisterConsoleCommand(this, "rando");
+            DevConsole.RegisterConsoleCommand("rando", OnConsoleCommand_rando);
 #endif
         }
 
