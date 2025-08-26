@@ -34,6 +34,9 @@ namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
             
             counter.Add(1);
             SortCounters();
+            // Consider this biome completed when all minimum spawns have been reached.
+            if (SpawnCounters[0].Spawned >= SpawnCounters[0].Required)
+                Finished = true;
         }
 
         /// <summary>
@@ -53,6 +56,10 @@ namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
         /// <returns>The TechType of the entity, or TechType.None if no forced spawn is needed.</returns>
         public TechType GetForcedSpawn(float completionThreshold)
         { 
+            // Shortcircuit this if we've already reached the required spawns.
+            if (Finished)
+                return TechType.None;
+            
             // Because we keep the list sorted the next most urgent spawn is always in first position.
             var counter = SpawnCounters[0];
             // Don't force anything if the vanilla systems are currently performing well.

@@ -152,7 +152,7 @@ namespace SubnauticaRandomiser.Logic.Modules
                 {
                     foreach (SpawnData spawnData in fragmentSave.SpawnDataDict[key])
                     {
-                        foreach (RandomiserBiomeData biomeData in spawnData.BiomeDataList)
+                        foreach (var biomeData in spawnData.BiomeDataList)
                         {
                             LootDistributionHandler.EditLootDistributionData(spawnData.ClassId, biomeData.Biome, 0f, 0);
                         }
@@ -211,6 +211,12 @@ namespace SubnauticaRandomiser.Logic.Modules
 
             // Determine how many different biomes the fragment should spawn in.
             int biomeCount = rng.Next(3, _config.MaxBiomesPerFragment.Value + 1);
+            // No vanilla fragment requires more than 5, so choose this to be safe.
+            int scansRequired = 5;
+            // Overwrite with randomised scan counts if those were enabled.
+            var unlockData = Bootstrap.SaveData.GetModuleData<FragmentSaveData>().NumFragmentsToUnlock;
+            if (unlockData?.Count > 0 && unlockData.ContainsKey(entity.TechType))
+                scansRequired = unlockData[entity.TechType];
 
             for (int i = 0; i < biomeCount; i++)
             {
@@ -231,14 +237,9 @@ namespace SubnauticaRandomiser.Logic.Modules
                         spawnData = new SpawnData(idList[j]);
                         spawnList.Add(spawnData);
                     }
-                    
-                    RandomiserBiomeData data = new RandomiserBiomeData
-                    {
-                        Biome = biome.Variant,
-                        Count = 1,
-                        Probability = splitRates[j]
-                    };
-                    spawnData.AddBiomeData(data);
+
+                    spawnData.AddBiomeData(biome.Variant, 1, splitRates[j],
+                        Mathf.CeilToInt((float)scansRequired / biomeCount));
                 }
 
                 _log.Debug($"+ Adding fragment to biome: {biome.Variant.AsString()}, {spawnRate}");

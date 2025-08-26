@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using HootLib;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects;
 
@@ -33,6 +34,25 @@ namespace SubnauticaRandomiser.Serialization.Modules
             }
             SpawnDataDict.Add(type, data);
             return true;
+        }
+
+        public Dictionary<BiomeType, List<(TechType, int)>> GetMinimumSpawns()
+        {
+            var data = new Dictionary<BiomeType, List<(TechType, int)>>();
+            foreach (var (techType, spawnDatas) in SpawnDataDict)
+            {
+                foreach (var spawnData in spawnDatas)
+                {
+                    foreach (var biomeData in spawnData.BiomeDataList)
+                    {
+                        if (!data.ContainsKey(biomeData.Biome))
+                            data.Add(biomeData.Biome, new List<(TechType, int)>());
+                        data[biomeData.Biome].Add((techType, biomeData.MinSpawns));
+                    }
+                }
+            }
+
+            return data;
         }
     }
 }

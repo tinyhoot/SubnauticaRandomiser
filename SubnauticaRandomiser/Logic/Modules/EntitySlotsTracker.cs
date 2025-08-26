@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
 using HootLib;
@@ -63,39 +62,8 @@ namespace SubnauticaRandomiser.Logic.Modules
                 return;
             }
 
-            // Make a shallow copy of the randomised fragment counts.
-            var minimumCounts = new Dictionary<TechType, int>(saveData.NumFragmentsToUnlock);
-            // Also populate the counts with fragments that have not had their unlock numbers changed.
-            foreach (TechType techType in saveData.SpawnDataDict.Keys)
-            {
-                // Vanilla fragments do not go above a maximum of 5 scans needed to unlock.
-                if (!minimumCounts.ContainsKey(techType))
-                    minimumCounts[techType] = 5;
-            }
-
-            // Set twice the number required to unlock as a minimum to allow the player to find them comfortably.
-            // Keys are put into a list, otherwise C# complains that the collection was modified during access.
-            foreach (TechType techType in minimumCounts.Keys.ToList())
-            {
-                minimumCounts[techType] *= 2;
-            }
-            
-            // TODO: Hook up to actual randomisation results instead of obvious test cases
-            var test = new Dictionary<BiomeType, List<(TechType, int)>>
-            {
-                { BiomeType.CrashHome, new List<(TechType, int)> { (TechType.Aerogel, 10) } },
-                { BiomeType.SafeShallows_Grass, new List<(TechType, int)> { (TechType.AluminumOxide, 15) } },
-                {
-                    BiomeType.SafeShallows_ShellTunnel,
-                    new List<(TechType, int)>
-                    {
-                        (TechType.BaseBioReactorFragment, 5), (TechType.CyclopsEngineFragment, 5)
-                    }
-                }
-            };
-
             _log.Debug("Setting up tracker entities and spawnables.");
-            Bootstrap.SaveData.GetModuleData<EntitySlotsTrackerSaveData>().SetupEntities(test);
+            Bootstrap.SaveData.GetModuleData<EntitySlotsTrackerSaveData>().SetupEntities(saveData.GetMinimumSpawns());
             Bootstrap.SaveData.GetModuleData<EntitySlotsTrackerSaveData>().SetupSpawnables();
         }
 
