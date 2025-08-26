@@ -11,6 +11,7 @@ using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
+using SubnauticaRandomiser.Serialization.Modules.EntitySlots;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
@@ -26,8 +27,8 @@ namespace SubnauticaRandomiser.Logic.Modules
     {
         private const string _slotsInfoFile = "entitySlots.csv";
 
-        private ILogHandler _log = PrefixLogHandler.Get("[Tracker]");
-        private List<EntitySlotCounts> _slotsData;
+        private ILogHandler _log = PrefixLogHandler.Get("[SlotsTracker]");
+        private List<SlotCounts> _slotsData;
 
         public IEnumerable<Task> LoadFiles()
         {
@@ -46,7 +47,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         public void RandomiseOutOfLoop(IRandomHandler rng, SaveData saveData)
         {
             // At this point the file is guaranteed to have finished loading.
-            saveData.GetModuleData<EntitySlotsTrackerSaveData>().Setup(_slotsData);
+            saveData.GetModuleData<EntitySlotsTrackerSaveData>().SetupSlots(_slotsData);
         }
 
         public bool RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
@@ -78,8 +79,24 @@ namespace SubnauticaRandomiser.Logic.Modules
             {
                 minimumCounts[techType] *= 2;
             }
+            
+            // TODO: Hook up to actual randomisation results instead of obvious test cases
+            var test = new Dictionary<BiomeType, List<(TechType, int)>>
+            {
+                { BiomeType.CrashHome, new List<(TechType, int)> { (TechType.Aerogel, 10) } },
+                { BiomeType.SafeShallows_Grass, new List<(TechType, int)> { (TechType.AluminumOxide, 15) } },
+                {
+                    BiomeType.SafeShallows_ShellTunnel,
+                    new List<(TechType, int)>
+                    {
+                        (TechType.BaseBioReactorFragment, 5), (TechType.CyclopsEngineFragment, 5)
+                    }
+                }
+            };
 
-            Bootstrap.SaveData.GetModuleData<EntitySlotsTrackerSaveData>().SetupMinimumSpawns(minimumCounts);
+            _log.Debug("Setting up tracker entities and spawnables.");
+            Bootstrap.SaveData.GetModuleData<EntitySlotsTrackerSaveData>().SetupEntities(test);
+            Bootstrap.SaveData.GetModuleData<EntitySlotsTrackerSaveData>().SetupSpawnables();
         }
 
         public void SetupHarmonyPatches(Harmony harmony, SaveData saveData)
@@ -91,7 +108,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         private async Task ParseDataFileAsync()
         {
             CsvParser parser = new CsvParser(Path.Combine(Hootils.GetModDirectory(), "Assets", _slotsInfoFile));
-            _slotsData = await parser.ParseAllLinesAsync<EntitySlotCounts>();
+            _slotsData = await parser.ParseAllLinesAsync<SlotCounts>();
             _slotsData.ForEach(line =>
                 _log.Debug($"Registered biome: {line.Biome}, {line.SmallMax}, {line.CreatureMax}"));
         }
