@@ -10,24 +10,22 @@ namespace SubnauticaRandomiser.Objects
     /// A wrapper for the game's SpawnData class to make it serializable.
     /// </summary>
     [Serializable]
-    public class SpawnData
+    internal class SpawnData
     {
         public readonly string ClassId;
-        public int AccessibleDepth;                         // Approximate depth needed to encounter this
-        public List<RandomiserBiomeData> BiomeDataList;     // All the biomes this can appear in
+        public List<BiomeDataWrapper> BiomeDataList;     // All the biomes this can appear in
 
-        public SpawnData(string classId, int depth = 0)
+        public SpawnData(string classId)
         {
             ClassId = classId;
-            AccessibleDepth = depth;
-            BiomeDataList = new List<RandomiserBiomeData>();
+            BiomeDataList = new List<BiomeDataWrapper>();
         }
 
         /// <summary>
         /// Add BiomeData to the SpawnData. Will throw out any duplicates.
         /// </summary>
         /// <param name="bd">The data to add.</param>
-        public void AddBiomeData(RandomiserBiomeData bd)
+        public void AddBiomeData(BiomeDataWrapper bd)
         {
             if (BiomeDataList.Find(x => x.Biome.Equals(bd.Biome)) != null)
             {
@@ -35,6 +33,18 @@ namespace SubnauticaRandomiser.Objects
                 return;
             }
             BiomeDataList.Add(bd);
+        }
+
+        public void AddBiomeData(BiomeType biome, int count, float probability, int minSpawns)
+        {
+            var biomeData = new BiomeDataWrapper
+            {
+                Biome = biome,
+                SpawnCount = count,
+                Probability = probability,
+                MinSpawns = minSpawns
+            };
+            AddBiomeData(biomeData);
         }
 
         /// <summary>
@@ -56,12 +66,40 @@ namespace SubnauticaRandomiser.Objects
         {
             List<BiomeData> list = new List<BiomeData>();
 
-            foreach (RandomiserBiomeData data in BiomeDataList)
+            foreach (BiomeDataWrapper data in BiomeDataList)
             {
                 list.Add(data.GetBaseBiomeData());
             }
 
             return list;
+        }
+        
+        /// <summary>
+        /// A wrapper for the game's BiomeData class to make it serializable.
+        /// </summary>
+        [Serializable]
+        internal class BiomeDataWrapper
+        {
+            public BiomeType Biome;
+            public int SpawnCount;
+            public float Probability;
+            public int MinSpawns;
+        
+            /// <summary>
+            /// Get the non-serializable in-game equivalent of this class.
+            /// </summary>
+            /// <returns>This class, converted to the game's equivalent.</returns>
+            public BiomeData GetBaseBiomeData()
+            {
+                BiomeData data = new BiomeData
+                {
+                    biome = Biome,
+                    count = SpawnCount,
+                    probability = Probability
+                };
+
+                return data;
+            }
         }
     }
 }

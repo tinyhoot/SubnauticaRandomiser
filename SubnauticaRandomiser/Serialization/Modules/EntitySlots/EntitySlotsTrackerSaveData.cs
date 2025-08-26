@@ -29,6 +29,7 @@ namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
                 if (!EntityData.TryGetValue(biome, out EntityCounts counts))
                 {
                     counts = new EntityCounts();
+                    counts.Biome = biome;
                     EntityData[biome] = counts;
                 }
 
