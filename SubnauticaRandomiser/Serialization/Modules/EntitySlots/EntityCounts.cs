@@ -77,18 +77,15 @@ namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
             public int Spawned;
             public int Required;
             public float Completion;
+            
+            public SpawnCounter()
+            {
+            }
 
             public SpawnCounter(TechType techType, int required)
             {
                 TechType = techType;
                 Spawned = 0;
-                Required = required;
-            }
-
-            public SpawnCounter(TechType techType, int spawned, int required)
-            {
-                TechType = techType;
-                Spawned = spawned;
                 Required = required;
             }
 
