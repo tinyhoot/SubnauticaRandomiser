@@ -1,13 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace SubnauticaRandomiser.Serialization.Modules
+namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
 {
     /// <summary>
     /// Represents the number of <see cref="EntitySlot"/> and <see cref="EntitySlotsPlaceholder"/> that can spawn
     /// something in a specific biome. Distinguishes by <see cref="EntitySlotData.EntitySlotType"/>.
     /// </summary>
     [Serializable]
-    internal class EntitySlotCounts
+    internal class SlotCounts
     {
         public BiomeType Biome;
         public int SmallMax;
@@ -23,8 +25,12 @@ namespace SubnauticaRandomiser.Serialization.Modules
         public int MediumSpawned;
         public int MediumLargeSpawned;
         public int CreatureSpawned;
+
+        public float SmallProgress;
+        public float MediumProgress;
+        public float CreatureProgress;
             
-        public EntitySlotCounts(BiomeType biome, int small, int smallMedium, int medium, int mediumLarge, int creature,
+        public SlotCounts(BiomeType biome, int small, int smallMedium, int medium, int mediumLarge, int creature,
             double avgDensity, double totalDensity)
         {
             Biome = biome;
@@ -43,22 +49,55 @@ namespace SubnauticaRandomiser.Serialization.Modules
             {
                 case EntitySlotData.EntitySlotType.Small | EntitySlotData.EntitySlotType.Medium:
                     SmallMediumSpawned += 1;
+                    CalculateSmallProgress();
+                    CalculateMediumProgress();
                     break;
                 case EntitySlotData.EntitySlotType.Medium | EntitySlotData.EntitySlotType.Large:
                     MediumLargeSpawned += 1;
+                    CalculateMediumProgress();
                     break;
                 case EntitySlotData.EntitySlotType.Small:
                     SmallSpawned += 1;
+                    CalculateSmallProgress();
                     break;
                 case EntitySlotData.EntitySlotType.Medium:
                     MediumSpawned += 1;
+                    CalculateMediumProgress();
                     break;
                 case EntitySlotData.EntitySlotType.Creature:
                     CreatureSpawned += 1;
+                    CreatureProgress = (float)CreatureSpawned / CreatureMax;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, "Unsupported EntitySlotType.");
             }
+        }
+
+        private void CalculateSmallProgress()
+        {
+            SmallProgress = (float)(SmallSpawned + SmallMediumSpawned) / (SmallMax + SmallMediumMax);
+        }
+
+        private void CalculateMediumProgress()
+        {
+            MediumProgress = (float)(MediumSpawned + SmallMediumSpawned + MediumLargeSpawned) /
+                             (MediumMax + SmallMediumMax + MediumLargeMax);
+        }
+
+        /// <summary>
+        /// Get the percentage of all slots of the given type in this biome that have already been processed.
+        /// </summary>
+        public float GetProgress(EntitySlotData.EntitySlotType slotType)
+        {
+            return slotType switch
+            {
+                EntitySlotData.EntitySlotType.Small | EntitySlotData.EntitySlotType.Medium => (SmallProgress + MediumProgress) / 2f,
+                EntitySlotData.EntitySlotType.Medium | EntitySlotData.EntitySlotType.Large => MediumProgress,
+                EntitySlotData.EntitySlotType.Small => SmallProgress,
+                EntitySlotData.EntitySlotType.Medium => MediumProgress,
+                EntitySlotData.EntitySlotType.Creature => CreatureProgress,
+                _ => throw new ArgumentOutOfRangeException(nameof(slotType), slotType, "Unsupported EntitySlotType.")
+            };
         }
         
         /// <summary>
@@ -76,6 +115,15 @@ namespace SubnauticaRandomiser.Serialization.Modules
                 EntitySlot.Type.Creature => EntitySlotData.EntitySlotType.Creature,
                 _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Invalid EntitySlotType.")
             };
+        }
+        
+        /// <inheritdoc cref="ConvertToPlaceholderType(EntitySlot.Type)"/>
+        public static EntitySlotData.EntitySlotType ConvertToPlaceholderType(List<EntitySlot.Type> allowedTypes)
+        {
+            // Bitwise OR of this flags enum is the same as just summing up all the underlying int values.
+            return (EntitySlotData.EntitySlotType)allowedTypes
+                .Select(ConvertToPlaceholderType)
+                .Sum(t => (int)t);
         }
     }
 }
