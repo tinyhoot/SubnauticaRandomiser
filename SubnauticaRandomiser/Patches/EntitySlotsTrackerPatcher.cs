@@ -15,6 +15,9 @@ namespace SubnauticaRandomiser.Patches
     [HarmonyPatch]
     internal static class EntitySlotsTrackerPatcher
     {
+        private const float AdjustedSlotMult = 1.25f;
+        private const float SlotEmergencyThreshold = 0.95f;
+        
         private static EntitySlotsTrackerSaveData _saveData;
         private static ILogHandler _log = PrefixLogHandler.Get("[SlotTrackerPatcher]");
         private static IRandomHandler _rng = new RandomHandler();
@@ -127,17 +130,25 @@ namespace SubnauticaRandomiser.Patches
                 return default;
             // Pretend that more slots have spawned than really did so that we reach guaranteed 100% of entities spawned
             // *before* we run out of slots to do so.
-            slotProgress *= 1.25f; // Works out to 100% fragment saturation after 80% of slots have been processed.
-            
-            if (slotProgress < entityCounts.NextCheckThreshold)
+            var adjustedProgress = slotProgress * AdjustedSlotMult;
+            if (adjustedProgress < entityCounts.NextCheckThreshold)
                 return default;
 
-            var techType = entityCounts.GetForcedSpawn(slotProgress);
+            var techType = entityCounts.GetForcedSpawn(adjustedProgress);
             if (techType == TechType.None)
                 return default;
 
             _log.Debug($"Forcing spawn of '{techType}' in biome '{biome}'");
-            return new EntitySlot.Filler { classId = _saveData.Spawnables[techType].GetRandomPrefab(_rng), count = 1 };
+            int spawnCount = 1;
+            // If almost no slots are left do an emergency spawn where several entities are layered on top of each
+            // other. It's not pretty, but it prevents getting stuck / softlocked.
+            if (slotProgress >= SlotEmergencyThreshold)
+            {
+                spawnCount = entityCounts.GetNumMissingSpawns(techType);
+                _log.Warn($"Forcing emergency spawn of {spawnCount} {techType} in {biome}!");
+            }
+
+            return new EntitySlot.Filler { classId = _saveData.Spawnables[techType].GetRandomPrefab(_rng), count = spawnCount };
         }
     }
 }

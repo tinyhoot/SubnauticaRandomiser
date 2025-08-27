@@ -98,9 +98,8 @@ namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
             {
                 throw new KeyNotFoundException($"Filler classId '{filler.classId}' is not in WorldEntityDB!");
             }
-
-            var techType = info.techType;
-            counts.CountSpawn(techType);
+            
+            counts.CountSpawn(info.techType, filler.count);
         }
     }
 }
