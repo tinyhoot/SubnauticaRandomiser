@@ -26,13 +26,13 @@ namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
         /// <summary>
         /// Count one successful spawn for an entity.
         /// </summary>
-        public void CountSpawn(TechType techType)
+        public void CountSpawn(TechType techType, int spawned = 1)
         {
             var counter = SpawnCounters.Find(c => c.TechType == techType);
             if (counter is null)
                 return;
             
-            counter.Add(1);
+            counter.Add(spawned);
             SortCounters();
             // Consider this biome completed when all minimum spawns have been reached.
             if (SpawnCounters[0].Spawned >= SpawnCounters[0].Required)
@@ -75,6 +75,20 @@ namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
             // forced spawns when the second entity's completion percentage is much higher than the first one's.
             NextCheckThreshold = counter.Completion;
             return counter.TechType;
+        }
+
+        /// <summary>
+        /// Get the number of remaining spawns needed to satisfy the minimum spawn requirements of an entity.
+        /// </summary>
+        /// <exception cref="ArgumentException"></exception>
+        public int GetNumMissingSpawns(TechType entity)
+        {
+            var counter = SpawnCounters.Find(c => c.TechType == entity);
+            if (counter is null)
+                throw new ArgumentException($"No entity with TechType '{entity}' present in spawn counters!");
+
+            // Never return negatives.
+            return Mathf.Max(counter.Required - counter.Spawned, 0);
         }
 
         [Serializable]
