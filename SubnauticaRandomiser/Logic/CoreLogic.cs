@@ -99,6 +99,22 @@ namespace SubnauticaRandomiser.Logic
             return (int)(Time.realtimeSinceStartup * 1000f);
         }
 
+        
+        #region logic-rework
+
+        public void RandomiseNew()
+        {
+            // Create new sphere
+            // Explore all regions and transitions as far as possible
+            // Prune inward facing transitions (only keep ones to new regions) and keep a list of all transitions
+            // Fill priority items
+            // Fill regular items
+            // Repeat
+        }
+
+        #endregion logic-rework
+        
+
         /// <summary>
         /// Once all datafiles have completed loading, start up the logic.
         /// Running this as a coroutine spaces the logic out over several frames, which prevents the game from
