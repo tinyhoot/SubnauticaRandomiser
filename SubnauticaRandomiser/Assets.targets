@@ -3,5 +3,6 @@
 <!-- Define which extra files to copy during testing / in the release zip. Copy this file to your own project directory and edit to your liking. -->
     <ItemGroup>
         <Assets Include="Assets\*" />
+        <Assets Include="Assets\Entities\*" />
     </ItemGroup>
 </Project>

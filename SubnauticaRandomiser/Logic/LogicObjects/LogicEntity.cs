@@ -1,15 +1,19 @@
+using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace SubnauticaRandomiser.Logic.LogicObjects
 {
     /// <summary>
     /// Represents an abstract unlockable that can be found in a <see cref="Region"/>.
     /// </summary>
+    [Serializable]
     internal abstract class LogicEntity
     {
         /// <summary>
         /// The TechType this Entity interacts with, whether by unlocking, crafting, spawning, or whatever else.
         /// </summary>
+        [JsonProperty]
         public readonly TechType TechType;
 
         /// <summary>

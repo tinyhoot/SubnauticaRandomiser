@@ -7,12 +7,13 @@ using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Logic.LogicObjects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
 using SubnauticaRandomiser.Serialization;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
+using LogicEntity = SubnauticaRandomiser.Objects.LogicEntity;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -110,6 +111,13 @@ namespace SubnauticaRandomiser.Logic
             // Fill priority items
             // Fill regular items
             // Repeat
+
+            List<Sphere> spheres = new List<Sphere>();
+            Sphere start = new Sphere(0);
+            // Add baseline info based on the lifepod's starting position.
+            // TODO: Include info from randomised start.
+            // Set starting region as only region of the starting sphere
+            // Proceed as normal
         }
 
         #endregion logic-rework

@@ -8,12 +8,17 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// <summary>
         /// Spheres are concentric. Spheres of higher tiers have access to everything in spheres of lower tiers.
         /// </summary>
-        public int Tier;
+        public readonly int Tier;
 
         /// <summary>
         /// All regions accessible within this sphere.
         /// </summary>
         public List<Region> Regions = new List<Region>();
+
+        public Sphere(int tier)
+        {
+            Tier = tier;
+        }
 
         public void PriorityFill()
         {

@@ -1,0 +1,39 @@
+[
+  {
+    "Name": "SafeShallows",
+    "Entities": [
+      "LogicInventoryItem:Titanium",
+      "LogicInventoryItem:Copper"
+    ],
+    "BiomeTypes": [
+      "SafeShallows_Grass",
+      "SafeShallows_ShellTunnel",
+      "SafeShallows_ShellTunnelHuge"
+    ]
+  },
+  {
+    "Name": "KelpForest",
+    "Entities": [
+      "LogicInventoryItem:CreepVinePiece"
+    ],
+    "BiomeTypes": [
+      "Kelp_GrassDense",
+      "Kelp_GrassSparse",
+      "Kelp_Sand",
+      "Kelp_TechSite_Scattered",
+      "Kelp_Wall"
+    ]
+  },
+  {
+    "Name": "Wreck18",
+    "BiomeTypes": [
+      "Kelp_TechSite"
+    ]
+  },
+  {
+    "Name": "Wreck18Barrier",
+    "BiomeTypes": [
+      "Kelp_TechSite_Barrier"
+    ]
+  }
+]

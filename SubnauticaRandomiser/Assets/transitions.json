@@ -1,0 +1,27 @@
+[
+  {
+    "Name": "SafeShallows__KelpForest",
+    "Entry": "SafeShallows",
+    "Exit": "KelpForest"
+  },
+  {
+    "Name": "KelpForest__Wreck18",
+    "Entry": "KelpForest",
+    "Exit": "Wreck18"
+  },
+  {
+    "Name": "Wreck18__Barrier",
+    "Entry": "Wreck18",
+    "Exit": "Wreck18Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 50
+      },
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  }
+]
