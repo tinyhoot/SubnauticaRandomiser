@@ -50,7 +50,9 @@ namespace SubnauticaRandomiser
         private void Test()
         {
             var manager = new EntityManager();
-            manager.ParseFromDisk();
+            manager.ParseEntitiesFromDisk();
+            var manager2 = new RegionManager();
+            manager2.ParseRegionsFromDisk(manager);
         }
 
         /// <summary>

@@ -15,6 +15,12 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// </summary>
         public List<Region> Regions = new List<Region>();
 
+        public Sphere(RandomisationContext context)
+        {
+            Tier = 0;
+            Regions.Add(context.StartingRegion);
+        }
+
         public Sphere(int tier)
         {
             Tier = tier;
