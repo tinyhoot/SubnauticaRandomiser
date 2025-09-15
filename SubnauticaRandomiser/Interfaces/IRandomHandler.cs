@@ -38,6 +38,11 @@ namespace SubnauticaRandomiser.Interfaces
         /// <summary>
         /// Returns a random floating-point number between 0.0 and 1.0
         /// </summary>
+        public float NextFloat();
+
+        /// <summary>
+        /// Returns a random floating-point number between 0.0 and 1.0
+        /// </summary>
         public double NextDouble();
 
         /// <inheritdoc cref="NextDouble()"/>

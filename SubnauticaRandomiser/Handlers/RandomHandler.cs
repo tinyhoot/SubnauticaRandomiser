@@ -73,6 +73,11 @@ namespace SubnauticaRandomiser.Handlers
             return minValue + x;
         }
 
+        public float NextFloat()
+        {
+            return (float)_random.NextDouble();
+        }
+
         public double NextDouble()
         {
             return _random.NextDouble();
