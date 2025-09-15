@@ -12,5 +12,10 @@ namespace SubnauticaRandomiser.Logic
     {
         public Region StartingRegion;
         public List<LogicEntity> StartingEntities;
+
+        public RandomisationContext(Region start)
+        {
+            StartingRegion = start;
+        }
     }
 }

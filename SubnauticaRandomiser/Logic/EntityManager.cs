@@ -39,6 +39,14 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
+        /// Get a shallow copy of the list of all entities.
+        /// </summary>
+        public List<LogicEntity> GetAllEntities()
+        {
+            return new List<LogicEntity>(_entities);
+        }
+
+        /// <summary>
         /// Get all entities that are instances or subclasses of T.
         /// </summary>
         public IEnumerable<T> GetAllEntities<T>() where T : LogicEntity

@@ -26,5 +26,11 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// last entity to be randomised.
         /// </summary>
         public float Priority;
+
+        /// <summary>
+        /// The <see cref="Sphere"/> this entity has been assigned to. A negative value indicates the entity has not
+        /// been randomised yet.
+        /// </summary>
+        public int Sphere = -1;
     }
 }

@@ -17,6 +17,18 @@ namespace SubnauticaRandomiser.Logic
         private List<Region> _regions;
         private List<Transition> _transitions;
 
+        /// <summary>
+        /// Get the region with the provided unique name.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if no region with that name exists.</exception>
+        public Region GetRegion(string name)
+        {
+            var region = _regions.Find(reg => reg.Name == name);
+            if (region is null)
+                throw new ArgumentException($"No region with name '{name}' exists!", nameof(name));
+            return region;
+        }
+
         public async Task ParseRegionsFromDisk(EntityManager manager)
         {
             try

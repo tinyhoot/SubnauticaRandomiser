@@ -8,6 +8,6 @@ namespace SubnauticaRandomiser.Logic.LogicObjects.Transitions
     [Serializable]
     internal abstract class TransitionLock
     {
-        public abstract bool IsUnlocked();
+        public abstract bool CheckUnlocked();
     }
 }

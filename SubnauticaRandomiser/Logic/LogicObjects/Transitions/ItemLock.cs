@@ -6,7 +6,7 @@ namespace SubnauticaRandomiser.Logic.LogicObjects.Transitions
     {
         public TechType RequiredItem;
         
-        public override bool IsUnlocked()
+        public override bool CheckUnlocked()
         {
             throw new NotImplementedException();
         }

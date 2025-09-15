@@ -36,6 +36,10 @@ namespace SubnauticaRandomiser.Logic
         private readonly Dictionary<EntityType, ILogicModule> _handlingModules = new Dictionary<EntityType, ILogicModule>();
         private List<LogicEntity> _priorityEntities;
 
+
+        private LogicMonitor _monitor;
+        private List<LogicObjects.LogicEntity> _entities;
+
         /// <summary>
         /// Invoked during the setup stage, before the main loop begins.
         /// </summary>
@@ -103,7 +107,7 @@ namespace SubnauticaRandomiser.Logic
         
         #region logic-rework
 
-        public void RandomiseNew()
+        internal void RandomiseNew(EntityManager entityManager, RegionManager regionManager)
         {
             // Create new sphere
             // Explore all regions and transitions as far as possible
@@ -111,13 +115,27 @@ namespace SubnauticaRandomiser.Logic
             // Fill priority items
             // Fill regular items
             // Repeat
+            
+            // Initially, the list of unrandomised entities is just the list of all entities.
+            _entities = entityManager.GetAllEntities();
+            
+            // Set up the context with vanilla information.
+            var context = new RandomisationContext(regionManager.GetRegion("SafeShallows"));
+            // If modules like randomised start need to change the context, they can do so through this event.
+            _monitor.TriggerContextCreated(context);
 
             List<Sphere> spheres = new List<Sphere>();
-            Sphere start = new Sphere(0);
-            // Add baseline info based on the lifepod's starting position.
-            // TODO: Include info from randomised start.
-            // Set starting region as only region of the starting sphere
-            // Proceed as normal
+            Sphere start = new Sphere(context);
+            spheres.Add(start);
+
+            // Keep going until every last entity has been randomised.
+            while (_entities.Count > 0)
+            {
+                // Get the newest, outermost sphere.
+                var sphere = spheres.Last();
+                // Do fills
+                // After every fill, check whether a transition lock can be unlocked. If yes, new sphere.
+            }
         }
 
         #endregion logic-rework

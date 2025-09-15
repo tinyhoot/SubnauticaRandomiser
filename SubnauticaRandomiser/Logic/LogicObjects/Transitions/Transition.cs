@@ -14,12 +14,12 @@ namespace SubnauticaRandomiser.Logic.LogicObjects.Transitions
         /// The unique name of this transition.
         /// </summary>
         [JsonProperty] public readonly string Name;
-        
+
         /// <summary>
         /// The region this transition originates from.
         /// </summary>
         public Region Entry;
-        
+
         /// <summary>
         /// The region this transition leads to.
         /// </summary>
@@ -31,13 +31,32 @@ namespace SubnauticaRandomiser.Logic.LogicObjects.Transitions
         [JsonProperty(ItemTypeNameHandling = TypeNameHandling.All)]
         public List<TransitionLock> Locks;
 
+        private bool _unlocked;
+
         public bool IsUnlocked()
         {
-            // What can it be?
-            // Laser cutter, Propulsion cannon, Teleporter IonCrystal, PrecursorKeys
-            // *Also* depth/distance from the nearest reachable Region
-            // Enum for lock type?
-            throw new NotImplementedException();
+            return _unlocked;
+        }
+
+        public bool CheckLocks()
+        {
+            // There can be no backwards progress. Locks that are open stay open.
+            if (_unlocked)
+                return true;
+            
+            if (Locks is null || Locks.Count == 0)
+            {
+                _unlocked = true;
+                return true;
+            }
+
+            if (Locks.TrueForAll(l => l.CheckUnlocked()))
+            {
+                _unlocked = true;
+                return true;
+            }
+
+            return false;
         }
     }
 }
