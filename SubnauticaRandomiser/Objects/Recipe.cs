@@ -86,7 +86,12 @@ namespace SubnauticaRandomiser.Objects
 
         public RecipeData ToRecipeData()
         {
-            return new RecipeData(Ingredients.Select(i => i.ToGameIngredient()).ToList());
+            var data = new RecipeData(Ingredients.Select(i => i.ToGameIngredient()).ToList())
+            {
+                craftAmount = CraftAmount,
+                LinkedItems = LinkedIngredients.ShallowCopy()
+            };
+            return data;
         }
     }
 }
