@@ -1,6 +1,106 @@
 [
   {
+    "TechType": "Beacon",
+    "SpawnableTechType": "BeaconFragment"
+  },
+  {
+    "TechType": "Constructor",
+    "SpawnableTechType": "ConstructorFragment"
+  },
+  {
+    "TechType": "GravSphere",
+    "SpawnableTechType": "GravSphereFragment"
+  },
+  {
+    "TechType": "LaserCutter",
+    "SpawnableTechType": "LaserCutterFragment"
+  },
+  {
+    "TechType": "LedLight",
+    "SpawnableTechType": "LedLightFragment"
+  },
+  {
+    "TechType": "PropulsionCannon",
+    "SpawnableTechType": "PropulsionCannonFragment"
+  },
+  {
+    "TechType": "StasisRifle",
+    "SpawnableTechType": "StasisRifleFragment"
+  },
+  {
     "TechType": "Seaglide",
     "SpawnableTechType": "SeaglideFragment"
+  },
+  {
+    "TechType": "Seamoth",
+    "SpawnableTechType": "SeamothFragment"
+  },
+  {
+    "TechType": "Exosuit",
+    "SpawnableTechType": "ExosuitFragment"
+  },
+  {
+    "TechType": "CyclopsBridgeBlueprint",
+    "SpawnableTechType": "CyclopseBridgeFragment"
+  },
+  {
+    "TechType": "CyclopsEngineBlueprint",
+    "SpawnableTechType": "CyclopsEngineFragment"
+  },
+  {
+    "TechType": "CyclopsHullBlueprint",
+    "SpawnableTechType": "CyclopsHullFragment"
+  },
+  {
+    "TechType": "ExosuitDrillArmModule",
+    "SpawnableTechType": "ExosuitDrillArmFragment"
+  },
+  {
+    "TechType": "ExosuitGrapplingArmModule",
+    "SpawnableTechType": "ExosuitGrapplingArmFragment"
+  },
+  {
+    "TechType": "ExosuitPropulsionArmModule",
+    "SpawnableTechType": "ExosuitPropulsionArmFragment"
+  },
+  {
+    "TechType": "ExosuitTorpedoArmModule",
+    "SpawnableTechType": "ExosuitTorpedoArmFragment"
+  },
+  {
+    "TechType": "BaseBioReactor",
+    "SpawnableTechType": "BaseBioReactorFragment"
+  },
+  {
+    "TechType": "BaseMapRoom",
+    "SpawnableTechType": "BaseMapRoomFragment"
+  },
+  {
+    "TechType": "BaseMoonPool",
+    "SpawnableTechType": "BaseMoonPoolFragment"
+  },
+  {
+    "TechType": "BaseNuclearReactor",
+    "SpawnableTechType": "BaseNuclearReactorFragment"
+  },
+  {
+    "TechType": "BatteryCharger",
+    "SpawnableTechType": "BatteryChargerFragment"
+  },
+  {
+    "TechType": "PowerCellCharger",
+    "SpawnableTechType": "PowerCellChargerFragment"
+  },
+  {
+    "TechType": "PowerTransmitter",
+    "SpawnableTechType": "PowerTransmitterFragment"
+  },
+  {
+    "TechType": "ThermalPlant",
+    "SpawnableTechType": "ThermalPlantFragment"
+  },
+  {
+    "TechType": "WorkBench",
+    "SpawnableTechType": "WorkBenchFragment"
   }
 ]

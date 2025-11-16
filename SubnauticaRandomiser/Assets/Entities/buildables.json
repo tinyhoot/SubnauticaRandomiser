@@ -1,0 +1,298 @@
+[
+  {
+    "TechType": "BaseBioReactor",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicBuildable:BaseRoom",
+      "LogicFragment:BaseBioReactor"
+    ]
+  },
+  {
+    "TechType": "BaseNuclearReactor",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicBuildable:BaseRoom",
+      "LogicFragment:BaseNuclearReactor"
+    ]
+  },
+  {
+    "TechType": "SolarPanel",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "ThermalPlant",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicFragment:ThermalPlant"
+    ]
+  },
+  {
+    "TechType": "BaseConnector",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseCorridorI",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseCorridorL",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseCorridorT",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseCorridorX",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseCorridorGlassI",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseCorridorGlassL",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseFoundation",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseGlassDome",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicBuildable:BaseRoom"
+    ]
+  },
+  {
+    "TechType": "BaseHatch",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseLargeGlassDome",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicBuildable:BaseRoom"
+    ]
+  },
+  {
+    "TechType": "BaseLargeRoom",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicBuildable:BaseRoom"
+    ]
+  },
+  {
+    "TechType": "BaseMapRoom",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicBuildable:BaseRoom",
+      "LogicFragment:BaseMapRoom"
+    ]
+  },
+  {
+    "TechType": "BaseMoonPool",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicBuildable:BaseRoom",
+      "LogicFragment:BaseMoonPool"
+    ]
+  },
+  {
+    "TechType": "BaseObservatory",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseRoom",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseReinforcement",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseWindow",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BasePipeConnector",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "FarmingTray",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "PowerTransmitter",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicFragment:PowerTransmitter"
+    ]
+  },
+  {
+    "TechType": "Spotlight",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "Techlight",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "Aquarium",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BatteryCharger",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicFragment:BatteryCharger"
+    ]
+  },
+  {
+    "TechType": "Fabricator",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "Locker",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "MedicalCabinet",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "PlanterBox",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "PlanterPot",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "PlanterPot2",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "PlanterPot3",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "PlanterShelf",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "PowerCellCharger",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicFragment:PowerCellCharger"
+    ]
+  },
+  {
+    "TechType": "Radio",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "SmallLocker",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "WorkBench",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicFragment:WorkBench"
+    ]
+  },
+  {
+    "TechType": "BaseBulkHead",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseFiltrationMachine",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseLadder",
+    "Dependencies": [
+      "LogicInventoryItem:Builder"
+    ]
+  },
+  {
+    "TechType": "BaseUpgradeConsole",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicBuildable:BaseMoonPool",
+      "LogicDatabox:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "BaseWaterPark",
+    "Dependencies": [
+      "LogicInventoryItem:Builder",
+      "LogicBuildable:BaseRoom",
+      "LogicDatabox:BaseWaterPark"
+    ]
+  }
+]

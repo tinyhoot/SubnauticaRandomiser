@@ -1,14 +1,980 @@
 [
   {
-    "TechType": "Titanium"
+    "TechType": "AluminumOxide"
+  },
+  {
+    "TechType": "CrashPowder",
+    "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "Copper"
   },
   {
+    "TechType": "Diamond"
+  },
+  {
+    "TechType": "Gold"
+  },
+  {
+    "TechType": "PrecursorIonCrystal",
+    "Dependencies": [
+      "LogicInventoryItem:ExoSuitDrillArmModule"
+    ]
+  },
+  {
+    "TechType": "Kyanite"
+  },
+  {
+    "TechType": "Lead"
+  },
+  {
+    "TechType": "Lithium"
+  },
+  {
+    "TechType": "Magnetite"
+  },
+  {
+    "TechType": "ScrapMetal"
+  },
+  {
+    "TechType": "Nickel"
+  },
+  {
+    "TechType": "Quartz"
+  },
+  {
+    "TechType": "Salt"
+  },
+  {
+    "TechType": "Silver"
+  },
+  {
+    "TechType": "Sulphur"
+  },
+  {
+    "TechType": "Titanium"
+  },
+  {
+    "TechType": "UraniniteCrystal"
+  },
+  {
+    "TechType": "AcidMushroom"
+  },
+  {
+    "TechType": "BloodOil"
+  },
+  {
+    "TechType": "CoralChunk",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "CreepVinePiece",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "CreepVineSeedCluster"
+  },
+  {
+    "TechType": "Floater"
+  },
+  {
+    "TechType": "GasPod"
+  },
+  {
+    "TechType": "JellyPlant"
+  },
+  {
+    "TechType": "JeweledDiskPiece",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "SeaTreaderPoop"
+  },
+  {
+    "TechType": "StalkerTooth",
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "WhiteMushroom"
+  },
+  {
+    "TechType": "Bleach"
+  },
+  {
+    "TechType": "EnameledGlass"
+  },
+  {
+    "TechType": "FiberMesh",
+    "Dependencies": [
+      "LogicInventoryItem:CreepVinePiece"
+    ]
+  },
+  {
+    "TechType": "Glass"
+  },
+  {
+    "TechType": "Lubricant",
+    "Dependencies": [
+      "LogicInventoryItem:CreepVineSeedCluster"
+    ]
+  },
+  {
+    "TechType": "PlasteelIngot",
+    "Dependencies": [
+      "LogicFragment:Seamoth"
+    ],
+    "MaxRecipeUsesPerGame": "5"
+  },
+  {
+    "TechType": "Silicone"
+  },
+  {
+    "TechType": "TitaniumIngot",
+    "MaxRecipeUsesPerGame": "5"
+  },
+  {
+    "TechType": "AramidFibers",
+    "Dependencies": [
+      "LogicInventoryItem:BloodOil"
+    ]
+  },
+  {
+    "TechType": "Aerogel",
+    "Dependencies": [
+      "LogicInventoryItem:JellyPlant"
+    ]
+  },
+  {
+    "TechType": "Benzene",
+    "Dependencies": [
+      "LogicInventoryItem:BloodOil"
+    ]
+  },
+  {
+    "TechType": "HatchingEnzymes",
+    "Dependencies": [
+      "LogicInventoryItem:PrecursorKey_Blue"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "HydrochloricAcid",
+    "Dependencies": [
+      "LogicInventoryItem:WhiteMushroom"
+    ]
+  },
+  {
+    "TechType": "Polyaniline",
+    "Dependencies": [
+      "LogicInventoryItem:WhiteMushroom"
+    ]
+  },
+  {
+    "TechType": "AdvancedWiringKit",
+    "Dependencies": [
+      "LogicInventoryItem:ComputerChip"
+    ]
+  },
+  {
     "TechType": "Battery"
   },
   {
-    "TechType": "CreepVinePiece"
+    "TechType": "ComputerChip"
+  },
+  {
+    "TechType": "CopperWire"
+  },
+  {
+    "TechType": "PowerCell",
+    "Dependencies": [
+      "LogicInventoryItem:Battery"
+    ]
+  },
+  {
+    "TechType": "PrecursorIonBattery"
+  },
+  {
+    "TechType": "PrecursorIonPowerCell"
+  },
+  {
+    "TechType": "ReactorRod",
+    "Dependencies": [
+      "LogicBuildable:BaseNuclearReactor"
+    ]
+  },
+  {
+    "TechType": "WiringKit"
+  },
+  {
+    "TechType": "AirBladder",
+    "Dependencies": [
+      "LogicInventoryItem:BladderFish"
+    ]
+  },
+  {
+    "TechType": "Builder",
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "DiveReel",
+    "Dependencies": [
+      "LogicInventoryItem:CreepVinePiece"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "Flare"
+  },
+  {
+    "TechType": "FlashLight",
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "LaserCutter",
+    "Dependencies": [
+      "LogicFragment:LaserCutter"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "LedLight",
+    "Dependencies": [
+      "LogicFragment:LedLight"
+    ]
+  },
+  {
+    "TechType": "PropulsionCannon",
+    "Dependencies": [
+      "LogicFragment:PropulsionCannon"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "Scanner",
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "StasisRifle",
+    "Dependencies": [
+      "LogicFragment:StasisRifle"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "Knife",
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "Welder",
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "PrecursorKey_Blue",
+    "Dependencies": [
+      "LogicInventoryItem:PrecursorKey_Purple"
+    ]
+  },
+  {
+    "TechType": "PrecursorKey_Orange"
+  },
+  {
+    "TechType": "PrecursorKey_Purple"
+  },
+  {
+    "TechType": "Compass",
+    "Dependencies": [
+      "LogicDatabox:Compass"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "DoubleTank",
+    "Dependencies": [
+      "LogicInventoryItem:Tank"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "Fins",
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "FireExtinguisher"
+  },
+  {
+    "TechType": "FirstAidKit"
+  },
+  {
+    "TechType": "RadiationSuit",
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "Rebreather",
+    "Dependencies": [
+      "LogicInventoryItem:DoubleTank"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "ReinforcedDiveSuit",
+    "Dependencies": [
+      "LogicDatabox:ReinforcedDiveSuit"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "MapRoomHudChip",
+    "Dependencies": [
+      "LogicBuildable:BaseMapRoom"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "Pipe"
+  },
+  {
+    "TechType": "PipeSurfaceFloater"
+  },
+  {
+    "TechType": "WaterFiltrationSuit",
+    "Dependencies": [
+      "LogicDatabox:WaterFiltrationSuit"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "Tank",
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "Beacon",
+    "Dependencies": [
+      "LogicFragment:Beacon"
+    ]
+  },
+  {
+    "TechType": "Constructor",
+    "Dependencies": [
+      "LogicFragment:Constructor"
+    ]
+  },
+  {
+    "TechType": "CyclopsDecoy"
+  },
+  {
+    "TechType": "Gravsphere",
+    "Dependencies": [
+      "LogicFragment:Gravsphere"
+    ]
+  },
+  {
+    "TechType": "SmallStorage"
+  },
+  {
+    "TechType": "Seaglide",
+    "Dependencies": [
+      "LogicFragment:Seaglide"
+    ]
+  },
+  {
+    "TechType": "MapRoomCamera",
+    "Dependencies": [
+      "LogicBuildable:BaseMapRoom"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "MapRoomUpgradeScanRange",
+    "Dependencies": [
+      "LogicBuildable:BaseMapRoom"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "MapRoomUpgradeScanSpeed",
+    "Dependencies": [
+      "LogicBuildable:BaseMapRoom"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "HeatBlade",
+    "Dependencies": [
+      "LogicBuildable:WorkBench"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "HighCapacityTank",
+    "Dependencies": [
+      "LogicBuildable:WorkBench",
+      "LogicDatabox:HighCapacityTank"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "PlasteelTank",
+    "Dependencies": [
+      "LogicBuildable:WorkBench",
+      "LogicDatabox:PlasteelTank"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "RepulsionCannon",
+    "Dependencies": [
+      "LogicBuildable:WorkBench",
+      "LogicDatabox:RepulsionCannon"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "SwimChargeFins",
+    "Dependencies": [
+      "LogicBuildable:WorkBench",
+      "LogicDatabox:SwimChargeFins"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "UltraGlideFins",
+    "Dependencies": [
+      "LogicBuildable:WorkBench",
+      "LogicDatabox:UltraGlideFins"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "CyclopsHullModule2",
+    "Dependencies": [
+      "LogicBuildable:WorkBench",
+      "LogicDatabox:CyclopsHullModule2"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "CyclopsHullModule3",
+    "Dependencies": [
+      "LogicBuildable:WorkBench",
+      "LogicDatabox:CyclopsHullModule3"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "ExoHullModule2",
+    "Dependencies": [
+      "LogicBuildable:WorkBench"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "VehicleHullModule2",
+    "Dependencies": [
+      "LogicBuildable:WorkBench"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "VehicleHullModule3",
+    "Dependencies": [
+      "LogicBuildable:WorkBench"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "CyclopsDecoyModule",
+    "Dependencies": [
+      "LogicBuildable:Cyclops",
+      "LogicDatabox:CyclopsDecoyModule"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "CyclopsFireSuppressionModule",
+    "Dependencies": [
+      "LogicBuildable:Cyclops",
+      "LogicDatabox:CyclopsFireSuppressionModule"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "CyclopsHullModule1",
+    "Dependencies": [
+      "LogicBuildable:Cyclops",
+      "LogicDatabox:CyclopsHullModule1"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "CyclopsSeaMothRepairModule",
+    "Dependencies": [
+      "LogicBuildable:Cyclops",
+      "LogicDatabox:CyclopsSeaMothRepairModule"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "CyclopsShieldModule",
+    "Dependencies": [
+      "LogicBuildable:Cyclops",
+      "LogicDatabox:CyclopsShieldModule"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "CyclopsSonarModule",
+    "Dependencies": [
+      "LogicBuildable:Cyclops",
+      "LogicDatabox:CyclopsSonarModule"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "CyclopsThermalReactorModule",
+    "Dependencies": [
+      "LogicBuildable:Cyclops",
+      "LogicDatabox:CyclopsThermalReactorModule"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "ExoHullModule1",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "ExoSuitDrillArmModule",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole",
+      "LogicFragment:ExosuitDrillArm"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "ExoSuitGrapplingArmModule",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole",
+      "LogicFragment:ExoSuitGrapplingArm"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "ExoSuitJetUpgradeModule",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "ExoSuitPropulsionArmModule",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole",
+      "LogicFragment:ExoSuitPropulsionArm"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "ExoSuitThermalReactorModule",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "ExoSuitTorpedoArmModule",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole",
+      "LogicFragment:ExoSuitTorpedoArm"
+    ],
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "PowerUpgradeModule",
+    "Dependencies": [
+      "LogicBuildable:Cyclops"
+    ]
+  },
+  {
+    "TechType": "SeaMothElectricalDefense",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "SeaMothSolarCharge",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "SeaMothSonarModule",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "SeaMothTorpedoModule",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "VehicleArmorPlating",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "VehicleHullModule1",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "VehiclePowerUpgradeModule",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "VehicleStorageModule",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "GasTorpedo",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "WhirlpoolTorpedo",
+    "Dependencies": [
+      "LogicBuildable:BaseUpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "BladderFish"
+  },
+  {
+    "TechType": "Boomerang"
+  },
+  {
+    "TechType": "Eyeye"
+  },
+  {
+    "TechType": "GarryFish"
+  },
+  {
+    "TechType": "HoleFish",
+    "MaxRecipeUsesPerGame": "3"
+  },
+  {
+    "TechType": "HoopFish"
+  },
+  {
+    "TechType": "HoverFish"
+  },
+  {
+    "TechType": "LavaBoomerang"
+  },
+  {
+    "TechType": "LavaEyeye"
+  },
+  {
+    "TechType": "Oculus"
+  },
+  {
+    "TechType": "Peeper"
+  },
+  {
+    "TechType": "Reginald"
+  },
+  {
+    "TechType": "SpadeFish"
+  },
+  {
+    "TechType": "SpineFish"
+  },
+  {
+    "TechType": "AcidMushroomSpore",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "BluePalmSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "EyesPlantSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "GabesFeatherSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "KooshChunk",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "JellyPlantSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "MembrainTreeSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "PurpleBrainCoralPiece",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "PurpleBranchesSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "PurpleFanSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "PurpleStalkSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "PurpleTentacleSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "RedBasketPlantSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "RedBushSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "RedConePlantSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "RedGreenTentacleSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "RedRollPlantSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "SeaCrownSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "ShellGrassSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "SmallFanSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "SnakeMushroomSpore",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "SpikePlantSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "SpottedLeavesPlantSeed",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "TreeMushroomPiece",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "WhiteMushroomSpore",
+    "Dependencies": [
+      "LogicInventoryItem:Knife"
+    ]
+  },
+  {
+    "TechType": "BoneSharkEgg"
+  },
+  {
+    "TechType": "CrabSnakeEgg"
+  },
+  {
+    "TechType": "CrabSquidEgg"
+  },
+  {
+    "TechType": "CrashEgg"
+  },
+  {
+    "TechType": "CuteFishEgg",
+    "MaxRecipeUsesPerGame": "1"
+  },
+  {
+    "TechType": "GasopodEgg"
+  },
+  {
+    "TechType": "JellyRayEgg"
+  },
+  {
+    "TechType": "LavaLizardEgg"
+  },
+  {
+    "TechType": "MesmerEgg"
+  },
+  {
+    "TechType": "RabbitRayEgg"
+  },
+  {
+    "TechType": "SandSharkEgg"
+  },
+  {
+    "TechType": "ShockerEgg"
+  },
+  {
+    "TechType": "SpadeFishEgg"
+  },
+  {
+    "TechType": "StalkerEgg"
+  },
+  {
+    "TechType": "BoneShark",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "CrabSnake",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "CrabSquid",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "Crash",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "CuteFish",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ],
+    "MaxRecipeUsesPerGame": "1"
+  },
+  {
+    "TechType": "Gasopod",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "JellyRay",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "LavaLizard",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "Mesmer",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "RabbitRay",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "SandShark",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "Shocker",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
+  },
+  {
+    "TechType": "Stalker",
+    "Dependencies": [
+      "LogicBuildable:BaseWaterPark"
+    ]
   }
 ]
