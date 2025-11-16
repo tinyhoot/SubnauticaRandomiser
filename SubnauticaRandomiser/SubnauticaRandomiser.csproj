@@ -8,7 +8,7 @@
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Subnautica.Nautilus" Version="1.0.0-pre.42" PrivateAssets="all" />
+        <PackageReference Include="Subnautica.Nautilus" Version="1.0.0-pre.47" PrivateAssets="all" />
     </ItemGroup>
     <Import Project="..\HootLib-Subnautica\HootLib\HootLib.projitems" Label="Shared"/>
 </Project>
