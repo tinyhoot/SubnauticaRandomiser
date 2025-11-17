@@ -1,8 +1,1692 @@
 [
   {
-    "TechType": "SeaglideFragment",
+    "TechType": "AluminumOxide",
     "Spawns": [
-      "SafeShallows_TechSite"
+      "BloodKelp_TrenchWall",
+      "BloodKelp_Wall",
+      "BonesField_ThermalVent",
+      "BonesField_Wall",
+      "Canyon_Wall",
+      "Dunes_ThermalVent",
+      "Dunes_ThermalVent_Rock",
+      "GhostTree_Wall",
+      "GrandReef_BalancingRock_Unused",
+      "GrandReef_BalancingRockInterior_Unused",
+      "GrandReef_CaveWall",
+      "GrandReef_ThermalVent",
+      "GrandReef_Wall",
+      "GrandReef_WhiteCoral",
+      "InactiveLavaZone_Chamber_MagmaBubble",
+      "InactiveLavaZone_Chamber_MagmaTree",
+      "KooshZone_CaveWall",
+      "KooshZone_Geyser",
+      "KooshZone_RockWall",
+      "LostRiverCorridor_Ceiling",
+      "LostRiverCorridor_Wall",
+      "LostRiverJunction_ThermalVent",
+      "LostRiverJunction_Wall",
+      "Mesas_Top",
+      "Mountains_CaveWall",
+      "SeaTreaderPath_CaveCeiling",
+      "SeaTreaderPath_CaveWall",
+      "SkeletonCave_Ceiling",
+      "SkeletonCave_Wall",
+      "SparseReef_DeepWall",
+      "TreeCove_Wall",
+      "UnderwaterIslands_IslandCaveFloor"
+    ]
+  },
+  {
+    "TechType": "BaseBioReactorFragment",
+    "Spawns": [
+      "FragmentBaseBioReactor",
+      "GrassyPlateaus_Grass",
+      "GrassyPlateaus_Sand",
+      "GrassyPlateaus_TechSite_Scattered",
+      "Kelp_TechSite_Scattered",
+      "SparseReef_Techsite_Scatter"
+    ]
+  },
+  {
+    "TechType": "BaseBulkheadFragment",
+    "Spawns": [
+      "FragmentBaseBulkhead"
+    ]
+  },
+  {
+    "TechType": "BaseNuclearReactorFragment",
+    "Spawns": [
+      "BloodKelp_TechSite",
+      "BloodKelp_TechSite_Barrier",
+      "BloodKelp_TechSite_Scatter",
+      "BloodKelp_TrenchFloor",
+      "FragmentBaseNuclearReactor",
+      "JellyShroomCaves_AbandonedBase_Outside",
+      "Mountains_Sand",
+      "Mountains_TechSite_Scatter",
+      "SeaTreaderPath_TechSite_Scatter"
+    ]
+  },
+  {
+    "TechType": "BaseRoomFragment",
+    "Spawns": [
+      "FragmentBaseRoom"
+    ]
+  },
+  {
+    "TechType": "BaseUpgradeConsoleFragment",
+    "Spawns": [
+      "CrashZone_Sand",
+      "DeepGrandReef_AbandonedBase_Exterior",
+      "Dunes_SandDune",
+      "KooshZone_TechSite",
+      "MushroomForest_TechSite_Barrier"
+    ]
+  },
+  {
+    "TechType": "BaseWaterParkFragment",
+    "Spawns": [
+      "BloodKelp_TechSite",
+      "DeepGrandReef_BlueCoral",
+      "GrandReef_TechSite",
+      "KooshZone_TechSite",
+      "SeaTreaderPath_TechSite"
+    ]
+  },
+  {
+    "TechType": "BatteryChargerFragment",
+    "Spawns": [
+      "FragmentBatteryCharger",
+      "GrassyPlateaus_TechSite",
+      "GrassyPlateaus_TechSite_Barrier"
+    ]
+  },
+  {
+    "TechType": "BeaconFragment",
+    "Spawns": [
+      "Kelp_TechSite",
+      "Kelp_TechSite_Scattered",
+      "SafeShallows_TechSite",
+      "SafeShallows_TechSite_Barrier",
+      "SafeShallows_TechSite_Scattered"
+    ]
+  },
+  {
+    "TechType": "Biter",
+    "Spawns": [
+      "GrassyPlateaus_CaveFloor",
+      "GrassyPlateaus_Grass",
+      "JellyshroomCaves_CaveFloor",
+      "Mesas_Open",
+      "Mountains_CaveFloor",
+      "Mountains_Grass",
+      "Mountains_Sand",
+      "Mountains_ThermalVent"
+    ]
+  },
+  {
+    "TechType": "Bladderfish",
+    "Spawns": [
+      "Dunes_ThermalVent_Grass",
+      "Dunes_ThermalVent_Rock",
+      "GrandReef_Grass",
+      "GrandReef_OpenDeep_CreatureOnly",
+      "GrandReef_Wall",
+      "GrandReef_WhiteCoral",
+      "Kelp_Sand",
+      "Kelp_ShellTunnel",
+      "Mesas_Top",
+      "MushroomForest_GiantTreeRoot",
+      "MushroomForest_GiantTreeRootBase",
+      "MushroomForest_MushroomTreeBase",
+      "PrisonAquarium_Grass",
+      "PrisonAquarium_Open_CreatureOnly",
+      "PrisonAquarium_SpecialCoral",
+      "SafeShallows_Plants",
+      "SafeShallows_ShellTunnel",
+      "TreeCove_Algae",
+      "UnderwaterIslands_ValleyWall"
+    ]
+  },
+  {
+    "TechType": "Bleeder",
+    "Spawns": [
+      "BonesField_Lake_Floor",
+      "BonesField_LakePit_Open_CreatureOnly",
+      "GhostTree_Lake_Floor",
+      "Kelp_CaveWall",
+      "Kelp_UniqueCreatureCave",
+      "Kelp_VineBase",
+      "MushroomForest_CaveSand",
+      "ShipInterior_Cargo",
+      "ShipInterior_PowerRoomUnderwater",
+      "SparseReef_Coral",
+      "SparseReef_DeepWall"
+    ]
+  },
+  {
+    "TechType": "Blighter",
+    "Spawns": [
+      "BloodKelp_CaveFloor",
+      "BloodKelp_Grass",
+      "BloodKelp_TrenchFloor"
+    ]
+  },
+  {
+    "TechType": "BloodOil",
+    "Spawns": [
+      "BloodKelp_CaveRoots",
+      "BloodKelp_Roots",
+      "BloodKelp_TrenchRoots"
+    ]
+  },
+  {
+    "TechType": "Bloom",
+    "Spawns": [
+      "TreeCove_Ceiling",
+      "TreeCove_Ground",
+      "TreeCove_Wall"
+    ]
+  },
+  {
+    "TechType": "BoneShark",
+    "Spawns": [
+      "CragField_OpenShallow_CreatureOnly",
+      "CragField_Sand",
+      "KooshZone_RockWall",
+      "Mesas_Open",
+      "MushroomForest_UniqueCreature",
+      "PrisonAquarium_Open_CreatureOnly",
+      "PrisonAquarium_Rock",
+      "UnderwaterIslands_IslandSides",
+      "UnderwaterIslands_OpenDeep_CreatureOnly",
+      "UnderwaterIslands_OpenShallow_CreatureOnly",
+      "UnderwaterIslands_ValleyFloor",
+      "UnderwaterIslands_ValleyLedge"
+    ]
+  },
+  {
+    "TechType": "BonesharkEgg",
+    "Spawns": [
+      "KooshZone_Grass",
+      "MushroomForest_GiantTreeInteriorFloor",
+      "MushroomForest_Grass"
+    ]
+  },
+  {
+    "TechType": "Boomerang",
+    "Spawns": [
+      "CragField_OpenShallow_CreatureOnly",
+      "CragField_Rock",
+      "CragField_Sand",
+      "CrashZone_Rock",
+      "CrashZone_Sand",
+      "DeepGrandReef_Ground",
+      "DeepGrandReef_Wall",
+      "Dunes_OpenDeep_CreatureOnly",
+      "Dunes_OpenShallow_CreatureOnly",
+      "Dunes_SandDune",
+      "GrassyPlateaus_OpenDeep_CreatureOnly",
+      "GrassyPlateaus_OpenShallow_CreatureOnly",
+      "GrassyPlateaus_Tower",
+      "GrassyPlateaus_Wall",
+      "Kelp_Wall",
+      "KooshZone_Grass",
+      "KooshZone_OpenDeep_CreatureOnly",
+      "KooshZone_OpenShallow_CreatureOnly",
+      "KooshZone_Sand",
+      "Mesas_Side",
+      "Mountains_CaveCeiling",
+      "PrisonAquarium_Coral",
+      "PrisonAquarium_Grass",
+      "SafeShallows_Grass",
+      "SeaTreaderPath_CaveFloor",
+      "SeaTreaderPath_Sand",
+      "UnderwaterIslands_IslandTop"
+    ]
+  },
+  {
+    "TechType": "CaveCrawler",
+    "Spawns": [
+      "Dunes_CaveFloor",
+      "Dunes_Rock",
+      "Dunes_SandPlateau",
+      "FloatingIslands_Beach",
+      "PrisonAquarium_CaveFloor",
+      "PrisonAquarium_CaveWall",
+      "ShipInterior_Platform",
+      "UnderwaterIslands_IslandCaveFloor",
+      "UnderwaterIslands_IslandCaveWall"
+    ]
+  },
+  {
+    "TechType": "ConstructorFragment",
+    "Spawns": [
+      "FragmentConstructor",
+      "GrassyPlateaus_TechSite",
+      "GrassyPlateaus_TechSite_Barrier",
+      "Kelp_TechSite",
+      "Kelp_TechSite_Barrier",
+      "SafeShallows_TechSite_Barrier"
+    ]
+  },
+  {
+    "TechType": "Copper",
+    "Spawns": [
+      "InactiveLavaZone_Chamber_MagmaTree"
+    ]
+  },
+  {
+    "TechType": "Crabsnake",
+    "Spawns": [
+      "JellyShroomCaves_CrabSnake"
+    ]
+  },
+  {
+    "TechType": "CrabsnakeEgg",
+    "Spawns": [
+      "JellyShroomCaves_InsideShroom"
+    ]
+  },
+  {
+    "TechType": "CrabSquid",
+    "Spawns": [
+      "BloodKelp_UniqueCreatures",
+      "BonesField_Corridor_CreatureOnly",
+      "DeepGrandReef_BlueCoral",
+      "GhostTree_Open_Big_CreatureOnly",
+      "SkeletonCave_Open_CreatureOnly",
+      "TreeCove_Ground"
+    ]
+  },
+  {
+    "TechType": "CrabsquidEgg",
+    "Spawns": [
+      "BloodKelp_Grass",
+      "DeepGrandReef_BlueCoral"
+    ]
+  },
+  {
+    "TechType": "CrashEgg",
+    "Spawns": [
+      "SafeShallows_CaveFloor"
+    ]
+  },
+  {
+    "TechType": "CrashHome",
+    "Spawns": [
+      "SafeShallows_UniqueCreatureCave"
+    ]
+  },
+  {
+    "TechType": "CrashPowder",
+    "Spawns": [
+      "CrashHome"
+    ]
+  },
+  {
+    "TechType": "CyclopsBridgeFragment",
+    "Spawns": [
+      "CrashZone_TrenchSand",
+      "FragmentCyclopsBridge",
+      "MushroomForest_Grass",
+      "MushroomForest_Sand",
+      "MushroomForest_TechSite",
+      "MushroomForest_TechSite_Barrier",
+      "SeaTreaderPath_Grass",
+      "SeaTreaderPath_Sand",
+      "SeaTreaderPath_TechSite",
+      "SeaTreaderPath_TechSite_Barrier"
+    ]
+  },
+  {
+    "TechType": "CyclopsEngineFragment",
+    "Spawns": [
+      "CragField_Grass",
+      "CrashZone_TrenchSand",
+      "FragmentCyclopsEngine",
+      "Mountains_Grass",
+      "Mountains_Sand",
+      "Mountains_TechSite_Scatter",
+      "ShipInterior_Cargo_Crate",
+      "UnderwaterIslands_TechSite_Scatter"
+    ]
+  },
+  {
+    "TechType": "CyclopsHullFragment",
+    "Spawns": [
+      "CrashZone_Sand",
+      "FragmentCyclopsHullLarge",
+      "FragmentCyclopsHullMedium",
+      "MushroomForest_Grass",
+      "MushroomForest_Sand",
+      "MushroomForest_TechSite",
+      "MushroomForest_TechSite_Barrier",
+      "SeaTreaderPath_Grass",
+      "SeaTreaderPath_Sand",
+      "SeaTreaderPath_TechSite",
+      "SeaTreaderPath_TechSite_Barrier",
+      "SeaTreaderPath_TechSite_Scatter"
+    ]
+  },
+  {
+    "TechType": "Diamond",
+    "Spawns": [
+      "BonesField_Cave_Wall",
+      "BonesField_Wall",
+      "DeepGrandReef_RockShallow_Obsolete",
+      "DeepGrandReef_Wall",
+      "GhostTree_Ceiling",
+      "GhostTree_Wall",
+      "InactiveLavaZone_Chamber_Lava",
+      "InactiveLavaZone_LavaPit_Wall",
+      "LostRiverCorridor_ThermalVents",
+      "LostRiverJunction_Ceiling"
+    ]
+  },
+  {
+    "TechType": "DrillableCopper",
+    "Spawns": [
+      "BloodKelp_CaveFloor",
+      "BloodKelp_Floor",
+      "BloodKelp_TrenchFloor",
+      "GrandReef_Ground",
+      "InactiveLavaZone_Corridor_Floor_Far",
+      "LostRiverJunction_LakeFloor",
+      "MushroomForest_Sand"
+    ]
+  },
+  {
+    "TechType": "DrillableGold",
+    "Spawns": [
+      "BloodKelp_CaveFloor",
+      "BloodKelp_Floor",
+      "BloodKelp_TrenchFloor",
+      "BonesField_Cave_Ground",
+      "BonesField_LakePit_Floor",
+      "InactiveLavaZone_Chamber_Floor_Far",
+      "JellyshroomCaves_CaveFloor",
+      "JellyshroomCaves_CaveSand",
+      "KooshZone_Sand",
+      "LostRiverJunction_LakeFloor",
+      "TreeCove_LakeFloor",
+      "UnderwaterIslands_ValleyLedge"
+    ]
+  },
+  {
+    "TechType": "DrillableLead",
+    "Spawns": [
+      "BloodKelp_Floor",
+      "BloodKelp_TrenchFloor",
+      "CrashZone_Sand",
+      "DeepGrandReef_Ground",
+      "GhostTree_Ground",
+      "InactiveLavaZone_Chamber_Floor_Far",
+      "InactiveLavaZone_Corridor_Floor_Far",
+      "LostRiverJunction_Ground",
+      "Mountains_Sand",
+      "SparseReef_Sand"
+    ]
+  },
+  {
+    "TechType": "DrillableLithium",
+    "Spawns": [
+      "BonesField_Cave_Ground",
+      "BonesField_LakePit_Floor",
+      "InactiveLavaZone_Corridor_Floor",
+      "JellyshroomCaves_CaveFloor",
+      "KooshZone_Sand",
+      "MushroomForest_CaveFloor",
+      "MushroomForest_Sand",
+      "SeaTreaderPath_CaveWall",
+      "SparseReef_DeepFloor",
+      "SparseReef_Sand",
+      "TreeCove_LakeFloor"
+    ]
+  },
+  {
+    "TechType": "DrillableMagnetite",
+    "Spawns": [
+      "JellyshroomCaves_CaveFloor"
+    ]
+  },
+  {
+    "TechType": "DrillableNickel",
+    "Spawns": [
+      "BonesField_Lake_Floor",
+      "BonesField_LakePit_Floor",
+      "GhostTree_Ground",
+      "LostRiverJunction_LakeFloor"
+    ]
+  },
+  {
+    "TechType": "DrillableQuartz",
+    "Spawns": [
+      "CragField_Ground",
+      "Dunes_CaveFloor",
+      "Dunes_CaveWall",
+      "Dunes_SandDune",
+      "Dunes_SandPlateau",
+      "GrandReef_CaveCeiling",
+      "GrandReef_Ground",
+      "InactiveLavaZone_Chamber_Floor_Far",
+      "LostRiverCorridor_Ground",
+      "LostRiverJunction_Ground",
+      "SparseReef_DeepFloor",
+      "SparseReef_Sand"
+    ]
+  },
+  {
+    "TechType": "DrillableSalt",
+    "Spawns": [
+      "Dunes_CaveFloor",
+      "Dunes_SandDune",
+      "Dunes_SandPlateau",
+      "GrassyPlateaus_Sand",
+      "Mesas_Top",
+      "Mountains_CaveFloor",
+      "MushroomForest_Sand",
+      "SeaTreaderPath_CaveFloor"
+    ]
+  },
+  {
+    "TechType": "DrillableSilver",
+    "Spawns": [
+      "BonesField_Ground",
+      "CragField_Ground",
+      "Dunes_CaveFloor",
+      "Dunes_CaveWall",
+      "Dunes_SandDune",
+      "Dunes_SandPlateau",
+      "GhostTree_Lake_Floor",
+      "InactiveLavaZone_Chamber_Floor_Far",
+      "JellyshroomCaves_CaveSand",
+      "LostRiverCorridor_LakeFloor",
+      "LostRiverJunction_LakeFloor",
+      "Mountains_Rock",
+      "UnderwaterIslands_ValleyFloor"
+    ]
+  },
+  {
+    "TechType": "DrillableTitanium",
+    "Spawns": [
+      "BonesField_Corridor_Ground",
+      "BonesField_Ground",
+      "BonesField_Lake_Floor",
+      "CrashZone_Sand",
+      "DeepGrandReef_Ground",
+      "Dunes_CaveFloor",
+      "Dunes_SandDune",
+      "GhostTree_Ground",
+      "GhostTree_Ground_Lower",
+      "InactiveLavaZone_Chamber_Floor_Far",
+      "InactiveLavaZone_Corridor_Floor_Far",
+      "KooshZone_Sand",
+      "LostRiverCorridor_Ground",
+      "LostRiverJunction_Ground",
+      "TreeCove_Ground"
+    ]
+  },
+  {
+    "TechType": "DrillableUranium",
+    "Spawns": [
+      "BloodKelp_CaveFloor",
+      "BonesField_LakePit_Floor",
+      "InactiveLavaZone_Chamber_Floor_Far",
+      "InactiveLavaZone_LavaPit_Floor",
+      "TreeCove_LakeFloor",
+      "UnderwaterIslands_ValleyFloor"
+    ]
+  },
+  {
+    "TechType": "ExosuitDrillArmFragment",
+    "Spawns": [
+      "BloodKelp_TechSite",
+      "BloodKelp_TechSite_Barrier",
+      "BloodKelp_TechSite_Scatter",
+      "Dunes_TechSite",
+      "Dunes_TechSite_Barrier",
+      "Dunes_TechSite_Scatter",
+      "GrandReef_TechSite",
+      "GrandReef_TechSite_Scattered",
+      "UnderwaterIslands_TechSite_Scatter"
+    ]
+  },
+  {
+    "TechType": "ExosuitFragment",
+    "Spawns": [
+      "FragmentExosuit"
+    ]
+  },
+  {
+    "TechType": "ExosuitGrapplingArmFragment",
+    "Spawns": [
+      "BloodKelp_TechSite",
+      "Dunes_TechSite",
+      "Dunes_TechSite_Barrier",
+      "GrandReef_TechSite",
+      "GrandReef_TechSite_Barrier",
+      "Mountains_TechSite_Scatter",
+      "UnderwaterIslands_TechSite"
+    ]
+  },
+  {
+    "TechType": "ExosuitPropulsionArmFragment",
+    "Spawns": [
+      "Mountains_TechSite",
+      "Mountains_TechSite_Barrier",
+      "SeaTreaderPath_TechSite",
+      "SeaTreaderPath_TechSite_Barrier",
+      "SeaTreaderPath_TechSite_Scatter",
+      "UnderwaterIslands_TechSite",
+      "UnderwaterIslands_TechSite_Barrier"
+    ]
+  },
+  {
+    "TechType": "ExosuitTorpedoArmFragment",
+    "Spawns": [
+      "BloodKelp_TechSite",
+      "BloodKelp_TechSite_Barrier",
+      "BloodKelp_TechSite_Scatter",
+      "Mountains_TechSite",
+      "Mountains_TechSite_Barrier",
+      "SparseReef_Techsite_Scatter"
+    ]
+  },
+  {
+    "TechType": "Eyeye",
+    "Spawns": [
+      "CrashZone_TrenchRock",
+      "Dunes_Grass",
+      "Dunes_OpenDeep_CreatureOnly",
+      "Dunes_SandDune",
+      "GrandReef_OpenDeep_CreatureOnly",
+      "GrandReef_WhiteCoral",
+      "JellyshroomCaves_CaveWall",
+      "Kelp_GrassDense",
+      "KooshZone_CaveFloor",
+      "KooshZone_CaveWall",
+      "KooshZone_Coral",
+      "KooshZone_Grass",
+      "KooshZone_OpenDeep_CreatureOnly",
+      "KooshZone_Sand",
+      "SeaTreaderPath_Grass",
+      "SeaTreaderPath_Rock"
+    ]
+  },
+  {
+    "TechType": "FirstAidKit",
+    "Spawns": [
+      "Medkit_Storage"
+    ]
+  },
+  {
+    "TechType": "GarryFish",
+    "Spawns": [
+      "Dunes_Grass",
+      "Dunes_SandDune",
+      "Mesas_Top",
+      "PrisonAquarium_DeadCoral",
+      "PrisonAquarium_Rock",
+      "SafeShallows_Wall",
+      "UnderwaterIslands_IslandPlants"
+    ]
+  },
+  {
+    "TechType": "Gasopod",
+    "Spawns": [
+      "Dunes_ThermalVent_Rock",
+      "Mesas_Open",
+      "SafeShallows_UniqueCreature"
+    ]
+  },
+  {
+    "TechType": "GasopodEgg",
+    "Spawns": [
+      "Dunes_ThermalVent_Grass",
+      "Mesas_Top",
+      "SafeShallows_UniqueCreature"
+    ]
+  },
+  {
+    "TechType": "GhostRayBlue",
+    "Spawns": [
+      "Canyon_Open_CreatureOnly",
+      "GhostTree_Open_CreatureOnly",
+      "LostRiverCorridor_Open_CreatureOnly",
+      "LostRiverJunction_Open_CreatureOnly",
+      "SkeletonCave_Open_CreatureOnly",
+      "SkeletonCave_Skeleton",
+      "TreeCove_Ceiling",
+      "TreeCove_Ground",
+      "TreeCove_TreeOpen_CreatureOnly",
+      "TreeCove_Wall"
+    ]
+  },
+  {
+    "TechType": "GhostRayRed",
+    "Spawns": [
+      "ActiveLavaZone_Chamber_Open_CreatureOnly",
+      "ActiveLavaZone_Falls_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Dragon_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Open_UniqueCreatureOnly"
+    ]
+  },
+  {
+    "TechType": "Gold",
+    "Spawns": [
+      "InactiveLavaZone_Chamber_MagmaBubble",
+      "InactiveLavaZone_LavaPit_Floor"
+    ]
+  },
+  {
+    "TechType": "GravSphereFragment",
+    "Spawns": [
+      "Kelp_TechSite",
+      "Kelp_TechSite_Barrier",
+      "SafeShallows_TechSite",
+      "SafeShallows_TechSite_Scattered"
+    ]
+  },
+  {
+    "TechType": "HoleFish",
+    "Spawns": [
+      "CrashZone_Sand",
+      "MushroomForest_CavePlants",
+      "MushroomForest_CaveWall",
+      "MushroomForest_GiantTreeInteriorWall",
+      "PrisonAquarium_CaveWall",
+      "PrisonAquarium_Rock",
+      "SafeShallows_CaveWall"
+    ]
+  },
+  {
+    "TechType": "Hoopfish",
+    "Spawns": [
+      "BloodKelp_OpenShallow_CreatureOnly",
+      "CragField_Rock",
+      "CragField_Sand",
+      "Dunes_SandDune",
+      "GrandReef_OpenShallow_CreatureOnly",
+      "GrandReef_PurpleCoral",
+      "GrassyPlateaus_Grass",
+      "Kelp_DenseVine",
+      "Kelp_Wall",
+      "KooshZone_RockWall",
+      "LostRiverJunction_Ground",
+      "LostRiverJunction_Open_CreatureOnly",
+      "Mesas_Top",
+      "Mountains_OpenDeep_CreatureOnly",
+      "Mountains_OpenShallow_CreatureOnly",
+      "PrisonAquarium_Coral",
+      "SeaTreaderPath_CaveFloor",
+      "SeaTreaderPath_Sand",
+      "UnderwaterIslands_OpenDeep_CreatureOnly",
+      "UnderwaterIslands_OpenShallow_CreatureOnly",
+      "UnderwaterIslands_ValleyWall"
+    ]
+  },
+  {
+    "TechType": "HoopfishSchool",
+    "Spawns": [
+      "BloodKelp_OpenDeep_CreatureOnly",
+      "BloodKelp_OpenShallow_CreatureOnly",
+      "BloodKelp_Roots",
+      "BloodKelp_TrenchRoots",
+      "BonesField_Corridor_CreatureOnly",
+      "BonesField_Corridor_Ground",
+      "BonesField_Open_Creature",
+      "BonesField_Wall",
+      "Canyon_Open_CreatureOnly",
+      "CragField_OpenShallow_CreatureOnly",
+      "CragField_Sand",
+      "CrashZone_Rock",
+      "CrashZone_Sand",
+      "DeepGrandReef_Ground",
+      "DeepGrandReef_Wall",
+      "Dunes_Grass",
+      "Dunes_OpenDeep_CreatureOnly",
+      "Dunes_OpenShallow_CreatureOnly",
+      "Dunes_SandDune",
+      "GhostTree_Grass",
+      "GhostTree_Lake_Floor",
+      "GhostTree_Open_CreatureOnly",
+      "GrandReef_OpenShallow_CreatureOnly",
+      "GrandReef_PurpleCoral",
+      "GrassyPlateaus_Grass",
+      "GrassyPlateaus_OpenDeep_CreatureOnly",
+      "GrassyPlateaus_OpenShallow_CreatureOnly",
+      "GrassyPlateaus_Tower",
+      "GrassyPlateaus_Wall",
+      "Kelp_DenseVine",
+      "Kelp_Wall",
+      "KooshZone_Grass",
+      "KooshZone_OpenDeep_CreatureOnly",
+      "KooshZone_OpenShallow_CreatureOnly",
+      "KooshZone_RockWall",
+      "KooshZone_Sand",
+      "LostRiverCorridor_Ceiling",
+      "LostRiverCorridor_Ground",
+      "LostRiverCorridor_Open_CreatureOnly",
+      "LostRiverCorridor_Wall",
+      "LostRiverJunction_Ceiling",
+      "LostRiverJunction_Ground",
+      "LostRiverJunction_Open_CreatureOnly",
+      "LostRiverJunction_Wall",
+      "Mesas_Top",
+      "Mountains_Grass",
+      "Mountains_OpenDeep_CreatureOnly",
+      "Mountains_OpenShallow_CreatureOnly",
+      "Mountains_Rock",
+      "MushroomForest_GiantTreeExterior",
+      "MushroomForest_GiantTreeExteriorBase",
+      "MushroomForest_Grass",
+      "MushroomForest_MushroomTreeTrunk",
+      "PrisonAquarium_Coral",
+      "PrisonAquarium_DeadCoral",
+      "PrisonAquarium_Grass",
+      "PrisonAquarium_Open_CreatureOnly",
+      "SafeShallows_Grass",
+      "SeaTreaderPath_Rock",
+      "SeaTreaderPath_Sand",
+      "SkeletonCave_Grass",
+      "SkeletonCave_Open_CreatureOnly",
+      "SparseReef_Coral",
+      "UnderwaterIslands_IslandTop",
+      "UnderwaterIslands_OpenDeep_CreatureOnly",
+      "UnderwaterIslands_OpenShallow_CreatureOnly",
+      "UnderwaterIslands_ValleyWall"
+    ]
+  },
+  {
+    "TechType": "Hoverfish",
+    "Spawns": [
+      "CrashZone_Rock",
+      "CrashZone_Sand",
+      "Kelp_GrassDense",
+      "Kelp_GrassSparse",
+      "Mesas_Top",
+      "PrisonAquarium_Grass",
+      "PrisonAquarium_Open_CreatureOnly",
+      "PrisonAquarium_SpecialCoral"
+    ]
+  },
+  {
+    "TechType": "JellyPlant",
+    "Spawns": [
+      "BloodKelp_Grass",
+      "BloodKelp_TrenchFloor",
+      "BloodKelp_TrenchRoots",
+      "BonesField_Corridor_Ground",
+      "BonesField_Ground",
+      "BonesField_LedgeTop",
+      "Canyon_Algae",
+      "DeepGrandReef_BlueCoral",
+      "Dunes_ThermalVent_Grass",
+      "GhostTree_Ground",
+      "GrandReef_PurpleCoral",
+      "Mountains_Grass",
+      "PrisonAquarium_Grass",
+      "SeaTreaderPath_CaveWall",
+      "SparseReef_DeepCoral",
+      "TreeCove_Ground"
+    ]
+  },
+  {
+    "TechType": "Jellyray",
+    "Spawns": [
+      "DeepGrandReef_Wall",
+      "JellyshroomCaves_CaveSand",
+      "MushroomForest_Grass",
+      "MushroomForest_UniqueCreature",
+      "MushroomForest_UniqueCreatureCave"
+    ]
+  },
+  {
+    "TechType": "JellyrayEgg",
+    "Spawns": [
+      "MushroomForest_GiantTreeInteriorFloor",
+      "MushroomForest_Grass",
+      "MushroomForest_MushroomTreeBase"
+    ]
+  },
+  {
+    "TechType": "Jumper",
+    "Spawns": [
+      "CragField_Rock",
+      "CrashZone_Rock",
+      "Dunes_CaveCeiling",
+      "Dunes_CaveWall",
+      "Dunes_Rock",
+      "Dunes_SandPlateau",
+      "GrassyPlateaus_CaveFloor",
+      "Kelp_CaveFloor",
+      "KooshZone_CaveFloor",
+      "KooshZone_CaveWall",
+      "Mountains_CaveFloor",
+      "Mountains_CaveWall",
+      "Mountains_ThermalVent",
+      "MushroomForest_CaveCeiling",
+      "MushroomForest_CaveEntrance",
+      "MushroomForest_CaveFloor",
+      "MushroomForest_CaveSand",
+      "MushroomForest_GiantTreeInteriorCeiling",
+      "MushroomForest_GiantTreeInteriorEntrance",
+      "MushroomForest_GiantTreeInteriorFloor",
+      "MushroomForest_GiantTreeInteriorPlants",
+      "PrisonAquarium_CaveFloor",
+      "SafeShallows_CaveFloor",
+      "SeaTreaderPath_CaveCeiling",
+      "SeaTreaderPath_CaveWall",
+      "SparseReef_DeepWall",
+      "SparseReef_Spike"
+    ]
+  },
+  {
+    "TechType": "Kyanite",
+    "Spawns": [
+      "InactiveLavaZone_CastleChamber_Wall",
+      "InactiveLavaZone_CastleTunnel_Wall"
+    ]
+  },
+  {
+    "TechType": "LaserCutterFragment",
+    "Spawns": [
+      "GrassyPlateaus_TechSite",
+      "GrassyPlateaus_TechSite_Barrier"
+    ]
+  },
+  {
+    "TechType": "LavaBoomerang",
+    "Spawns": [
+      "ActiveLavaZone_Chamber_Open_CreatureOnly",
+      "ActiveLavaZone_Falls_Open_CreatureOnly",
+      "InactiveLavaZone_CastleChamber_Open_CreatureOnly",
+      "InactiveLavaZone_CastleTunnel_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Dragon_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Open_CreatureOnly",
+      "InactiveLavaZone_Corridor_Open_CreatureOnly"
+    ]
+  },
+  {
+    "TechType": "LavaEyeye",
+    "Spawns": [
+      "ActiveLavaZone_Chamber_Open_CreatureOnly",
+      "ActiveLavaZone_Falls_Open_CreatureOnly",
+      "InactiveLavaZone_CastleChamber_Open_CreatureOnly",
+      "InactiveLavaZone_CastleTunnel_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Dragon_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Open_CreatureOnly",
+      "InactiveLavaZone_Corridor_Open_CreatureOnly"
+    ]
+  },
+  {
+    "TechType": "LavaLarva",
+    "Spawns": [
+      "ActiveLavaZone_Chamber_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Lava",
+      "InactiveLavaZone_Chamber_Open_CreatureOnly",
+      "InactiveLavaZone_Corridor_Lava_CreatureOnly",
+      "InactiveLavaZone_Corridor_Open_CreatureOnly"
+    ]
+  },
+  {
+    "TechType": "LavaLizard",
+    "Spawns": [
+      "ActiveLavaZone_Chamber_Open_CreatureOnly",
+      "ActiveLavaZone_Falls_Open_CreatureOnly",
+      "InactiveLavaZone_CastleTunnel_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Dragon_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Lava",
+      "InactiveLavaZone_Chamber_Open_UniqueCreatureOnly",
+      "InactiveLavaZone_Corridor_Lava_CreatureOnly"
+    ]
+  },
+  {
+    "TechType": "LavaLizardEgg",
+    "Spawns": [
+      "InactiveLavaZone_CastleTunnel_Floor"
+    ]
+  },
+  {
+    "TechType": "Lead",
+    "Spawns": [
+      "InactiveLavaZone_LavaPit_Wall"
+    ]
+  },
+  {
+    "TechType": "LEDLightFragment",
+    "Spawns": [
+      "MushroomForest_TechSite",
+      "MushroomForest_TechSite_Barrier",
+      "SparseReef_Techsite",
+      "SparseReef_Techsite_Barrier"
+    ]
+  },
+  {
+    "TechType": "LimestoneChunk",
+    "Spawns": [
+      "BonesField_Corridor_Ground",
+      "CragField_Rock",
+      "CrashZone_Rock",
+      "CrashZone_Sand",
+      "CrashZone_TrenchRock",
+      "Dunes_CaveCeiling",
+      "Dunes_Rock",
+      "Dunes_SandPlateau",
+      "GrandReef_Wall",
+      "GrassyPlateaus_CaveCeiling",
+      "GrassyPlateaus_CaveWall",
+      "GrassyPlateaus_Wall",
+      "Kelp_CaveFloor",
+      "Kelp_GrassSparse",
+      "Kelp_Wall",
+      "LostRiverJunction_Ground",
+      "Mesas_Side",
+      "MushroomForest_Sand",
+      "SafeShallows_CaveWall",
+      "SafeShallows_ShellTunnel",
+      "SafeShallows_ShellTunnelHuge",
+      "SafeShallows_Wall",
+      "SeaTreaderPath_CaveCeiling",
+      "SeaTreaderPath_CaveWall",
+      "SeaTreaderPath_Rock",
+      "SparseReef_Wall",
+      "UnderwaterIslands_ValleyWall"
+    ]
+  },
+  {
+    "TechType": "Lithium",
+    "Spawns": [
+      "BonesField_ThermalVent",
+      "CragField_Rock",
+      "Dunes_ThermalVent",
+      "Dunes_ThermalVent_Rock",
+      "GhostTree_Lake_Floor",
+      "InactiveLavaZone_LavaPit_Wall",
+      "JellyshroomCaves_CaveSand",
+      "KooshZone_Grass",
+      "LostRiverCorridor_ThermalVents",
+      "LostRiverJunction_ThermalVent",
+      "Mountains_IslandCaveCeiling",
+      "Mountains_IslandCaveWall",
+      "Mountains_ThermalVent",
+      "MushroomForest_CaveWall",
+      "MushroomForest_CoralRoot",
+      "MushroomForest_GiantTreeInteriorSpecial",
+      "MushroomForest_MushroomTreeTrunk",
+      "MushroomForest_RockWall",
+      "SparseReef_DeepFloor",
+      "UnderwaterIslands_IslandCaveWall"
+    ]
+  },
+  {
+    "TechType": "Magnetite",
+    "Spawns": [
+      "BloodKelp_CaveWall",
+      "BloodKelp_Wall",
+      "BonesField_Cave_Wall",
+      "GhostTree_Lake_Floor",
+      "InactiveLavaZone_CastleChamber_Wall",
+      "InactiveLavaZone_Chamber_MagmaBubble",
+      "InactiveLavaZone_LavaPit_Floor",
+      "JellyshroomCaves_CaveFloor",
+      "JellyshroomCaves_CaveSand",
+      "JellyshroomCaves_Geyser",
+      "Mountains_CaveCeiling",
+      "Mountains_Grass",
+      "Mountains_ThermalVent",
+      "SeaTreaderPath_Rock",
+      "TreeCove_LakeFloor"
+    ]
+  },
+  {
+    "TechType": "MercuryOre",
+    "Spawns": [
+      "BloodKelp_Grass",
+      "CragField_Rock",
+      "Dunes_CaveCeiling",
+      "Dunes_CaveFloor",
+      "Dunes_CaveWall",
+      "GrandReef_RockShallow_Underground_Obsolete",
+      "SeaTreaderPath_CaveCeiling",
+      "SeaTreaderPath_CaveWall",
+      "SparseReef_Wall"
+    ]
+  },
+  {
+    "TechType": "Mesmer",
+    "Spawns": [
+      "BonesField_LedgeTop",
+      "CragField_Grass",
+      "KooshZone_CaveSpecial",
+      "KooshZone_HugeKooshBase",
+      "KooshZone_RockWall",
+      "MushroomForest_UniqueCreature"
+    ]
+  },
+  {
+    "TechType": "MesmerEgg",
+    "Spawns": [
+      "BonesField_LedgeTop",
+      "KooshZone_CaveFloor",
+      "KooshZone_Grass"
+    ]
+  },
+  {
+    "TechType": "MoonpoolFragment",
+    "Spawns": [
+      "BloodKelp_TechSite_Barrier",
+      "BloodKelp_TechSite_Scatter",
+      "BloodKelp_TrenchFloor",
+      "Dunes_TechSite_Scatter",
+      "GrandReef_Ground",
+      "GrandReef_TechSite_Scattered",
+      "JellyShroomCaves_AbandonedBase_Outside",
+      "Mountains_Grass",
+      "Mountains_TechSite_Scatter",
+      "MushroomForest_Grass",
+      "MushroomForest_Sand",
+      "SparseReef_Techsite_Scatter"
+    ]
+  },
+  {
+    "TechType": "Nickel",
+    "Spawns": [
+      "BonesField_Cave_Wall",
+      "BonesField_Wall",
+      "Canyon_Ground",
+      "Canyon_Wall",
+      "GhostTree_Wall",
+      "InactiveLavaZone_Chamber_Floor",
+      "SkeletonCave_Ground",
+      "TreeCove_Ground",
+      "TreeCove_LedgeSide"
+    ]
+  },
+  {
+    "TechType": "Oculus",
+    "Spawns": [
+      "JellyshroomCaves_CaveFloor",
+      "PrisonAquarium_CaveCeiling",
+      "PrisonAquarium_CaveFloor"
+    ]
+  },
+  {
+    "TechType": "Peeper",
+    "Spawns": [
+      "Dunes_Grass",
+      "Dunes_OpenDeep_CreatureOnly",
+      "Dunes_OpenShallow_CreatureOnly",
+      "Dunes_SandDune",
+      "GrandReef_PurpleCoral",
+      "GrassyPlateaus_Grass",
+      "Kelp_DenseVine",
+      "Kelp_Wall",
+      "KooshZone_OpenDeep_CreatureOnly",
+      "KooshZone_OpenShallow_CreatureOnly",
+      "KooshZone_RockWall",
+      "Mesas_Top",
+      "Mountains_Grass",
+      "Mountains_OpenDeep_CreatureOnly",
+      "Mountains_OpenShallow_CreatureOnly",
+      "Mountains_Rock",
+      "MushroomForest_GiantTreeExterior",
+      "MushroomForest_GiantTreeExteriorBase",
+      "MushroomForest_Grass",
+      "MushroomForest_MushroomTreeTrunk",
+      "Precursor_SurfaceVent_Generic",
+      "PrisonAquarium_Open_CreatureOnly",
+      "PrisonAquarium_Sand",
+      "SafeShallows_OpenShallow_CreatureOnly",
+      "SafeShallows_SandFlat",
+      "SafeShallows_ShellTunnelHuge",
+      "SafeShallows_Wall",
+      "SeaTreaderPath_Sand",
+      "SparseReef_Coral",
+      "UnderwaterIslands_ValleyWall"
+    ]
+  },
+  {
+    "TechType": "PowerCellChargerFragment",
+    "Spawns": [
+      "Dunes_TechSite",
+      "Dunes_TechSite_Barrier",
+      "FragmentPowerCellCharger",
+      "JellyShroomCaves_AbandonedBase_Outside",
+      "MushroomForest_TechSite",
+      "MushroomForest_TechSite_Barrier",
+      "SparseReef_DeepFloor",
+      "SparseReef_Techsite",
+      "SparseReef_Techsite_Barrier",
+      "UnderwaterIslands_TechSite",
+      "UnderwaterIslands_TechSite_Barrier"
+    ]
+  },
+  {
+    "TechType": "PowerTransmitterFragment",
+    "Spawns": [
+      "CrashZone_Sand",
+      "KooshZone_TechSite",
+      "KooshZone_TechSite_Scatter",
+      "MushroomForest_Grass",
+      "MushroomForest_Sand",
+      "MushroomForest_TechSite"
+    ]
+  },
+  {
+    "TechType": "PowerUpgradeModule",
+    "Spawns": [
+      "Aurora_UpgradeConsole"
+    ]
+  },
+  {
+    "TechType": "Quartz",
+    "Spawns": [
+      "BloodKelp_Roots",
+      "BloodKelp_Wall",
+      "BonesField_Corridor_Ground",
+      "BonesField_Ground",
+      "BonesField_Lake_Floor",
+      "Canyon_Ceiling",
+      "Canyon_Ground",
+      "Canyon_Wall",
+      "CragField_Grass",
+      "CragField_Sand",
+      "CrashZone_Sand",
+      "CrashZone_TrenchSand",
+      "Dunes_CaveFloor",
+      "Dunes_Grass",
+      "GhostTree_Ground",
+      "GrandReef_Ground",
+      "GrassyPlateaus_CaveFloor",
+      "GrassyPlateaus_Grass",
+      "InactiveLavaZone_LavaPit_Wall",
+      "Kelp_CaveFloor",
+      "LostRiverCorridor_Ground",
+      "LostRiverCorridor_Roots",
+      "LostRiverJunction_Ground",
+      "LostRiverJunction_Roots",
+      "Mesas_Side",
+      "SafeShallows_CaveFloor",
+      "SafeShallows_CaveWall",
+      "SafeShallows_ShellTunnelHuge",
+      "SeaTreaderPath_CaveFloor",
+      "SeaTreaderPath_Grass",
+      "SkeletonCave_Ceiling",
+      "SkeletonCave_Ground",
+      "SkeletonCave_Wall",
+      "SparseReef_DeepWall",
+      "UnderwaterIslands_IslandSides"
+    ]
+  },
+  {
+    "TechType": "RabbitRay",
+    "Spawns": [
+      "Kelp_Sand",
+      "PrisonAquarium_Open_CreatureOnly",
+      "PrisonAquarium_Sand",
+      "SafeShallows_SandFlat"
+    ]
+  },
+  {
+    "TechType": "RabbitrayEgg",
+    "Spawns": [
+      "SafeShallows_Plants"
+    ]
+  },
+  {
+    "TechType": "ReaperLeviathan",
+    "Spawns": [
+      "CrashZone_Rock",
+      "CrashZone_Sand",
+      "CrashZone_TrenchSand",
+      "Mountains_Rock",
+      "ShipSpecial_Wreck_Obsolete"
+    ]
+  },
+  {
+    "TechType": "Reginald",
+    "Spawns": [
+      "Canyon_Open_CreatureOnly",
+      "CragField_Ground",
+      "DeepGrandReef_BlueCoral",
+      "GhostTree_Grass",
+      "GhostTree_Open_CreatureOnly",
+      "GrandReef_CaveWall",
+      "GrassyPlateaus_Tower",
+      "LostRiverCorridor_Open_CreatureOnly",
+      "LostRiverCorridor_ThermalVents",
+      "LostRiverJunction_Open_CreatureOnly",
+      "Mountains_Grass",
+      "PrisonAquarium_DeadCoral",
+      "PrisonAquarium_SpecialCoral",
+      "SeaTreaderPath_Grass",
+      "SkeletonCave_Grass",
+      "SkeletonCave_Open_CreatureOnly",
+      "SparseReef_Coral",
+      "SparseReef_DeepWall"
+    ]
+  },
+  {
+    "TechType": "ReinforceHullFragment",
+    "Spawns": [
+      "BloodKelp_Floor",
+      "BloodKelp_TechSite",
+      "BloodKelp_TechSite_Barrier",
+      "BloodKelp_TrenchFloor",
+      "GrandReef_Grass",
+      "GrandReef_Ground",
+      "GrandReef_TechSite",
+      "GrandReef_TechSite_Barrier"
+    ]
+  },
+  {
+    "TechType": "Rockgrub",
+    "Spawns": [
+      "Dunes_CaveCeiling",
+      "Dunes_CaveWall",
+      "Dunes_Rock",
+      "Dunes_SandPlateau",
+      "GrassyPlateaus_CaveCeiling",
+      "GrassyPlateaus_CaveFloor",
+      "KooshZone_CaveWall",
+      "Mountains_CaveWall",
+      "MushroomForest_CaveRecess",
+      "MushroomForest_CaveSpecial",
+      "MushroomForest_GiantTreeInteriorRecess",
+      "MushroomForest_GiantTreeInteriorSpecial",
+      "SafeShallows_CaveSpecial",
+      "SparseReef_DeepWall"
+    ]
+  },
+  {
+    "TechType": "Salt",
+    "Spawns": [
+      "BloodKelp_Grass",
+      "CragField_Grass",
+      "CragField_Sand",
+      "CrashZone_Sand",
+      "Dunes_SandDune",
+      "GrandReef_Grass",
+      "GrassyPlateaus_CaveFloor",
+      "GrassyPlateaus_Sand",
+      "Kelp_Sand",
+      "KooshZone_Sand",
+      "Mountains_IslandSand",
+      "MushroomForest_Sand",
+      "SeaTreaderPath_CaveFloor",
+      "SeaTreaderPath_Sand",
+      "SparseReef_Sand",
+      "UnderwaterIslands_IslandTop"
+    ]
+  },
+  {
+    "TechType": "Sandshark",
+    "Spawns": [
+      "CrashZone_Sand",
+      "Dunes_Grass",
+      "Dunes_SandDune",
+      "GrassyPlateaus_Sand"
+    ]
+  },
+  {
+    "TechType": "SandsharkEgg",
+    "Spawns": [
+      "GrassyPlateaus_Grass"
+    ]
+  },
+  {
+    "TechType": "SandstoneChunk",
+    "Spawns": [
+      "BonesField_Ground",
+      "CragField_Ground",
+      "CrashZone_Rock",
+      "Dunes_CaveCeiling",
+      "Dunes_Rock",
+      "Dunes_SandPlateau",
+      "GhostTree_Ground",
+      "GrandReef_Ground",
+      "GrandReef_Wall",
+      "GrassyPlateaus_CaveCeiling",
+      "GrassyPlateaus_CaveWall",
+      "GrassyPlateaus_Tower",
+      "GrassyPlateaus_Wall",
+      "Kelp_CaveSpecial",
+      "Kelp_CaveWall",
+      "Kelp_GrassDense",
+      "Kelp_Wall",
+      "KooshZone_RockWall",
+      "LostRiverCorridor_Ground",
+      "Mesas_Side",
+      "Mountains_Rock",
+      "Mountains_Sand",
+      "MushroomForest_RockWall",
+      "SafeShallows_CaveSpecial",
+      "SeaTreaderPath_Sand",
+      "SparseReef_DeepFloor",
+      "TreeCove_Ground",
+      "UnderwaterIslands_IslandTop"
+    ]
+  },
+  {
+    "TechType": "ScannerRoomFragment",
+    "Spawns": [
+      "BloodKelp_TrenchFloor",
+      "CragField_Sand",
+      "DeepGrandReef_AbandonedBase_Exterior",
+      "GrandReef_TechSite_Scattered",
+      "GrassyPlateaus_Sand",
+      "GrassyPlateaus_TechSite_Scattered",
+      "KooshZone_TechSite_Scatter"
+    ]
+  },
+  {
+    "TechType": "ScrapMetal",
+    "Spawns": [
+      "CragField_Sand",
+      "CrashZone_Sand",
+      "CrashZone_TrenchSand",
+      "Dunes_SandDune",
+      "GrassyPlateaus_TechSite_Scattered",
+      "Kelp_Sand",
+      "KooshZone_Grass",
+      "SafeShallows_SandFlat"
+    ]
+  },
+  {
+    "TechType": "SeamothFragment",
+    "Spawns": [
+      "FragmentSeamoth",
+      "GrassyPlateaus_Grass",
+      "GrassyPlateaus_Sand",
+      "GrassyPlateaus_TechSite_Scattered"
+    ]
+  },
+  {
+    "TechType": "ShaleChunk",
+    "Spawns": [
+      "BloodKelp_CaveWall",
+      "BloodKelp_Floor",
+      "BloodKelp_Wall",
+      "BonesField_Corridor_Wall",
+      "CragField_Rock",
+      "CrashZone_TrenchRock",
+      "GhostTree_Wall",
+      "GrandReef_CaveWall",
+      "GrandReef_Ground",
+      "InactiveLavaZone_Chamber_Floor",
+      "JellyshroomCaves_CaveFloor",
+      "JellyshroomCaves_CaveSand",
+      "JellyshroomCaves_CaveWall",
+      "JellyshroomCaves_Geyser",
+      "KooshZone_CaveWall",
+      "KooshZone_Geyser",
+      "KooshZone_RockWall",
+      "LostRiverCorridor_Wall",
+      "LostRiverJunction_Wall",
+      "Mesas_Side",
+      "Mountains_CaveWall",
+      "Mountains_IslandCaveWall",
+      "Mountains_Rock",
+      "Mountains_Sand",
+      "Mountains_ThermalVent",
+      "MushroomForest_CaveSpecial",
+      "MushroomForest_CaveWall",
+      "MushroomForest_GiantTreeExterior",
+      "MushroomForest_GiantTreeInteriorFloor",
+      "MushroomForest_GiantTreeInteriorWall",
+      "MushroomForest_RockWall",
+      "SeaTreaderPath_CaveCeiling",
+      "SeaTreaderPath_CaveWall",
+      "SeaTreaderPath_Rock",
+      "SparseReef_DeepWall",
+      "SparseReef_Wall",
+      "UnderwaterIslands_CaveFloor_Obsolete",
+      "UnderwaterIslands_IslandCaveWall",
+      "UnderwaterIslands_IslandTop"
+    ]
+  },
+  {
+    "TechType": "Shocker",
+    "Spawns": [
+      "BloodKelp_UniqueCreatures",
+      "BloodKelp_WreckCreatures",
+      "KooshZone_Coral",
+      "KooshZone_Grass"
+    ]
+  },
+  {
+    "TechType": "ShockerEgg",
+    "Spawns": [
+      "BloodKelp_ShockerEggs",
+      "KooshZone_Grass",
+      "KooshZone_HugeKooshBase"
+    ]
+  },
+  {
+    "TechType": "Shuttlebug",
+    "Spawns": [
+      "BloodKelp_CaveFloor",
+      "Canyon_Algae",
+      "GhostTree_Ground_Lower",
+      "SkeletonCave_Algae"
+    ]
+  },
+  {
+    "TechType": "Silver",
+    "Spawns": [
+      "InactiveLavaZone_Chamber_Lava"
+    ]
+  },
+  {
+    "TechType": "Skyray",
+    "Spawns": [
+      "Mountains_Birds"
+    ]
+  },
+  {
+    "TechType": "Spadefish",
+    "Spawns": [
+      "Dunes_Rock",
+      "Dunes_SandPlateau",
+      "GrandReef_Ground",
+      "GrandReef_Wall",
+      "GrassyPlateaus_Grass",
+      "GrassyPlateaus_OpenDeep_CreatureOnly",
+      "GrassyPlateaus_OpenShallow_CreatureOnly",
+      "GrassyPlateaus_Sand",
+      "GrassyPlateaus_Tower",
+      "MushroomForest_Sand",
+      "SeaTreaderPath_Rock",
+      "SeaTreaderPath_Sand",
+      "SparseReef_Coral",
+      "SparseReef_Spike",
+      "SparseReef_Wall",
+      "UnderwaterIslands_ValleyWall"
+    ]
+  },
+  {
+    "TechType": "SpadefishEgg",
+    "Spawns": [
+      "GrandReef_Grass",
+      "GrassyPlateaus_CaveFloor",
+      "GrassyPlateaus_Grass",
+      "SparseReef_DeepCoral",
+      "UnderwaterIslands_CaveFloor_Obsolete",
+      "UnderwaterIslands_ValleyLedge"
+    ]
+  },
+  {
+    "TechType": "SpineEel",
+    "Spawns": [
+      "BonesField_Skeleton_Open_CreatureOnly",
+      "GhostTree_Open_Big_CreatureOnly",
+      "GhostTree_Skeleton_Open_CreatureOnly",
+      "LostRiverCorridor_Open_CreatureOnly",
+      "LostRiverJunction_Open_CreatureOnly"
+    ]
+  },
+  {
+    "TechType": "Spinefish",
+    "Spawns": [
+      "BloodKelp_Grass",
+      "BloodKelp_OpenDeep_CreatureOnly",
+      "BloodKelp_Roots",
+      "BloodKelp_TrenchRoots",
+      "BloodKelp_TrenchWall",
+      "BloodKelp_Wall",
+      "BonesField_Corridor_CreatureOnly",
+      "BonesField_Corridor_Ground",
+      "BonesField_Open_Creature",
+      "BonesField_Wall",
+      "Canyon_Open_CreatureOnly",
+      "GhostTree_Grass",
+      "GhostTree_Open_CreatureOnly",
+      "LostRiverCorridor_Ceiling",
+      "LostRiverCorridor_Ground",
+      "LostRiverCorridor_Open_CreatureOnly",
+      "LostRiverCorridor_Wall",
+      "LostRiverJunction_Ceiling",
+      "LostRiverJunction_Ground",
+      "LostRiverJunction_LostRiverBase_Interior",
+      "LostRiverJunction_Open_CreatureOnly",
+      "LostRiverJunction_Wall",
+      "SkeletonCave_Grass",
+      "SkeletonCave_Open_CreatureOnly",
+      "SkeletonCave_Skeleton"
+    ]
+  },
+  {
+    "TechType": "Stalker",
+    "Spawns": [
+      "CrashZone_Rock",
+      "Kelp_UniqueCreature",
+      "PrisonAquarium_Grass",
+      "PrisonAquarium_Open_CreatureOnly"
+    ]
+  },
+  {
+    "TechType": "StalkerEgg",
+    "Spawns": [
+      "Kelp_VineBase"
+    ]
+  },
+  {
+    "TechType": "Sulphur",
+    "Spawns": [
+      "ActiveLavaZone_Chamber_Floor",
+      "ActiveLavaZone_Falls_Floor",
+      "ActiveLavaZone_Falls_Wall",
+      "BonesField_Lake_Floor",
+      "BonesField_LakePit_Floor",
+      "GhostTree_Lake_Floor",
+      "GrandReef_Ground",
+      "InactiveLavaZone_CastleTunnel_Floor",
+      "InactiveLavaZone_CastleTunnel_Wall",
+      "InactiveLavaZone_Chamber_Lava",
+      "InactiveLavaZone_Corridor_Floor",
+      "InactiveLavaZone_Corridor_Wall",
+      "Mountains_IslandCaveFloor",
+      "Mountains_Sand",
+      "SparseReef_Spike",
+      "SparseReef_Wall"
+    ]
+  },
+  {
+    "TechType": "ThermalPlantFragment",
+    "Spawns": [
+      "Dunes_SandDune",
+      "Dunes_TechSite",
+      "Dunes_TechSite_Barrier",
+      "Dunes_TechSite_Scatter",
+      "FragmentThermalPlant",
+      "GrandReef_Grass",
+      "GrandReef_Ground",
+      "GrandReef_TechSite",
+      "GrandReef_TechSite_Barrier",
+      "GrandReef_TechSite_Scattered",
+      "JellyShroomCaves_AbandonedBase_Outside",
+      "SparseReef_Techsite_Scatter"
+    ]
+  },
+  {
+    "TechType": "TimeCapsule",
+    "Spawns": [
+      "BloodKelp_Floor",
+      "CrashZone_Sand",
+      "Dunes_SandDune",
+      "GrandReef_Ground",
+      "GrassyPlateaus_Sand",
+      "KooshZone_Grass",
+      "Mountains_Grass",
+      "MushroomForest_Grass",
+      "SparseReef_DeepFloor",
+      "SparseReef_Sand"
+    ]
+  },
+  {
+    "TechType": "Titanium",
+    "Spawns": [
+      "InactiveLavaZone_Chamber_MagmaTree",
+      "InactiveLavaZone_LavaPit_Wall"
+    ]
+  },
+  {
+    "TechType": "UraniniteCrystal",
+    "Spawns": [
+      "BloodKelp_CaveFloor",
+      "BloodKelp_CaveWall",
+      "BloodKelp_TrenchWall",
+      "BloodKelp_Wall",
+      "DeepGrandReef_Ceiling",
+      "DeepGrandReef_Wall",
+      "GrandReef_CaveCeiling",
+      "GrandReef_CaveFloor",
+      "GrandReef_CaveWall",
+      "KooshZone_CaveWall",
+      "LostRiverCorridor_ThermalVents",
+      "LostRiverJunction_Roots",
+      "Mountains_CaveCeiling",
+      "Mountains_CaveWall",
+      "Mountains_Rock",
+      "TreeCove_LakeFloor",
+      "TreeCove_LakeWall"
+    ]
+  },
+  {
+    "TechType": "WarperSpawner",
+    "Spawns": [
+      "ActiveLavaZone_Chamber_Open_CreatureOnly",
+      "ActiveLavaZone_Falls_Open_CreatureOnly",
+      "BloodKelp_TrenchWall",
+      "BloodKelp_Wall",
+      "DeepGrandReef_Wall",
+      "Dunes_SandDune",
+      "GrandReef_Ground",
+      "InactiveLavaZone_Chamber_Open_CreatureOnly",
+      "InactiveLavaZone_Corridor_Open_CreatureOnly",
+      "Mountains_Rock",
+      "SeaTreaderPath_Sand",
+      "TreeCove_Open_CreatureOnly"
+    ]
+  },
+  {
+    "TechType": "WorkbenchFragment",
+    "Spawns": [
+      "BloodKelp_TechSite",
+      "CragField_Ground",
+      "FragmentWorkbench",
+      "GrassyPlateaus_TechSite_Barrier",
+      "JellyShroomCaves_AbandonedBase_Outside",
+      "KooshZone_TechSite",
+      "KooshZone_TechSite_Barrier",
+      "Mountains_TechSite_Barrier",
+      "MushroomForest_Grass",
+      "MushroomForest_TechSite",
+      "MushroomForest_TechSite_Barrier",
+      "SparseReef_Techsite",
+      "SparseReef_Techsite_Barrier"
     ]
   }
 ]

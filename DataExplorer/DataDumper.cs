@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using HarmonyLib;
+using Newtonsoft.Json;
 using UnityEngine;
 using UWE;
 
@@ -53,6 +56,66 @@ namespace DataExplorer
                     Initialiser._Log.LogDebug($"{biome.AsString()}\tNONE\t\t");
                 }
             }
+        }
+
+        /// <summary>
+        /// Dump all randomly spawned classIds into a csv in the mod folder.
+        /// Additionally, prepare a less detailed json for randomiser use.
+        /// </summary>
+        public static void LogLootData()
+        {
+            var path = new FileInfo(Assembly.GetExecutingAssembly().Location).Directory!.FullName;
+            using var csvWriter = new StreamWriter(File.Create(Path.Combine(path, "lootdata.csv")));
+            var jsonDump = new List<LootData>();
+            
+            LootDistributionData loot = LootDistributionData.Load(LootDistributionData.dataPath);
+            foreach (var kvpair in loot.srcDistribution)
+            {
+                string classId = kvpair.Key;
+                var data = kvpair.Value;
+                TechType techType = default;
+                if (WorldEntityDatabase.TryGetInfo(classId, out WorldEntityInfo info))
+                {
+                    techType = info.techType;
+                }
+
+                // Prepare data for the secondary, randomiser-focused file.
+                var lootData = jsonDump.Find(ld => ld.TechType == techType.AsString());
+                if (lootData is null)
+                {
+                    lootData = new LootData
+                    {
+                        TechType = techType.AsString(),
+                        Spawns = new List<string>()
+                    };
+                    jsonDump.Add(lootData);
+                }
+                
+                foreach (var biome in data.distribution)
+                {
+                    // Write the full data to the primary file.
+                    csvWriter.WriteLine(string.Join(",", classId, data.prefabPath, techType.AsString(), biome.biome,
+                        biome.count, biome.probability));
+                    // Add only relevant data to the secondary file.
+                    lootData.Spawns.Add(biome.biome.AsString());
+                }
+
+                // In the randomiser file, keep the spawns unique and alphabetical.
+                lootData.Spawns = lootData.Spawns.Distinct().OrderBy(str => str).ToList();
+            }
+
+            // Write the secondary file that can be used by the randomiser directly.
+            // Bring the techtypes into alphabetical order.
+            jsonDump.Sort((a, b) => string.Compare(a.TechType, b.TechType, StringComparison.InvariantCulture));
+            string json = JsonConvert.SerializeObject(jsonDump, Formatting.Indented);
+            using var jsonWriter = new StreamWriter(File.Create(Path.Combine(path, "spawnables.json")));
+            jsonWriter.Write(json);
+        }
+
+        class LootData
+        {
+            public string TechType;
+            public List<string> Spawns;
         }
         
         public static void LogKnownTech()

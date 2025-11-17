@@ -21,13 +21,13 @@ namespace DataExplorer
 
         private void OnConsoleCommand_dump(NotificationCenter.Notification n)
         {
-            if (n.data.Count < 2)
+            if (n.data is null || n.data.Count < 1)
             {
-                ErrorMessage.AddMessage("Options: biomes, databoxes, ency, knownTech, prefabs");
+                ErrorMessage.AddMessage("Options: biomes, databoxes, ency, knownTech, loot, prefabs");
                 return;
             }
 
-            switch (n.data[1])
+            switch (n.data[0])
             {
                 case "biomes":
                     DumpBiomes();
@@ -41,6 +41,10 @@ namespace DataExplorer
                     break;
                 case "knowntech":
                     DumpKnownTech();
+                    break;
+                case "loot":
+                    ErrorMessage.AddMessage("Dumping loot");
+                    DataDumper.LogLootData();
                     break;
                 case "prefabs":
                     DumpPrefabs();
