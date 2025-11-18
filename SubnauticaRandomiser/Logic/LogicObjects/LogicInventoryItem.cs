@@ -15,6 +15,11 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// </summary>
         public LogicSpawnable Spawnable { get; private set; }
 
+        /// <summary>
+        /// The maximum number of recipes this item can be assigned to as an ingredient.
+        /// </summary>
+        public int MaxRecipeUsesPerGame = -1;
+
         public void AddRecipe(LogicRecipe recipe)
         {
             Recipe = recipe;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using Newtonsoft.Json;
 using SubnauticaRandomiser.Logic;
@@ -16,6 +17,8 @@ namespace SubnauticaRandomiser.Serialization.Converters
         private readonly Type _logicEntity = typeof(LogicEntity);
         private EntityManager _manager;
 
+        public StringEntityConverter(){}
+        
         public StringEntityConverter(EntityManager manager)
         {
             _manager = manager;
@@ -29,16 +32,37 @@ namespace SubnauticaRandomiser.Serialization.Converters
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
             JsonSerializer serializer)
         {
-            // The entity will have been saved as a reference only. We need to use the available info to uniquely
-            // identify the specific existing entity in the manager.
-            string json = reader.Value as string;
+            // This could be either a straight-up LogicEntity or a list of references specified in a dependencies
+            // section. Find out which.
+            if (reader.TokenType == JsonToken.StartArray)
+            {
+                List<LogicEntity> entities = new List<LogicEntity>();
+                // Read the next entry but stop if we reached the end of the list.
+                while (reader.Read() && reader.TokenType != JsonToken.EndArray)
+                {
+                    if (reader.TokenType == JsonToken.String)
+                        entities.Add(Deserialise(reader.Value as string));
+                }
+
+                // Position the reader for the rest of the JSON after this list.
+                reader.Skip();
+                return entities;
+            }
+
+            // Parse just a single entity.
+            return Deserialise(reader.Value as string);
+        }
+
+        private LogicEntity Deserialise(string json)
+        {
             if (string.IsNullOrEmpty(json))
                 return null;
-
+            
             // The entity isn't saved as a whole class, but rather as a reference to its type and name.
-            var split = json!.Split(Separator);
+            var split = json!.Split(LogicEntity.TypeNameSeparator);
             if (split.Length != 2)
-                throw new JsonSerializationException($"Entity must contain exactly one '{Separator}' separator!");
+                throw new JsonSerializationException("Entity must contain exactly one " +
+                                                     $"'{LogicEntity.TypeNameSeparator}' separator!");
             
             Type entityType = ConvertToEntityType(split[0]);
             if (entityType is null)
@@ -47,9 +71,14 @@ namespace SubnauticaRandomiser.Serialization.Converters
                 throw new JsonSerializationException($"Entity name is not a valid TechType: '{split[1]}'");
             
             // Try to look up the type-name combination in the manager.
-            var entity = _manager.Find(entityType, techType);
+            var entity = _manager?.Find(entityType, techType);
             if (entity is null)
-                throw new JsonSerializationException($"No entity of type '{entityType}' and TechType '{techType}' exists!");
+            {
+                // throw new JsonSerializationException($"No entity of type '{entityType}' and TechType '{techType}' exists!");
+                // Create a temporary reference to be resolved later.
+                return new LogicEntityReference(entityType, techType);
+            }
+
             return entity;
         }
 
