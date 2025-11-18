@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
-using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
@@ -26,7 +25,7 @@ namespace SubnauticaRandomiser.Logic.Modules
             _coreLogic = GetComponent<CoreLogic>();
             _manager = GetComponent<ProgressionManager>();
 
-            _coreLogic.RegisterEntityHandler(EntityType.RawMaterial, this);
+            // _coreLogic.RegisterEntityHandler(EntityType.RawMaterial, this);
         }
         
         public IEnumerable<Task> LoadFiles()

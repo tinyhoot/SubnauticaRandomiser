@@ -9,7 +9,6 @@ using SubnauticaRandomiser.CsvReader;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
-using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
 using SubnauticaRandomiser.Objects.Exceptions;
 using SubnauticaRandomiser.Patches;
@@ -93,7 +92,7 @@ namespace SubnauticaRandomiser.Logic.Modules
                 _coreLogic.EntityCollecting += OnCollectFragments;
                 _manager.HasProgressed += OnProgression;
                 // Handle any fragment entities using this component.
-                _coreLogic.RegisterEntityHandler(EntityType.Fragment, this);
+                // _coreLogic.RegisterEntityHandler(EntityType.Fragment, this);
                 // Reset all existing fragment spawns.
                 Init();
             }

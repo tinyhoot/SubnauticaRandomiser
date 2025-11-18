@@ -3,21 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using BepInEx.Bootstrap;
+using HarmonyLib;
 using HootLib;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
-using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Logic.Modules;
-using SubnauticaRandomiser.Logic.Modules.Recipes;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
-using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
-using Object = UnityEngine.Object;
-using Task = System.Threading.Tasks.Task;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -32,13 +27,12 @@ namespace SubnauticaRandomiser.Logic
         
         private Config _config;
         private ILogHandler _log = PrefixLogHandler.Get("[Bootstrap]");
-
-        private GameObject _logicObject;
+        
         private CoreLogic _coreLogic;
         private GameStateSynchroniser _sync;
-        private readonly List<ILogicModule> _modules = new List<ILogicModule>();
+        private readonly List<BaseLogicModule> _modules = new List<BaseLogicModule>();
 
-        public ReadOnlyCollection<ILogicModule> Modules => _modules.AsReadOnly();
+        public ReadOnlyCollection<BaseLogicModule> Modules => _modules.AsReadOnly();
 
         public Bootstrap(Config config)
         {
@@ -59,8 +53,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private IEnumerator Initialise(WaitScreenHandler.WaitScreenTask task)
         {
-            _log.Debug("Setting up central GameObject.");
-            SetupGameObject();
+            _coreLogic = new CoreLogic();
             
             // If the save version is negative it is on the default value and has never been set, meaning the file
             // has never been saved and this is a fresh start.
@@ -83,17 +76,6 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Initialise the GameObject that holds the randomisation logic components.
-        /// </summary>
-        private void SetupGameObject()
-        {
-            _logicObject = new GameObject("Randomiser Logic");
-            // Set the BepInEx manager object as the parent of the logic GameObject.
-            _logicObject.transform.SetParent(Chainloader.ManagerObject.transform, false);
-            _coreLogic = _logicObject.AddComponent<CoreLogic>();
-        }
-
-        /// <summary>
         /// Enable all modules for a fresh start as deemed necessary by the config.
         /// </summary>
         private IEnumerator EnableModules(WaitScreenHandler.WaitScreenTask task)
@@ -102,25 +84,27 @@ namespace SubnauticaRandomiser.Logic
             task.Status = "Randomising - Registering modules";
             yield return null;
             
-            if (_config.EnableAlternateStartModule.Value && !_config.SpawnPoint.Value.Equals("Vanilla"))
-                RegisterModule<AlternateStartLogic>();
-            if (_config.RandomiseDoorCodes.Value || _config.RandomiseSupplyBoxes.Value)
-                RegisterModule<AuroraLogic>();
-            if (_config.RandomiseDataboxes.Value)
-                RegisterModule<DataboxLogic>();
-            if (_config.EnableFragmentModule.Value &&
-                (_config.RandomiseFragments.Value || _config.RandomiseNumFragments.Value
-                                                  || _config.RandomiseDuplicateScans.Value))
-            {
-                RegisterModule<FragmentLogic>();
-                RegisterModule<EntitySlotsTracker>();
-            }
-
-            if (_config.EnableRecipeModule.Value && _config.RandomiseRecipes.Value)
-            {
-                RegisterModule<RawMaterialLogic>();
-                RegisterModule<RecipeLogic>();
-            }
+            // TODO: Re-enable these modules once they have been ported to the new system.
+            //
+            // if (_config.EnableAlternateStartModule.Value && !_config.SpawnPoint.Value.Equals("Vanilla"))
+            //     RegisterModule<AlternateStartLogic>();
+            // if (_config.RandomiseDoorCodes.Value || _config.RandomiseSupplyBoxes.Value)
+            //     RegisterModule<AuroraLogic>();
+            // if (_config.RandomiseDataboxes.Value)
+            //     RegisterModule<DataboxLogic>();
+            // if (_config.EnableFragmentModule.Value &&
+            //     (_config.RandomiseFragments.Value || _config.RandomiseNumFragments.Value
+            //                                       || _config.RandomiseDuplicateScans.Value))
+            // {
+            //     RegisterModule<FragmentLogic>();
+            //     RegisterModule<EntitySlotsTracker>();
+            // }
+            //
+            // if (_config.EnableRecipeModule.Value && _config.RandomiseRecipes.Value)
+            // {
+            //     RegisterModule<RawMaterialLogic>();
+            //     RegisterModule<RecipeLogic>();
+            // }
             _log.Debug($"Enabled {Modules.Count} modules: {Modules.ElementsToString()}");
         }
 
@@ -132,9 +116,9 @@ namespace SubnauticaRandomiser.Logic
             _log.Debug("Re-enabling modules specified in saved game.");
             task.Status = "Loading previously enabled modules";
             yield return null;
-            foreach (Type module in SaveData.EnabledModules)
+            foreach (Type moduleType in SaveData.EnabledModules)
             {
-                RegisterModule(module);
+                RegisterModule(moduleType);
             }
         }
 
@@ -147,15 +131,15 @@ namespace SubnauticaRandomiser.Logic
             task.Status = "Randomising - Loading info files";
             yield return null;
             
-            var fileTasks = new List<Task>();
-            // The entity handler loads a file with critical information on every entity. It is always required.
-            fileTasks.Add(_coreLogic.EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
-            foreach (ILogicModule module in Modules)
-            {
-                fileTasks.AddRange(module.LoadFiles());
-            }
-            
-            yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
+            // var fileTasks = new List<Task>();
+            // // The entity handler loads a file with critical information on every entity. It is always required.
+            // fileTasks.Add(_coreLogic.EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
+            // foreach (ILogicModule module in Modules)
+            // {
+            //     fileTasks.AddRange(module.LoadFiles());
+            // }
+            //
+            // yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
         }
 
         /// <summary>
@@ -167,7 +151,7 @@ namespace SubnauticaRandomiser.Logic
             yield return null;
             
             SaveData.SaveVersion = Initialiser.SaveVersion;
-            foreach (ILogicModule module in Modules)
+            foreach (var module in Modules)
             {
                 BaseModuleSaveData moduleData = module.SetupSaveData();
                 if (moduleData != null)
@@ -195,7 +179,7 @@ namespace SubnauticaRandomiser.Logic
             _modules.Clear();
             // Then destroy the central logic object in preparation for the next fresh save.
             _log.Debug("Destroying logic object.");
-            Object.Destroy(_logicObject);
+            _coreLogic = null;
         }
 
         /// <summary>
@@ -207,26 +191,31 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Register a component module for use with the randomiser.
+        /// Register a module for use with the randomiser. Must be a subclass of <see cref="BaseLogicModule"/> with a
+        /// parameterless constructor.
         /// </summary>
-        public TLogicModule RegisterModule<TLogicModule>() where TLogicModule : MonoBehaviour, ILogicModule
+        public void RegisterModule<T>(T module) where T : BaseLogicModule, new()
         {
-            TLogicModule component = _logicObject.EnsureComponent<TLogicModule>();
-            _modules.Add(component);
-            return component;
+            InternalRegisterModule(module);
         }
 
-        /// <inheritdoc cref="RegisterModule{TLogicModule}"/>
-        /// <exception cref="ArgumentException">Thrown if the provided type does not implement
-        /// <see cref="ILogicModule"/>.</exception>
-        public ILogicModule RegisterModule(Type moduleType)
+        /// <inheritdoc cref="RegisterModule{T}"/>
+        public void RegisterModule(Type type)
         {
-            Component component = _logicObject.EnsureComponent(moduleType);
-            if (!(component is ILogicModule module))
-                throw new ArgumentException("Tried to register type which does not implement "
-                                            + $"{nameof(ILogicModule)}: {component.GetType()}");
+            if (!typeof(BaseLogicModule).IsAssignableFrom(type))
+                throw new ArgumentException($"Provided module type must inherit from {nameof(BaseLogicModule)}!");
+            if (AccessTools.Constructor(type) is null)
+                throw new ArgumentException("Provided module type must have a public parameterless constructor!");
+            
+            var module = Activator.CreateInstance(type) as BaseLogicModule;
+            InternalRegisterModule(module);
+        }
+
+        private void InternalRegisterModule(BaseLogicModule module)
+        {
+            _coreLogic.RegisterEntityHandler(module.HandledEntityType, module);
+            module.OnRegisterModule(_config, PrefixLogHandler.Get(module.LogPrefix));
             _modules.Add(module);
-            return module;
         }
     }
 }

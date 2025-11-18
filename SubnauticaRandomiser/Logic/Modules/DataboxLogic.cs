@@ -7,7 +7,6 @@ using SubnauticaRandomiser.CsvReader;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
-using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Events;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
@@ -34,7 +33,7 @@ namespace SubnauticaRandomiser.Logic.Modules
             _log = PrefixLogHandler.Get("[D]");
             
             // Register this module as a handler for databox entities.
-            _coreLogic.RegisterEntityHandler(EntityType.Databox, this);
+            // _coreLogic.RegisterEntityHandler(EntityType.Databox, this);
             // Register events.
             _coreLogic.EntityCollecting += OnCollectDataboxes;
         }

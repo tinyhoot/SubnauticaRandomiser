@@ -59,7 +59,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             _manager.SetupPriority += OnSetupPriorityEntities;
             _manager.SetupProgression += OnSetupProgressionEntitites;
             // Register this module as handler for recipe type entities.
-            _coreLogic.RegisterEntityHandler(EntityType.Craftable, this);
+            // _coreLogic.RegisterEntityHandler(EntityType.Craftable, this);
         }
         
         public IEnumerable<Task> LoadFiles()
