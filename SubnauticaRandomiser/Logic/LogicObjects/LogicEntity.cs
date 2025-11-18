@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using SubnauticaRandomiser.Serialization.Converters;
 
 namespace SubnauticaRandomiser.Logic.LogicObjects
 {
@@ -8,8 +9,13 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
     /// Represents an abstract unlockable that can be found in a <see cref="Region"/>.
     /// </summary>
     [Serializable]
-    public abstract class LogicEntity
+    public abstract class LogicEntity : IComparable<LogicEntity>
     {
+        /// <summary>
+        /// The separation character used in string representations of an entity.
+        /// </summary>
+        public const char TypeNameSeparator = ':';
+        
         /// <summary>
         /// The TechType this Entity interacts with, whether by unlocking, crafting, spawning, or whatever else.
         /// </summary>
@@ -19,6 +25,7 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// <summary>
         /// These other Entities need to be in logic first in order for this Entity to be able to be randomised.
         /// </summary>
+        [JsonConverter(typeof(StringEntityConverter))]
         public List<LogicEntity> Dependencies = new List<LogicEntity>();
 
         /// <summary>
@@ -32,5 +39,25 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// been randomised yet.
         /// </summary>
         public int Sphere = -1;
+
+        protected LogicEntity(){}
+
+        protected LogicEntity(TechType techType)
+        {
+            TechType = techType;
+        }
+
+        /// <summary>
+        /// Used for sorting operations. Sorting happens based on priority, preferring lowest.
+        /// </summary>
+        public int CompareTo(LogicEntity other)
+        {
+            return Priority.CompareTo(other.Priority);
+        }
+
+        public override string ToString()
+        {
+            return GetType().Name + TypeNameSeparator + TechType.AsString();
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using SubnauticaRandomiser.Logic.LogicObjects.Transitions;
 
 namespace SubnauticaRandomiser.Logic.LogicObjects
@@ -35,10 +36,10 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
             Regions.Add(context.StartingRegion);
         }
 
-        public Sphere(Sphere innerSphere)
+        public Sphere(Sphere innerSphere, IEnumerable<Region> newRegions)
         {
             Tier = innerSphere.Tier + 1;
-            Regions = new List<Region>(innerSphere.Regions);
+            Regions = new List<Region>(innerSphere.Regions.Concat(newRegions));
             AddAllReachableRegions();
         }
 
