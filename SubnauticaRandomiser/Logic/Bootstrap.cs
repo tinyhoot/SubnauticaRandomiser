@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using HarmonyLib;
 using HootLib;
 using Nautilus.Handlers;
@@ -12,6 +13,7 @@ using SubnauticaRandomiser.Logic.Modules;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
+using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic
@@ -29,6 +31,9 @@ namespace SubnauticaRandomiser.Logic
         private ILogHandler _log = PrefixLogHandler.Get("[Bootstrap]");
         
         private CoreLogic _coreLogic;
+        private LogicMonitor _monitor;
+        private EntityManager _entityManager;
+        private RegionManager _regionManager;
         private GameStateSynchroniser _sync;
         private readonly List<BaseLogicModule> _modules = new List<BaseLogicModule>();
 
@@ -53,18 +58,21 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private IEnumerator Initialise(WaitScreenHandler.WaitScreenTask task)
         {
-            _coreLogic = new CoreLogic();
+            _monitor = new LogicMonitor();
+            _coreLogic = new CoreLogic(_monitor);
             
             // If the save version is negative it is on the default value and has never been set, meaning the file
             // has never been saved and this is a fresh start.
             if (SaveData.SaveVersion < 0)
             {
                 _log.Info("Starting new game, randomising...");
+                _entityManager = new EntityManager();
+                _regionManager = new RegionManager();
                 yield return EnableModules(task);
                 yield return InitSaveData(task);
                 yield return LoadRandomisationInfoFiles(task);
                 // Randomise the game and save the final state to the SaveData.
-                yield return _coreLogic.Randomise(task, SaveData);
+                yield return _coreLogic.Randomise(task, SaveData, _entityManager, _regionManager);
             }
             else
             {
@@ -131,15 +139,16 @@ namespace SubnauticaRandomiser.Logic
             task.Status = "Randomising - Loading info files";
             yield return null;
             
-            // var fileTasks = new List<Task>();
-            // // The entity handler loads a file with critical information on every entity. It is always required.
-            // fileTasks.Add(_coreLogic.EntityHandler.ParseDataFileAsync(Initialiser._RecipeFile));
-            // foreach (ILogicModule module in Modules)
-            // {
-            //     fileTasks.AddRange(module.LoadFiles());
-            // }
-            //
-            // yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
+            var fileTasks = new List<Task>();
+            // The entity handler loads a file with critical information on every entity. It is always required.
+            fileTasks.Add(_entityManager.ParseEntitiesFromDisk());
+            fileTasks.Add(_regionManager.ParseRegionsFromDisk(_entityManager));
+            foreach (BaseLogicModule module in Modules)
+            {
+                fileTasks.AddRange(module.LoadFiles());
+            }
+            
+            yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
         }
 
         /// <summary>
@@ -180,6 +189,9 @@ namespace SubnauticaRandomiser.Logic
             // Then destroy the central logic object in preparation for the next fresh save.
             _log.Debug("Destroying logic object.");
             _coreLogic = null;
+            _monitor = null;
+            _entityManager = null;
+            _regionManager = null;
         }
 
         /// <summary>
@@ -214,7 +226,7 @@ namespace SubnauticaRandomiser.Logic
         private void InternalRegisterModule(BaseLogicModule module)
         {
             _coreLogic.RegisterEntityHandler(module.HandledEntityType, module);
-            module.OnRegisterModule(_config, PrefixLogHandler.Get(module.LogPrefix));
+            module.OnRegisterModule(_config, PrefixLogHandler.Get(module.LogPrefix), _monitor);
             _modules.Add(module);
         }
     }

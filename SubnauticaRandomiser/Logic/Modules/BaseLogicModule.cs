@@ -19,6 +19,7 @@ namespace SubnauticaRandomiser.Logic.Modules
     {
         protected Config _config;
         protected ILogHandler _log;
+        protected LogicMonitor _monitor;
 
         /// <summary>
         /// Specific which types of <see cref="LogicEntity"/> this module is equipped to handle.
@@ -28,10 +29,11 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         public abstract string LogPrefix { get; }
 
-        internal void OnRegisterModule(Config config, ILogHandler logger)
+        internal virtual void OnRegisterModule(Config config, ILogHandler logger, LogicMonitor monitor)
         {
             _config = config;
             _log = logger;
+            _monitor = monitor;
         }
 
         /// <summary>

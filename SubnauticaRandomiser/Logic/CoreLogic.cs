@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Nautilus.Handlers;
-using Nautilus.Utility;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
@@ -11,6 +10,7 @@ using SubnauticaRandomiser.Logic.LogicObjects;
 using SubnauticaRandomiser.Logic.Modules;
 using SubnauticaRandomiser.Objects.Events;
 using SubnauticaRandomiser.Serialization;
+using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
 using LogicEntity = SubnauticaRandomiser.Objects.LogicEntity;
 
@@ -73,9 +73,10 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         public event EventHandler MainLoopCompleted;
 
-        public CoreLogic()
+        public CoreLogic(LogicMonitor monitor)
         {
             Main = this;
+            _monitor = monitor;
             
             _priorityEntities = new List<LogicEntity>();
             
@@ -94,13 +95,11 @@ namespace SubnauticaRandomiser.Logic
         {
             // Ensure an empty seed is replaced with something random.
             if (string.IsNullOrEmpty(_Config.Seed.Value))
-                // return (int)(Time.realtimeSinceStartup * 1000f);
-                return 0;
+                return (int)(Time.realtimeSinceStartup * 1000f);
             if (int.TryParse(_Config.Seed.Value, out int seed))
                 return seed;
             _log.Warn("Seed was non-numeric value, substituting current time.");
-            return 0;
-            // return (int)(Time.realtimeSinceStartup * 1000f);
+            return (int)(Time.realtimeSinceStartup * 1000f);
         }
 
         
@@ -206,18 +205,13 @@ namespace SubnauticaRandomiser.Logic
         /// Running this as a coroutine spaces the logic out over several frames, which prevents the game from
         /// locking up / freezing.
         /// </summary>
-        internal IEnumerator Randomise(WaitScreenHandler.WaitScreenTask task, SaveData saveData)
+        internal IEnumerator Randomise(WaitScreenHandler.WaitScreenTask task, SaveData saveData, 
+            EntityManager entityManager, RegionManager regionManager)
         {
             _rng = new RandomHandler(GetSeedFromConfig());
-            _monitor = new LogicMonitor();
 
-            var enman = new EntityManager();
-            var t = enman.ParseEntitiesFromDisk();
-            yield return AsyncUtils.WaitUntilTaskComplete(t);
-            var regman = new RegionManager();
-            var t2 = regman.ParseRegionsFromDisk(enman);
-            yield return AsyncUtils.WaitUntilTaskComplete(t2);
-            yield return RandomiseNew(enman, regman);
+            
+            yield return RandomiseNew(entityManager, regionManager);
 
             yield break;
             
