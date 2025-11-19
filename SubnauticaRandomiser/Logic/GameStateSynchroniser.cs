@@ -3,7 +3,7 @@ using System.Linq;
 using HarmonyLib;
 using HootLib;
 using SubnauticaRandomiser.Handlers;
-using SubnauticaRandomiser.Interfaces;
+using SubnauticaRandomiser.Logic.Modules;
 using SubnauticaRandomiser.Objects.Exceptions;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
@@ -38,9 +38,9 @@ namespace SubnauticaRandomiser.Logic
             
             _log.Info("Applying changes to game.");
             // Load changes stored in the save data.
-            foreach (ILogicModule module in Bootstrap.Main.Modules)
+            foreach (BaseLogicModule module in Bootstrap.Main.Modules)
             {
-                module.ApplySerializedChanges(saveData);
+                module.ApplySerializedState(saveData);
             }
 
             // Load any changes that rely on harmony patches.
@@ -66,9 +66,9 @@ namespace SubnauticaRandomiser.Logic
         private void EnableHarmony(SaveData saveData)
         {
             _harmony = new Harmony(Initialiser.GUID);
-            foreach (ILogicModule module in Bootstrap.Main.Modules)
+            foreach (BaseLogicModule module in Bootstrap.Main.Modules)
             {
-                module.SetupHarmonyPatches(_harmony, saveData);
+                module.RegisterHarmonyPatches(_harmony, saveData);
             }
             // Ensure we get access to granular hooks into the game logic.
             _harmony.PatchAll(typeof(Hooking));
@@ -81,9 +81,9 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         public void Teardown(SaveData saveData)
         {
-            foreach (ILogicModule module in Bootstrap.Main.Modules)
+            foreach (BaseLogicModule module in Bootstrap.Main.Modules)
             {
-                module.UndoSerializedChanges(saveData);
+                module.UndoSerializedState(saveData);
             }
             saveData.Reset();
             _harmony.UnpatchSelf();
