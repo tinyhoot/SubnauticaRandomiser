@@ -43,6 +43,7 @@ namespace SubnauticaRandomiser
 
             // Set up the bootstrap to be ready for randomising later on.
             Bootstrap bootstrap = new Bootstrap(_Config);
+            bootstrap.RegisterHooks();
             
             DevConsole.RegisterConsoleCommand("test", _ => Test());
         }

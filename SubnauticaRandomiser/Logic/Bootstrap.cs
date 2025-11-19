@@ -43,11 +43,14 @@ namespace SubnauticaRandomiser.Logic
         {
             Main = this;
             _config = config;
+        }
 
+        public void RegisterHooks()
+        {
             // Register the save data file. Doing this before the WaitScreen task guarantees it will be ready when
             // we need it.
             SaveData = SaveDataHandler.RegisterSaveDataCache<SaveData>();
-            // Do setup for the current save game during the loading screen.
+            // Kick off the randomiser for real early during the loading screen.
             WaitScreenHandler.RegisterEarlyAsyncLoadTask(Initialiser.NAME, Initialise, "Setting up.");
             // Undo all changes to the game when the user quits back to the main menu.
             Hooking.OnQuitToMainMenu += Teardown;
