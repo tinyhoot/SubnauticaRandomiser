@@ -1,39 +1,861 @@
 [
   {
-    "Name": "SafeShallows",
-    "Entities": [
-      "LogicInventoryItem:Titanium",
-      "LogicInventoryItem:Copper"
-    ],
+    "Name": "ActiveLavaZone",
     "BiomeTypes": [
-      "SafeShallows_Grass",
-      "SafeShallows_ShellTunnel",
-      "SafeShallows_ShellTunnelHuge"
+      "ActiveLavaZone_Chamber_Ceiling",
+      "ActiveLavaZone_Chamber_Floor",
+      "ActiveLavaZone_Chamber_Floor_Far",
+      "ActiveLavaZone_Chamber_Open_CreatureOnly",
+      "ActiveLavaZone_Chamber_Wall",
+      "ActiveLavaZone_Falls_Ceiling",
+      "ActiveLavaZone_Falls_Floor",
+      "ActiveLavaZone_Falls_Open_CreatureOnly",
+      "ActiveLavaZone_Falls_Wall"
+    ]
+  },
+  {
+    "Name": "BloodKelpNorth",
+    "BiomeTypes": [
+      "BloodKelp_CaveCeiling",
+      "BloodKelp_CaveFloor",
+      "BloodKelp_CaveRoots",
+      "BloodKelp_CaveWall",
+      "BloodKelp_Floor",
+      "BloodKelp_Grass",
+      "BloodKelp_OpenDeep_CreatureOnly",
+      "BloodKelp_OpenShallow_CreatureOnly",
+      "BloodKelp_Roots",
+      "BloodKelp_ShockerEggs",
+      "BloodKelp_UniqueCreatures",
+      "BloodKelp_Wall"
+    ]
+  },
+  {
+    "Name": "BloodKelpTrench",
+    "BiomeTypes": [
+      "BloodKelp_CaveCeiling",
+      "BloodKelp_CaveFloor",
+      "BloodKelp_CaveRoots",
+      "BloodKelp_CaveWall",
+      "BloodKelp_Floor",
+      "BloodKelp_Roots",
+      "BloodKelp_ShockerEggs",
+      "BloodKelp_TrenchFloor",
+      "BloodKelp_TrenchRoots",
+      "BloodKelp_TrenchWall",
+      "BloodKelp_Wall"
+    ]
+  },
+  {
+    "Name": "CragField",
+    "BiomeTypes": [
+      "CragField_Grass",
+      "CragField_Ground",
+      "CragField_OpenShallow_CreatureOnly",
+      "CragField_Rock",
+      "CragField_Sand"
+    ]
+  },
+  {
+    "Name": "CrashZone",
+    "BiomeTypes": [
+      "CrashZone_OpenDeep_CreatureOnly",
+      "CrashZone_OpenShallow_CreatureOnly",
+      "CrashZone_Rock",
+      "CrashZone_Sand"
+    ]
+  },
+  {
+    "Name": "CrashZoneTrench",
+    "BiomeTypes": [
+      "CrashZone_TrenchSand",
+      "CrashZone_TrenchRock"
+    ]
+  },
+  {
+    "Name": "CrashZoneMesa",
+    "BiomeTypes": [
+      "Mesas_Open",
+      "Mesas_Side",
+      "Mesas_Top"
+    ]
+  },
+  {
+    "Name": "DeepGrandReef",
+    "BiomeTypes": [
+      "DeepGrandReef_BlueCoral",
+      "DeepGrandReef_Ceiling",
+      "DeepGrandReef_Ground",
+      "DeepGrandReef_RockDeep_Obsolete",
+      "DeepGrandReef_RockShallow_Obsolete",
+      "DeepGrandReef_ThermalVent",
+      "DeepGrandReef_Wall"
+    ]
+  },
+  {
+    "Name": "Dunes",
+    "BiomeTypes": [
+      "Dunes_Grass",
+      "Dunes_OpenDeep_CreatureOnly",
+      "Dunes_OpenShallow_CreatureOnly",
+      "Dunes_Rock",
+      "Dunes_SandDune",
+      "Dunes_SandPlateau",
+      "Dunes_ThermalVent",
+      "Dunes_ThermalVent_Grass",
+      "Dunes_ThermalVent_Rock",
+      "Dunes_ThermalVent_Sand"
+    ]
+  },
+  {
+    "Name": "DunesCaves",
+    "BiomeTypes": [
+      "Dunes_CaveCeiling",
+      "Dunes_CaveFloor",
+      "Dunes_CaveWall"
+    ]
+  },
+  {
+    "Name": "FloatingIslands",
+    "BiomeTypes": [
+      "FloatingIslands_Birds"
+    ]
+  },
+  {
+    "Name": "GhostTree",
+    "BiomeTypes": [
+      "GhostTree_Ceiling",
+      "GhostTree_Grass",
+      "GhostTree_Ground",
+      "GhostTree_Ground_Lower",
+      "GhostTree_Lake_Floor",
+      "GhostTree_Open_CreatureOnly",
+      "GhostTree_Skeleton_Open_CreatureOnly",
+      "GhostTree_Wall",
+      "TreeCove_Algae",
+      "TreeCove_Ceiling",
+      "TreeCove_Ground",
+      "TreeCove_LakeFloor",
+      "TreeCove_LakeWall",
+      "TreeCove_LedgeSide",
+      "TreeCove_Open_CreatureOnly",
+      "TreeCove_TreeOpen_CreatureOnly",
+      "TreeCove_Wall"
+    ]
+  },
+  {
+    "Name": "GrandReef",
+    "BiomeTypes": [
+      "GrandReef_CaveWall",
+      "GrandReef_Grass",
+      "GrandReef_Ground",
+      "GrandReef_OpenDeep_CreatureOnly",
+      "GrandReef_OpenShallow_CreatureOnly",
+      "GrandReef_PurpleCoral",
+      "GrandReef_RockDeep_Underground_Obsolete",
+      "GrandReef_RockShallow_Underground_Obsolete",
+      "GrandReef_ThermalVent",
+      "GrandReef_TreaderPath",
+      "GrandReef_Wall",
+      "GrandReef_WhiteCoral"
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus",
+    "BiomeTypes": [
+      "GrassyPlateaus_Arch_Obsolete",
+      "GrassyPlateaus_Grass",
+      "GrassyPlateaus_OpenDeep_CreatureOnly",
+      "GrassyPlateaus_OpenShallow_CreatureOnly",
+      "GrassyPlateaus_PlateauTop_Obsolete",
+      "GrassyPlateaus_Sand",
+      "GrassyPlateaus_Tower",
+      "GrassyPlateaus_UniqueCreatureSpecial_Obsolete",
+      "GrassyPlateaus_UniqueCreature_Obsolete",
+      "GrassyPlateaus_Wall"
+    ]
+  },
+  {
+    "Name": "GrassyPlateausCaves",
+    "BiomeTypes": [
+      "GrassyPlateaus_CaveCeiling",
+      "GrassyPlateaus_CaveEntrance",
+      "GrassyPlateaus_CaveFloor",
+      "GrassyPlateaus_CaveWall"
+    ]
+  },
+  {
+    "Name": "InactiveLavaZone",
+    "BiomeTypes": [
+      "InactiveLavaZone_Chamber_Ceiling",
+      "InactiveLavaZone_Chamber_Dragon_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Floor",
+      "InactiveLavaZone_Chamber_Floor_Far",
+      "InactiveLavaZone_Chamber_Lava",
+      "InactiveLavaZone_Chamber_MagmaBubble",
+      "InactiveLavaZone_Chamber_MagmaTree",
+      "InactiveLavaZone_Chamber_Open_CreatureOnly",
+      "InactiveLavaZone_Chamber_Open_UniqueCreatureOnly",
+      "InactiveLavaZone_Chamber_Wall"
+    ]
+  },
+  {
+    "Name": "InactiveLavaZoneCastle",
+    "BiomeTypes": [
+      "InactiveLavaZone_CastleChamber_Ceiling",
+      "InactiveLavaZone_CastleChamber_Floor",
+      "InactiveLavaZone_CastleChamber_Open_CreatureOnly",
+      "InactiveLavaZone_CastleChamber_Wall"
+    ]
+  },
+  {
+    "Name": "InactiveLavaZoneCastleTunnel",
+    "BiomeTypes": [
+      "InactiveLavaZone_CastleTunnel_Ceiling",
+      "InactiveLavaZone_CastleTunnel_Floor",
+      "InactiveLavaZone_CastleTunnel_Open_CreatureOnly",
+      "InactiveLavaZone_CastleTunnel_Wall"
+    ]
+  },
+  {
+    "Name": "InactiveLavaZoneCorridor",
+    "BiomeTypes": [
+      "InactiveLavaZone_Corridor_Floor_Far",
+      "InactiveLavaZone_Corridor_Open_CreatureOnly"
+    ]
+  },
+  {
+    "Name": "InactiveLavaZoneLavaPit",
+    "BiomeTypes": [
+      "InactiveLavaZone_LavaPit_Floor",
+      "InactiveLavaZone_LavaPit_Open_CreatureOnly",
+      "InactiveLavaZone_LavaPit_Wall"
+    ]
+  },
+  {
+    "Name": "JellyShroomCaves",
+    "BiomeTypes": [
+      "JellyShroomCaves_CrabSnake",
+      "JellyShroomCaves_InsideShroom",
+      "JellyshroomCaves_CaveFloor",
+      "JellyshroomCaves_CaveSand",
+      "JellyshroomCaves_CaveWall",
+      "JellyshroomCaves_Geyser",
+      "JellyshroomCaves_Jellyshroom"
     ]
   },
   {
     "Name": "KelpForest",
-    "Entities": [
-      "LogicInventoryItem:CreepVinePiece"
-    ],
     "BiomeTypes": [
+      "Kelp_DenseVine",
       "Kelp_GrassDense",
       "Kelp_GrassSparse",
+      "Kelp_Outcropping_Obsolete",
       "Kelp_Sand",
-      "Kelp_TechSite_Scattered",
+      "Kelp_SandRocky_Obsolete",
+      "Kelp_ShellTunnel",
+      "Kelp_UniqueCreature",
+      "Kelp_UniqueCreatureCave",
+      "Kelp_VineBase",
       "Kelp_Wall"
+    ]
+  },
+  {
+    "Name": "KelpForestCaves",
+    "BiomeTypes": [
+      "Kelp_CaveEntrance_Obsolete",
+      "Kelp_CaveFloor",
+      "Kelp_CaveRecess_Obsolete",
+      "Kelp_CaveSpecial",
+      "Kelp_CaveWall"
+    ]
+  },
+  {
+    "Name": "KooshZone",
+    "BiomeTypes": [
+      "KooshZone_Coral",
+      "KooshZone_Geyser",
+      "KooshZone_Grass",
+      "KooshZone_HugeKooshBase",
+      "KooshZone_OpenDeep_CreatureOnly",
+      "KooshZone_OpenShallow_CreatureOnly",
+      "KooshZone_RockWall",
+      "KooshZone_Sand"
+    ]
+  },
+  {
+    "Name": "KooshZoneCaves",
+    "BiomeTypes": [
+      "KooshZone_CaveFloor",
+      "KooshZone_CaveSpecial",
+      "KooshZone_CaveWall"
+    ]
+  },
+  {
+    "Name": "LostRiverBonesField",
+    "BiomeTypes": [
+      "BonesField_Algae",
+      "BonesField_Cave_Ceiling",
+      "BonesField_Cave_Ground",
+      "BonesField_Cave_Wall",
+      "BonesField_Ceiling",
+      "BonesField_Corridor_Ceiling",
+      "BonesField_Corridor_CreatureOnly",
+      "BonesField_Corridor_Ground",
+      "BonesField_Corridor_Stream",
+      "BonesField_Corridor_Wall",
+      "BonesField_Ground",
+      "BonesField_LakePit_Floor",
+      "BonesField_LakePit_Open_CreatureOnly",
+      "BonesField_LakePit_Wall",
+      "BonesField_Lake_Floor",
+      "BonesField_LedgeTop",
+      "BonesField_Open_Creature",
+      "BonesField_Skeleton_Open_CreatureOnly",
+      "BonesField_ThermalVent",
+      "BonesField_Wall"
+    ]
+  },
+  {
+    "Name": "LostRiverBonesFieldCave",
+    "BiomeTypes": [
+      "BonesField_Cave_Ceiling",
+      "BonesField_Cave_Ground",
+      "BonesField_Cave_Wall"
+    ]
+  },
+  {
+    "Name": "LostRiverCanyon",
+    "BiomeTypes": [
+      "Canyon_Algae",
+      "Canyon_Ceiling",
+      "Canyon_Grass",
+      "Canyon_Ground",
+      "Canyon_Open_CreatureOnly",
+      "Canyon_Wall"
+    ]
+  },
+  {
+    "Name": "LostRiverCorridor",
+    "BiomeTypes": [
+      "LostRiverCorridor_Ceiling",
+      "LostRiverCorridor_Ground",
+      "LostRiverCorridor_Open_CreatureOnly",
+      "LostRiverCorridor_ThermalVents",
+      "LostRiverCorridor_Wall"
+    ]
+  },
+  {
+    "Name": "LostRiverJunction",
+    "BiomeTypes": [
+      "LostRiverJunction_Ceiling",
+      "LostRiverJunction_Ground",
+      "LostRiverJunction_LakeFloor",
+      "LostRiverJunction_LakeWall",
+      "LostRiverJunction_LostRiverBase_Interior",
+      "LostRiverJunction_Open_CreatureOnly",
+      "LostRiverJunction_Roots",
+      "LostRiverJunction_ThermalVent",
+      "LostRiverJunction_Wall"
+    ]
+  },
+  {
+    "Name": "LostRiverSkeletonCave",
+    "BiomeTypes": [
+      "SkeletonCave_Algae",
+      "SkeletonCave_Ceiling",
+      "SkeletonCave_Grass",
+      "SkeletonCave_Ground",
+      "SkeletonCave_Open_CreatureOnly",
+      "SkeletonCave_Wall"
+    ]
+  },
+  {
+    "Name": "Mountains",
+    "BiomeTypes": [
+      "Mountains_Grass",
+      "Mountains_OpenDeep_CreatureOnly",
+      "Mountains_OpenShallow_CreatureOnly",
+      "Mountains_Rock",
+      "Mountains_Sand",
+      "Mountains_ThermalVent"
+    ]
+  },
+  {
+    "Name": "MountainsCaves",
+    "BiomeTypes": [
+      "Mountains_CaveCeiling",
+      "Mountains_CaveFloor",
+      "Mountains_CaveWall"
+    ]
+  },
+  {
+    "Name": "MountainsIsland",
+    "BiomeTypes": [
+      "Mountains_Birds",
+      "Mountains_IslandCaveCeiling",
+      "Mountains_IslandCaveFloor",
+      "Mountains_IslandCaveWall",
+      "Mountains_IslandGrass",
+      "Mountains_IslandRock",
+      "Mountains_IslandSand"
+    ]
+  },
+  {
+    "Name": "MushroomForestNorthWest",
+    "BiomeTypes": [
+      "MushroomForest_CoralRoot",
+      "MushroomForest_GiantTreeExterior",
+      "MushroomForest_GiantTreeInteriorFloor",
+      "MushroomForest_GiantTreeInteriorSpecial",
+      "MushroomForest_GiantTreeInteriorWall",
+      "MushroomForest_GiantTreeRootBase",
+      "MushroomForest_Grass",
+      "MushroomForest_MushroomTreeTrunk",
+      "MushroomForest_RockWall",
+      "MushroomForest_Sand",
+      "MushroomForest_UniqueCreature"
+    ]
+  },
+  {
+    "Name": "MushroomForestNorthEast",
+    "BiomeTypes": [
+      "MushroomForest_Grass",
+      "MushroomForest_MushroomTreeTrunk",
+      "MushroomForest_RockWall",
+      "MushroomForest_Sand",
+      "MushroomForest_UniqueCreature"
+    ]
+  },
+  {
+    "Name": "MushroomForestCaves",
+    "BiomeTypes": [
+      "MushroomForest_CaveEntrance",
+      "MushroomForest_CaveFloor",
+      "MushroomForest_CaveWall"
+    ]
+  },
+  {
+    "Name": "PrisonAquarium",
+    "BiomeTypes": [
+      "PrisonAquarium_CaveCeiling",
+      "PrisonAquarium_CaveFloor",
+      "PrisonAquarium_CaveWall",
+      "PrisonAquarium_Coral",
+      "PrisonAquarium_DeadCoral",
+      "PrisonAquarium_Grass",
+      "PrisonAquarium_Open_CreatureOnly",
+      "PrisonAquarium_Rock",
+      "PrisonAquarium_Sand",
+      "PrisonAquarium_SpecialCoral"
+    ]
+  },
+  {
+    "Name": "SafeShallows",
+    "Entities": [
+    ],
+    "BiomeTypes": [
+      "CrashHome",
+      "SafeShallows_CaveFloor",
+      "SafeShallows_CaveSpecial",
+      "SafeShallows_CaveWall",
+      "SafeShallows_Grass",
+      "SafeShallows_OpenDeep_CreatureOnly",
+      "SafeShallows_OpenShallow_CreatureOnly",
+      "SafeShallows_Plants",
+      "SafeShallows_SandFlat",
+      "SafeShallows_ShellTunnel",
+      "SafeShallows_ShellTunnelHuge",
+      "SafeShallows_UniqueCreature",
+      "SafeShallows_UniqueCreatureCave",
+      "SafeShallows_Wall"
+    ]
+  },
+  {
+    "Name": "SeaTreaderPath",
+    "BiomeType": [
+      "SeaTreaderPath_Grass",
+      "SeaTreaderPath_OpenDeep_CreatureOnly",
+      "SeaTreaderPath_OpenShallow_CreatureOnly",
+      "SeaTreaderPath_Path",
+      "SeaTreaderPath_Rock",
+      "SeaTreaderPath_Sand"
+    ]
+  },
+  {
+    "Name": "SeaTreaderPathCaves",
+    "BiomeType": [
+      "SeaTreaderPath_CaveCeiling",
+      "SeaTreaderPath_CaveFloor",
+      "SeaTreaderPath_CaveWall"
+    ]
+  },
+  {
+    "Name": "SparseReef",
+    "BiomeTypes": [
+      "SparseReef_Coral",
+      "SparseReef_OpenDeep_CreatureOnly",
+      "SparseReef_OpenShallow_CreatureOnly",
+      "SparseReef_Sand",
+      "SparseReef_Spike",
+      "SparseReef_Wall"
+    ]
+  },
+  {
+    "Name": "SparseReefDeep",
+    "BiomeTypes": [
+      "SparseReef_CaveCoral",
+      "SparseReef_CaveFloor",
+      "SparseReef_CaveWall"
+    ]
+  },
+  {
+    "Name": "SparseReefCaves",
+    "BiomeTypes": [
+      "SparseReef_DeepCoral",
+      "SparseReef_DeepFloor",
+      "SparseReef_DeepWall"
+    ]
+  },
+  {
+    "Name": "UnderwaterIslands",
+    "BiomeTypes": [
+      "UnderwaterIslands_IslandPlants",
+      "UnderwaterIslands_IslandSides",
+      "UnderwaterIslands_IslandTop",
+      "UnderwaterIslands_OpenDeep_CreatureOnly",
+      "UnderwaterIslands_OpenShallow_CreatureOnly"
+    ]
+  },
+  {
+    "Name": "UnderwaterIslandsCaves",
+    "BiomeTypes": [
+      "UnderwaterIslands_IslandCaveFloor",
+      "UnderwaterIslands_IslandCavePlants",
+      "UnderwaterIslands_IslandCaveWall"
+    ]
+  },
+  {
+    "Name": "UnderwaterIslandsFloorBelow",
+    "BiomeTypes": [
+      "UnderwaterIslands_Geyser",
+      "UnderwaterIslands_ValleyFloor",
+      "UnderwaterIslands_ValleyLedge",
+      "UnderwaterIslands_ValleyWall"
+    ]
+  },
+  {
+    "Name": "Degasi1",
+    "BiomeTypes": [
+      "FloatingIslands_AbandonedBase_Inside",
+      "FloatingIslands_AbandonedBase_Outside"
+    ]
+  },
+  {
+    "Name": "Degasi2",
+    "BiomeTypes": [
+      "JellyShroomCaves_AbandonedBase_Inside",
+      "JellyShroomCaves_AbandonedBase_Outside"
+    ]
+  },
+  {
+    "Name": "Degasi3",
+    "BiomeTypes": [
+      "DeepGrandReef_AbandonedBase_Exterior",
+      "DeepGrandReef_AbandonedBase_Interior"
+    ]
+  },
+  {
+    "Name": "Lifepod2",
+    "BiomeTypes": [
+      "BloodKelp_EscapePod"
+    ]
+  },
+  {
+    "Name": "Lifepod3",
+    "BiomeTypes": [
+      "Kelp_EscapePod"
+    ]
+  },
+  {
+    "Name": "Lifepod4",
+    "BiomeTypes": [
+      "CrashZone_EscapePod"
+    ]
+  },
+  {
+    "Name": "Lifepod6",
+    "BiomeTypes": [
+      "GrassyPlateaus_EscapePod"
+    ]
+  },
+  {
+    "Name": "Lifepod7"
+  },
+  {
+    "Name": "Lifepod12",
+    "BiomeTypes": [
+      "KooshZone_EscapePod"
+    ]
+  },
+  {
+    "Name": "Lifepod13",
+    "BiomeTypes": [
+      "MushroomForest_EscapePod"
+    ]
+  },
+  {
+    "Name": "Lifepod17",
+    "BiomeTypes": [
+      "GrassyPlateaus_EscapePod"
+    ]
+  },
+  {
+    "Name": "Lifepod19",
+    "BiomeTypes": [
+      "SparseReef_EscapePod"
+    ]
+  },
+  {
+    "Name": "Wreck1",
+    "BiomeTypes": [
+      "GrassyPlateaus_TechSite",
+      "GrassyPlateaus_TechSite_Scattered"
+    ]
+  },
+  {
+    "Name": "Wreck1Barrier",
+    "BiomeTypes": [
+      "GrassyPlateaus_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "Wreck2",
+    "BiomeTypes": [
+      "GrassyPlateaus_TechSite",
+      "GrassyPlateaus_TechSite_Scattered"
+    ]
+  },
+  {
+    "Name": "Wreck3",
+    "BiomeTypes": [
+      "KooshZone_TechSite",
+      "KooshZone_TechSite_Scatter"
+    ]
+  },
+  {
+    "Name": "Wreck3Barrier",
+    "BiomeTypes": [
+      "KooshZone_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "Wreck4",
+    "BiomeTypes": [
+      "UnderwaterIslands_TechSite",
+      "UnderwaterIslands_TechSite_Scatter"
+    ]
+  },
+  {
+    "Name": "Wreck4Barrier",
+    "BiomeTypes": [
+      "UnderwaterIslands_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "Wreck4PropCannon"
+  },
+  {
+    "Name": "Wreck5",
+    "BiomeTypes": [
+      "Mountains_TechSite",
+      "Mountains_TechSite_Barrier",
+      "Mountains_TechSite_Scatter"
+    ]
+  },
+  {
+    "Name": "Wreck5Barrier",
+    "BiomeTypes": [
+      "Mountains_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "Wreck6",
+    "BiomeTypes": [
+    ]
+  },
+  {
+    "Name": "Wreck7",
+    "BiomeTypes": [
+      "SeaTreaderPath_TechSite",
+      "SeaTreaderPath_TechSite_Scatter"
+    ]
+  },
+  {
+    "Name": "Wreck7Barrier",
+    "BiomeTypes": [
+      "SeaTreaderPath_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "Wreck8",
+    "BiomeTypes": [
+      "BloodKelp_TechSite",
+      "BloodKelp_TechSite_Scatter"
+    ]
+  },
+  {
+    "Name": "Wreck9",
+    "BiomeTypes": [
+      "MushroomForest_TechSite"
+    ]
+  },
+  {
+    "Name": "Wreck9Barrier",
+    "BiomeTypes": [
+      "MushroomForest_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "Wreck10",
+    "BiomeTypes": [
+      "GrandReef_TechSite",
+      "GrandReef_TechSite_Scattered"
+    ]
+  },
+  {
+    "Name": "Wreck10Barrier",
+    "BiomeTypes": [
+      "GrandReef_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "Wreck11",
+    "BiomeTypes": [
+      "GrandReef_TechSite",
+      "GrandReef_TechSite_Scattered"
+    ]
+  },
+  {
+    "Name": "Wreck11Barrier",
+    "BiomeTypes": [
+      "GrandReef_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "Wreck12",
+    "BiomeTypes": [
+      "GrassyPlateaus_TechSite",
+      "GrassyPlateaus_TechSite_Scattered"
+    ]
+  },
+  {
+    "Name": "Wreck13",
+    "BiomeTypes": [
+      "GrassyPlateaus_TechSite",
+      "GrassyPlateaus_TechSite_Scattered"
+    ]
+  },
+  {
+    "Name": "Wreck14",
+    "BiomeTypes": [
+      "GrassyPlateaus_TechSite",
+      "GrassyPlateaus_TechSite_Scattered"
+    ]
+  },
+  {
+    "Name": "Wreck14Barrier",
+    "BiomeTypes": [
+      "GrassyPlateaus_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "Wreck15",
+    "BiomeTypes": [
+      "SafeShallows_TechSite",
+      "SafeShallows_TechSite_Barrier",
+      "SafeShallows_TechSite_Scattered"
+    ]
+  },
+  {
+    "Name": "Wreck16",
+    "BiomeTypes": [
+      "SafeShallows_TechSite",
+      "SafeShallows_TechSite_Barrier",
+      "SafeShallows_TechSite_Scattered"
+    ]
+  },
+  {
+    "Name": "Wreck17",
+    "BiomeTypes": [
+      "Kelp_TechSite",
+      "Kelp_TechSite_Scattered"
     ]
   },
   {
     "Name": "Wreck18",
     "BiomeTypes": [
-      "Kelp_TechSite"
+      "Kelp_TechSite",
+      "Kelp_TechSite_Scattered"
     ]
   },
   {
     "Name": "Wreck18Barrier",
     "BiomeTypes": [
       "Kelp_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "Wreck19",
+    "BiomeTypes": [
+      "Mountains_TechSite",
+      "Mountains_TechSite_Scatter"
+    ]
+  },
+  {
+    "Name": "Wreck20",
+    "BiomeTypes": [
+      "SparseReef_Techsite",
+      "SparseReef_Techsite_Scatter"
+    ]
+  },
+  {
+    "Name": "Wreck20Barrier",
+    "BiomeTypes": [
+      "SparseReef_Techsite_Barrier"
+    ]
+  },
+  {
+    "Name": "WreckExtra1",
+    "BiomeTypes": [
+      "KooshZone_TechSite",
+      "KooshZone_TechSite_Scatter"
+    ]
+  },
+  {
+    "Name": "WreckExtra2",
+    "BiomeTypes": [
+      "Dunes_TechSite",
+      "Dunes_TechSite_Scatter"
+    ]
+  },
+  {
+    "Name": "WreckExtra2Barrier",
+    "BiomeTypes": [
+      "Dunes_TechSite_Barrier"
+    ]
+  },
+  {
+    "Name": "WreckExtra3",
+    "BiomeTypes": [
+      "Dunes_TechSite",
+      "Dunes_TechSite_Scatter"
+    ]
+  },
+  {
+    "Name": "WreckExtra3Barrier",
+    "BiomeTypes": [
+      "Dunes_TechSite_Barrier"
     ]
   }
 ]
