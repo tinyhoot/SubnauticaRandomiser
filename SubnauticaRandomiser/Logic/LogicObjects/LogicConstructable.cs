@@ -4,7 +4,7 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
     /// Represents buildable structures, vehicles, and rocket stages. Anything that has a recipe but *cannot* be held
     /// in the inventory.
     /// </summary>
-    internal class LogicBuildable : LogicEntity
+    internal class LogicConstructable : LogicEntity
     {
         /// <summary>
         /// Buildables are generally not free and require ingredients to build.

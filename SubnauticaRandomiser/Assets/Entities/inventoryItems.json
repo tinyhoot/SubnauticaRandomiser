@@ -205,7 +205,7 @@
   {
     "TechType": "ReactorRod",
     "Dependencies": [
-      "LogicBuildable:BaseNuclearReactor"
+      "LogicConstructable:BaseNuclearReactor"
     ]
   },
   {
@@ -331,7 +331,7 @@
   {
     "TechType": "MapRoomHudChip",
     "Dependencies": [
-      "LogicBuildable:BaseMapRoom"
+      "LogicConstructable:BaseMapRoom"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
@@ -385,35 +385,35 @@
   {
     "TechType": "MapRoomCamera",
     "Dependencies": [
-      "LogicBuildable:BaseMapRoom"
+      "LogicConstructable:BaseMapRoom"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "MapRoomUpgradeScanRange",
     "Dependencies": [
-      "LogicBuildable:BaseMapRoom"
+      "LogicConstructable:BaseMapRoom"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "MapRoomUpgradeScanSpeed",
     "Dependencies": [
-      "LogicBuildable:BaseMapRoom"
+      "LogicConstructable:BaseMapRoom"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "HeatBlade",
     "Dependencies": [
-      "LogicBuildable:WorkBench"
+      "LogicConstructable:WorkBench"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "HighCapacityTank",
     "Dependencies": [
-      "LogicBuildable:WorkBench",
+      "LogicConstructable:WorkBench",
       "LogicDatabox:HighCapacityTank"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -421,7 +421,7 @@
   {
     "TechType": "PlasteelTank",
     "Dependencies": [
-      "LogicBuildable:WorkBench",
+      "LogicConstructable:WorkBench",
       "LogicDatabox:PlasteelTank"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -429,7 +429,7 @@
   {
     "TechType": "RepulsionCannon",
     "Dependencies": [
-      "LogicBuildable:WorkBench",
+      "LogicConstructable:WorkBench",
       "LogicDatabox:RepulsionCannon"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -437,7 +437,7 @@
   {
     "TechType": "SwimChargeFins",
     "Dependencies": [
-      "LogicBuildable:WorkBench",
+      "LogicConstructable:WorkBench",
       "LogicDatabox:SwimChargeFins"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -445,7 +445,7 @@
   {
     "TechType": "UltraGlideFins",
     "Dependencies": [
-      "LogicBuildable:WorkBench",
+      "LogicConstructable:WorkBench",
       "LogicDatabox:UltraGlideFins"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -453,7 +453,7 @@
   {
     "TechType": "CyclopsHullModule2",
     "Dependencies": [
-      "LogicBuildable:WorkBench",
+      "LogicConstructable:WorkBench",
       "LogicDatabox:CyclopsHullModule2"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -461,7 +461,7 @@
   {
     "TechType": "CyclopsHullModule3",
     "Dependencies": [
-      "LogicBuildable:WorkBench",
+      "LogicConstructable:WorkBench",
       "LogicDatabox:CyclopsHullModule3"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -469,28 +469,28 @@
   {
     "TechType": "ExoHullModule2",
     "Dependencies": [
-      "LogicBuildable:WorkBench"
+      "LogicConstructable:WorkBench"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "VehicleHullModule2",
     "Dependencies": [
-      "LogicBuildable:WorkBench"
+      "LogicConstructable:WorkBench"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "VehicleHullModule3",
     "Dependencies": [
-      "LogicBuildable:WorkBench"
+      "LogicConstructable:WorkBench"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "CyclopsDecoyModule",
     "Dependencies": [
-      "LogicBuildable:Cyclops",
+      "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsDecoyModule"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -498,7 +498,7 @@
   {
     "TechType": "CyclopsFireSuppressionModule",
     "Dependencies": [
-      "LogicBuildable:Cyclops",
+      "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsFireSuppressionModule"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -506,7 +506,7 @@
   {
     "TechType": "CyclopsHullModule1",
     "Dependencies": [
-      "LogicBuildable:Cyclops",
+      "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsHullModule1"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -514,7 +514,7 @@
   {
     "TechType": "CyclopsSeaMothRepairModule",
     "Dependencies": [
-      "LogicBuildable:Cyclops",
+      "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsSeaMothRepairModule"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -522,7 +522,7 @@
   {
     "TechType": "CyclopsShieldModule",
     "Dependencies": [
-      "LogicBuildable:Cyclops",
+      "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsShieldModule"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -530,7 +530,7 @@
   {
     "TechType": "CyclopsSonarModule",
     "Dependencies": [
-      "LogicBuildable:Cyclops",
+      "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsSonarModule"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -538,7 +538,7 @@
   {
     "TechType": "CyclopsThermalReactorModule",
     "Dependencies": [
-      "LogicBuildable:Cyclops",
+      "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsThermalReactorModule"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -546,14 +546,14 @@
   {
     "TechType": "ExoHullModule1",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "ExoSuitDrillArmModule",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole",
+      "LogicConstructable:BaseUpgradeConsole",
       "LogicFragment:ExosuitDrillArm"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -561,7 +561,7 @@
   {
     "TechType": "ExoSuitGrapplingArmModule",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole",
+      "LogicConstructable:BaseUpgradeConsole",
       "LogicFragment:ExoSuitGrapplingArm"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -569,14 +569,14 @@
   {
     "TechType": "ExoSuitJetUpgradeModule",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "ExoSuitPropulsionArmModule",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole",
+      "LogicConstructable:BaseUpgradeConsole",
       "LogicFragment:ExoSuitPropulsionArm"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -584,14 +584,14 @@
   {
     "TechType": "ExoSuitThermalReactorModule",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "ExoSuitTorpedoArmModule",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole",
+      "LogicConstructable:BaseUpgradeConsole",
       "LogicFragment:ExoSuitTorpedoArm"
     ],
     "MaxRecipeUsesPerGame": "3"
@@ -599,67 +599,67 @@
   {
     "TechType": "PowerUpgradeModule",
     "Dependencies": [
-      "LogicBuildable:Cyclops"
+      "LogicConstructable:Cyclops"
     ]
   },
   {
     "TechType": "SeaMothElectricalDefense",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "SeaMothSolarCharge",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "SeaMothSonarModule",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "SeaMothTorpedoModule",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "VehicleArmorPlating",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "VehicleHullModule1",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "VehiclePowerUpgradeModule",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "VehicleStorageModule",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "GasTorpedo",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "WhirlpoolTorpedo",
     "Dependencies": [
-      "LogicBuildable:BaseUpgradeConsole"
+      "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
@@ -901,80 +901,80 @@
   {
     "TechType": "BoneShark",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "CrabSnake",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "CrabSquid",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "Crash",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "CuteFish",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ],
     "MaxRecipeUsesPerGame": "1"
   },
   {
     "TechType": "Gasopod",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "JellyRay",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "LavaLizard",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "Mesmer",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "RabbitRay",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "SandShark",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "Shocker",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "Stalker",
     "Dependencies": [
-      "LogicBuildable:BaseWaterPark"
+      "LogicConstructable:BaseWaterPark"
     ]
   }
 ]

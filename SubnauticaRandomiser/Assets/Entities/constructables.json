@@ -3,7 +3,7 @@
     "TechType": "BaseBioReactor",
     "Dependencies": [
       "LogicInventoryItem:Builder",
-      "LogicBuildable:BaseRoom",
+      "LogicConstructable:BaseRoom",
       "LogicFragment:BaseBioReactor"
     ]
   },
@@ -11,7 +11,7 @@
     "TechType": "BaseNuclearReactor",
     "Dependencies": [
       "LogicInventoryItem:Builder",
-      "LogicBuildable:BaseRoom",
+      "LogicConstructable:BaseRoom",
       "LogicFragment:BaseNuclearReactor"
     ]
   },
@@ -80,7 +80,7 @@
     "TechType": "BaseGlassDome",
     "Dependencies": [
       "LogicInventoryItem:Builder",
-      "LogicBuildable:BaseRoom"
+      "LogicConstructable:BaseRoom"
     ]
   },
   {
@@ -93,21 +93,21 @@
     "TechType": "BaseLargeGlassDome",
     "Dependencies": [
       "LogicInventoryItem:Builder",
-      "LogicBuildable:BaseRoom"
+      "LogicConstructable:BaseRoom"
     ]
   },
   {
     "TechType": "BaseLargeRoom",
     "Dependencies": [
       "LogicInventoryItem:Builder",
-      "LogicBuildable:BaseRoom"
+      "LogicConstructable:BaseRoom"
     ]
   },
   {
     "TechType": "BaseMapRoom",
     "Dependencies": [
       "LogicInventoryItem:Builder",
-      "LogicBuildable:BaseRoom",
+      "LogicConstructable:BaseRoom",
       "LogicFragment:BaseMapRoom"
     ]
   },
@@ -115,7 +115,7 @@
     "TechType": "BaseMoonPool",
     "Dependencies": [
       "LogicInventoryItem:Builder",
-      "LogicBuildable:BaseRoom",
+      "LogicConstructable:BaseRoom",
       "LogicFragment:BaseMoonPool"
     ]
   },
@@ -283,7 +283,7 @@
     "TechType": "BaseUpgradeConsole",
     "Dependencies": [
       "LogicInventoryItem:Builder",
-      "LogicBuildable:BaseMoonPool",
+      "LogicConstructable:BaseMoonPool",
       "LogicDatabox:BaseUpgradeConsole"
     ]
   },
@@ -291,7 +291,7 @@
     "TechType": "BaseWaterPark",
     "Dependencies": [
       "LogicInventoryItem:Builder",
-      "LogicBuildable:BaseRoom",
+      "LogicConstructable:BaseRoom",
       "LogicDatabox:BaseWaterPark"
     ]
   }
