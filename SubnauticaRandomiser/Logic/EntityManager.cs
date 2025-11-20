@@ -16,6 +16,8 @@ namespace SubnauticaRandomiser.Logic
     internal class EntityManager
     {
         private const string EntitiesFolder = "Entities";
+        private const string ConstructablesFile = "constructables.json";
+        private const string DataboxFile = "databoxes.json";
         private const string FragmentsFile = "fragments.json";
         private const string RecipesFile = "recipes.json";
         private const string SpawnablesFile = "spawnables.json";
@@ -64,18 +66,23 @@ namespace SubnauticaRandomiser.Logic
             
             try
             {
+                var databoxes = await DeserializeLogicObjects<LogicDatabox>(Path.Combine(EntitiesFolder, DataboxFile));
+                _entities.AddRange(databoxes);
                 var spawnables = await DeserializeLogicObjects<LogicSpawnable>(Path.Combine(EntitiesFolder, SpawnablesFile));
                 _entities.AddRange(spawnables);
                 var fragments = await DeserializeLogicObjects<LogicFragment>(Path.Combine(EntitiesFolder, FragmentsFile));
                 _entities.AddRange(fragments);
                 var recipes = await DeserializeLogicObjects<LogicRecipe>(Path.Combine(EntitiesFolder, RecipesFile));
                 _entities.AddRange(recipes);
-                
+
+                var constructables = await DeserializeLogicObjects<LogicConstructable>(Path.Combine(EntitiesFolder, ConstructablesFile));
+                _entities.AddRange(constructables);
                 var iitems = await DeserializeLogicObjects<LogicInventoryItem>(Path.Combine(EntitiesFolder, InvItemsFile));
                 _entities.AddRange(iitems);
                 
                 LinkRecipes(recipes, new List<LogicBlueprint>(fragments));
                 LinkSpawnables(spawnables, fragments, iitems);
+                ReplaceReferences(_entities);
             }
             catch (Exception ex)
             {
@@ -125,6 +132,34 @@ namespace SubnauticaRandomiser.Logic
                 var spawnable = spawnables.Find(spawn => spawn.TechType == fragment.SpawnableTechType);
                 if (spawnable != null)
                     fragment.Dependencies.Add(spawnable);
+            }
+        }
+
+        /// <summary>
+        /// Try to replace all <see cref="LogicEntityReference"/> with the proper <see cref="LogicEntity"/>.
+        /// </summary>
+        private void ReplaceReferences(List<LogicEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                if (entity.Dependencies is null || entity.Dependencies.Count == 0)
+                    continue;
+                
+                for (int i = entity.Dependencies.Count - 1; i >= 0; i--)
+                {
+                    if (entity.Dependencies[i] is LogicEntityReference dep)
+                    {
+                        var replacement = Find(dep.EntityType, dep.TechType);
+                        if (replacement is null)
+                        {
+                            _log.Warn($"Failed to replace reference entity in dependencies of {entity} --> {dep}");
+                            entity.Dependencies.RemoveAt(i);
+                            continue;
+                        }
+
+                        entity.Dependencies[i] = replacement;
+                    }
+                }
             }
         }
     }

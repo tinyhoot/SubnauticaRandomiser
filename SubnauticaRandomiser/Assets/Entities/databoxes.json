@@ -1,0 +1,516 @@
+[
+  {
+    "TechType": "BaseUpgradeConsole",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck1Barrier",
+        "Position": {
+          "X": "319",
+          "Y": "-104",
+          "Z": "441"
+        }
+      },
+      {
+        "RegionName": "Wreck9Barrier",
+        "Position": {
+          "X": "-655",
+          "Y": "-109",
+          "Z": "791"
+        }
+      },
+      {
+        "RegionName": "Wreck20",
+        "Position": {
+          "X": "-810",
+          "Y": "-209",
+          "Z": "-685"
+        }
+      },
+      {
+        "RegionName": "WreckExtra3",
+        "Position": {
+          "X": "-1196",
+          "Y": "-223",
+          "Z": "12"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "BaseWaterPark",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck4PropCannon",
+        "Position": {
+          "X": "-124",
+          "Y": "-200",
+          "Z": "853"
+        }
+      },
+      {
+        "RegionName": "Wreck5",
+        "Position": {
+          "X": "740",
+          "Y": "-389",
+          "Z": "1179"
+        }
+      },
+      {
+        "RegionName": "WreckExtra1",
+        "Position": {
+          "X": "1327",
+          "Y": "-234",
+          "Z": "575"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "Compass",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck18",
+        "Position": {
+          "X": "-317",
+          "Y": "-78",
+          "Z": "247"
+        }
+      },
+      {
+        "RegionName": "Lifepod3",
+        "Position": {
+          "X": "-34",
+          "Y": "-22",
+          "Z": "410"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "CyclopsDecoy",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck4",
+        "Position": {
+          "X": "-170",
+          "Y": "-187",
+          "Z": "880"
+        }
+      },
+      {
+        "RegionName": "Lifepod4",
+        "Position": {
+          "X": "712",
+          "Y": "-3",
+          "Z": "160"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "CyclopsDecoyModule",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck7",
+        "Position": {
+          "X": "-1161",
+          "Y": "-191",
+          "Z": "-758"
+        }
+      },
+      {
+        "RegionName": "Wreck11",
+        "Position": {
+          "X": "-850",
+          "Y": "-473",
+          "Z": "-1414"
+        }
+      },
+      {
+        "RegionName": "Wreck19",
+        "Position": {
+          "X": "1075",
+          "Y": "-288",
+          "Z": "1321"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "CyclopsFireSuppressionModule",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck4Barrier",
+        "Position": {
+          "X": "-138",
+          "Y": "-193",
+          "Z": "888"
+        }
+      },
+      {
+        "RegionName": "Wreck8",
+        "Position": {
+          "X": "-1234",
+          "Y": "-349",
+          "Z": "-396"
+        }
+      },
+      {
+        "RegionName": "Wreck20Barrier",
+        "Position": {
+          "X": "-795",
+          "Y": "-204",
+          "Z": "-774"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "CyclopsHullModule1",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck6",
+        "Position": {
+          "X": "-1407",
+          "Y": "-344",
+          "Z": "721"
+        }
+      },
+      {
+        "RegionName": "Wreck10",
+        "Position": {
+          "X": "-269",
+          "Y": "-262",
+          "Z": "-764"
+        }
+      },
+      {
+        "RegionName": "Lifepod2",
+        "Position": {
+          "X": "-483",
+          "Y": "-504",
+          "Z": "132"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "CyclopsSeamothRepairModule",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck7",
+        "Position": {
+          "X": "-1115",
+          "Y": "-175",
+          "Z": "-724"
+        }
+      },
+      {
+        "RegionName": "Wreck10Barrier",
+        "Position": {
+          "X": "-285",
+          "Y": "-240",
+          "Z": "-786"
+        }
+      },
+      {
+        "RegionName": "Wreck19",
+        "Position": {
+          "X": "1068",
+          "Y": "-283",
+          "Z": "1345"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "CyclopsShieldModule",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck6Barrier",
+        "Position": {
+          "X": "-1409",
+          "Y": "-332",
+          "Z": "706"
+        }
+      },
+      {
+        "RegionName": "Wreck7Barrier",
+        "Position": {
+          "X": "-1129",
+          "Y": "-155",
+          "Z": "-729"
+        }
+      },
+      {
+        "RegionName": "Degasi3",
+        "Position": {
+          "X": "-635",
+          "Y": "-502",
+          "Z": "-951"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "CyclopsSonarModule",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck3Barrier",
+        "Position": {
+          "X": "914",
+          "Y": "-202",
+          "Z": "611"
+        }
+      },
+      {
+        "RegionName": "Wreck8",
+        "Position": {
+          "X": "-1208",
+          "Y": "-349",
+          "Z": "-383"
+        }
+      },
+      {
+        "RegionName": "Wreck11Barrier",
+        "Position": {
+          "X": "-889",
+          "Y": "-433",
+          "Z": "-1424"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "CyclopsThermalReactorModule",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck5Barrier",
+        "Position": {
+          "X": "698",
+          "Y": "-350",
+          "Z": "1186"
+        }
+      },
+      {
+        "RegionName": "Wreck9",
+        "Position": {
+          "X": "-663",
+          "Y": "-111",
+          "Z": "777"
+        }
+      },
+      {
+        "RegionName": "Wreck11",
+        "Position": {
+          "X": "-862",
+          "Y": "-437",
+          "Z": "-1444"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "HighCapacityTank",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck6",
+        "Position": {
+          "X": "-1393",
+          "Y": "-329",
+          "Z": "733"
+        }
+      },
+      {
+        "RegionName": "Lifepod19",
+        "Position": {
+          "X": "-809",
+          "Y": "-302",
+          "Z": "-876"
+        }
+      },
+      {
+        "RegionName": "Degasi2",
+        "Position": {
+          "X": "110",
+          "Y": "-264",
+          "Z": "-369"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "PlasteelTank",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck1Barrier",
+        "Position": {
+          "X": "313",
+          "Y": "-91",
+          "Z": "432"
+        }
+      },
+      {
+        "RegionName": "Wreck3",
+        "Position": {
+          "X": "903",
+          "Y": "-220",
+          "Z": "590"
+        }
+      },
+      {
+        "RegionName": "Wreck14Barrier",
+        "Position": {
+          "X": "-421",
+          "Y": "-107",
+          "Z": "-266"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "ReinforcedDiveSuit",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck3",
+        "Position": {
+          "X": "910",
+          "Y": "-201",
+          "Z": "623"
+        }
+      },
+      {
+        "RegionName": "Wreck20Barrier",
+        "Position": {
+          "X": "-789",
+          "Y": "-216",
+          "Z": "-711"
+        }
+      },
+      {
+        "RegionName": "WreckExtra3",
+        "Position": {
+          "X": "-1206",
+          "Y": "-225",
+          "Z": "4"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "RepulsionCannon",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck4PropCannon",
+        "Position": {
+          "X": "-126",
+          "Y": "-201",
+          "Z": "852"
+        }
+      },
+      {
+        "RegionName": "Wreck10",
+        "Position": {
+          "X": "-285",
+          "Y": "-262",
+          "Z": "-788"
+        }
+      },
+      {
+        "RegionName": "Lifepod12",
+        "Position": {
+          "X": "1119",
+          "Y": "-271",
+          "Z": "531"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "SwimChargeFins",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck4",
+        "Position": {
+          "X": "-137",
+          "Y": "-193",
+          "Z": "879"
+        }
+      },
+      {
+        "RegionName": "Degasi3",
+        "Position": {
+          "X": "-643",
+          "Y": "-509",
+          "Z": "-941"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "UltraGlideFins",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck13",
+        "Position": {
+          "X": "-23",
+          "Y": "-105",
+          "Z": "-604"
+        }
+      },
+      {
+        "RegionName": "Lifepod6",
+        "Position": {
+          "X": "358",
+          "Y": "-117",
+          "Z": "306"
+        }
+      },
+      {
+        "RegionName": "Lifepod13",
+        "Position": {
+          "X": "-926",
+          "Y": "-185",
+          "Z": "501"
+        }
+      },
+      {
+        "RegionName": "Degasi1",
+        "Position": {
+          "X": "-765",
+          "Y": "17",
+          "Z": "-1116"
+        }
+      }
+    ]
+  },
+  {
+    "TechType": "WaterFiltrationSuit",
+    "DataboxPositions": [
+      {
+        "RegionName": "Wreck5",
+        "Position": {
+          "X": "676",
+          "Y": "-343",
+          "Z": "1204"
+        }
+      },
+      {
+        "RegionName": "WreckExtra1",
+        "Position": {
+          "X": "1305",
+          "Y": "-223",
+          "Z": "566"
+        }
+      },
+      {
+        "RegionName": "WreckExtra2",
+        "Position": {
+          "X": "-1626",
+          "Y": "-357",
+          "Z": "99"
+        }
+      }
+    ]
+  }
+]

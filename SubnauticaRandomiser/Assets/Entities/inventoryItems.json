@@ -454,7 +454,7 @@
     "TechType": "CyclopsHullModule2",
     "Dependencies": [
       "LogicConstructable:WorkBench",
-      "LogicDatabox:CyclopsHullModule2"
+      "LogicDatabox:CyclopsHullModule1"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
@@ -462,7 +462,7 @@
     "TechType": "CyclopsHullModule3",
     "Dependencies": [
       "LogicConstructable:WorkBench",
-      "LogicDatabox:CyclopsHullModule3"
+      "LogicDatabox:CyclopsHullModule1"
     ],
     "MaxRecipeUsesPerGame": "3"
   },

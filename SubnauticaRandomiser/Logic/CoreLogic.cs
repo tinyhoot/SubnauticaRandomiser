@@ -141,6 +141,11 @@ namespace SubnauticaRandomiser.Logic
                     entity.Priority += (1 - entity.Priority) * _rng.NextFloat();
                     _entities.Sort();
                     _log.Debug($"Dependencies not met. New entity priority is {entity.Priority}");
+                    _log.Debug("Dependencies were:");
+                    foreach (var dep in entity.Dependencies)
+                    {
+                        _log.Debug($"- {dep}");
+                    }
                     continue;
                 }
 
