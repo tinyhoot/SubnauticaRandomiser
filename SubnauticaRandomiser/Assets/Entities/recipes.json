@@ -1,5 +1,455 @@
 [
   {
+    "TechType": "Titanium"
+  },
+  {
+    "TechType": "Bleach"
+  },
+  {
+    "TechType": "EnameledGlass"
+  },
+  {
+    "TechType": "FiberMesh"
+  },
+  {
+    "TechType": "Glass"
+  },
+  {
+    "TechType": "Lubricant"
+  },
+  {
+    "TechType": "PlasteelIngot"
+  },
+  {
+    "TechType": "Silicone"
+  },
+  {
+    "TechType": "TitaniumIngot"
+  },
+  {
+    "TechType": "AramidFibers"
+  },
+  {
+    "TechType": "Aerogel"
+  },
+  {
+    "TechType": "Benzene"
+  },
+  {
+    "TechType": "HatchingEnzymes"
+  },
+  {
+    "TechType": "HydrochloricAcid"
+  },
+  {
+    "TechType": "Polyaniline"
+  },
+  {
+    "TechType": "AdvancedWiringKit"
+  },
+  {
     "TechType": "Battery"
+  },
+  {
+    "TechType": "ComputerChip"
+  },
+  {
+    "TechType": "CopperWire"
+  },
+  {
+    "TechType": "PowerCell"
+  },
+  {
+    "TechType": "PrecursorIonBattery"
+  },
+  {
+    "TechType": "PrecursorIonPowerCell"
+  },
+  {
+    "TechType": "ReactorRod"
+  },
+  {
+    "TechType": "WiringKit"
+  },
+  {
+    "TechType": "AirBladder"
+  },
+  {
+    "TechType": "Builder"
+  },
+  {
+    "TechType": "DiveReel"
+  },
+  {
+    "TechType": "Flare"
+  },
+  {
+    "TechType": "FlashLight"
+  },
+  {
+    "TechType": "LaserCutter"
+  },
+  {
+    "TechType": "LedLight"
+  },
+  {
+    "TechType": "PropulsionCannon"
+  },
+  {
+    "TechType": "Scanner"
+  },
+  {
+    "TechType": "StasisRifle"
+  },
+  {
+    "TechType": "Knife"
+  },
+  {
+    "TechType": "Welder"
+  },
+  {
+    "TechType": "PrecursorKey_Blue"
+  },
+  {
+    "TechType": "PrecursorKey_Orange"
+  },
+  {
+    "TechType": "PrecursorKey_Purple"
+  },
+  {
+    "TechType": "Compass"
+  },
+  {
+    "TechType": "DoubleTank"
+  },
+  {
+    "TechType": "Fins"
+  },
+  {
+    "TechType": "FireExtinguisher"
+  },
+  {
+    "TechType": "FirstAidKit"
+  },
+  {
+    "TechType": "RadiationSuit"
+  },
+  {
+    "TechType": "Rebreather"
+  },
+  {
+    "TechType": "ReinforcedDiveSuit"
+  },
+  {
+    "TechType": "MapRoomHudChip"
+  },
+  {
+    "TechType": "Pipe"
+  },
+  {
+    "TechType": "PipeSurfaceFloater"
+  },
+  {
+    "TechType": "WaterFiltrationSuit"
+  },
+  {
+    "TechType": "Tank"
+  },
+  {
+    "TechType": "Beacon"
+  },
+  {
+    "TechType": "Constructor"
+  },
+  {
+    "TechType": "CyclopsDecoy"
+  },
+  {
+    "TechType": "Gravsphere"
+  },
+  {
+    "TechType": "SmallStorage"
+  },
+  {
+    "TechType": "Seaglide"
+  },
+  {
+    "TechType": "Seamoth"
+  },
+  {
+    "TechType": "Exosuit"
+  },
+  {
+    "TechType": "Cyclops"
+  },
+  {
+    "TechType": "RocketBase"
+  },
+  {
+    "TechType": "RocketBaseLadder"
+  },
+  {
+    "TechType": "RocketStage1"
+  },
+  {
+    "TechType": "RocketStage2"
+  },
+  {
+    "TechType": "RocketStage3"
+  },
+  {
+    "TechType": "MapRoomCamera"
+  },
+  {
+    "TechType": "MapRoomUpgradeScanRange"
+  },
+  {
+    "TechType": "MapRoomUpgradeScanSpeed"
+  },
+  {
+    "TechType": "HeatBlade"
+  },
+  {
+    "TechType": "HighCapacityTank"
+  },
+  {
+    "TechType": "PlasteelTank"
+  },
+  {
+    "TechType": "RepulsionCannon"
+  },
+  {
+    "TechType": "SwimChargeFins"
+  },
+  {
+    "TechType": "UltraGlideFins"
+  },
+  {
+    "TechType": "CyclopsHullModule2"
+  },
+  {
+    "TechType": "CyclopsHullModule3"
+  },
+  {
+    "TechType": "ExoHullModule2"
+  },
+  {
+    "TechType": "VehicleHullModule2"
+  },
+  {
+    "TechType": "VehicleHullModule3"
+  },
+  {
+    "TechType": "CyclopsDecoyModule"
+  },
+  {
+    "TechType": "CyclopsFireSuppressionModule"
+  },
+  {
+    "TechType": "CyclopsHullModule1"
+  },
+  {
+    "TechType": "CyclopsSeaMothRepairModule"
+  },
+  {
+    "TechType": "CyclopsShieldModule"
+  },
+  {
+    "TechType": "CyclopsSonarModule"
+  },
+  {
+    "TechType": "CyclopsThermalReactorModule"
+  },
+  {
+    "TechType": "ExoHullModule1"
+  },
+  {
+    "TechType": "ExoSuitDrillArmModule"
+  },
+  {
+    "TechType": "ExoSuitGrapplingArmModule"
+  },
+  {
+    "TechType": "ExoSuitJetUpgradeModule"
+  },
+  {
+    "TechType": "ExoSuitPropulsionArmModule"
+  },
+  {
+    "TechType": "ExoSuitThermalReactorModule"
+  },
+  {
+    "TechType": "ExoSuitTorpedoArmModule"
+  },
+  {
+    "TechType": "PowerUpgradeModule"
+  },
+  {
+    "TechType": "SeaMothElectricalDefense"
+  },
+  {
+    "TechType": "SeaMothSolarCharge"
+  },
+  {
+    "TechType": "SeaMothSonarModule"
+  },
+  {
+    "TechType": "SeaMothTorpedoModule"
+  },
+  {
+    "TechType": "VehicleArmorPlating"
+  },
+  {
+    "TechType": "VehicleHullModule1"
+  },
+  {
+    "TechType": "VehiclePowerUpgradeModule"
+  },
+  {
+    "TechType": "VehicleStorageModule"
+  },
+  {
+    "TechType": "GasTorpedo"
+  },
+  {
+    "TechType": "WhirlpoolTorpedo"
+  },
+  {
+    "TechType": "BaseBioReactor"
+  },
+  {
+    "TechType": "BaseNuclearReactor"
+  },
+  {
+    "TechType": "SolarPanel"
+  },
+  {
+    "TechType": "ThermalPlant"
+  },
+  {
+    "TechType": "BaseConnector"
+  },
+  {
+    "TechType": "BaseCorridorI"
+  },
+  {
+    "TechType": "BaseCorridorL"
+  },
+  {
+    "TechType": "BaseCorridorT"
+  },
+  {
+    "TechType": "BaseCorridorX"
+  },
+  {
+    "TechType": "BaseCorridorGlassI"
+  },
+  {
+    "TechType": "BaseCorridorGlassL"
+  },
+  {
+    "TechType": "BaseFoundation"
+  },
+  {
+    "TechType": "BaseGlassDome"
+  },
+  {
+    "TechType": "BaseHatch"
+  },
+  {
+    "TechType": "BaseLargeGlassDome"
+  },
+  {
+    "TechType": "BaseLargeRoom"
+  },
+  {
+    "TechType": "BaseMapRoom"
+  },
+  {
+    "TechType": "BaseMoonPool"
+  },
+  {
+    "TechType": "BaseObservatory"
+  },
+  {
+    "TechType": "BaseRoom"
+  },
+  {
+    "TechType": "BaseReinforcement"
+  },
+  {
+    "TechType": "BaseWindow"
+  },
+  {
+    "TechType": "BasePipeConnector"
+  },
+  {
+    "TechType": "FarmingTray"
+  },
+  {
+    "TechType": "PowerTransmitter"
+  },
+  {
+    "TechType": "Spotlight"
+  },
+  {
+    "TechType": "Techlight"
+  },
+  {
+    "TechType": "Aquarium"
+  },
+  {
+    "TechType": "BatteryCharger"
+  },
+  {
+    "TechType": "Fabricator"
+  },
+  {
+    "TechType": "Locker"
+  },
+  {
+    "TechType": "MedicalCabinet"
+  },
+  {
+    "TechType": "PlanterBox"
+  },
+  {
+    "TechType": "PlanterPot"
+  },
+  {
+    "TechType": "PlanterPot2"
+  },
+  {
+    "TechType": "PlanterPot3"
+  },
+  {
+    "TechType": "PlanterShelf"
+  },
+  {
+    "TechType": "PowerCellCharger"
+  },
+  {
+    "TechType": "Radio"
+  },
+  {
+    "TechType": "SmallLocker"
+  },
+  {
+    "TechType": "WorkBench"
+  },
+  {
+    "TechType": "BaseBulkHead"
+  },
+  {
+    "TechType": "BaseFiltrationMachine"
+  },
+  {
+    "TechType": "BaseLadder"
+  },
+  {
+    "TechType": "BaseUpgradeConsole"
+  },
+  {
+    "TechType": "BaseWaterPark"
   }
 ]

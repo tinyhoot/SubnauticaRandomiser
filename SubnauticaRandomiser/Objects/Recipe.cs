@@ -18,10 +18,6 @@ namespace SubnauticaRandomiser.Objects
         public List<TechType> LinkedIngredients;
         public int CraftAmount;
 
-        [JsonIgnore] public int craftAmount => CraftAmount;
-        [JsonIgnore] public int ingredientCount => Ingredients.Count;
-        [JsonIgnore] public int linkedItemCount => LinkedIngredients.Count;
-
         /// <summary>
         /// This constructor exists primarily to make it easier for JSON to serialise this class.
         /// </summary>
@@ -30,7 +26,6 @@ namespace SubnauticaRandomiser.Objects
         {
             Ingredients = new List<RandomiserIngredient>();
             LinkedIngredients = new List<TechType>();
-            // Not copying linked data here since JSON should already be populating that field on its own.
         }
 
         public Recipe(TechType type)
@@ -40,7 +35,6 @@ namespace SubnauticaRandomiser.Objects
             TechType = type;
             Ingredients = new List<RandomiserIngredient>();
             LinkedIngredients = new List<TechType>();
-            CopyLinkedData();
         }
 
         public Recipe(TechType type, List<RandomiserIngredient> ingredients, List<TechType> linkedIngredients, int craftAmount)
@@ -54,7 +48,7 @@ namespace SubnauticaRandomiser.Objects
         /// <summary>
         /// Copy information on linked items from the base recipe already loaded by the game.
         /// </summary>
-        private void CopyLinkedData()
+        public void CopyVanillaData()
         {
             RecipeData techdata = CraftDataHandler.GetRecipeData(TechType);
             if (techdata == null)
@@ -74,19 +68,14 @@ namespace SubnauticaRandomiser.Objects
             CraftAmount = techdata.craftAmount;
         }
 
-        public Ingredient GetIngredient(int index)
-        {
-            return Ingredients[index].ToGameIngredient();
-        }
-
-        public TechType GetLinkedItem(int index)
-        {
-            return LinkedIngredients[index];
-        }
-
         public RecipeData ToRecipeData()
         {
-            return new RecipeData(Ingredients.Select(i => i.ToGameIngredient()).ToList());
+            var recipe = new RecipeData(Ingredients.Select(i => i.ToGameIngredient()).ToList())
+            {
+                LinkedItems = LinkedIngredients.ShallowCopy(),
+                craftAmount = CraftAmount
+            };
+            return recipe;
         }
     }
 }

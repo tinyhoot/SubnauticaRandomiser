@@ -1,5 +1,4 @@
-using System;
-using System.Collections.Generic;
+using HootLib.Interfaces;
 using SubnauticaRandomiser.Objects;
 
 namespace SubnauticaRandomiser.Logic.LogicObjects
@@ -7,7 +6,7 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
     /// <summary>
     /// Represents a craftable recipe. This entity is made specifically to check whether an item is <em>craftable</em>,
     /// i.e. whether all components are accessible. Responsibility for checking whether an item's craft node has been
-    /// unlocked lies with <see cref="Blueprint"/>.
+    /// unlocked lies with <see cref="LogicBlueprint"/>.
     /// </summary>
     internal class LogicRecipe : LogicEntity
     {
@@ -22,11 +21,25 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// </summary>
         public LogicBlueprint Blueprint { get; private set; }
 
-        public void CreateRecipe(IEnumerable<LogicEntity> ingredients, int craftAmount = 1)
+        public void LinkVanillaRecipe(EntityManager manager, ILogHandler log)
         {
             Recipe = new Recipe(TechType);
-            // Needs figuring out how exactly ingredients are done, and migrating of the Recipe class
-            throw new NotImplementedException();
+            Recipe.CopyVanillaData();
+            
+            // Link recipe ingredients from the vanilla game.
+            // If any other mods have modified the recipes this will be reflected here too.
+            foreach (var ingredient in Recipe.Ingredients)
+            {
+                var iitem = manager.Find<LogicInventoryItem>(ingredient.techType);
+                if (iitem is null)
+                {
+                    log.Warn($"Tried to link {TechType.AsString()} recipe ingredient " +
+                             $"{ingredient.techType.AsString()} but no such InventoryItem exists!");
+                    continue;
+                }
+
+                Dependencies.Add(iitem);
+            }
         }
 
         public void AddBlueprint(LogicBlueprint blueprint)

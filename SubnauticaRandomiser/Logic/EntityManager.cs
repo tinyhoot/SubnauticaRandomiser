@@ -74,7 +74,7 @@ namespace SubnauticaRandomiser.Logic
                 var iitems = await DeserializeLogicObjects<LogicInventoryItem>(Path.Combine(EntitiesFolder, InvItemsFile));
                 _entities.AddRange(iitems);
                 
-                LinkRecipesToBlueprints(recipes, new List<LogicBlueprint>(fragments));
+                LinkRecipes(recipes, new List<LogicBlueprint>(fragments));
                 LinkSpawnables(spawnables, fragments, iitems);
             }
             catch (Exception ex)
@@ -97,13 +97,15 @@ namespace SubnauticaRandomiser.Logic
             return await reader.ReadToEndAsync();
         }
 
-        private void LinkRecipesToBlueprints(List<LogicRecipe> recipes, List<LogicBlueprint> blueprints)
+        private void LinkRecipes(List<LogicRecipe> recipes, List<LogicBlueprint> blueprints)
         {
             foreach (var recipe in recipes)
             {
                 var blueprint = blueprints.Find(bp => bp.TechType == recipe.TechType);
                 if (blueprint != null)
                     recipe.AddBlueprint(blueprint);
+                
+                recipe.LinkVanillaRecipe(this, _log);
             }
         }
 

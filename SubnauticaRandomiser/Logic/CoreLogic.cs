@@ -212,8 +212,6 @@ namespace SubnauticaRandomiser.Logic
 
             
             yield return RandomiseNew(entityManager, regionManager);
-
-            yield break;
             
             // task.Status = "Randomising - Extras";
             // yield return null;
@@ -438,7 +436,8 @@ namespace SubnauticaRandomiser.Logic
         /// exists. There can be only one per type.</exception>
         public void RegisterEntityHandler(Type type, BaseLogicModule module)
         {
-            _entityRandomisers.Add(type, module);
+            if (type != null)
+                _entityRandomisers.Add(type, module);
         }
     }
 }
