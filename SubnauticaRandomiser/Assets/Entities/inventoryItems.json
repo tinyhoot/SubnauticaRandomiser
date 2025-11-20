@@ -554,7 +554,7 @@
     "TechType": "ExoSuitDrillArmModule",
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole",
-      "LogicFragment:ExosuitDrillArm"
+      "LogicFragment:ExosuitDrillArmModule"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
@@ -562,7 +562,7 @@
     "TechType": "ExoSuitGrapplingArmModule",
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole",
-      "LogicFragment:ExoSuitGrapplingArm"
+      "LogicFragment:ExoSuitGrapplingArmModule"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
@@ -577,7 +577,7 @@
     "TechType": "ExoSuitPropulsionArmModule",
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole",
-      "LogicFragment:ExoSuitPropulsionArm"
+      "LogicFragment:ExoSuitPropulsionArmModule"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
@@ -592,7 +592,7 @@
     "TechType": "ExoSuitTorpedoArmModule",
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole",
-      "LogicFragment:ExoSuitTorpedoArm"
+      "LogicFragment:ExoSuitTorpedoArmModule"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
