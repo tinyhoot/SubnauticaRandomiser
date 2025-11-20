@@ -1,5 +1,53 @@
 [
   {
+    "TechType": "Seamoth",
+    "Dependencies": [
+      "LogicInventoryItem:Constructor"
+    ]
+  },
+  {
+    "TechType": "Exosuit",
+    "Dependencies": [
+      "LogicInventoryItem:Constructor"
+    ]
+  },
+  {
+    "TechType": "Cyclops",
+    "Dependencies": [
+      "LogicInventoryItem:Constructor"
+    ]
+  },
+  {
+    "TechType": "RocketBase",
+    "Dependencies": [
+      "LogicInventoryItem:Constructor"
+    ]
+  },
+  {
+    "TechType": "RocketBaseLadder",
+    "Dependencies": [
+      "LogicConstructable:RocketBase"
+    ]
+  },
+  {
+    "TechType": "RocketStage1",
+    "Dependencies": [
+      "LogicConstructable:RocketBaseLadder"
+    ]
+  },
+  {
+    "TechType": "RocketStage2",
+    "Dependencies": [
+      "LogicConstructable:RocketStage1"
+    ]
+  },
+  {
+    "TechType": "RocketStage3",
+    "Dependencies": [
+      "LogicConstructable:RocketStage2"
+    ]
+  },
+  {
     "TechType": "BaseBioReactor",
     "Dependencies": [
       "LogicInventoryItem:Builder",
