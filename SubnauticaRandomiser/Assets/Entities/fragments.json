@@ -41,7 +41,7 @@
   },
   {
     "TechType": "CyclopsBridgeBlueprint",
-    "SpawnableTechType": "CyclopseBridgeFragment"
+    "SpawnableTechType": "CyclopsBridgeFragment"
   },
   {
     "TechType": "CyclopsEngineBlueprint",
@@ -77,7 +77,7 @@
   },
   {
     "TechType": "BaseMoonPool",
-    "SpawnableTechType": "BaseMoonPoolFragment"
+    "SpawnableTechType": "MoonpoolFragment"
   },
   {
     "TechType": "BaseNuclearReactor",
