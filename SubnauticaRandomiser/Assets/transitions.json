@@ -1,26 +1,1205 @@
 [
   {
-    "Name": "SafeShallows__KelpForest",
+    "Name": "SafeShallows:KelpForest",
     "Entry": "SafeShallows",
     "Exit": "KelpForest"
   },
   {
-    "Name": "KelpForest__Wreck18",
-    "Entry": "KelpForest",
-    "Exit": "Wreck18"
+    "Name": "SafeShallows:GrassyPlateaus",
+    "Entry": "SafeShallows",
+    "Exit": "GrassyPlateaus"
   },
   {
-    "Name": "Wreck18__Barrier",
+    "Name": "SafeShallows:CrashZone",
+    "Entry": "SafeShallows",
+    "Exit": "CrashZone"
+  },
+  {
+    "Name": "KelpForest:Lifepod3",
+    "Entry": "KelpForest",
+    "Exit": "Lifepod3"
+  },
+  {
+    "Name": "KelpForest:Wreck17",
+    "Entry": "KelpForest",
+    "Exit": "Wreck17"
+  },
+  {
+    "Name": "KelpForest:Wreck18",
+    "Entry": "KelpForest",
+    "Exit": "Wreck18",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 60
+      }
+    ]
+  },
+  {
+    "Name": "Wreck18:Barrier",
     "Entry": "Wreck18",
     "Exit": "Wreck18Barrier",
     "Locks": [
       {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "KelpForest:KelpForestCaves",
+    "Entry": "KelpForest",
+    "Exit": "KelpForestCaves",
+    "Locks": [
+      {
         "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
-        "RequiredDepth": 50
-      },
+        "RequiredDepth": 120
+      }
+    ]
+  },
+  {
+    "Name": "KelpForest:GrassyPlateaus",
+    "Entry": "KelpForest",
+    "Exit": "GrassyPlateaus",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 75
+      }
+    ]
+  },
+  {
+    "Name": "KelpForest:CrashZone",
+    "Entry": "KelpForest",
+    "Exit": "CrashZone"
+  },
+  {
+    "Name": "KelpForest:GrandReef",
+    "Entry": "KelpForest",
+    "Exit": "GrandReef",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 150
+      }
+    ]
+  },
+  {
+    "Name": "KelpForest:Mountains",
+    "Entry": "KelpForest",
+    "Exit": "Mountains",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "KelpForest:MushroomForestNorthWest",
+    "Entry": "KelpForest",
+    "Exit": "MushroomForestNorthWest",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 150
+      }
+    ]
+  },
+  {
+    "Name": "KelpForest:MushroomForestNorthEast",
+    "Entry": "KelpForest",
+    "Exit": "MushroomForestNorthEast",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 150
+      }
+    ]
+  },
+  {
+    "Name": "KelpForest:UnderwaterIslands",
+    "Entry": "KelpForest",
+    "Exit": "UnderwaterIslands",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 175
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:Lifepod6",
+    "Entry": "GrassyPlateaus",
+    "Exit": "Lifepod6",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 109
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:Lifepod17",
+    "Entry": "GrassyPlateaus",
+    "Exit": "Lifepod17",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 91
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:GrassyPlateausCaves",
+    "Entry": "GrassyPlateaus",
+    "Exit": "GrassyPlateausCaves",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 125
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:Wreck1",
+    "Entry": "GrassyPlateaus",
+    "Exit": "Wreck1",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 75
+      }
+    ]
+  },
+  {
+    "Name": "Wreck1:Wreck1Barrier",
+    "Entry": "Wreck1",
+    "Exit": "Wreck1Barrier",
+    "Locks": [
       {
         "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
         "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:Wreck2",
+    "Entry": "GrassyPlateaus",
+    "Exit": "Wreck2",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 50
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:Wreck12",
+    "Entry": "GrassyPlateaus",
+    "Exit": "Wreck12",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 120
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:Wreck13",
+    "Entry": "GrassyPlateaus",
+    "Exit": "Wreck13",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 100
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:Wreck14",
+    "Entry": "GrassyPlateaus",
+    "Exit": "Wreck14",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 90
+      }
+    ]
+  },
+  {
+    "Name": "Wreck14:Wreck14Barrier",
+    "Entry": "Wreck14",
+    "Exit": "Wreck14Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:CrashZone",
+    "Entry": "GrassyPlateaus",
+    "Exit": "CrashZone"
+  },
+  {
+    "Name": "GrassyPlateaus:JellyShroomCaves",
+    "Entry": "GrassyPlateaus",
+    "Exit": "JellyShroomCaves",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 220
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:MushroomForestNorthWest",
+    "Entry": "GrassyPlateaus",
+    "Exit": "MushroomForestNorthWest",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 150
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:MushroomForestNorthEast",
+    "Entry": "GrassyPlateaus",
+    "Exit": "MushroomForestNorthEast",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 150
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:UnderwaterIslands",
+    "Entry": "GrassyPlateaus",
+    "Exit": "UnderwaterIslands",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 175
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:BloodKelpTrench",
+    "Entry": "GrassyPlateaus",
+    "Exit": "BloodKelpTrench",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:CragField",
+    "Entry": "GrassyPlateaus",
+    "Exit": "CragField",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 150
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:Dunes",
+    "Entry": "GrassyPlateaus",
+    "Exit": "Dunes",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus:SparseReef",
+    "Entry": "GrassyPlateaus",
+    "Exit": "SparseReef",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 150
+      }
+    ]
+  },
+  {
+    "Name": "CrashZone:Lifepod4",
+    "Entry": "CrashZone",
+    "Exit": "Lifepod4"
+  },
+  {
+    "Name": "CrashZone:CrashZoneTrench",
+    "Entry": "CrashZone",
+    "Exit": "CrashZoneTrench"
+  },
+  {
+    "Name": "CrashZone:CrashZoneMesa",
+    "Entry": "CrashZone",
+    "Exit": "CrashZoneTrench",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 200
+      }
+    ]
+  },
+  {
+    "Name": "CrashZone:CragField",
+    "Entry": "CrashZone",
+    "Exit": "CragField",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 150
+      }
+    ]
+  },
+  {
+    "Name": "CrashZone:KooshZone",
+    "Entry": "CrashZone",
+    "Exit": "KooshZone",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 200
+      }
+    ]
+  },
+  {
+    "Name": "CrashZone:MushroomForestNorthEast",
+    "Entry": "CrashZone",
+    "Exit": "MushroomForestNorthEast",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 150
+      }
+    ]
+  },
+  {
+    "Name": "KooshZone:Lifepod12",
+    "Entry": "KooshZone",
+    "Exit": "Lifepod12",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 266
+      }
+    ]
+  },
+  {
+    "Name": "KooshZone:Wreck3",
+    "Entry": "KooshZone",
+    "Exit": "Wreck3",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 200
+      }
+    ]
+  },
+  {
+    "Name": "Wreck3:Wreck3Barrier",
+    "Entry": "Wreck3",
+    "Exit": "Wreck3Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "KooshZone:WreckExtra1",
+    "Entry": "KooshZone",
+    "Exit": "WreckExtra1",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 266
+      }
+    ]
+  },
+  {
+    "Name": "KooshZone:KooshZoneCaves",
+    "Entry": "KooshZone",
+    "Exit": "KooshZoneCaves",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 250
+      }
+    ]
+  },
+  {
+    "Name": "KooshZone:Mountains",
+    "Entry": "KooshZone",
+    "Exit": "Mountains",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "KooshZone:Mountains",
+    "Entry": "KooshZone",
+    "Exit": "Mountains",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "KooshZone:LostRiverCorridor",
+    "Entry": "KooshZone",
+    "Exit": "LostRiverCorridor",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 600
+      }
+    ]
+  },
+  {
+    "Name": "MushroomForestNorthEast:MushroomForestCaves",
+    "Entry": "MushroomForestNorthEast",
+    "Exit": "MushroomForestCaves",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 200
+      }
+    ]
+  },
+  {
+    "Name": "MushroomForestNorthEast:KooshZone",
+    "Entry": "MushroomForestNorthEast",
+    "Exit": "KooshZone",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 200
+      }
+    ]
+  },
+  {
+    "Name": "MushroomForestCaves:KooshZoneCaves",
+    "Entry": "MushroomForestCaves",
+    "Exit": "KooshZoneCaves",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 250
+      }
+    ]
+  },
+  {
+    "Name": "MushroomForestNorthWest:Lifepod13",
+    "Entry": "MushroomForestNorthWest",
+    "Exit": "Lifepod13",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 177
+      }
+    ]
+  },
+  {
+    "Name": "MushroomForestNorthWest:Wreck9",
+    "Entry": "MushroomForestNorthWest",
+    "Exit": "Wreck9",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 120
+      }
+    ]
+  },
+  {
+    "Name": "Wreck9:Wreck9Barrier",
+    "Entry": "Wreck9",
+    "Exit": "Wreck9Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "MushroomForestNorthWest:Dunes",
+    "Entry": "MushroomForestNorthWest",
+    "Exit": "Dunes",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "MushroomForestNorthWest:BloodKelpNorth",
+    "Entry": "MushroomForestNorthWest",
+    "Exit": "BloodKelpNorth",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 400
+      }
+    ]
+  },
+  {
+    "Name": "MushroomForestNorthWest:UnderwaterIslands",
+    "Entry": "MushroomForestNorthWest",
+    "Exit": "UnderwaterIslands",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 175
+      }
+    ]
+  },
+  {
+    "Name": "MushroomForestNorthWest:Dunes",
+    "Entry": "MushroomForestNorthWest",
+    "Exit": "Dunes",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "Mountains:Wreck5",
+    "Entry": "Mountains",
+    "Exit": "Wreck5",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 346
+      }
+    ]
+  },
+  {
+    "Name": "Wreck5:Wreck5Barrier",
+    "Entry": "Wreck5",
+    "Exit": "Wreck5Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "Mountains:Wreck19",
+    "Entry": "Mountains",
+    "Exit": "Wreck19",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 254
+      }
+    ]
+  },
+  {
+    "Name": "Mountains:MountainsCaves",
+    "Entry": "Mountains",
+    "Exit": "MountainsCaves",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 350
+      }
+    ]
+  },
+  {
+    "Name": "Mountains:LostRiverCorridor",
+    "Entry": "Mountains",
+    "Exit": "LostRiverCorridor",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 600
+      }
+    ]
+  },
+  {
+    "Name": "UnderwaterIslands:Wreck4",
+    "Entry": "UnderwaterIslands",
+    "Exit": "Wreck4",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 179
+      }
+    ]
+  },
+  {
+    "Name": "Wreck4:Wreck4Barrier",
+    "Entry": "Wreck4",
+    "Exit": "Wreck4Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "Wreck4:Wreck4PropCannon",
+    "Entry": "Wreck4",
+    "Exit": "Wreck4PropCannon",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "PropulsionCannon"
+      }
+    ]
+  },
+  {
+    "Name": "UnderwaterIslands:UnderwaterIslandsCaves",
+    "Entry": "UnderwaterIslands",
+    "Exit": "UnderwaterIslandsCaves",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 250
+      }
+    ]
+  },
+  {
+    "Name": "UnderwaterIslands:UnderwaterIslandsFloorBelow",
+    "Entry": "UnderwaterIslands",
+    "Exit": "UnderwaterIslandsFloorBelow",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 500
+      }
+    ]
+  },
+  {
+    "Name": "UnderwaterIslands:BloodKelpNorth",
+    "Entry": "UnderwaterIslands",
+    "Exit": "BloodKelpNorth",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 400
+      }
+    ]
+  },
+  {
+    "Name": "UnderwaterIslands:Mountains",
+    "Entry": "UnderwaterIslands",
+    "Exit": "Mountains",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "Dunes:Wreck6",
+    "Entry": "Dunes",
+    "Exit": "Wreck6",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 332
+      }
+    ]
+  },
+  {
+    "Name": "Dunes:WreckExtra2",
+    "Entry": "Dunes",
+    "Exit": "WreckExtra2",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 334
+      }
+    ]
+  },
+  {
+    "Name": "WreckExtra2:WreckExtra2Barrier",
+    "Entry": "WreckExtra2",
+    "Exit": "WreckExtra2Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "Dunes:WreckExtra3",
+    "Entry": "Dunes",
+    "Exit": "WreckExtra2",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 217
+      }
+    ]
+  },
+  {
+    "Name": "WreckExtra3:WreckExtra3Barrier",
+    "Entry": "WreckExtra3",
+    "Exit": "WreckExtra3Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "Dunes:DunesCaves",
+    "Entry": "Dunes",
+    "Exit": "DunesCaves",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 400
+      }
+    ]
+  },
+  {
+    "Name": "Dunes:SeaTreaderPath",
+    "Entry": "Dunes",
+    "Exit": "SeaTreaderPath",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 200
+      }
+    ]
+  },
+  {
+    "Name": "SeaTreaderPath:Wreck7",
+    "Entry": "SeaTreaderPath",
+    "Exit": "Wreck7",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 190
+      }
+    ]
+  },
+  {
+    "Name": "Wreck7:Wreck7Barrier",
+    "Entry": "Wreck7",
+    "Exit": "Wreck7Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "SeaTreaderPath:SeaTreaderPathCaves",
+    "Entry": "SeaTreaderPath",
+    "Exit": "SeaTreaderPathCaves",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "SeaTreaderPath:GrandReef",
+    "Entry": "SeaTreaderPath",
+    "Exit": "GrandReef",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "SparseReef:GrandReef",
+    "Entry": "SparseReef",
+    "Exit": "GrandReef",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "SparseReef:BloodKelpTrench",
+    "Entry": "SparseReef",
+    "Exit": "BloodKelpTrench",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 400
+      }
+    ]
+  },
+  {
+    "Name": "SparseReef:SeaTreaderPath",
+    "Entry": "SparseReef",
+    "Exit": "SeaTreaderPath",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 200
+      }
+    ]
+  },
+  {
+    "Name": "SparseReef:SparseReefDeep",
+    "Entry": "SparseReef",
+    "Exit": "SparseReefDeep",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 250
+      }
+    ]
+  },
+  {
+    "Name": "SparseReef:Wreck20",
+    "Entry": "SparseReef",
+    "Exit": "Wreck20",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 208
+      }
+    ]
+  },
+  {
+    "Name": "Wreck20:Wreck20Barrier",
+    "Entry": "Wreck20",
+    "Exit": "Wreck20Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "SparseReefDeep:Lifepod19",
+    "Entry": "SparseReefDeep",
+    "Exit": "Lifepod19",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "SparseReef:SparseReefCaves",
+    "Entry": "SparseReef",
+    "Exit": "SparseReefCaves",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 250
+      }
+    ]
+  },
+  {
+    "Name": "CragField:GrandReef",
+    "Entry": "CragField",
+    "Exit": "GrandReef",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 300
+      }
+    ]
+  },
+  {
+    "Name": "CragField:Lifepod7",
+    "Entry": "CragField",
+    "Exit": "Lifepod7",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 179
+      }
+    ]
+  },
+  {
+    "Name": "GrandReef:Wreck10",
+    "Entry": "GrandReef",
+    "Exit": "Wreck10",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 222
+      }
+    ]
+  },
+  {
+    "Name": "Wreck10:Wreck10Barrier",
+    "Entry": "Wreck10",
+    "Exit": "Wreck10Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "GrandReef:Wreck11",
+    "Entry": "GrandReef",
+    "Exit": "Wreck11",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 430
+      }
+    ]
+  },
+  {
+    "Name": "Wreck11:Wreck11Barrier",
+    "Entry": "Wreck11",
+    "Exit": "Wreck11Barrier",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "LaserCutter"
+      }
+    ]
+  },
+  {
+    "Name": "GrandReef:DeepGrandReef",
+    "Entry": "GrandReef",
+    "Exit": "DeepGrandReef",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 500
+      }
+    ]
+  },
+  {
+    "Name": "DeepGrandReef:Degasi3",
+    "Entry": "DeepGrandReef",
+    "Exit": "Degasi3",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 500
+      }
+    ]
+  },
+  {
+    "Name": "DeepGrandReef:LostRiverCanyon",
+    "Entry": "DeepGrandReef",
+    "Exit": "LostRiverCanyon",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 600
+      }
+    ]
+  },
+  {
+    "Name": "BloodKelpNorth:Lifepod2",
+    "Entry": "BloodKelpNorth",
+    "Exit": "Lifepod2",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 500
+      }
+    ]
+  },
+  {
+    "Name": "BloodKelpNorth:LostRiverCanyon",
+    "Entry": "BloodKelpNorth",
+    "Exit": "LostRiverCanyon",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 600
+      }
+    ]
+  },
+  {
+    "Name": "BloodKelpTrench:Wreck8",
+    "Entry": "BloodKelpTrench",
+    "Exit": "Wreck8",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 324
+      }
+    ]
+  },
+  {
+    "Name": "BloodKelpTrench:LostRiverCorridor",
+    "Entry": "BloodKelpTrench",
+    "Exit": "LostRiverCorridor",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 600
+      }
+    ]
+  },
+  {
+    "Name": "LostRiverCorridor:LostRiverJunction",
+    "Entry": "LostRiverCorridor",
+    "Exit": "LostRiverJunction",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 700
+      }
+    ]
+  },
+  {
+    "Name": "LostRiverCanyon:LostRiverBonesField",
+    "Entry": "LostRiverCanyon",
+    "Exit": "LostRiverBonesField",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 650
+      }
+    ]
+  },
+  {
+    "Name": "LostRiverBonesField:LostRiverBonesFieldCave",
+    "Entry": "LostRiverBonesField",
+    "Exit": "LostRiverBonesFieldCave",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 600
+      }
+    ]
+  },
+  {
+    "Name": "LostRiverBonesField:LostRiverJunction",
+    "Entry": "LostRiverBonesField",
+    "Exit": "LostRiverJunction",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 700
+      }
+    ]
+  },
+  {
+    "Name": "LostRiverJunction:GhostTree",
+    "Entry": "LostRiverJunction",
+    "Exit": "GhostTree",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 900
+      }
+    ]
+  },
+  {
+    "Name": "GhostTree:InactiveLavaZoneCorridor",
+    "Entry": "GhostTree",
+    "Exit": "InactiveLavaZoneCorridor",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 1000
+      }
+    ]
+  },
+  {
+    "Name": "GhostTree:InactiveLavaZoneCorridor",
+    "Entry": "GhostTree",
+    "Exit": "InactiveLavaZoneCorridor",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 1000
+      }
+    ]
+  },
+  {
+    "Name": "InactiveLavaZoneCorridor:InactiveLavaZone",
+    "Entry": "InactiveLavaZoneCorridor",
+    "Exit": "InactiveLavaZone"
+  },
+  {
+    "Name": "LostRiverCorridor:InactiveLavaZone",
+    "Entry": "LostRiverCorridor",
+    "Exit": "InactiveLavaZone",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 1000
+      }
+    ]
+  },
+  {
+    "Name": "InactiveLavaZone:InactiveLavaZoneCastleTunnel",
+    "Entry": "InactiveLavaZone",
+    "Exit": "InactiveLavaZoneCastleTunnel"
+  },
+  {
+    "Name": "InactiveLavaZoneCastleTunnel:InactiveLavaZoneCastle",
+    "Entry": "InactiveLavaZoneCastleTunnel",
+    "Exit": "InactiveLavaZoneCastle"
+  },
+  {
+    "Name": "InactiveLavaZone:InactiveLavaZoneLavaPit",
+    "Entry": "InactiveLavaZone",
+    "Exit": "InactiveLavaZoneLavaPit",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 1300
+      }
+    ]
+  },
+  {
+    "Name": "InactiveLavaZoneLavaPit:ActiveLavaZone",
+    "Entry": "InactiveLavaZoneLavaPit",
+    "Exit": "ActiveLavaZone",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.DepthLock, SubnauticaRandomiser",
+        "RequiredDepth": 1400
+      }
+    ]
+  },
+  {
+    "Name": "ActiveLavaZone:PrisonAquarium",
+    "Entry": "ActiveLavaZone",
+    "Exit": "PrisonAquarium",
+    "Locks": [
+      {
+        "$type": "SubnauticaRandomiser.Logic.LogicObjects.Transitions.ItemLock, SubnauticaRandomiser",
+        "RequiredItem": "PrecursorKey_Blue"
       }
     ]
   }
