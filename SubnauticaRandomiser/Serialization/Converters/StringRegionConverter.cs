@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using SubnauticaRandomiser.Logic;
 using SubnauticaRandomiser.Logic.LogicObjects;
 
 namespace SubnauticaRandomiser.Serialization.Converters
@@ -12,9 +12,9 @@ namespace SubnauticaRandomiser.Serialization.Converters
     /// </summary>
     internal class StringRegionConverter : JsonConverter
     {
-        private List<Region> _regions;
+        private RegionManager _regions;
 
-        public StringRegionConverter(List<Region> regions)
+        public StringRegionConverter(RegionManager regions)
         {
             _regions = regions;
         }
@@ -31,7 +31,7 @@ namespace SubnauticaRandomiser.Serialization.Converters
                 return null;
 
             // Try to resolve the unique name from the JSON into a proper Region we loaded previously.
-            var region = _regions.Find(r => r.Name.Equals(json, StringComparison.InvariantCultureIgnoreCase));
+            var region = _regions.GetRegion(json);
             if (region is null)
                 throw new SerializationException($"Could not find Region with name '{json}'!");
             
