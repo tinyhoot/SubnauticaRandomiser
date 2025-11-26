@@ -25,19 +25,53 @@ namespace SubnauticaRandomiser.Logic
         
         private PrefixLogHandler _log = PrefixLogHandler.Get("[EntityManager]");
         private List<LogicEntity> _entities = new List<LogicEntity>();
+        private Dictionary<string, int> _entityIdMap = new Dictionary<string, int>();
+        private Dictionary<TechType, List<int>> _entityTechIds = new Dictionary<TechType, List<int>>();
 
         /// <summary>
         /// Try to find a specific entity. Will return null if none match the search criteria.
         /// </summary>
         public T Find<T>(TechType techType) where T : LogicEntity
         {
-            return _entities.OfType<T>().FirstOrDefault(ent => ent.TechType == techType);
+            foreach (var entity in GetAllByTechType(techType) ?? Enumerable.Empty<LogicEntity>())
+            {
+                if (entity is T t)
+                    return t;
+            }
+
+            return null;
         }
 
         /// <inheritdoc cref="Find{T}"/>
         public LogicEntity Find(Type type, TechType techType)
         {
-            return _entities.FirstOrDefault(ent => ent.TechType == techType && ent.GetType() == type);
+            return GetAllByTechType(techType)?.FirstOrDefault(entity => entity.GetType() == type);
+        }
+        
+        /// <summary>
+        /// Get a specific entity by its id.
+        /// </summary>
+        /// <param name="id">The numerical id assigned during registration.</param>
+        /// <exception cref="KeyNotFoundException">Thrown if the provided id was not assigned to any entity.</exception>
+        public LogicEntity Get(int id)
+        {
+            if (id < 0 || id >= _entities.Count)
+                throw new KeyNotFoundException($"No such entity with id {id}");
+
+            return _entities[id];
+        }
+
+        /// <summary>
+        /// Get a specific entity by its id.
+        /// </summary>
+        /// <param name="id">The string representation of the entity, consisting of type and name.</param>
+        /// <exception cref="KeyNotFoundException">Thrown if the provided id was not assigned to any entity.</exception>
+        public LogicEntity Get(string id)
+        {
+            if (!_entityIdMap.TryGetValue(id, out int i))
+                throw new KeyNotFoundException($"No such entity with id {id}");
+
+            return Get(i);
         }
 
         /// <summary>
@@ -55,6 +89,28 @@ namespace SubnauticaRandomiser.Logic
         {
             return _entities.OfType<T>();
         }
+        
+        /// <summary>
+        /// Get all entities that share the provided TechType.
+        /// </summary>
+        /// <returns>The entities, or null if no entity with that TechType exists.</returns>
+        public List<LogicEntity> GetAllByTechType(TechType techType)
+        {
+            var ids = GetAllIdsByTechType(techType);
+            return ids?.Select(Get).ToList();
+        }
+        
+        /// <summary>
+        /// Get all entities that share the provided TechType.
+        /// </summary>
+        /// <returns>The entity ids, or null if no entity with that TechType exists.</returns>
+        public List<int> GetAllIdsByTechType(TechType techType)
+        {
+            if (!_entityTechIds.TryGetValue(techType, out List<int> ids))
+                return null;
+
+            return ids.ShallowCopy();
+        }
 
         public async Task ParseEntitiesFromDisk()
         {
@@ -67,21 +123,21 @@ namespace SubnauticaRandomiser.Logic
             try
             {
                 var databoxes = await DeserializeLogicObjects<LogicDatabox>(Path.Combine(EntitiesFolder, DataboxFile));
-                _entities.AddRange(databoxes);
+                AddEntities(databoxes);
                 var spawnables = await DeserializeLogicObjects<LogicSpawnable>(Path.Combine(EntitiesFolder, SpawnablesFile));
-                _entities.AddRange(spawnables);
+                AddEntities(spawnables);
                 var fragments = await DeserializeLogicObjects<LogicFragment>(Path.Combine(EntitiesFolder, FragmentsFile));
-                _entities.AddRange(fragments);
+                AddEntities(fragments);
                 var recipes = await DeserializeLogicObjects<LogicRecipe>(Path.Combine(EntitiesFolder, RecipesFile));
-                _entities.AddRange(recipes);
+                AddEntities(recipes);
 
                 var constructables = await DeserializeLogicObjects<LogicConstructable>(Path.Combine(EntitiesFolder, ConstructablesFile));
-                _entities.AddRange(constructables);
+                AddEntities(constructables);
                 var iitems = await DeserializeLogicObjects<LogicInventoryItem>(Path.Combine(EntitiesFolder, InvItemsFile));
-                _entities.AddRange(iitems);
+                AddEntities(iitems);
                 
-                LinkRecipes(recipes, new List<LogicBlueprint>(fragments));
-                LinkSpawnables(spawnables, fragments, iitems);
+                LinkRecipes(recipes);
+                LinkSpawnables(fragments, iitems);
                 ReplaceReferences(_entities);
             }
             catch (Exception ex)
@@ -104,11 +160,32 @@ namespace SubnauticaRandomiser.Logic
             return await reader.ReadToEndAsync();
         }
 
-        private void LinkRecipes(List<LogicRecipe> recipes, List<LogicBlueprint> blueprints)
+        private void AddEntities(IEnumerable<LogicEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                AddEntity(entity);
+            }
+        }
+
+        private void AddEntity(LogicEntity entity)
+        {
+            // The numerical ID of an entity is its registration number.
+            _entityIdMap[entity.ToString()] = _entities.Count;
+            if (!_entityTechIds.TryGetValue(entity.TechType, out List<int> ids))
+            {
+                ids = new List<int>();
+                _entityTechIds[entity.TechType] = ids;
+            }
+            ids.Add(_entities.Count);
+            _entities.Add(entity);
+        }
+
+        private void LinkRecipes(List<LogicRecipe> recipes)
         {
             foreach (var recipe in recipes)
             {
-                var blueprint = blueprints.Find(bp => bp.TechType == recipe.TechType);
+                var blueprint = Find<LogicBlueprint>(recipe.TechType);
                 if (blueprint != null)
                     recipe.AddBlueprint(blueprint);
                 
@@ -116,12 +193,12 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
-        private void LinkSpawnables(List<LogicSpawnable> spawnables, List<LogicFragment> fragments, List<LogicInventoryItem> items)
+        private void LinkSpawnables(List<LogicFragment> fragments, List<LogicInventoryItem> items)
         {
             // Add spawnables to inventory items for cases like rubies or quartz.
             foreach (var item in items)
             {
-                var spawnable = spawnables.Find(spawn => spawn.TechType == item.TechType);
+                var spawnable = Find<LogicSpawnable>(item.TechType);
                 if (spawnable != null)
                     item.AddSpawnable(spawnable);
             }
@@ -129,7 +206,7 @@ namespace SubnauticaRandomiser.Logic
             // Add spawnables to fragments for cases like seamoth fragments.
             foreach (var fragment in fragments)
             {
-                var spawnable = spawnables.Find(spawn => spawn.TechType == fragment.SpawnableTechType);
+                var spawnable = Find<LogicSpawnable>(fragment.TechType);
                 if (spawnable != null)
                     fragment.Dependencies.Add(spawnable);
             }
