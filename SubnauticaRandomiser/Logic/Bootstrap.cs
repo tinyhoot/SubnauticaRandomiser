@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading.Tasks;
 using HarmonyLib;
 using HootLib;
 using Nautilus.Handlers;
@@ -15,6 +14,7 @@ using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
+using Task = System.Threading.Tasks.Task;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -61,6 +61,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private IEnumerator Initialise(WaitScreenHandler.WaitScreenTask task)
         {
+            var startTime = Time.realtimeSinceStartup;
             _monitor = new LogicMonitor();
             _coreLogic = new CoreLogic(_monitor);
             
@@ -72,8 +73,13 @@ namespace SubnauticaRandomiser.Logic
                 _entityManager = new EntityManager();
                 _regionManager = new RegionManager();
                 yield return EnableModules(task);
+                _log.Debug($"Modules - {Time.realtimeSinceStartup - startTime}");
                 yield return InitSaveData(task);
+                _log.Debug($"SaveData - {Time.realtimeSinceStartup - startTime}");
                 yield return LoadRandomisationInfoFiles(task);
+                _log.Debug($"InfoFiles - {Time.realtimeSinceStartup - startTime}");
+                yield return BuildEntityRegionModel(task);
+                _log.Debug($"EntityModel - {Time.realtimeSinceStartup - startTime}");
                 // Randomise the game and save the final state to the SaveData.
                 yield return _coreLogic.Randomise(task, SaveData, _entityManager, _regionManager);
             }
@@ -143,15 +149,28 @@ namespace SubnauticaRandomiser.Logic
             yield return null;
             
             var fileTasks = new List<Task>();
-            // The entity handler loads a file with critical information on every entity. It is always required.
-            fileTasks.Add(_entityManager.ParseEntitiesFromDisk());
-            fileTasks.Add(_regionManager.ParseRegionsFromDisk(_entityManager));
+            // Start loading these now so they can complete in the background.
             foreach (BaseLogicModule module in Modules)
             {
-                fileTasks.AddRange(module.LoadFiles());
+                fileTasks.AddRange(module.LoadFilesAsync());
             }
             
+            // These files are always required, as they form the backbone of the entity-region model.
+            yield return new RushedCoroutine(_entityManager.ParseEntitiesFromDiskAsync(), 1f / 30f).Advance();
+            yield return new RushedCoroutine(_regionManager.ParseFromDiskAsync(), 1f / 30f).Advance();
             yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
+        }
+
+        /// <summary>
+        /// Link entities and regions together to build the full game model.
+        /// </summary>
+        private IEnumerator BuildEntityRegionModel(WaitScreenHandler.WaitScreenTask task)
+        {
+            task.Status = "Randomising - Linking entities";
+            yield return null;
+            
+            yield return _entityManager.LinkEntities();
+            _regionManager.ReplaceReferences(_entityManager);
         }
 
         /// <summary>

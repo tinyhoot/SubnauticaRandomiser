@@ -40,7 +40,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// If the module requires any kind of external file to be able to randomise, register a task responsible for
         /// loading this critical data. Randomising is guaranteed to wait until all of these tasks have completed.
         /// </summary>
-        public virtual IEnumerable<Task> LoadFiles()
+        public virtual IEnumerable<Task> LoadFilesAsync()
         {
             return Enumerable.Empty<Task>();
         }

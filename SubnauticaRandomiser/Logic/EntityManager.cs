@@ -1,12 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using HootLib;
-using Newtonsoft.Json;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic.LogicObjects;
+using SubnauticaRandomiser.Serialization;
+using UnityEngine;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -112,52 +111,30 @@ namespace SubnauticaRandomiser.Logic
             return ids.ShallowCopy();
         }
 
-        public async Task ParseEntitiesFromDisk()
+        /// <summary>
+        /// Load and parse all entities from their respective files on disk.
+        /// </summary>
+        public IEnumerator ParseEntitiesFromDiskAsync()
         {
-            // Load the file and parse the baseline data for each entity
-            // Perform linking - hook up recipes and blueprints, etc.
-            // Set up entity dependencies
-            // Validate that everything has been linked up and no stragglers are missing buddies
-            // TODO
-            
-            try
-            {
-                var databoxes = await DeserializeLogicObjects<LogicDatabox>(Path.Combine(EntitiesFolder, DataboxFile));
-                AddEntities(databoxes);
-                var spawnables = await DeserializeLogicObjects<LogicSpawnable>(Path.Combine(EntitiesFolder, SpawnablesFile));
-                AddEntities(spawnables);
-                var fragments = await DeserializeLogicObjects<LogicFragment>(Path.Combine(EntitiesFolder, FragmentsFile));
-                AddEntities(fragments);
-                var recipes = await DeserializeLogicObjects<LogicRecipe>(Path.Combine(EntitiesFolder, RecipesFile));
-                AddEntities(recipes);
-
-                var constructables = await DeserializeLogicObjects<LogicConstructable>(Path.Combine(EntitiesFolder, ConstructablesFile));
-                AddEntities(constructables);
-                var iitems = await DeserializeLogicObjects<LogicInventoryItem>(Path.Combine(EntitiesFolder, InvItemsFile));
-                AddEntities(iitems);
-                
-                LinkRecipes(recipes);
-                LinkSpawnables(fragments, iitems);
-                ReplaceReferences(_entities);
-            }
-            catch (Exception ex)
-            {
-                _log.Error($"{ex.GetType()}: {ex.Message}\n{ex.StackTrace}");
-            }
+            yield return DeserializeEntitiesAsync<LogicConstructable>(EntitiesFolder, ConstructablesFile);
+            yield return DeserializeEntitiesAsync<LogicDatabox>(EntitiesFolder, DataboxFile);
+            yield return DeserializeEntitiesAsync<LogicFragment>(EntitiesFolder, FragmentsFile);
+            yield return DeserializeEntitiesAsync<LogicInventoryItem>(EntitiesFolder, InvItemsFile);
+            yield return DeserializeEntitiesAsync<LogicRecipe>(EntitiesFolder, RecipesFile);
+            yield return DeserializeEntitiesAsync<LogicSpawnable>(EntitiesFolder, SpawnablesFile);
         }
 
-        public static async Task<List<T>> DeserializeLogicObjects<T>(string fileName, params JsonConverter[] converters)
+        private IEnumerator DeserializeEntitiesAsync<T>(params string[] path) where T : LogicEntity
         {
-            var json = await ReadFileContents(fileName);
-            var logicObjects = JsonConvert.DeserializeObject<List<T>>(json, converters);
-            return logicObjects;
-        }
+            _log.Debug($"> Starting {string.Join("/", path)} at {Time.realtimeSinceStartup}");
+            var task = SerdeUtils.ReadFileContents(path);
+            yield return new WaitUntil(() => task.IsCompleted);
+            _log.Debug($"- Raw file contents loaded for {string.Join("/", path)} at {Time.realtimeSinceStartup}");
 
-        private static async Task<string> ReadFileContents(string fileName)
-        {
-            var path = Path.Combine(Hootils.GetModDirectory(), "Assets", fileName);
-            using StreamReader reader = new StreamReader(File.OpenRead(path));
-            return await reader.ReadToEndAsync();
+            var entities = new TaskResult<List<T>>();
+            yield return SerdeUtils.DeserializeObjectsAsync(task.Result, entities);
+            AddEntities(entities.Get());
+            _log.Debug($"- Completed parsing {string.Join("/", path)} at {Time.realtimeSinceStartup}");
         }
 
         private void AddEntities(IEnumerable<LogicEntity> entities)
@@ -181,9 +158,43 @@ namespace SubnauticaRandomiser.Logic
             _entities.Add(entity);
         }
 
-        private void LinkRecipes(List<LogicRecipe> recipes)
+        public IEnumerator LinkEntities()
         {
-            foreach (var recipe in recipes)
+            LinkConstructables();
+            LinkInventoryItems();
+            LinkRecipes();
+            LinkBlueprints();
+            yield return null;
+            ReplaceReferences(_entities);
+        }
+
+        private void LinkConstructables()
+        {
+            foreach (var constructable in GetAllEntities<LogicConstructable>())
+            {
+                var recipe = Find<LogicRecipe>(constructable.TechType);
+                if (recipe != null)
+                    constructable.AddRecipe(recipe);
+            }
+        }
+
+        private void LinkInventoryItems()
+        {
+            foreach (var iitem in GetAllEntities<LogicInventoryItem>())
+            {
+                var recipe = Find<LogicRecipe>(iitem.TechType);
+                if (recipe != null)
+                    iitem.AddRecipe(recipe);
+                
+                var spawnable = Find<LogicSpawnable>(iitem.TechType);
+                if (spawnable != null)
+                    iitem.AddSpawnable(spawnable);
+            }
+        }
+
+        private void LinkRecipes()
+        {
+            foreach (var recipe in GetAllEntities<LogicRecipe>())
             {
                 var blueprint = Find<LogicBlueprint>(recipe.TechType);
                 if (blueprint != null)
@@ -193,18 +204,10 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
-        private void LinkSpawnables(List<LogicFragment> fragments, List<LogicInventoryItem> items)
+        private void LinkBlueprints()
         {
-            // Add spawnables to inventory items for cases like rubies or quartz.
-            foreach (var item in items)
-            {
-                var spawnable = Find<LogicSpawnable>(item.TechType);
-                if (spawnable != null)
-                    item.AddSpawnable(spawnable);
-            }
-
             // Add spawnables to fragments for cases like seamoth fragments.
-            foreach (var fragment in fragments)
+            foreach (var fragment in GetAllEntities<LogicFragment>())
             {
                 var spawnable = Find<LogicSpawnable>(fragment.TechType);
                 if (spawnable != null)

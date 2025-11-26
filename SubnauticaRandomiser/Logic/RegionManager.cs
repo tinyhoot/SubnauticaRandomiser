@@ -1,10 +1,11 @@
-using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic.LogicObjects;
 using SubnauticaRandomiser.Logic.LogicObjects.Transitions;
+using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Converters;
+using UnityEngine;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -42,20 +43,23 @@ namespace SubnauticaRandomiser.Logic
             return _regions[id];
         }
 
-        public async Task ParseRegionsFromDisk()
+        /// <summary>
+        /// Load and parse regions and transitions from their files on disk.
+        /// </summary>
+        public IEnumerator ParseFromDiskAsync()
         {
-            try
-            {
-                var regions = await EntityManager.DeserializeLogicObjects<Region>(RegionsFile,
-                    new StringEntityConverter());
-                AddRegions(regions);
-                _transitions = await EntityManager.DeserializeLogicObjects<Transition>(TransitionsFile,
-                    new StringRegionConverter(this));
-            }
-            catch (Exception ex)
-            {
-                _log.Error($"{ex.GetType()}: {ex.Message}\n{ex.StackTrace}");
-            }
+            // Start loading all files' contents.
+            var regionTask = SerdeUtils.ReadFileContents(RegionsFile);
+            var transTask = SerdeUtils.ReadFileContents(TransitionsFile);
+            yield return new WaitUntil(() => regionTask.IsCompleted && transTask.IsCompleted);
+
+            var regions = new TaskResult<List<Region>>();
+            yield return SerdeUtils.DeserializeObjectsAsync(regionTask.Result, regions, new StringEntityConverter());
+            AddRegions(regions.Get());
+            
+            var transitions = new TaskResult<List<Transition>>();
+            yield return SerdeUtils.DeserializeObjectsAsync(transTask.Result, transitions, new StringRegionConverter(this));
+            _transitions = transitions.Get();
         }
 
         private void AddRegions(IEnumerable<Region> regions)
