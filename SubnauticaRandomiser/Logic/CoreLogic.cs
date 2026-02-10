@@ -34,7 +34,6 @@ namespace SubnauticaRandomiser.Logic
         private List<LogicEntity> _priorityEntities;
         
         private LogicMonitor _monitor;
-        private List<LogicObjects.LogicEntity> _entities;
         private Dictionary<Type, BaseLogicModule> _entityRandomisers = new Dictionary<Type, BaseLogicModule>();
 
         /// <summary>
@@ -114,10 +113,8 @@ namespace SubnauticaRandomiser.Logic
             // Fill regular items
             // Repeat
             
-            // Initially, the list of unrandomised entities is just the list of all entities.
-            _entities = entityManager.GetAllEntities();
-            RandomiseEntityOrder(_rng);
-            
+            // Set up the queue with every known entity.
+            var queue = new EntityQueue(entityManager.GetAllEntities(), _rng);
             // Set up the context with vanilla information.
             var context = new RandomisationContext(regionManager.GetRegion("SafeShallows"));
             // If modules like randomised start need to change the context, they can do so through this event.
@@ -130,17 +127,13 @@ namespace SubnauticaRandomiser.Logic
             List<Region> newRegions;
 
             // Keep going until every last entity has been randomised.
-            while (_entities.Count > 0)
+            foreach (var entity in queue)
             {
-                // Get the next entity to randomise.
-                var entity = _entities[0];
                 _log.Debug($"> Picked entity {entity}");
                 if (!entity.Dependencies.TrueForAll(e => e.Sphere >= 0))
                 {
                     // This isn't ready yet. Delay it before trying again.
-                    entity.Priority += (1 - entity.Priority) * _rng.NextFloat();
-                    _entities.Sort();
-                    _log.Debug($"Dependencies not met. New entity priority is {entity.Priority}");
+                    queue.DelayCurrent();
                     _log.Debug("Dependencies were:");
                     foreach (var dep in entity.Dependencies)
                     {
@@ -160,7 +153,7 @@ namespace SubnauticaRandomiser.Logic
                     _log.Debug($"Entity {entity} does not have a handler, skipping.");
                 }
                 entity.Sphere = sphere.Tier;
-                _entities.RemoveAt(0);
+                queue.RemoveCurrent();
                 
                 // After every fill, check whether a transition lock can be opened.
                 if (sphere.TryUnlockEdges(out newRegions))
@@ -173,33 +166,6 @@ namespace SubnauticaRandomiser.Logic
                 yield return null;
             }
             _log.Info("Finished randomising.");
-        }
-
-        /// <summary>
-        /// Instead of drawing a random entity every time put the entities in a queue of random order.
-        /// </summary>
-        private void RandomiseEntityOrder(IRandomHandler rng)
-        {
-            // First, assign a random priority to every entity.
-            foreach (var entity in _entities)
-            {
-                entity.Priority = rng.NextFloat();
-            }
-            // Sort the entities by this random priority.
-            _entities.Sort();
-            
-            // Normalise the priorities.
-            float total = _entities.Count;
-            for (int i = 0; i < _entities.Count; i++)
-            {
-                var entity = _entities[i];
-                entity.Priority = i / total;
-                // Give modules a chance to adjust entity priorities.
-                _monitor.TriggerPrioritySetup(entity);
-            }
-            
-            // Sort again in case the priorities were modified by a module.
-            _entities.Sort();
         }
 
         #endregion logic-rework
