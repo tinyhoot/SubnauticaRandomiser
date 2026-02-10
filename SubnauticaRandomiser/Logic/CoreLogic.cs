@@ -165,7 +165,7 @@ namespace SubnauticaRandomiser.Logic
 
                 yield return null;
             }
-            _log.Info("Finished randomising.");
+            _log.Info($"Finished randomising. Created {spheres.Count} spheres.");
         }
 
         #endregion logic-rework

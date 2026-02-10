@@ -60,6 +60,7 @@ namespace SubnauticaRandomiser.Logic
             var transitions = new TaskResult<List<Transition>>();
             yield return SerdeUtils.DeserializeObjectsAsync(transTask.Result, transitions, new StringRegionConverter(this));
             _transitions = transitions.Get();
+            LinkTransitions();
         }
 
         private void AddRegions(IEnumerable<Region> regions)
@@ -69,6 +70,18 @@ namespace SubnauticaRandomiser.Logic
                 // The numerical ID of an entity is its registration number.
                 _regionIdMap[region.Name] = _regions.Count;
                 _regions.Add(region);
+            }
+        }
+        
+        /// <summary>
+        /// Update regions with all the transitions connected to them.
+        /// </summary>
+        private void LinkTransitions()
+        {
+            foreach (var trans in _transitions)
+            {
+                trans.Entry?.Transitions.Add(trans);
+                trans.Exit?.Transitions.Add(trans);
             }
         }
         

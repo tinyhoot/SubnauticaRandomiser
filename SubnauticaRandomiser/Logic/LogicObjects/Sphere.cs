@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic.LogicObjects.Transitions;
 
 namespace SubnauticaRandomiser.Logic.LogicObjects
@@ -29,11 +30,14 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// All transitions leading from this sphere to regions not contained within this sphere.
         /// </summary>
         public List<Transition> EdgeTransitions = new List<Transition>();
+        
+        private PrefixLogHandler _log = PrefixLogHandler.Get("[Sphere]");
 
         public Sphere(RandomisationContext context)
         {
             Tier = 0;
             Regions.Add(context.StartingRegion);
+            PopulateEdges();
         }
 
         public Sphere(Sphere innerSphere, IEnumerable<Region> newRegions)
@@ -74,10 +78,12 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
                     {
                         // Because we are only adding transitions with one region in the sphere this can never lead
                         // to duplicates.
+                        _log.Debug($"Adding edge {trans} to sphere {Tier}.");
                         EdgeTransitions.Add(trans);
                     }
                 }
             }
+            _log.Debug($"Recalculated {EdgeTransitions.Count} edges for sphere {Tier}.");
         }
 
         /// <summary>
@@ -91,6 +97,7 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         {
             if (EdgeTransitions.Count == 0)
             {
+                _log.Debug("Sphere had no edges, can't unlock new regions.");
                 unlockedRegions = null;
                 return false;
             }
