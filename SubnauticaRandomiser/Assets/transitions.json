@@ -15,6 +15,16 @@
     "Exit": "CrashZone"
   },
   {
+    "Name": "SafeShallows:Wreck15",
+    "Entry": "SafeShallows",
+    "Exit": "Wreck15"
+  },
+  {
+    "Name": "SafeShallows:Wreck16",
+    "Entry": "SafeShallows",
+    "Exit": "Wreck16"
+  },
+  {
     "Name": "KelpForest:Lifepod3",
     "Entry": "KelpForest",
     "Exit": "Lifepod3"
@@ -205,7 +215,7 @@
   {
     "Name": "CrashZone:CrashZoneMesa",
     "Entry": "CrashZone",
-    "Exit": "CrashZoneTrench"
+    "Exit": "CrashZoneMesa"
   },
   {
     "Name": "CrashZone:CragField",
@@ -341,6 +351,11 @@
     "Exit": "Wreck19"
   },
   {
+    "Name": "Mountains:MountainsIsland",
+    "Entry": "Mountains",
+    "Exit": "MountainsIsland"
+  },
+  {
     "Name": "Mountains:MountainsCaves",
     "Entry": "Mountains",
     "Exit": "MountainsCaves"
@@ -421,7 +436,7 @@
   {
     "Name": "Dunes:WreckExtra3",
     "Entry": "Dunes",
-    "Exit": "WreckExtra2"
+    "Exit": "WreckExtra3"
   },
   {
     "Name": "WreckExtra3:WreckExtra3Barrier",
@@ -559,6 +574,11 @@
     ]
   },
   {
+    "Name": "GrandReef:FloatingIsland",
+    "Entry": "GrandReef",
+    "Exit": "FloatingIsland"
+  },
+  {
     "Name": "GrandReef:DeepGrandReef",
     "Entry": "GrandReef",
     "Exit": "DeepGrandReef"
@@ -574,14 +594,19 @@
     "Exit": "LostRiverCanyon"
   },
   {
+    "Name": "FloatingIsland:Degasi1",
+    "Entry": "FloatingIsland",
+    "Exit": "Degasi1"
+  },
+  {
     "Name": "BloodKelpNorth:Lifepod2",
     "Entry": "BloodKelpNorth",
     "Exit": "Lifepod2"
   },
   {
-    "Name": "BloodKelpNorth:LostRiverCanyon",
+    "Name": "BloodKelpNorth:LostRiverGhostTree",
     "Entry": "BloodKelpNorth",
-    "Exit": "LostRiverCanyon"
+    "Exit": "LostRiverGhostTree"
   },
   {
     "Name": "BloodKelpTrench:Wreck8",
@@ -589,14 +614,29 @@
     "Exit": "Wreck8"
   },
   {
-    "Name": "BloodKelpTrench:LostRiverCorridor",
+    "Name": "LostRiverGhostTree:LostRiverJunction",
+    "Entry": "LostRiverGhostTree",
+    "Exit": "LostRiverJunction"
+  },
+  {
+    "Name": "BloodKelpTrench:LostRiverBonesFieldCorridor",
     "Entry": "BloodKelpTrench",
-    "Exit": "LostRiverCorridor"
+    "Exit": "LostRiverBonesFieldCorridor"
   },
   {
     "Name": "LostRiverCorridor:LostRiverJunction",
     "Entry": "LostRiverCorridor",
     "Exit": "LostRiverJunction"
+  },
+  {
+    "Name": "LostRiverCanyon:LostRiverSkeletonCave",
+    "Entry": "LostRiverCanyon",
+    "Exit": "LostRiverSkeletonCave"
+  },
+  {
+    "Name": "LostRiverBonesFieldCorridor:LostRiverBonesField",
+    "Entry": "LostRiverBonesFieldCorridor",
+    "Exit": "LostRiverBonesField"
   },
   {
     "Name": "LostRiverCanyon:LostRiverBonesField",
@@ -614,13 +654,13 @@
     "Exit": "LostRiverJunction"
   },
   {
-    "Name": "LostRiverJunction:GhostTree",
+    "Name": "LostRiverJunction:LostRiverTreeCove",
     "Entry": "LostRiverJunction",
-    "Exit": "GhostTree"
+    "Exit": "LostRiverTreeCove"
   },
   {
-    "Name": "GhostTree:InactiveLavaZoneCorridor",
-    "Entry": "GhostTree",
+    "Name": "LostRiverTreeCove:InactiveLavaZoneCorridor",
+    "Entry": "LostRiverTreeCove",
     "Exit": "InactiveLavaZoneCorridor"
   },
   {
@@ -663,5 +703,10 @@
         "RequiredItem": "PrecursorKey_Blue"
       }
     ]
+  },
+  {
+    "Name": "PrisonAquarium:PrisonAquariumCave",
+    "Entry": "PrisonAquarium",
+    "Exit": "PrisonAquariumCave"
   }
 ]

@@ -126,33 +126,10 @@
     ]
   },
   {
-    "Name": "FloatingIslands",
+    "Name": "FloatingIsland",
     "Depth": 0,
     "BiomeTypes": [
       "FloatingIslands_Birds"
-    ]
-  },
-  {
-    "Name": "GhostTree",
-    "Depth": 900,
-    "BiomeTypes": [
-      "GhostTree_Ceiling",
-      "GhostTree_Grass",
-      "GhostTree_Ground",
-      "GhostTree_Ground_Lower",
-      "GhostTree_Lake_Floor",
-      "GhostTree_Open_CreatureOnly",
-      "GhostTree_Skeleton_Open_CreatureOnly",
-      "GhostTree_Wall",
-      "TreeCove_Algae",
-      "TreeCove_Ceiling",
-      "TreeCove_Ground",
-      "TreeCove_LakeFloor",
-      "TreeCove_LakeWall",
-      "TreeCove_LedgeSide",
-      "TreeCove_Open_CreatureOnly",
-      "TreeCove_TreeOpen_CreatureOnly",
-      "TreeCove_Wall"
     ]
   },
   {
@@ -201,7 +178,7 @@
   },
   {
     "Name": "InactiveLavaZone",
-    "Depth": 1000,
+    "Depth": 1200,
     "BiomeTypes": [
       "InactiveLavaZone_Chamber_Ceiling",
       "InactiveLavaZone_Chamber_Dragon_Open_CreatureOnly",
@@ -217,7 +194,7 @@
   },
   {
     "Name": "InactiveLavaZoneCastle",
-    "Depth": 1200,
+    "Depth": 1230,
     "BiomeTypes": [
       "InactiveLavaZone_CastleChamber_Ceiling",
       "InactiveLavaZone_CastleChamber_Floor",
@@ -237,7 +214,7 @@
   },
   {
     "Name": "InactiveLavaZoneCorridor",
-    "Depth": 1000,
+    "Depth": 1100,
     "BiomeTypes": [
       "InactiveLavaZone_Corridor_Floor_Far",
       "InactiveLavaZone_Corridor_Open_CreatureOnly"
@@ -245,7 +222,7 @@
   },
   {
     "Name": "InactiveLavaZoneLavaPit",
-    "Depth": 1300,
+    "Depth": 1350,
     "BiomeTypes": [
       "InactiveLavaZone_LavaPit_Floor",
       "InactiveLavaZone_LavaPit_Open_CreatureOnly",
@@ -318,18 +295,13 @@
   },
   {
     "Name": "LostRiverBonesField",
-    "Depth": 650,
+    "Depth": 700,
     "BiomeTypes": [
       "BonesField_Algae",
       "BonesField_Cave_Ceiling",
       "BonesField_Cave_Ground",
       "BonesField_Cave_Wall",
       "BonesField_Ceiling",
-      "BonesField_Corridor_Ceiling",
-      "BonesField_Corridor_CreatureOnly",
-      "BonesField_Corridor_Ground",
-      "BonesField_Corridor_Stream",
-      "BonesField_Corridor_Wall",
       "BonesField_Ground",
       "BonesField_LakePit_Floor",
       "BonesField_LakePit_Open_CreatureOnly",
@@ -343,8 +315,19 @@
     ]
   },
   {
+    "Name": "LostRiverBonesFieldCorridor",
+    "Depth": 650,
+    "BiomeTypes": [
+      "BonesField_Corridor_Ceiling",
+      "BonesField_Corridor_CreatureOnly",
+      "BonesField_Corridor_Ground",
+      "BonesField_Corridor_Stream",
+      "BonesField_Corridor_Wall"
+    ]
+  },
+  {
     "Name": "LostRiverBonesFieldCave",
-    "Depth": 600,
+    "Depth": 650,
     "BiomeTypes": [
       "BonesField_Cave_Ceiling",
       "BonesField_Cave_Ground",
@@ -353,7 +336,7 @@
   },
   {
     "Name": "LostRiverCanyon",
-    "Depth": 600,
+    "Depth": 700,
     "BiomeTypes": [
       "Canyon_Algae",
       "Canyon_Ceiling",
@@ -375,8 +358,22 @@
     ]
   },
   {
+    "Name": "LostRiverGhostTree",
+    "Depth": 650,
+    "BiomeTypes": [
+      "GhostTree_Ceiling",
+      "GhostTree_Grass",
+      "GhostTree_Ground",
+      "GhostTree_Ground_Lower",
+      "GhostTree_Lake_Floor",
+      "GhostTree_Open_CreatureOnly",
+      "GhostTree_Skeleton_Open_CreatureOnly",
+      "GhostTree_Wall"
+    ]
+  },
+  {
     "Name": "LostRiverJunction",
-    "Depth": 700,
+    "Depth": 840,
     "BiomeTypes": [
       "LostRiverJunction_Ceiling",
       "LostRiverJunction_Ground",
@@ -391,7 +388,7 @@
   },
   {
     "Name": "LostRiverSkeletonCave",
-    "Depth": 650,
+    "Depth": 700,
     "BiomeTypes": [
       "SkeletonCave_Algae",
       "SkeletonCave_Ceiling",
@@ -399,6 +396,21 @@
       "SkeletonCave_Ground",
       "SkeletonCave_Open_CreatureOnly",
       "SkeletonCave_Wall"
+    ]
+  },
+  {
+    "Name": "LostRiverTreeCove",
+    "Depth": 920,
+    "BiomeTypes": [
+      "TreeCove_Algae",
+      "TreeCove_Ceiling",
+      "TreeCove_Ground",
+      "TreeCove_LakeFloor",
+      "TreeCove_LakeWall",
+      "TreeCove_LedgeSide",
+      "TreeCove_Open_CreatureOnly",
+      "TreeCove_TreeOpen_CreatureOnly",
+      "TreeCove_Wall"
     ]
   },
   {
@@ -474,11 +486,8 @@
   },
   {
     "Name": "PrisonAquarium",
-    "Depth": 1500,
+    "Depth": 1600,
     "BiomeTypes": [
-      "PrisonAquarium_CaveCeiling",
-      "PrisonAquarium_CaveFloor",
-      "PrisonAquarium_CaveWall",
       "PrisonAquarium_Coral",
       "PrisonAquarium_DeadCoral",
       "PrisonAquarium_Grass",
@@ -486,6 +495,15 @@
       "PrisonAquarium_Rock",
       "PrisonAquarium_Sand",
       "PrisonAquarium_SpecialCoral"
+    ]
+  },
+  {
+    "Name": "PrisonAquariumCave",
+    "Depth": 1630,
+    "BiomeTypes": [
+      "PrisonAquarium_CaveCeiling",
+      "PrisonAquarium_CaveFloor",
+      "PrisonAquarium_CaveWall"
     ]
   },
   {
