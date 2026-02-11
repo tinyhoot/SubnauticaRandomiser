@@ -21,6 +21,12 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         public readonly string Name;
 
         /// <summary>
+        /// The depth at which this region lies.
+        /// </summary>
+        [JsonProperty]
+        public readonly int Depth;
+
+        /// <summary>
         /// The list of transitions leading to other regions that can be reached from this region.
         /// </summary>
         public List<Transition> Transitions = new List<Transition>();

@@ -1,6 +1,7 @@
 [
   {
     "Name": "ActiveLavaZone",
+    "Depth": 1400,
     "BiomeTypes": [
       "ActiveLavaZone_Chamber_Ceiling",
       "ActiveLavaZone_Chamber_Floor",
@@ -15,6 +16,7 @@
   },
   {
     "Name": "BloodKelpNorth",
+    "Depth": 400,
     "BiomeTypes": [
       "BloodKelp_CaveCeiling",
       "BloodKelp_CaveFloor",
@@ -32,6 +34,7 @@
   },
   {
     "Name": "BloodKelpTrench",
+    "Depth": 300,
     "BiomeTypes": [
       "BloodKelp_CaveCeiling",
       "BloodKelp_CaveFloor",
@@ -48,6 +51,7 @@
   },
   {
     "Name": "CragField",
+    "Depth": 150,
     "BiomeTypes": [
       "CragField_Grass",
       "CragField_Ground",
@@ -58,6 +62,7 @@
   },
   {
     "Name": "CrashZone",
+    "Depth": 10,
     "BiomeTypes": [
       "CrashZone_OpenDeep_CreatureOnly",
       "CrashZone_OpenShallow_CreatureOnly",
@@ -67,6 +72,7 @@
   },
   {
     "Name": "CrashZoneTrench",
+    "Depth": 30,
     "BiomeTypes": [
       "CrashZone_TrenchSand",
       "CrashZone_TrenchRock"
@@ -74,6 +80,7 @@
   },
   {
     "Name": "CrashZoneMesa",
+    "Depth": 200,
     "BiomeTypes": [
       "Mesas_Open",
       "Mesas_Side",
@@ -82,6 +89,7 @@
   },
   {
     "Name": "DeepGrandReef",
+    "Depth": 500,
     "BiomeTypes": [
       "DeepGrandReef_BlueCoral",
       "DeepGrandReef_Ceiling",
@@ -94,6 +102,7 @@
   },
   {
     "Name": "Dunes",
+    "Depth": 300,
     "BiomeTypes": [
       "Dunes_Grass",
       "Dunes_OpenDeep_CreatureOnly",
@@ -109,6 +118,7 @@
   },
   {
     "Name": "DunesCaves",
+    "Depth": 400,
     "BiomeTypes": [
       "Dunes_CaveCeiling",
       "Dunes_CaveFloor",
@@ -117,12 +127,14 @@
   },
   {
     "Name": "FloatingIslands",
+    "Depth": 0,
     "BiomeTypes": [
       "FloatingIslands_Birds"
     ]
   },
   {
     "Name": "GhostTree",
+    "Depth": 900,
     "BiomeTypes": [
       "GhostTree_Ceiling",
       "GhostTree_Grass",
@@ -145,6 +157,7 @@
   },
   {
     "Name": "GrandReef",
+    "Depth": 300,
     "BiomeTypes": [
       "GrandReef_CaveWall",
       "GrandReef_Grass",
@@ -162,6 +175,7 @@
   },
   {
     "Name": "GrassyPlateaus",
+    "Depth": 80,
     "BiomeTypes": [
       "GrassyPlateaus_Arch_Obsolete",
       "GrassyPlateaus_Grass",
@@ -177,6 +191,7 @@
   },
   {
     "Name": "GrassyPlateausCaves",
+    "Depth": 125,
     "BiomeTypes": [
       "GrassyPlateaus_CaveCeiling",
       "GrassyPlateaus_CaveEntrance",
@@ -186,6 +201,7 @@
   },
   {
     "Name": "InactiveLavaZone",
+    "Depth": 1000,
     "BiomeTypes": [
       "InactiveLavaZone_Chamber_Ceiling",
       "InactiveLavaZone_Chamber_Dragon_Open_CreatureOnly",
@@ -201,6 +217,7 @@
   },
   {
     "Name": "InactiveLavaZoneCastle",
+    "Depth": 1200,
     "BiomeTypes": [
       "InactiveLavaZone_CastleChamber_Ceiling",
       "InactiveLavaZone_CastleChamber_Floor",
@@ -210,6 +227,7 @@
   },
   {
     "Name": "InactiveLavaZoneCastleTunnel",
+    "Depth": 1200,
     "BiomeTypes": [
       "InactiveLavaZone_CastleTunnel_Ceiling",
       "InactiveLavaZone_CastleTunnel_Floor",
@@ -219,6 +237,7 @@
   },
   {
     "Name": "InactiveLavaZoneCorridor",
+    "Depth": 1000,
     "BiomeTypes": [
       "InactiveLavaZone_Corridor_Floor_Far",
       "InactiveLavaZone_Corridor_Open_CreatureOnly"
@@ -226,6 +245,7 @@
   },
   {
     "Name": "InactiveLavaZoneLavaPit",
+    "Depth": 1300,
     "BiomeTypes": [
       "InactiveLavaZone_LavaPit_Floor",
       "InactiveLavaZone_LavaPit_Open_CreatureOnly",
@@ -234,6 +254,7 @@
   },
   {
     "Name": "JellyShroomCaves",
+    "Depth": 220,
     "BiomeTypes": [
       "JellyShroomCaves_CrabSnake",
       "JellyShroomCaves_InsideShroom",
@@ -246,6 +267,7 @@
   },
   {
     "Name": "KelpForest",
+    "Depth": 50,
     "BiomeTypes": [
       "Kelp_DenseVine",
       "Kelp_GrassDense",
@@ -262,6 +284,7 @@
   },
   {
     "Name": "KelpForestCaves",
+    "Depth": 120,
     "BiomeTypes": [
       "Kelp_CaveEntrance_Obsolete",
       "Kelp_CaveFloor",
@@ -272,6 +295,7 @@
   },
   {
     "Name": "KooshZone",
+    "Depth": 200,
     "BiomeTypes": [
       "KooshZone_Coral",
       "KooshZone_Geyser",
@@ -285,6 +309,7 @@
   },
   {
     "Name": "KooshZoneCaves",
+    "Depth": 250,
     "BiomeTypes": [
       "KooshZone_CaveFloor",
       "KooshZone_CaveSpecial",
@@ -293,6 +318,7 @@
   },
   {
     "Name": "LostRiverBonesField",
+    "Depth": 650,
     "BiomeTypes": [
       "BonesField_Algae",
       "BonesField_Cave_Ceiling",
@@ -318,6 +344,7 @@
   },
   {
     "Name": "LostRiverBonesFieldCave",
+    "Depth": 600,
     "BiomeTypes": [
       "BonesField_Cave_Ceiling",
       "BonesField_Cave_Ground",
@@ -326,6 +353,7 @@
   },
   {
     "Name": "LostRiverCanyon",
+    "Depth": 600,
     "BiomeTypes": [
       "Canyon_Algae",
       "Canyon_Ceiling",
@@ -337,6 +365,7 @@
   },
   {
     "Name": "LostRiverCorridor",
+    "Depth": 600,
     "BiomeTypes": [
       "LostRiverCorridor_Ceiling",
       "LostRiverCorridor_Ground",
@@ -347,6 +376,7 @@
   },
   {
     "Name": "LostRiverJunction",
+    "Depth": 700,
     "BiomeTypes": [
       "LostRiverJunction_Ceiling",
       "LostRiverJunction_Ground",
@@ -361,6 +391,7 @@
   },
   {
     "Name": "LostRiverSkeletonCave",
+    "Depth": 650,
     "BiomeTypes": [
       "SkeletonCave_Algae",
       "SkeletonCave_Ceiling",
@@ -372,6 +403,7 @@
   },
   {
     "Name": "Mountains",
+    "Depth": 300,
     "BiomeTypes": [
       "Mountains_Grass",
       "Mountains_OpenDeep_CreatureOnly",
@@ -383,6 +415,7 @@
   },
   {
     "Name": "MountainsCaves",
+    "Depth": 350,
     "BiomeTypes": [
       "Mountains_CaveCeiling",
       "Mountains_CaveFloor",
@@ -391,6 +424,7 @@
   },
   {
     "Name": "MountainsIsland",
+    "Depth": 0,
     "BiomeTypes": [
       "Mountains_Birds",
       "Mountains_IslandCaveCeiling",
@@ -403,6 +437,7 @@
   },
   {
     "Name": "MushroomForestNorthWest",
+    "Depth": 150,
     "BiomeTypes": [
       "MushroomForest_CoralRoot",
       "MushroomForest_GiantTreeExterior",
@@ -419,6 +454,7 @@
   },
   {
     "Name": "MushroomForestNorthEast",
+    "Depth": 150,
     "BiomeTypes": [
       "MushroomForest_Grass",
       "MushroomForest_MushroomTreeTrunk",
@@ -429,6 +465,7 @@
   },
   {
     "Name": "MushroomForestCaves",
+    "Depth": 200,
     "BiomeTypes": [
       "MushroomForest_CaveEntrance",
       "MushroomForest_CaveFloor",
@@ -437,6 +474,7 @@
   },
   {
     "Name": "PrisonAquarium",
+    "Depth": 1500,
     "BiomeTypes": [
       "PrisonAquarium_CaveCeiling",
       "PrisonAquarium_CaveFloor",
@@ -452,6 +490,7 @@
   },
   {
     "Name": "SafeShallows",
+    "Depth": 10,
     "Entities": [
     ],
     "BiomeTypes": [
@@ -473,6 +512,7 @@
   },
   {
     "Name": "SeaTreaderPath",
+    "Depth": 200,
     "BiomeType": [
       "SeaTreaderPath_Grass",
       "SeaTreaderPath_OpenDeep_CreatureOnly",
@@ -484,6 +524,7 @@
   },
   {
     "Name": "SeaTreaderPathCaves",
+    "Depth": 300,
     "BiomeType": [
       "SeaTreaderPath_CaveCeiling",
       "SeaTreaderPath_CaveFloor",
@@ -492,6 +533,7 @@
   },
   {
     "Name": "SparseReef",
+    "Depth": 150,
     "BiomeTypes": [
       "SparseReef_Coral",
       "SparseReef_OpenDeep_CreatureOnly",
@@ -503,6 +545,7 @@
   },
   {
     "Name": "SparseReefDeep",
+    "Depth": 250,
     "BiomeTypes": [
       "SparseReef_CaveCoral",
       "SparseReef_CaveFloor",
@@ -511,6 +554,7 @@
   },
   {
     "Name": "SparseReefCaves",
+    "Depth": 250,
     "BiomeTypes": [
       "SparseReef_DeepCoral",
       "SparseReef_DeepFloor",
@@ -519,6 +563,7 @@
   },
   {
     "Name": "UnderwaterIslands",
+    "Depth": 175,
     "BiomeTypes": [
       "UnderwaterIslands_IslandPlants",
       "UnderwaterIslands_IslandSides",
@@ -529,6 +574,7 @@
   },
   {
     "Name": "UnderwaterIslandsCaves",
+    "Depth": 250,
     "BiomeTypes": [
       "UnderwaterIslands_IslandCaveFloor",
       "UnderwaterIslands_IslandCavePlants",
@@ -537,6 +583,7 @@
   },
   {
     "Name": "UnderwaterIslandsFloorBelow",
+    "Depth": 500,
     "BiomeTypes": [
       "UnderwaterIslands_Geyser",
       "UnderwaterIslands_ValleyFloor",
@@ -546,6 +593,7 @@
   },
   {
     "Name": "Degasi1",
+    "Depth": -50,
     "BiomeTypes": [
       "FloatingIslands_AbandonedBase_Inside",
       "FloatingIslands_AbandonedBase_Outside"
@@ -553,6 +601,7 @@
   },
   {
     "Name": "Degasi2",
+    "Depth": 264,
     "BiomeTypes": [
       "JellyShroomCaves_AbandonedBase_Inside",
       "JellyShroomCaves_AbandonedBase_Outside"
@@ -560,6 +609,7 @@
   },
   {
     "Name": "Degasi3",
+    "Depth": 500,
     "BiomeTypes": [
       "DeepGrandReef_AbandonedBase_Exterior",
       "DeepGrandReef_AbandonedBase_Interior"
@@ -567,57 +617,67 @@
   },
   {
     "Name": "Lifepod2",
+    "Depth": 500,
     "BiomeTypes": [
       "BloodKelp_EscapePod"
     ]
   },
   {
     "Name": "Lifepod3",
+    "Depth": 17,
     "BiomeTypes": [
       "Kelp_EscapePod"
     ]
   },
   {
     "Name": "Lifepod4",
+    "Depth": 5,
     "BiomeTypes": [
       "CrashZone_EscapePod"
     ]
   },
   {
     "Name": "Lifepod6",
+    "Depth": 109,
     "BiomeTypes": [
       "GrassyPlateaus_EscapePod"
     ]
   },
   {
-    "Name": "Lifepod7"
+    "Name": "Lifepod7",
+    "Depth": 179
   },
   {
     "Name": "Lifepod12",
+    "Depth": 266,
     "BiomeTypes": [
       "KooshZone_EscapePod"
     ]
   },
   {
     "Name": "Lifepod13",
+    "Depth": 177,
     "BiomeTypes": [
       "MushroomForest_EscapePod"
     ]
   },
   {
     "Name": "Lifepod17",
+    "Depth": 91,
     "BiomeTypes": [
       "GrassyPlateaus_EscapePod"
     ]
   },
   {
     "Name": "Lifepod19",
+    "Depth": 300,
     "BiomeTypes": [
       "SparseReef_EscapePod"
     ]
   },
   {
     "Name": "Wreck1",
+    "Depth": 75,
     "BiomeTypes": [
       "GrassyPlateaus_TechSite",
       "GrassyPlateaus_TechSite_Scattered"
@@ -631,6 +691,7 @@
   },
   {
     "Name": "Wreck2",
+    "Depth": 50,
     "BiomeTypes": [
       "GrassyPlateaus_TechSite",
       "GrassyPlateaus_TechSite_Scattered"
@@ -638,6 +699,7 @@
   },
   {
     "Name": "Wreck3",
+    "Depth": 200,
     "BiomeTypes": [
       "KooshZone_TechSite",
       "KooshZone_TechSite_Scatter"
@@ -651,6 +713,7 @@
   },
   {
     "Name": "Wreck4",
+    "Depth": 174,
     "BiomeTypes": [
       "UnderwaterIslands_TechSite",
       "UnderwaterIslands_TechSite_Scatter"
@@ -667,9 +730,9 @@
   },
   {
     "Name": "Wreck5",
+    "Depth": 346,
     "BiomeTypes": [
       "Mountains_TechSite",
-      "Mountains_TechSite_Barrier",
       "Mountains_TechSite_Scatter"
     ]
   },
@@ -681,11 +744,13 @@
   },
   {
     "Name": "Wreck6",
+    "Depth": 332,
     "BiomeTypes": [
     ]
   },
   {
     "Name": "Wreck7",
+    "Depth": 190,
     "BiomeTypes": [
       "SeaTreaderPath_TechSite",
       "SeaTreaderPath_TechSite_Scatter"
@@ -699,6 +764,7 @@
   },
   {
     "Name": "Wreck8",
+    "Depth": 324,
     "BiomeTypes": [
       "BloodKelp_TechSite",
       "BloodKelp_TechSite_Scatter"
@@ -706,6 +772,7 @@
   },
   {
     "Name": "Wreck9",
+    "Depth": 120,
     "BiomeTypes": [
       "MushroomForest_TechSite"
     ]
@@ -718,6 +785,7 @@
   },
   {
     "Name": "Wreck10",
+    "Depth": 222,
     "BiomeTypes": [
       "GrandReef_TechSite",
       "GrandReef_TechSite_Scattered"
@@ -731,6 +799,7 @@
   },
   {
     "Name": "Wreck11",
+    "Depth": 430,
     "BiomeTypes": [
       "GrandReef_TechSite",
       "GrandReef_TechSite_Scattered"
@@ -744,6 +813,7 @@
   },
   {
     "Name": "Wreck12",
+    "Depth": 120,
     "BiomeTypes": [
       "GrassyPlateaus_TechSite",
       "GrassyPlateaus_TechSite_Scattered"
@@ -751,6 +821,7 @@
   },
   {
     "Name": "Wreck13",
+    "Depth": 100,
     "BiomeTypes": [
       "GrassyPlateaus_TechSite",
       "GrassyPlateaus_TechSite_Scattered"
@@ -758,6 +829,7 @@
   },
   {
     "Name": "Wreck14",
+    "Depth": 90,
     "BiomeTypes": [
       "GrassyPlateaus_TechSite",
       "GrassyPlateaus_TechSite_Scattered"
@@ -771,6 +843,7 @@
   },
   {
     "Name": "Wreck15",
+    "Depth": 14,
     "BiomeTypes": [
       "SafeShallows_TechSite",
       "SafeShallows_TechSite_Barrier",
@@ -779,6 +852,7 @@
   },
   {
     "Name": "Wreck16",
+    "Depth": 6,
     "BiomeTypes": [
       "SafeShallows_TechSite",
       "SafeShallows_TechSite_Barrier",
@@ -787,6 +861,7 @@
   },
   {
     "Name": "Wreck17",
+    "Depth": 25,
     "BiomeTypes": [
       "Kelp_TechSite",
       "Kelp_TechSite_Scattered"
@@ -794,6 +869,7 @@
   },
   {
     "Name": "Wreck18",
+    "Depth": 60,
     "BiomeTypes": [
       "Kelp_TechSite",
       "Kelp_TechSite_Scattered"
@@ -807,6 +883,7 @@
   },
   {
     "Name": "Wreck19",
+    "Depth": 254,
     "BiomeTypes": [
       "Mountains_TechSite",
       "Mountains_TechSite_Scatter"
@@ -814,6 +891,7 @@
   },
   {
     "Name": "Wreck20",
+    "Depth": 208,
     "BiomeTypes": [
       "SparseReef_Techsite",
       "SparseReef_Techsite_Scatter"
@@ -827,6 +905,7 @@
   },
   {
     "Name": "WreckExtra1",
+    "Depth": 266,
     "BiomeTypes": [
       "KooshZone_TechSite",
       "KooshZone_TechSite_Scatter"
@@ -834,6 +913,7 @@
   },
   {
     "Name": "WreckExtra2",
+    "Depth": 334,
     "BiomeTypes": [
       "Dunes_TechSite",
       "Dunes_TechSite_Scatter"
@@ -847,6 +927,7 @@
   },
   {
     "Name": "WreckExtra3",
+    "Depth": 217,
     "BiomeTypes": [
       "Dunes_TechSite",
       "Dunes_TechSite_Scatter"
