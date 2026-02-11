@@ -16,6 +16,7 @@ namespace SubnauticaRandomiser.Serialization.Converters
         private const char Separator = ':';
         private readonly Type _logicEntity = typeof(LogicEntity);
         private EntityManager _manager;
+        private Dictionary<string, Type> _typeCache = new Dictionary<string, Type>();
 
         public StringEntityConverter(){}
         
@@ -84,7 +85,13 @@ namespace SubnauticaRandomiser.Serialization.Converters
 
         private Type ConvertToEntityType(string typeName)
         {
-            var type = AccessTools.TypeByName(typeName);
+            // This cache saves about ten seconds of load time. Do not ask how I know.
+            if (!_typeCache.TryGetValue(typeName, out Type type))
+            {
+                type = AccessTools.TypeByName(typeName);
+                _typeCache.Add(typeName, type);
+            }
+
             // Is a LogicEntity or subclass thereof.
             if (_logicEntity.IsAssignableFrom(type))
                 return type;
