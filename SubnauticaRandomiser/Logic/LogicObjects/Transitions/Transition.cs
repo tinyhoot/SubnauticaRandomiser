@@ -13,7 +13,8 @@ namespace SubnauticaRandomiser.Logic.LogicObjects.Transitions
         /// <summary>
         /// The unique name of this transition.
         /// </summary>
-        [JsonProperty] public readonly string Name;
+        [JsonProperty]
+        public readonly string Name;
 
         /// <summary>
         /// The region this transition originates from.
@@ -57,6 +58,11 @@ namespace SubnauticaRandomiser.Logic.LogicObjects.Transitions
             }
 
             return false;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }
