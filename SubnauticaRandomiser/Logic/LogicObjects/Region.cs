@@ -40,5 +40,10 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// Access to this region corresponds to access to these vanilla biomes for spawning random loot.
         /// </summary>
         public List<BiomeType> BiomeTypes = new List<BiomeType>();
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

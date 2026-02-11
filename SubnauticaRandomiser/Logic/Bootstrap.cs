@@ -80,6 +80,8 @@ namespace SubnauticaRandomiser.Logic
                 _log.Debug($"InfoFiles - {Time.realtimeSinceStartup - startTime}");
                 yield return BuildEntityRegionModel(task);
                 _log.Debug($"EntityModel - {Time.realtimeSinceStartup - startTime}");
+                yield return ValidateSetupStage(task);
+                _log.Debug($"ValidateSetup - {Time.realtimeSinceStartup - startTime}");
                 // Randomise the game and save the final state to the SaveData.
                 yield return _coreLogic.Randomise(task, SaveData, _entityManager, _regionManager);
             }
@@ -171,6 +173,18 @@ namespace SubnauticaRandomiser.Logic
             
             yield return _entityManager.LinkEntities();
             _regionManager.ReplaceReferences(_entityManager);
+        }
+
+        /// <summary>
+        /// Ensure that all the data gathered and all the models built for randomising are valid.
+        /// </summary>
+        private IEnumerator ValidateSetupStage(WaitScreenHandler.WaitScreenTask task)
+        {
+            task.Status = "Randomising - Validating setup data";
+            yield return null;
+            
+            Validator.ValidateEntityReferenceLinking(_entityManager.GetAllEntities());
+            Validator.ValidateRegionLinking(_regionManager);
         }
 
         /// <summary>

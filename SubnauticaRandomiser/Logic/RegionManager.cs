@@ -20,14 +20,33 @@ namespace SubnauticaRandomiser.Logic
         private Dictionary<string, int> _regionIdMap = new Dictionary<string, int>();
 
         /// <summary>
+        /// Get the id of the region with the provided unique name.
+        /// </summary>
+        /// <exception cref="KeyNotFoundException">Thrown if no region with that name exists.</exception>
+        public int GetId(string name)
+        {
+            if (!_regionIdMap.TryGetValue(name, out int id))
+                throw new KeyNotFoundException($"Tried to get nonexistent region with name '{name}'!");
+            
+            return id;
+        }
+
+        /// <summary>
+        /// Get the id of the provided region.
+        /// </summary>
+        /// <exception cref="KeyNotFoundException">Thrown if no region with that name exists.</exception>
+        public int GetId(Region region)
+        {
+            return GetId(region.Name);
+        }
+
+        /// <summary>
         /// Get the region with the provided unique name.
         /// </summary>
         /// <exception cref="KeyNotFoundException">Thrown if no region with that name exists.</exception>
         public Region GetRegion(string name)
         {
-            if (!_regionIdMap.TryGetValue(name, out int id))
-                throw new KeyNotFoundException($"Tried to get nonexistent region with name '{name}'!");
-            
+            int id = GetId(name);
             return GetRegion(id);
         }
 
@@ -41,6 +60,16 @@ namespace SubnauticaRandomiser.Logic
                 throw new KeyNotFoundException($"Tried to get nonexistent region with id {id}!");
 
             return _regions[id];
+        }
+
+        public List<Region> GetAllRegions()
+        {
+            return _regions.ShallowCopy();
+        }
+
+        public List<Transition> GetAllTransitions()
+        {
+            return _transitions.ShallowCopy();
         }
 
         /// <summary>
