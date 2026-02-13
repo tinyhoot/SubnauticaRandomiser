@@ -88,6 +88,35 @@ namespace SubnauticaRandomiser.Logic
         }
         
         /// <summary>
+        /// Once all datafiles have completed loading, start up the logic.
+        /// Running this as a coroutine spaces the logic out over several frames, which prevents the game from
+        /// locking up / freezing.
+        /// </summary>
+        internal IEnumerator Randomise(WaitScreenHandler.WaitScreenTask task, SaveData saveData, 
+            EntityManager entityManager, RegionManager regionManager, TravelDistanceManager travelManager)
+        {
+            _rng = new RandomHandler(GetSeedFromConfig());
+            
+            // Let modules set up
+            // Randomise before main
+            
+            task.Status = "Randomising entities (this may take a while)";
+            yield return null;
+            yield return RandomiseEntities(entityManager, regionManager, travelManager);
+            
+            // Randomise after main
+
+            task.Status = "Saving randomised data";
+            yield return null;
+            saveData.SetEnabledModules(Bootstrap.Main.GetActiveModuleTypes());
+            saveData.Save();
+            
+            // This makes the loading screen longer than it needs to be but informing the user is worth it.
+            task.Status = "Success!";
+            yield return new WaitForSecondsRealtime(1f);
+        }
+        
+        /// <summary>
         /// Parse the current config settings into a numeric seed.
         /// </summary>
         private int GetSeedFromConfig()
@@ -101,10 +130,7 @@ namespace SubnauticaRandomiser.Logic
             return (int)(Time.realtimeSinceStartup * 1000f);
         }
 
-        
-        #region logic-rework
-
-        internal IEnumerator RandomiseNew(EntityManager entityManager, RegionManager regionManager,
+        private IEnumerator RandomiseEntities(EntityManager entityManager, RegionManager regionManager,
             TravelDistanceManager travelManager)
         {
             // Create new sphere
@@ -168,46 +194,6 @@ namespace SubnauticaRandomiser.Logic
                 yield return null;
             }
             _log.Info($"Finished randomising. Created {spheres.Count} spheres.");
-        }
-
-        #endregion logic-rework
-        
-
-        /// <summary>
-        /// Once all datafiles have completed loading, start up the logic.
-        /// Running this as a coroutine spaces the logic out over several frames, which prevents the game from
-        /// locking up / freezing.
-        /// </summary>
-        internal IEnumerator Randomise(WaitScreenHandler.WaitScreenTask task, SaveData saveData, 
-            EntityManager entityManager, RegionManager regionManager, TravelDistanceManager travelManager)
-        {
-            task.Status = "Randomising!";
-            yield return null;
-            
-            _rng = new RandomHandler(GetSeedFromConfig());
-
-            
-            yield return RandomiseNew(entityManager, regionManager, travelManager);
-            
-            // task.Status = "Randomising - Extras";
-            // yield return null;
-            //
-            // List<LogicEntity> mainEntities = Setup();
-            // RandomisePreLoop();
-            //
-            // // Force a new frame before the main loop.
-            // task.Status = "Randomising - Entities";
-            // yield return null;
-            // yield return Hootils.WrapCoroutine(RandomiseMainEntities(mainEntities), Initialiser.FatalError);
-            //
-            // task.Status = "Randomising - Saving state";
-            // yield return null;
-            // saveData.SetEnabledModules(Bootstrap.Main.GetActiveModuleTypes());
-            // saveData.Save();
-            //
-            // // This makes the loading screen longer than it needs to be but that's worth the tradeoff.
-            // task.Status = "Success!";
-            // yield return new WaitForSecondsRealtime(1f);
         }
 
         /// <summary>
