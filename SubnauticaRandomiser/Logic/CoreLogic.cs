@@ -97,14 +97,17 @@ namespace SubnauticaRandomiser.Logic
         {
             _rng = new RandomHandler(GetSeedFromConfig());
             
-            // Let modules set up
-            // Randomise before main
+            task.Status = "Randomising before entities";
+            yield return null;
+            yield return RandomisePreEntities(saveData);
             
             task.Status = "Randomising entities (this may take a while)";
             yield return null;
             yield return RandomiseEntities(entityManager, regionManager, travelManager);
             
-            // Randomise after main
+            task.Status = "Randomising after entities";
+            yield return null;
+            yield return RandomisePostEntities(saveData);
 
             task.Status = "Saving randomised data";
             yield return null;
@@ -128,6 +131,15 @@ namespace SubnauticaRandomiser.Logic
                 return seed;
             _log.Warn("Seed was non-numeric value, substituting current time.");
             return (int)(Time.realtimeSinceStartup * 1000f);
+        }
+
+        private IEnumerator RandomisePreEntities(SaveData saveData)
+        {
+            foreach (var module in Bootstrap.Main.Modules)
+            {
+                module.PreEntityRandomisation(_rng, saveData);
+                yield return null;
+            }
         }
 
         private IEnumerator RandomiseEntities(EntityManager entityManager, RegionManager regionManager,
@@ -194,6 +206,15 @@ namespace SubnauticaRandomiser.Logic
                 yield return null;
             }
             _log.Info($"Finished randomising. Created {spheres.Count} spheres.");
+        }
+        
+        private IEnumerator RandomisePostEntities(SaveData saveData)
+        {
+            foreach (var module in Bootstrap.Main.Modules)
+            {
+                module.PostEntityRandomisation(_rng, saveData);
+                yield return null;
+            }
         }
 
         /// <summary>

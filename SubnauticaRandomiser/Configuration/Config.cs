@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
 using HootLib.Configuration;
 using Nautilus.Options;
+using SubnauticaRandomiser.Logic.Modules;
 using SubnauticaRandomiser.Objects.Enums;
 using TMPro;
 using UnityEngine;
@@ -17,7 +20,7 @@ namespace SubnauticaRandomiser.Configuration
         // These are intentionally 'static readonly' instead of constants to enable equality checking by reference.
         private static readonly string SectionGeneral = "General";
         private static readonly string SectionGeneralAdvanced = "General.Advanced";
-        private static readonly string SectionAlternateStart = "Spawn";
+        private static readonly string SectionLifepod = "Lifepod";
         private static readonly string SectionAurora = "Aurora";
         private static readonly string SectionDataboxes = "Databoxes";
         private static readonly string SectionFragments = "Fragments";
@@ -29,10 +32,10 @@ namespace SubnauticaRandomiser.Configuration
         public ConfigEntryWrapper<int> DepthSearchTime;
         public ConfigEntryWrapper<int> MaxDepthWithoutVehicle;
 
-        // Alternate Start
-        public ConfigEntryWrapper<bool> EnableAlternateStartModule;
+        // Lifepod
+        public ConfigEntryWrapper<bool> EnableLifepodModule;
         public ConfigEntryWrapper<string> SpawnPoint;
-        public ConfigEntryWrapper<bool> AllowRadiatedStarts;
+        public ConfigEntryWrapper<bool> AllowIrradiatedStarts;
 
         // Aurora
         public ConfigEntryWrapper<bool> RandomiseDoorCodes;
@@ -81,8 +84,14 @@ namespace SubnauticaRandomiser.Configuration
 
         // Used for the shared settings import/export.
         private TextInputDecorator _textInputDecorator;
-        
-        public Config(string path, BepInPlugin metadata) : base(path, metadata) { }
+
+        public List<LifepodStartData> LifepodStarts;
+
+        public Config(string path, BepInPlugin metadata) : base(path, metadata)
+        {
+            // Must be done here because we need the data to build the config option dynamically.
+            LifepodStarts = LifepodModule.LoadLifepodFile();
+        }
 
         protected override void RegisterOptions()
         {
@@ -122,33 +131,30 @@ namespace SubnauticaRandomiser.Configuration
                 acceptableValues: new AcceptableValueRange<int>(100, 500)
             );
             
-            // Alternate Start
-            EnableAlternateStartModule = RegisterEntry(
-                section: SectionAlternateStart,
-                key: nameof(EnableAlternateStartModule),
+            // Lifepod
+            EnableLifepodModule = RegisterEntry(
+                section: SectionLifepod,
+                key: nameof(EnableLifepodModule),
                 defaultValue: false,
-                description: "Enable spawning module."
+                description: "Enable lifepod module."
             ).WithDescription(
-                "Enable Spawning Module",
+                "Enable Lifepod Module",
                 null
             );
             SpawnPoint = RegisterEntry(
-                section: SectionAlternateStart,
+                section: SectionLifepod,
                 key: nameof(SpawnPoint),
-                defaultValue: "Vanilla",
+                defaultValue: "Random",
                 description: "The biome the lifepod will spawn in. Random is limited to early game biomes, "
                              + "Chaotic Random chooses from ALL available biomes.",
-                acceptableValues: new AcceptableValueList<string>("Vanilla", "Random", "Chaotic Random",
-                    "BloodKelp", "BulbZone", "CragField", "CrashZone", "Dunes", "Floating Island", "GrandReef",
-                    "GrassyPlateaus", "Kelp", "Mountains", "MushroomForest", "SeaTreaderPath", "SparseReef",
-                    "UnderwaterIslands", "Void")
+                acceptableValues: new AcceptableValueList<string>(LifepodStarts.Select(ls => ls.Name).ToArray())
             ).WithDescription(
                 "Spawnpoint biome",
                 "Random is limited to early game biomes, Chaotic Random chooses from ALL available biomes."
             );
-            AllowRadiatedStarts = RegisterEntry(
-                section: SectionAlternateStart,
-                key: nameof(AllowRadiatedStarts),
+            AllowIrradiatedStarts = RegisterEntry(
+                section: SectionLifepod,
+                key: nameof(AllowIrradiatedStarts),
                 defaultValue: false,
                 description: "Allow spawns that start inside the Aurora's expanding radiation zone. This probably will "
                              + "not spawn you close enough to take damage immediately, but the radiation will expand "
@@ -547,7 +553,7 @@ namespace SubnauticaRandomiser.Configuration
         /// </summary>
         protected override void RegisterControllingOptions()
         {
-            EnableAlternateStartModule.WithConditionalOptions(true, SectionAlternateStart);
+            EnableLifepodModule.WithConditionalOptions(true, SectionLifepod);
             EnableFragmentModule.WithConditionalOptions(true, SectionFragments);
             EnableRecipeModule.WithConditionalOptions(true, SectionRecipes);
             RecipeMode.WithConditionalOptions(RecipeDifficultyMode.Balanced, RecipeValueMult);
@@ -568,9 +574,9 @@ namespace SubnauticaRandomiser.Configuration
             modOptions.AddItem(ModButtonOption.Create("settingsClipboard", "Export to Clipboard", OnCopyToClipboardButtonClicked));
             
             modOptions.AddSeparator();
-            modOptions.AddItem(EnableAlternateStartModule.ToModToggleOption());
+            modOptions.AddItem(EnableLifepodModule.ToModToggleOption());
             modOptions.AddItem(SpawnPoint.ToModChoiceOption());
-            modOptions.AddItem(AllowRadiatedStarts.ToModToggleOption());
+            modOptions.AddItem(AllowIrradiatedStarts.ToModToggleOption());
 
             modOptions.AddSeparator();
             modOptions.AddItem(RandomiseDataboxes.ToModToggleOption());

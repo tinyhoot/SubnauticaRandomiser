@@ -1,7 +1,6 @@
 using HarmonyLib;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
-using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
@@ -9,9 +8,9 @@ using ILogHandler = HootLib.Interfaces.ILogHandler;
 namespace SubnauticaRandomiser.Patches
 {
     [HarmonyPatch]
-    internal static class AlternateStart
+    internal static class LifepodPatcher
     {
-        private static ILogHandler _log => PrefixLogHandler.Get("[AS]");
+        private static ILogHandler _log => PrefixLogHandler.Get("[Lifepod]");
         
         /// <summary>
         /// Override the spawn location of the lifepod at the start of the game.
@@ -24,13 +23,13 @@ namespace SubnauticaRandomiser.Patches
             if (__result.y > 50f)
                 // User is likely using Lifepod Unleashed, skip randomising in that case.
                 return;
-            if (!Bootstrap.SaveData.TryGetModuleData(out AlternateStartSaveData saveData) 
-                || saveData.StartPoint == RandomiserVector.ZERO)
+            if (!Bootstrap.SaveData.TryGetModuleData(out LifepodSaveData saveData) 
+                || saveData.StartPoint == Vector3.zero)
                 // Has not been randomised, don't do anything.
                 return;
 
             _log.Debug("Replacing lifepod spawnpoint with " + saveData.StartPoint);
-            __result = saveData.StartPoint.ToUnityVector();
+            __result = saveData.StartPoint;
         }
 
         /// <summary>

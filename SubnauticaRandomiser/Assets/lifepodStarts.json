@@ -1,0 +1,402 @@
+[
+  {
+    "Name": "BloodKelp",
+    "IsValidForRandom": false,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -850,
+          "z": 1600
+        },
+        "max": {
+          "x": -350,
+          "z": 1200
+        }
+      },
+      {
+        "min": {
+          "x": -1050,
+          "z": -480
+        },
+        "max": {
+          "x": -910,
+          "z": -600
+        }
+      }
+    ]
+  },
+  {
+    "Name": "CragField",
+    "IsValidForRandom": false,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -100,
+          "z": -1200
+        },
+        "max": {
+          "x": 500,
+          "z": -1500
+        }
+      }
+    ]
+  },
+  {
+    "Name": "CrashZone",
+    "IsValidForRandom": true,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": 250,
+          "z": -650
+        },
+        "max": {
+          "x": 700,
+          "z": -1100
+        }
+      },
+      {
+        "min": {
+          "x": 700,
+          "z": -900
+        },
+        "max": {
+          "x": 1200,
+          "z": -1300
+        }
+      },
+      {
+        "min": {
+          "x": 1100,
+          "z": -650
+        },
+        "max": {
+          "x": 1400,
+          "z": -1000
+        }
+      },
+      {
+        "min": {
+          "x": 1350,
+          "z": 550
+        },
+        "max": {
+          "x": 1550,
+          "z": 350
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Dunes",
+    "IsValidForRandom": false,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -1600,
+          "z": 300
+        },
+        "max": {
+          "x": -1100,
+          "z": 0
+        }
+      },
+      {
+        "min": {
+          "x": -1600,
+          "z": 900
+        },
+        "max": {
+          "x": -1300,
+          "z": 300
+        }
+      },
+      {
+        "min": {
+          "x": -1200,
+          "z": 800
+        },
+        "max": {
+          "x": -1100,
+          "z": 700
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Floating Island",
+    "IsValidForRandom": true,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -712,
+          "z": -1072
+        },
+        "max": {
+          "x": -708,
+          "z": -1076
+        }
+      }
+    ]
+  },
+  {
+    "Name": "GrandReef",
+    "IsValidForRandom": false,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -1400,
+          "z": -1100
+        },
+        "max": {
+          "x": -900,
+          "z": -1500
+        }
+      },
+      {
+        "min": {
+          "x": -900,
+          "z": -1300
+        },
+        "max": {
+          "x": -300,
+          "z": -1600
+        }
+      }
+    ]
+  },
+  {
+    "Name": "GrassyPlateaus",
+    "IsValidForRandom": true,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -400,
+          "z": 600
+        },
+        "max": {
+          "x": -300,
+          "z": 500
+        }
+      },
+      {
+        "min": {
+          "x": -800,
+          "z": 200
+        },
+        "max": {
+          "x": -500,
+          "z": 0
+        }
+      },
+      {
+        "min": {
+          "x": 250,
+          "z": 350
+        },
+        "max": {
+          "x": 350,
+          "z": 150
+        }
+      },
+      {
+        "min": {
+          "x": 0,
+          "z": -600
+        },
+        "max": {
+          "x": 100,
+          "z": -700
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Kelp",
+    "IsValidForRandom": true,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -550,
+          "z": 320
+        },
+        "max": {
+          "x": -250,
+          "z": 280
+        }
+      },
+      {
+        "min": {
+          "x": 100,
+          "z": 700
+        },
+        "max": {
+          "x": 400,
+          "z": 600
+        }
+      },
+      {
+        "min": {
+          "x": -300,
+          "z": -500
+        },
+        "max": {
+          "x": -200,
+          "z": -600
+        }
+      },
+      {
+        "min": {
+          "x": 280,
+          "z": -380
+        },
+        "max": {
+          "x": 320,
+          "z": -420
+        }
+      }
+    ]
+  },
+  {
+    "Name": "KooshZone",
+    "IsValidForRandom": false,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": 900,
+          "z": 800
+        },
+        "max": {
+          "x": 1400,
+          "z": 600
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Mountains",
+    "IsValidForRandom": false,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": 600,
+          "z": 1500
+        },
+        "max": {
+          "x": 1300,
+          "z": 1100
+        }
+      }
+    ]
+  },
+  {
+    "Name": "MushroomForest",
+    "IsValidForRandom": true,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -1000,
+          "z": 700
+        },
+        "max": {
+          "x": -700,
+          "z": 500
+        }
+      },
+      {
+        "min": {
+          "x": 600,
+          "z": 600
+        },
+        "max": {
+          "x": 700,
+          "z": 300
+        }
+      }
+    ]
+  },
+  {
+    "Name": "SeaTraderPath",
+    "IsValidForRandom": false,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -1500,
+          "z": -500
+        },
+        "max": {
+          "x": -1200,
+          "z": -800
+        }
+      }
+    ]
+  },
+  {
+    "Name": "SparseReef",
+    "IsValidForRandom": false,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -800,
+          "z": -500
+        },
+        "max": {
+          "x": -600,
+          "z": -850
+        }
+      }
+    ]
+  },
+  {
+    "Name": "UnderwaterIslands",
+    "IsValidForRandom": false,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -250,
+          "z": -1150
+        },
+        "max": {
+          "x": 0,
+          "z": 800
+        }
+      }
+    ]
+  },
+  {
+    "Name": "Void",
+    "IsValidForRandom": false,
+    "BoundingBoxes": [
+      {
+        "min": {
+          "x": -1540,
+          "z": -1000
+        },
+        "max": {
+          "x": -1500,
+          "z": -1040
+        }
+      },
+      {
+        "min": {
+          "x": 1580,
+          "z": -580
+        },
+        "max": {
+          "x": 1620,
+          "z": -620
+        }
+      },
+      {
+        "min": {
+          "x": -1410,
+          "z": 1410
+        },
+        "max": {
+          "x": -1390,
+          "z": 1390
+        }
+      }
+    ]
+  }
+]

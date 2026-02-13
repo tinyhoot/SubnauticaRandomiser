@@ -29,6 +29,10 @@ namespace SubnauticaRandomiser.Logic.Modules
 
         public abstract string LogPrefix { get; }
 
+        /// <summary>
+        /// A parameterless constructor must exist for the reflection-based instantiation to be relatively painless.
+        /// Treat this method as a setup function similar to Awake() in unity components.
+        /// </summary>
         internal virtual void OnRegisterModule(Config config, ILogHandler logger, LogicMonitor monitor)
         {
             _config = config;

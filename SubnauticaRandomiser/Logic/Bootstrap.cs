@@ -107,8 +107,8 @@ namespace SubnauticaRandomiser.Logic
             
             // TODO: Re-enable these modules once they have been ported to the new system.
             //
-            // if (_config.EnableAlternateStartModule.Value && !_config.SpawnPoint.Value.Equals("Vanilla"))
-            //     RegisterModule<AlternateStartLogic>();
+            if (_config.EnableLifepodModule.Value && !_config.SpawnPoint.Value.Equals("Vanilla"))
+                RegisterModule<LifepodModule>();
             // if (_config.RandomiseDoorCodes.Value || _config.RandomiseSupplyBoxes.Value)
             //     RegisterModule<AuroraLogic>();
             // if (_config.RandomiseDataboxes.Value)
@@ -245,8 +245,9 @@ namespace SubnauticaRandomiser.Logic
         /// Register a module for use with the randomiser. Must be a subclass of <see cref="BaseLogicModule"/> with a
         /// parameterless constructor.
         /// </summary>
-        public void RegisterModule<T>(T module) where T : BaseLogicModule, new()
+        public void RegisterModule<T>() where T : BaseLogicModule, new()
         {
+            var module = Activator.CreateInstance(typeof(T)) as BaseLogicModule;
             InternalRegisterModule(module);
         }
 
