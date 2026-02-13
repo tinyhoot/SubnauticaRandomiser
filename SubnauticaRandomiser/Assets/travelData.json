@@ -1,0 +1,107 @@
+{
+  "BaseSpeed": 4.7,
+  "BaseOxygen": 45,
+  "SeaglideSpeed": 11.0,
+  "FinSpeeds": {
+    "Fins": 1.41,
+    "UltraGlideFins": 1.88
+  },
+  "TankCapacities": [
+    {
+      "TechType": "Tank",
+      "Capacity": 75,
+      "WeightFactor": 0.4
+    },
+    {
+      "TechType": "DoubleTank",
+      "Capacity": 135,
+      "WeightFactor": 0.47
+    },
+    {
+      "TechType": "HighCapacityTank",
+      "Capacity": 225,
+      "WeightFactor": 0.6
+    },
+    {
+      "TechType": "PlasteelTank",
+      "Capacity": 135,
+      "WeightFactor": 0.1
+    }
+  ],
+  "VehicleDepths": [
+    {
+      "Depth": 200,
+      "Entities": [
+        "LogicConstructable:Seamoth"
+      ]
+    },
+    {
+      "Depth": 300,
+      "Entities": [
+        "LogicConstructable:Seamoth",
+        "LogicInventoryItem:VehicleHullModule1"
+      ]
+    },
+    {
+      "Depth": 500,
+      "Entities": [
+        "LogicConstructable:Seamoth",
+        "LogicInventoryItem:VehicleHullModule2"
+      ]
+    },
+    {
+      "Depth": 900,
+      "Entities": [
+        "LogicConstructable:Seamoth",
+        "LogicInventoryItem:VehicleHullModule3"
+      ]
+    },
+    {
+      "Depth": 900,
+      "Entities": [
+        "LogicConstructable:Exosuit"
+      ]
+    },
+    {
+      "Depth": 1300,
+      "Entities": [
+        "LogicConstructable:Exosuit",
+        "LogicInventoryItem:ExoHullModule1"
+      ]
+    },
+    {
+      "Depth": 1700,
+      "Entities": [
+        "LogicConstructable:Exosuit",
+        "LogicInventoryItem:ExoHullModule2"
+      ]
+    },
+    {
+      "Depth": 500,
+      "Entities": [
+        "LogicConstructable:Cyclops"
+      ]
+    },
+    {
+      "Depth": 900,
+      "Entities": [
+        "LogicConstructable:Cyclops",
+        "LogicInventoryItem:CyclopsHullModule1"
+      ]
+    },
+    {
+      "Depth": 1300,
+      "Entities": [
+        "LogicConstructable:Cyclops",
+        "LogicInventoryItem:CyclopsHullModule2"
+      ]
+    },
+    {
+      "Depth": 1700,
+      "Entities": [
+        "LogicConstructable:Cyclops",
+        "LogicInventoryItem:CyclopsHullModule3"
+      ]
+    }
+  ]
+}

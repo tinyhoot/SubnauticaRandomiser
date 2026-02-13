@@ -110,6 +110,25 @@ namespace SubnauticaRandomiser.Logic
 
             return ids.ShallowCopy();
         }
+        
+        /// <summary>
+        /// Check whether the given entity is accessible in the given sphere (or lower).
+        /// </summary>
+        public bool IsAccessible<T>(TechType entity, int sphereTier = 1000) where T : LogicEntity
+        {
+            return IsAccessible(Find<T>(entity), sphereTier);
+        }
+
+        /// <summary>
+        /// Check whether the given entity is accessible in the given sphere (or lower).
+        /// </summary>
+        public bool IsAccessible(LogicEntity entity, int sphereTier = 1000)
+        {
+            if (entity is null)
+                return false;
+            
+            return entity.Sphere >= 0 && entity.Sphere <= sphereTier;
+        }
 
         /// <summary>
         /// Load and parse all entities from their respective files on disk.

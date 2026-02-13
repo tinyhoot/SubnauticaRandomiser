@@ -30,35 +30,50 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// All transitions leading from this sphere to regions not contained within this sphere.
         /// </summary>
         public List<Transition> EdgeTransitions = new List<Transition>();
+
+        /// <summary>
+        /// The entities that are accessible within this sphere. Includes all entities from previous spheres.
+        /// </summary>
+        public HashSet<int> Entities = new HashSet<int>();
         
         private PrefixLogHandler _log = PrefixLogHandler.Get("[Sphere]");
+        private EntityManager _entityManager;
+        private TravelDistanceManager _travelManager;
 
-        public Sphere(RandomisationContext context)
+        public Sphere(RandomisationContext context, EntityManager entities, TravelDistanceManager travelManager)
         {
             Tier = 0;
+            _entityManager = entities;
+            _travelManager = travelManager;
             Regions.Add(context.StartingRegion);
+            // Keep tier 0 very small, intentionally.
             PopulateEdges();
         }
 
         public Sphere(Sphere innerSphere, IEnumerable<Region> newRegions)
         {
             Tier = innerSphere.Tier + 1;
+            _entityManager = innerSphere._entityManager;
+            _travelManager = innerSphere._travelManager;
             Regions = new List<Region>(innerSphere.Regions.Concat(newRegions));
+            Entities = new HashSet<int>(innerSphere.Entities);
             AddAllReachableRegions();
         }
 
         private void AddAllReachableRegions()
         {
-            PopulateEdges();
-            while (TryUnlockEdges(out var unlocked))
+            List<Region> unlocked;
+            // Keep trying to unlock new regions until all region/transition chains hit a dead end.
+            do
             {
-                // A new region was unlocked; either it has no lock or all its locks are already covered by progression
-                // from earlier spheres.
-                Regions.AddRange(unlocked);
-                // Repopulate the edges with any new transitions from the new regions.
-                // TODO: Check performance impact of redoing this work all the time and optimise if needed.
                 PopulateEdges();
-            }
+                TryUnlockEdges(out unlocked);
+                if (unlocked != null)
+                {
+                    _log.Debug($"Unlocking {unlocked.Count} regions.");
+                    Regions.AddRange(unlocked);
+                }
+            } while (unlocked?.Count > 0);
         }
 
         /// <summary>
@@ -66,6 +81,7 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// </summary>
         private void PopulateEdges()
         {
+            _log.Debug($"Recalculating region edges of sphere {Tier}.");
             EdgeTransitions.Clear();
 
             foreach (var region in Regions)
@@ -105,13 +121,17 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
             unlockedRegions = new List<Region>();
             foreach (var edge in EdgeTransitions)
             {
-                if (!edge.CheckLocks())
+                if (!edge.CheckLocks(_entityManager))
                     continue;
 
-                if (!Regions.Contains(edge.Entry))
-                    unlockedRegions.Add(edge.Entry);
-                if (!Regions.Contains(edge.Exit))
-                    unlockedRegions.Add(edge.Exit);
+                foreach (var region in edge.Regions)
+                {
+                    if (CanUnlockRegion(region) && !unlockedRegions.Contains(region))
+                    {
+                        unlockedRegions.Add(region);
+                        _log.Debug($"Unlocking region {region}");
+                    }
+                }
             }
 
             if (unlockedRegions.Count != 0)
@@ -119,6 +139,11 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
 
             unlockedRegions = null;
             return false;
+        }
+
+        private bool CanUnlockRegion(Region region)
+        {
+            return !Regions.Contains(region) && _travelManager.CanReach(region.Depth);
         }
 
         public void PriorityFill()

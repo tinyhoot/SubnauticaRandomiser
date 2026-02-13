@@ -27,6 +27,11 @@ namespace SubnauticaRandomiser.Logic.LogicObjects.Transitions
         public Region Exit;
 
         /// <summary>
+        /// All regions associated with this transition.
+        /// </summary>
+        public Region[] Regions => new Region[] { Entry, Exit };
+
+        /// <summary>
         /// The locks that prevent passage through this transition until resolved.
         /// </summary>
         [JsonProperty(ItemTypeNameHandling = TypeNameHandling.All)]
@@ -39,7 +44,7 @@ namespace SubnauticaRandomiser.Logic.LogicObjects.Transitions
             return _unlocked;
         }
 
-        public bool CheckLocks()
+        public bool CheckLocks(EntityManager manager)
         {
             // There can be no backwards progress. Locks that are open stay open.
             if (_unlocked)
@@ -51,7 +56,7 @@ namespace SubnauticaRandomiser.Logic.LogicObjects.Transitions
                 return true;
             }
 
-            if (Locks.TrueForAll(l => l.CheckUnlocked()))
+            if (Locks.TrueForAll(l => l.CheckUnlocked(manager)))
             {
                 _unlocked = true;
                 return true;

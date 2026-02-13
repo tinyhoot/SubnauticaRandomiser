@@ -104,7 +104,8 @@ namespace SubnauticaRandomiser.Logic
         
         #region logic-rework
 
-        internal IEnumerator RandomiseNew(EntityManager entityManager, RegionManager regionManager)
+        internal IEnumerator RandomiseNew(EntityManager entityManager, RegionManager regionManager,
+            TravelDistanceManager travelManager)
         {
             // Create new sphere
             // Explore all regions and transitions as far as possible
@@ -122,7 +123,7 @@ namespace SubnauticaRandomiser.Logic
             
             // Set up the starting sphere.
             List<Sphere> spheres = new List<Sphere>();
-            Sphere sphere = new Sphere(context);
+            Sphere sphere = new Sphere(context, entityManager, travelManager);
             spheres.Add(sphere);
             List<Region> newRegions;
 
@@ -154,6 +155,7 @@ namespace SubnauticaRandomiser.Logic
                 }
                 entity.Sphere = sphere.Tier;
                 queue.RemoveCurrent();
+                travelManager.UpdateDepths(entityManager);
                 
                 // After every fill, check whether a transition lock can be opened.
                 if (sphere.TryUnlockEdges(out newRegions))
@@ -177,12 +179,15 @@ namespace SubnauticaRandomiser.Logic
         /// locking up / freezing.
         /// </summary>
         internal IEnumerator Randomise(WaitScreenHandler.WaitScreenTask task, SaveData saveData, 
-            EntityManager entityManager, RegionManager regionManager)
+            EntityManager entityManager, RegionManager regionManager, TravelDistanceManager travelManager)
         {
+            task.Status = "Randomising!";
+            yield return null;
+            
             _rng = new RandomHandler(GetSeedFromConfig());
 
             
-            yield return RandomiseNew(entityManager, regionManager);
+            yield return RandomiseNew(entityManager, regionManager, travelManager);
             
             // task.Status = "Randomising - Extras";
             // yield return null;

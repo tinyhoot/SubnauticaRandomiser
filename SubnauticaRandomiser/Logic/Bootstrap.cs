@@ -34,6 +34,7 @@ namespace SubnauticaRandomiser.Logic
         private LogicMonitor _monitor;
         private EntityManager _entityManager;
         private RegionManager _regionManager;
+        private TravelDistanceManager _travelDistanceManager;
         private GameStateSynchroniser _sync;
         private readonly List<BaseLogicModule> _modules = new List<BaseLogicModule>();
 
@@ -72,6 +73,7 @@ namespace SubnauticaRandomiser.Logic
                 _log.Info("Starting new game, randomising...");
                 _entityManager = new EntityManager();
                 _regionManager = new RegionManager();
+                _travelDistanceManager = new TravelDistanceManager(_config);
                 yield return EnableModules(task);
                 _log.Debug($"Modules - {Time.realtimeSinceStartup - startTime}");
                 yield return InitSaveData(task);
@@ -83,7 +85,7 @@ namespace SubnauticaRandomiser.Logic
                 yield return ValidateSetupStage(task);
                 _log.Debug($"ValidateSetup - {Time.realtimeSinceStartup - startTime}");
                 // Randomise the game and save the final state to the SaveData.
-                yield return _coreLogic.Randomise(task, SaveData, _entityManager, _regionManager);
+                yield return _coreLogic.Randomise(task, SaveData, _entityManager, _regionManager, _travelDistanceManager);
             }
             else
             {
@@ -160,6 +162,7 @@ namespace SubnauticaRandomiser.Logic
             // These files are always required, as they form the backbone of the entity-region model.
             yield return new RushedCoroutine(_entityManager.ParseEntitiesFromDiskAsync(), 1f / 30f).Advance();
             yield return new RushedCoroutine(_regionManager.ParseFromDiskAsync(), 1f / 30f).Advance();
+            yield return _travelDistanceManager.LoadTravelDataFromDiskAsync(_entityManager);
             yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
         }
 
