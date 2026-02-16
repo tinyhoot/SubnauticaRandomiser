@@ -23,6 +23,12 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         public readonly TechType TechType;
 
         /// <summary>
+        /// A number of tags that convey additional information about this entity. A tag could e.g. mark an entity as
+        /// an egg, or as a base piece.
+        /// </summary>
+        public List<string> Tags = new List<string>();
+
+        /// <summary>
         /// These other Entities need to be in logic first in order for this Entity to be able to be randomised.
         /// </summary>
         [JsonConverter(typeof(StringEntityConverter))]
