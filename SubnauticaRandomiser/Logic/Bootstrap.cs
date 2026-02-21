@@ -9,6 +9,7 @@ using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic.Modules;
+using SubnauticaRandomiser.Logic.Modules.Recipes;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
@@ -82,6 +83,8 @@ namespace SubnauticaRandomiser.Logic
                 _log.Debug($"InfoFiles - {Time.realtimeSinceStartup - startTime}");
                 yield return BuildEntityRegionModel(task);
                 _log.Debug($"EntityModel - {Time.realtimeSinceStartup - startTime}");
+                yield return LetModulesSetup(task);
+                _log.Debug($"ModuleSetup - {Time.realtimeSinceStartup - startTime}");
                 yield return ValidateSetupStage(task);
                 _log.Debug($"ValidateSetup - {Time.realtimeSinceStartup - startTime}");
                 // Randomise the game and save the final state to the SaveData.
@@ -121,11 +124,11 @@ namespace SubnauticaRandomiser.Logic
             //     RegisterModule<EntitySlotsTracker>();
             // }
             //
-            // if (_config.EnableRecipeModule.Value && _config.RandomiseRecipes.Value)
-            // {
-            //     RegisterModule<RawMaterialLogic>();
-            //     RegisterModule<RecipeLogic>();
-            // }
+            if (_config.EnableRecipeModule.Value && _config.RandomiseRecipes.Value)
+            {
+                // RegisterModule<RawMaterialLogic>();
+                RegisterModule<RecipeModule>();
+            }
             _log.Debug($"Enabled {Modules.Count} modules: {Modules.ElementsToString()}");
         }
 
@@ -176,6 +179,17 @@ namespace SubnauticaRandomiser.Logic
             
             yield return _entityManager.LinkEntities();
             _regionManager.ReplaceReferences(_entityManager);
+        }
+
+        /// <summary>
+        /// Give modules an opportunity to prepare and/or modify entity relationships before randomisation begins.
+        /// </summary>
+        private IEnumerator LetModulesSetup(WaitScreenHandler.WaitScreenTask task)
+        {
+            task.Status = "Randomising - Letting modules do individual setup";
+            yield return null;
+            
+            _modules.ForEach(m => m.PrepareRandomisation(_entityManager));
         }
 
         /// <summary>
@@ -231,6 +245,7 @@ namespace SubnauticaRandomiser.Logic
             _monitor = null;
             _entityManager = null;
             _regionManager = null;
+            _travelDistanceManager = null;
         }
 
         /// <summary>

@@ -32,6 +32,9 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// <summary>
         /// A parameterless constructor must exist for the reflection-based instantiation to be relatively painless.
         /// Treat this method as a setup function similar to Awake() in unity components.
+        /// <br />
+        /// Setup that is used solely during randomisation should be done during <see cref="PrepareRandomisation"/>
+        /// instead.
         /// </summary>
         internal virtual void OnRegisterModule(Config config, ILogHandler logger, LogicMonitor monitor)
         {
@@ -59,6 +62,14 @@ namespace SubnauticaRandomiser.Logic.Modules
         }
 
         /// <summary>
+        /// Perform setup necessary for the module to function properly during randomisation. Only called if randomising
+        /// is actually necessary, i.e. only during first load of a new game.
+        /// </summary>
+        public virtual void PrepareRandomisation(EntityManager manager)
+        {
+        }
+
+        /// <summary>
         /// Randomise any non-entity data that does not require use of the main loop. Executed before the main loop
         /// starts, i.e. before any entities have been randomised.
         /// </summary>
@@ -73,8 +84,9 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// registered itself as a handler for via <see cref="HandledEntityTypes"/>.
         /// </summary>
         /// <param name="rng">The random number generator of this seed.</param>
+        /// <param name="saveData">The save data used for this seed.</param>
         /// <param name="entity">The entity to be randomised.</param>
-        public virtual void RandomiseEntity(IRandomHandler rng, ref LogicEntity entity)
+        public virtual void RandomiseEntity(IRandomHandler rng, SaveData saveData, LogicEntity entity)
         {
         }
 

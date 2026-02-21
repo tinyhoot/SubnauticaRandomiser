@@ -21,6 +21,11 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         public event Action<LogicEntity> PrioritySetup;
 
+        /// <summary>
+        /// Triggered after an entity was successfully randomised.
+        /// </summary>
+        public event Action<LogicEntity> EntityRandomised;
+
         internal void TriggerContextCreated(RandomisationContext ctx)
         {
             ContextCreated?.Invoke(ctx);
@@ -29,6 +34,11 @@ namespace SubnauticaRandomiser.Logic
         internal void TriggerPrioritySetup(LogicEntity entity)
         {
             PrioritySetup?.Invoke(entity);
+        }
+
+        internal void TriggerEntityRandomised(LogicEntity entity)
+        {
+            EntityRandomised?.Invoke(entity);
         }
     }
 }

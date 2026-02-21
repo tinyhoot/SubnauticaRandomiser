@@ -21,6 +21,11 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// </summary>
         public LogicBlueprint Blueprint { get; private set; }
 
+        /// <summary>
+        /// The recipe's value in relation to other items or recipes.
+        /// </summary>
+        public int Value;
+
         public void LinkVanillaRecipe(EntityManager manager, ILogHandler log)
         {
             Recipe = new Recipe(TechType);

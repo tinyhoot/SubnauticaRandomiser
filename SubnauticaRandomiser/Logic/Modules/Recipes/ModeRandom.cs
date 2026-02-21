@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Linq;
+using SubnauticaRandomiser.Configuration;
+using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Logic.LogicObjects;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic.Modules.Recipes
 {
@@ -11,38 +13,43 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
     /// </summary>
     internal class ModeRandom : Mode
     {
-        internal ModeRandom(CoreLogic coreLogic, RecipeLogic recipeLogic, IRandomHandler rng) : base(coreLogic, recipeLogic, rng) { }
-        
-        protected override IEnumerable<(LogicEntity, int)> YieldRandomIngredients(LogicEntity entity,
-            ReadOnlyCollection<RandomiserIngredient> ingredients, Func<TechType, bool> isDuplicate)
+        protected override ILogHandler _log => PrefixLogHandler.Get("[RM-Random]");
+
+        public ModeRandom(Config config, EntityManager manager, Dictionary<TechType, int> outpostPieces)
+            : base(config, manager, outpostPieces)
         {
-            int number = _rng.Next(1, _config.MaxIngredientsPerRecipe.Value + 1, _distribution);
+        }
+
+        protected override IEnumerable<LogicIngredient> YieldRandomIngredients(IRandomHandler rng, LogicRecipe recipe,
+            List<LogicIngredient> ingredients, List<LogicInventoryItem> validIngredients)
+        {
+            int number = rng.Next(1, _config.MaxIngredientsPerRecipe.Value + 1, _distribution);
 
             for (int i = 1; i <= number; i++)
             {
-                LogicEntity ingredientEntity = GetRandom(_recipeLogic.ValidIngredients);
+                LogicInventoryItem item = rng.Choice(validIngredients);
 
                 // Prevent duplicates.
-                if (isDuplicate(ingredientEntity.TechType))
+                if (ingredients.Any(ing => ing.Item.TechType == item.TechType))
                 {
                     i--;
                     continue;
                 }
 
-                int max = FindMaximum(ingredientEntity);
-                yield return (ingredientEntity, _rng.Next(1, max + 1, _distribution));
+                int max = FindMaxIngredientNum(item);
+                yield return new LogicIngredient(item, rng.Next(1, max + 1, _distribution));
             }
         }
 
-        protected override int GetBaseThemeIngredientNumber(LogicEntity baseTheme)
-        {
-            return _rng.Next(1, FindMaximum(baseTheme) + 1, _distribution);
-        }
+        
 
         public override TechType GetScrapMetalReplacement()
         {
-            var options = _entityHandler.GetAllRawMaterials();
-            return _rng.Choice(options).TechType;
+            // TODO
+            return TechType.AcidMushroom;
+            
+            // var options = _entityHandler.GetAllRawMaterials();
+            // return _rng.Choice(options).TechType;
         }
     }
 }

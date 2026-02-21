@@ -103,7 +103,7 @@ namespace SubnauticaRandomiser.Logic
             
             task.Status = "Randomising entities (this may take a while)";
             yield return null;
-            yield return RandomiseEntities(entityManager, regionManager, travelManager);
+            yield return RandomiseEntities(saveData, entityManager, regionManager, travelManager);
             
             task.Status = "Randomising after entities";
             yield return null;
@@ -142,7 +142,7 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
-        private IEnumerator RandomiseEntities(EntityManager entityManager, RegionManager regionManager,
+        private IEnumerator RandomiseEntities(SaveData saveData, EntityManager entityManager, RegionManager regionManager,
             TravelDistanceManager travelManager)
         {
             // Create new sphere
@@ -184,7 +184,7 @@ namespace SubnauticaRandomiser.Logic
                 // Hand the entity off to one of the modules for randomising.
                 if (_entityRandomisers.TryGetValue(entity.GetType(), out BaseLogicModule module))
                 {
-                    //module.RandomiseEntity(_rng, entity);
+                    module.RandomiseEntity(_rng, saveData, entity);
                     _log.Debug($"{entity} randomised into sphere {sphere.Tier}");
                 }
                 else
@@ -193,8 +193,14 @@ namespace SubnauticaRandomiser.Logic
                 }
                 entity.Sphere = sphere.Tier;
                 queue.RemoveCurrent();
-                travelManager.UpdateDepths(entityManager);
+                _monitor.TriggerEntityRandomised(entity);
+                // TODO: Check whether all entities of this techtype have been done.
+                // If not, check for any that have no handler.
+                // Instantly complete any without a handler which have their dependencies fulfilled.
+                // This helps e.g. RecipeModule for spawnable-->inventoryitem availability.
                 
+                // TODO: Assemble dynamic list of things that *can* cause progress, only update when that is rando'd.
+                travelManager.UpdateDepths(entityManager);
                 // After every fill, check whether a transition lock can be opened.
                 if (sphere.TryUnlockEdges(out newRegions))
                 {

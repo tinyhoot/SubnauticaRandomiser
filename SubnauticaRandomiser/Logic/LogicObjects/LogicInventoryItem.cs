@@ -18,7 +18,17 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// <summary>
         /// The maximum number of recipes this item can be assigned to as an ingredient.
         /// </summary>
-        public int MaxRecipeUsesPerGame = -1;
+        public int MaxRecipeUses = -1;
+
+        /// <summary>
+        /// The number of times this item has been used in recipes during randomisation.
+        /// </summary>
+        public int TimesUsedInRecipes = 0;
+
+        /// <summary>
+        /// The item's value in relation to other items or recipes.
+        /// </summary>
+        public int Value;
 
         public void AddRecipe(LogicRecipe recipe)
         {

@@ -34,6 +34,10 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// <returns>A random LogicEntity from the Raw Materials or (if enabled) Fish categories.</returns>
         public LogicEntity ChooseBaseTheme(int depth, bool useFish = false)
         {
+            // This is very, very difficult to do pre-loop in the new system.
+            // Move the entire base theming to post-loop and replace ingredient #1 in existing recipes?
+            
+            
             var options = _entityHandler.GetAllEntities().FindAll(x => x.Category.Equals(TechTypeCategory.RawMaterials)
                                                                        && x.AccessibleDepth < depth
                                                                        && !x.HasPrerequisites

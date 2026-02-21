@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using HootLib.Interfaces;
-using JetBrains.Annotations;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
-using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
-using SubnauticaRandomiser.Objects;
+using SubnauticaRandomiser.Logic.LogicObjects;
 using SubnauticaRandomiser.Objects.Enums;
+using UnityEngine;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 
 namespace SubnauticaRandomiser.Logic.Modules.Recipes
 {
@@ -18,68 +16,63 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
     /// </summary>
     internal abstract class Mode
     {
-        protected readonly CoreLogic _coreLogic;
-        protected readonly RecipeLogic _recipeLogic;
-        protected Config _config => _coreLogic._Config;
-        protected EntityHandler _entityHandler => _coreLogic.EntityHandler;
-        protected ILogHandler _log;
-        protected IRandomHandler _rng;
-
-        protected List<TechType> _blacklist = new List<TechType>();
-        protected List<TechTypeCategory> _categoryBlacklist = new List<TechTypeCategory>();
-        protected BaseTheme _baseTheme;
-        private int _basicOutpostSize;
+        protected abstract ILogHandler _log { get; }
+        protected Config _config;
+        protected EntityManager _entityManager;
+        private Dictionary<TechType, int> _outpostPieces;
+        private int _outpostSize;
         protected RandomDistribution _distribution;
 
-        protected Mode(CoreLogic coreLogic, RecipeLogic recipeLogic, IRandomHandler rng)
+        protected Mode(Config config, EntityManager manager, Dictionary<TechType, int> outpostPieces)
         {
-            _coreLogic = coreLogic;
-            _recipeLogic = recipeLogic;
-            _log = PrefixLogHandler.Get("[R]");
-            _rng = rng;
-
-            if (_config.BaseTheming.Value)
-                _baseTheme = new BaseTheme(_entityHandler, _log, _rng);
+            _config = config;
+            _entityManager = manager;
+            _outpostPieces = outpostPieces;
             _distribution = _config.DistributionWeighting.Value;
         }
 
         /// <summary>
         /// Fill a given recipe with ingredients in-place.
         /// </summary>
+        /// <param name="rng">The RNG of this seed.</param>
         /// <param name="recipe">The recipe to randomise ingredients for.</param>
+        /// <param name="validIngredients">All valid ingredients that can be chosen for the recipe.</param>
         /// <returns>The same modified entity.</returns>
-        public LogicEntity RandomiseIngredients(ref LogicEntity recipe)
+        public LogicRecipe RandomiseIngredients(IRandomHandler rng, LogicRecipe recipe, List<LogicInventoryItem> validIngredients)
         {
-            List<RandomiserIngredient> ingredients = new List<RandomiserIngredient>();
-            bool isDuplicate(TechType t) => ingredients.Exists(ing => ing.techType.Equals(t));
-            UpdateBlacklist(recipe);
-
-            int totalSize = HandleSpecialIngredients(ingredients, recipe);
+            recipe.Recipe.Ingredients = new List<Ingredient>();
+            List<LogicIngredient> ingredients = new List<LogicIngredient>();
+            int totalSize = 0;
+            int totalValue = 0;
 
             // Get ingredients from the subclass one at a time.
-            foreach ((LogicEntity ingredient, int number) in YieldRandomIngredients(recipe, ingredients.AsReadOnly(), isDuplicate))
+            foreach (var ingredient in YieldRandomIngredients(rng, recipe, ingredients, validIngredients))
             {
                 if (ingredients.Count > 0 && CheckForConfigStop(ingredients, recipe, totalSize))
                     break;
-                if (ingredient is null || number < 1)
+                if (ingredient.Item is null || ingredient.Amount < 1)
                     continue;
 
                 // Ensure no number of ingredients can exceed the maximum config value.
-                int max = FindMaximum(ingredient, totalSize);
+                int max = FindMaxIngredientNum(ingredient.Item, totalSize);
                 // If the maximum of allowable ingredients is less than 1, we hit a config limit and should stop.
                 if (max <= 0)
                     break;
-                int chosenNum = Math.Min(number, max);
-                AddIngredientWithMaxUsesCheck(ingredients, ingredient, chosenNum);
-                totalSize += ingredient.GetItemSize() * chosenNum;
-                _log.Debug($"> Adding ingredient: {ingredient}, {chosenNum}, size: {totalSize}");
+
+                int amount = Mathf.Min(ingredient.Amount, max);
+                ingredients.Add(new LogicIngredient(ingredient.Item, amount));
+                totalSize += GetItemSize(ingredient.Item.TechType) * amount;
+                recipe.Value += ingredient.Item.Value * amount;
+                _log.Debug($"> Adding ingredient: {ingredient.Item}, {amount}, size: {totalSize}");
+                UpdateNumUsed(ingredient.Item);
             }
             
             // Update the total size of everything needed to build a basic outpost.
-            _basicOutpostSize += totalSize * _recipeLogic.BasicOutpostPieces.GetOrDefault(recipe.TechType, 0);
-
-            recipe.Recipe.Ingredients = ingredients;
+            _outpostSize += totalSize * _outpostPieces.GetOrDefault(recipe.TechType, 0);
+            recipe.Recipe.Ingredients = ingredients.Select(i => new Ingredient(i.Item.TechType, i.Amount)).ToList();
             recipe.Recipe.CraftAmount = CraftDataHandler.GetRecipeData(recipe.TechType)?.craftAmount ?? 1;
+            // Set the recipe's value as the sum total of the value of its ingredients.
+            recipe.Value = totalValue;
             return recipe;
         }
 
@@ -88,39 +81,13 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// respected across all deriving modes. It may also mandate an early stop without exhausting this method.<br/>
         /// A lazy approach using an iterator is strongly recommended.
         /// </summary>
+        /// <param name="rng">The RNG for this seed.</param>
         /// <param name="recipe">The recipe to randomise ingredients for.</param>
-        /// <param name="ingredients">The existing ingredients already added before this method was called.</param>
-        /// <param name="isDuplicate">A function that checks whether the given techtype is already present in the recipe.</param>
+        /// <param name="ingredients">The existing ingredients of the recipe.</param>
+        /// <param name="validIngredients">The potential ingredients to choose from.</param>
         /// <returns>The ingredients for the recipe.</returns>
-        protected abstract IEnumerable<(LogicEntity, int)> YieldRandomIngredients(LogicEntity recipe,
-            ReadOnlyCollection<RandomiserIngredient> ingredients, Func<TechType, bool> isDuplicate);
-
-        /// <summary>
-        /// Add an ingredient to the list of ingredients used to form a recipe, but ensure its MaxUses field is
-        /// respected.
-        /// </summary>
-        /// <param name="ingredients">The current list of ingredients.</param>
-        /// <param name="entity">The entity to add.</param>
-        /// <param name="number">The number of uses to consume.</param>
-        private void AddIngredientWithMaxUsesCheck(List<RandomiserIngredient> ingredients, LogicEntity entity, int number)
-        {
-            // Ensure that limited ingredients are not overused. Particularly
-            // intended for cuddlefish.
-            int remainder = entity.MaxUsesPerGame - entity.UsedInRecipes;
-            if (entity.MaxUsesPerGame != 0 && remainder > 0 && remainder < number)
-                number = remainder;
-
-            ingredients.Add(new RandomiserIngredient(entity.TechType, number));
-            entity.UsedInRecipes++;
-
-            if (!entity.HasUsesLeft())
-            {
-                _recipeLogic.ValidIngredients.Remove(entity);
-                _log.Debug($"! Removing {entity} ingredients list due to " + 
-                           $"max uses reached: {entity.UsedInRecipes}");
-                RemoveParentRecipes(entity);
-            }
-        }
+        protected abstract IEnumerable<LogicIngredient> YieldRandomIngredients(IRandomHandler rng, LogicRecipe recipe,
+            List<LogicIngredient> ingredients, List<LogicInventoryItem> validIngredients);
 
         /// <summary>
         /// Check whether conditions have been reached that mandate an early stop as defined by config values.
@@ -129,7 +96,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// <param name="entity">The recipe to randomise ingredients for.</param>
         /// <param name="totalSize">The current size required by all previously chosen ingredients for the recipe.</param>
         /// <returns>True if the loop needs to stop, false if it can continue running.</returns>
-        private bool CheckForConfigStop(List<RandomiserIngredient> ingredients, LogicEntity entity, int totalSize)
+        private bool CheckForConfigStop(List<LogicIngredient> ingredients, LogicRecipe entity, int totalSize)
         {
             // Respect the maximum number of ingredients set in the config.
             if (ingredients.Count >= _config.MaxIngredientsPerRecipe.Value)
@@ -146,22 +113,14 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             }
             
             // For special case of outpost base parts, be conservative with ingredients.
-            if (_recipeLogic.BasicOutpostPieces.ContainsKey(entity.TechType)
-                && _basicOutpostSize > _config.MaxBasicOutpostSize.Value * 0.7)
+            if (_outpostPieces.ContainsKey(entity.TechType)
+                && _outpostSize > _config.MaxBasicOutpostSize.Value * 0.7)
             {
                 _log.Debug("! Basic outpost size is getting too large, stopping.");
                 return true;
             }
 
             return false;
-        }
-        
-        /// <summary>
-        /// Choose a base theme once off-loop randomisation begins.
-        /// </summary>
-        public void ChooseBaseTheme(int depth, bool useFish)
-        {
-            _baseTheme?.ChooseBaseTheme(depth, useFish);
         }
 
         /// <summary>
@@ -170,7 +129,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// <param name="ingredient">The ingredient to consider.</param>
         /// <param name="totalSize">The total size of all ingredients added so far.</param>
         /// <returns>A positive integer.</returns>
-        protected int FindMaximum(LogicEntity ingredient, int totalSize = 0)
+        protected int FindMaxIngredientNum(LogicInventoryItem ingredient, int totalSize = 0)
         {
             if (totalSize >= _config.MaxInventorySizePerRecipe.Value)
                 return 1;
@@ -178,98 +137,52 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             // Do not allow more ingredients than set in the config.
             int max = _config.MaxNumberPerIngredient.Value;
             // Account for how much space this new ingredient would take up.
-            max = Math.Min(max, (_config.MaxInventorySizePerRecipe.Value - totalSize) / ingredient.GetItemSize());
+            max = Math.Min(max, (_config.MaxInventorySizePerRecipe.Value - totalSize) / GetItemSize(ingredient.TechType));
             _log.Debug($"Calc max: {max}");
             
+            // TODO: Replace with tagging system
             // Tools and upgrades do not stack, but if the recipe would require several and you have more than one in
             // inventory, it will consume all of them.
-            if (ingredient.Category.Equals(TechTypeCategory.Tools) 
-                || ingredient.Category.Equals(TechTypeCategory.VehicleUpgrades) 
-                || ingredient.Category.Equals(TechTypeCategory.WorkBenchUpgrades))
-                max = Math.Min(max, 1);
-            
-            // Never require more than one (default) egg. That's tedious.
-            if (ingredient.Category.Equals(TechTypeCategory.Eggs))
-                max = Math.Min(max, _config.MaxEggsAsSingleIngredient.Value);
+            // if (ingredient.Category.Equals(TechTypeCategory.Tools) 
+            //     || ingredient.Category.Equals(TechTypeCategory.VehicleUpgrades) 
+            //     || ingredient.Category.Equals(TechTypeCategory.WorkBenchUpgrades))
+            //     max = Math.Min(max, 1);
+            //
+            // // Never require more than one (default) egg. That's tedious.
+            // if (ingredient.Category.Equals(TechTypeCategory.Eggs))
+            //     max = Math.Min(max, _config.MaxEggsAsSingleIngredient.Value);
 
             return max;
         }
 
-        /// <summary>
-        /// Get the number of ingredients to be used for the base theme, if any.
-        /// </summary>
-        protected abstract int GetBaseThemeIngredientNumber(LogicEntity baseTheme);
+        private int GetItemSize(TechType item)
+        {
+            var size = TechData.GetItemSize(item);
+            return size.x * size.y;
+        }
+
+        private void UpdateNumUsed(LogicInventoryItem item)
+        {
+            // Only do this for items that actually need tracking.
+            if (item.MaxRecipeUses < 0)
+                return;
+
+            item.TimesUsedInRecipes++;
+            if (item.MaxRecipeUses - item.TimesUsedInRecipes <= 0)
+            {
+                // TODO: Remove from valid ingredients, remove parent recipe too.
+            }
+        }
 
         /// <summary>
         /// Get the TechType of the material to deconstruct scrap metal into.
         /// </summary>
         public abstract TechType GetScrapMetalReplacement();
 
-        /// <summary>
-        /// Get a random entity from a list, ensuring that it is not part of a previously prepared blacklist.
-        /// TODO: Install safeguards to prevent infinite loops.
-        /// </summary>
-        /// <param name="list">The list to get a random element from.</param>
-        /// <returns>A random, non-blacklisted element from the list.</returns>
-        /// <exception cref="InvalidOperationException">Raised if the list is null or empty.</exception>
-        [NotNull]
-        protected LogicEntity GetRandom(ICollection<LogicEntity> list)
+        protected bool IsAllowedAsIngredient(LogicRecipe recipe, TechType ingredient)
         {
-            if (list == null || list.Count == 0)
-                throw new InvalidOperationException("Failed to get valid entity from materials list: "
-                                                    + "list is null or empty.");
-
-            LogicEntity randomEntity;
-            while (true)
-            {
-                randomEntity = _rng.Choice(list);
-                if (IsBlacklisted(randomEntity))
-                    continue;
-                
-                break;
-            }
-
-            return randomEntity;
-        }
-
-        /// <summary>
-        /// Handle any config options that result in specialised items being added to the recipe.
-        /// </summary>
-        /// <returns>The new total size of the recipe.</returns>
-        private int HandleSpecialIngredients(List<RandomiserIngredient> ingredients, LogicEntity recipe)
-        {
-            int totalSize = 0;
-            
-            // Add the base theme first if necessary.
-            if (_baseTheme?.GetThemeForEntity(recipe) != null)
-            {
-                LogicEntity theme = _baseTheme.GetBaseTheme();
-                int number = GetBaseThemeIngredientNumber(theme);
-                AddIngredientWithMaxUsesCheck(ingredients, theme, number);
-                totalSize += _baseTheme.GetBaseTheme().GetItemSize() * number;
-                _log.Debug($"> Added base theme {theme}.");
-            }
-
-            // If vanilla upgrade chains are set to be preserved, prioritise the thing this recipe upgrades from.
-            LogicEntity vanilla;
-            if (_config.VanillaUpgradeChains.Value && ((vanilla = _recipeLogic.GetBaseOfUpgrade(recipe.TechType, _entityHandler)) != null))
-            {
-                AddIngredientWithMaxUsesCheck(ingredients, vanilla, 1);
-                totalSize += vanilla.GetItemSize();
-                _log.Debug($"> Added upgrade base {vanilla}.");
-            }
-
-            return totalSize;
-        }
-
-        /// <summary>
-        /// Checks whether the given ingredient is blacklisted for the recipe that is currently being randomised.
-        /// </summary>
-        /// <returns>True if the ingredient is blacklisted (and therefore invalid), false if it is not.</returns>
-        protected bool IsBlacklisted(LogicEntity entity)
-        {
-            return (_categoryBlacklist?.Count > 0 && _categoryBlacklist.Contains(entity.Category)) 
-                   || (_blacklist?.Count > 0 && _blacklist.Contains(entity.TechType));
+            // TODO: Check for tags of constructable, equipment, tools, upgrade.
+            return true;
         }
 
         /// <summary>
@@ -277,37 +190,22 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// </summary>
         private void RemoveParentRecipes(LogicEntity entity)
         {
-            int count = _recipeLogic.ValidIngredients.RemoveWhere(e =>
-                e.Recipe?.Ingredients.Any(i => i.techType.Equals(entity.TechType)) ?? false);
-            _log.Debug($"  Also removing {count} parent recipes.");
+            // TODO
         }
 
         /// <summary>
-        /// Set up the blacklist with entities that are not allowed to function as ingredients for the given entity.
+        /// Exists for convenience, and so that we don't have to look up the InventoryItem via the manager all the time.
         /// </summary>
-        /// <param name="entity">The entity to build a blacklist against.</param>
-        private void UpdateBlacklist(LogicEntity entity)
+        protected struct LogicIngredient
         {
-            _blacklist = new List<TechType>();
-            _categoryBlacklist = new List<TechTypeCategory>();
+            public LogicInventoryItem Item;
+            public int Amount;
 
-            if (_config.EquipmentAsIngredients.Value == IngredientInclusionLevel.Never
-                || (_config.EquipmentAsIngredients.Value == IngredientInclusionLevel.TopLevelOnly && entity.CanFunctionAsIngredient()))
-                _categoryBlacklist.Add(TechTypeCategory.Equipment);
-            if (_config.ToolsAsIngredients.Value == IngredientInclusionLevel.Never
-                || (_config.ToolsAsIngredients.Value == IngredientInclusionLevel.TopLevelOnly && entity.CanFunctionAsIngredient()))
-                _categoryBlacklist.Add(TechTypeCategory.Tools);
-            if (_config.UpgradesAsIngredients.Value == IngredientInclusionLevel.Never
-                || (_config.UpgradesAsIngredients.Value == IngredientInclusionLevel.TopLevelOnly && entity.CanFunctionAsIngredient()))
+            public LogicIngredient(LogicInventoryItem item, int amount)
             {
-                _categoryBlacklist.Add(TechTypeCategory.ScannerRoom);
-                _categoryBlacklist.Add(TechTypeCategory.VehicleUpgrades);
-                _categoryBlacklist.Add(TechTypeCategory.WorkBenchUpgrades);
+                Item = item;
+                Amount = amount;
             }
-            
-            // Disallow the builder tool from being used in base pieces.
-            if (entity.Category.IsBasePiece())
-                _blacklist.Add(TechType.Builder);
         }
     }
 }
