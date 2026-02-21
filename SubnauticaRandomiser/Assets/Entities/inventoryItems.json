@@ -1,107 +1,137 @@
 [
   {
-    "TechType": "AluminumOxide"
+    "TechType": "AluminumOxide",
+    "Value": 15
   },
   {
     "TechType": "CrashPowder",
-    "MaxRecipeUsesPerGame": "3"
+    "MaxRecipeUsesPerGame": "3",
+    "Value": 20
   },
   {
-    "TechType": "Copper"
+    "TechType": "Copper",
+    "Value": 10
   },
   {
-    "TechType": "Diamond"
+    "TechType": "Diamond",
+    "Value": 15
   },
   {
-    "TechType": "Gold"
+    "TechType": "Gold",
+    "Value": 15
   },
   {
     "TechType": "PrecursorIonCrystal",
+    "Value": 50,
     "Dependencies": [
       "LogicInventoryItem:ExoSuitDrillArmModule"
     ]
   },
   {
-    "TechType": "Kyanite"
+    "TechType": "Kyanite",
+    "Value": 30
   },
   {
-    "TechType": "Lead"
+    "TechType": "Lead",
+    "Value": 10
   },
   {
-    "TechType": "Lithium"
+    "TechType": "Lithium",
+    "Value": 15
   },
   {
-    "TechType": "Magnetite"
+    "TechType": "Magnetite",
+    "Value": 20
   },
   {
-    "TechType": "ScrapMetal"
+    "TechType": "ScrapMetal",
+    "Value": 10
   },
   {
-    "TechType": "Nickel"
+    "TechType": "Nickel",
+    "Value": 20
   },
   {
-    "TechType": "Quartz"
+    "TechType": "Quartz",
+    "Value": 10
   },
   {
-    "TechType": "Salt"
+    "TechType": "Salt",
+    "Value": 10
   },
   {
-    "TechType": "Silver"
+    "TechType": "Silver",
+    "Value": 10
   },
   {
-    "TechType": "Sulphur"
+    "TechType": "Sulphur",
+    "Value": 20
   },
   {
-    "TechType": "Titanium"
+    "TechType": "Titanium",
+    "Value": 10
   },
   {
-    "TechType": "UraniniteCrystal"
+    "TechType": "UraniniteCrystal",
+    "Value": 20
   },
   {
-    "TechType": "AcidMushroom"
+    "TechType": "AcidMushroom",
+    "Value": 10
   },
   {
-    "TechType": "BloodOil"
+    "TechType": "BloodOil",
+    "Value": 10
   },
   {
     "TechType": "CoralChunk",
+    "Value": 5,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "CreepVinePiece",
+    "Value": 5,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
-    "TechType": "CreepVineSeedCluster"
+    "TechType": "CreepVineSeedCluster",
+    "Value": 10
   },
   {
-    "TechType": "Floater"
+    "TechType": "Floater",
+    "Value": 25
   },
   {
-    "TechType": "GasPod"
+    "TechType": "GasPod",
+    "Value": 15
   },
   {
-    "TechType": "JellyPlant"
+    "TechType": "JellyPlant",
+    "Value": 15
   },
   {
     "TechType": "JeweledDiskPiece",
+    "Value": 15,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
-    "TechType": "SeaTreaderPoop"
+    "TechType": "SeaTreaderPoop",
+    "Value": 40
   },
   {
     "TechType": "StalkerTooth",
-    "MaxRecipeUsesPerGame": "3"
+    "MaxRecipeUsesPerGame": "3",
+    "Value": 40
   },
   {
-    "TechType": "WhiteMushroom"
+    "TechType": "WhiteMushroom",
+    "Value": 10
   },
   {
     "TechType": "Bleach"
@@ -663,267 +693,325 @@
     ]
   },
   {
-    "TechType": "BladderFish"
+    "TechType": "BladderFish",
+    "Value": 15
   },
   {
-    "TechType": "Boomerang"
+    "TechType": "Boomerang",
+    "Value": 15
   },
   {
-    "TechType": "Eyeye"
+    "TechType": "Eyeye",
+    "Value": 20
   },
   {
-    "TechType": "GarryFish"
+    "TechType": "GarryFish",
+    "Value": 15
   },
   {
     "TechType": "HoleFish",
-    "MaxRecipeUsesPerGame": "3"
+    "MaxRecipeUsesPerGame": "3",
+    "Value": 25
   },
   {
-    "TechType": "HoopFish"
+    "TechType": "HoopFish",
+    "Value": 15
   },
   {
-    "TechType": "HoverFish"
+    "TechType": "HoverFish",
+    "Value": 15
   },
   {
-    "TechType": "LavaBoomerang"
+    "TechType": "LavaBoomerang",
+    "Value": 25
   },
   {
-    "TechType": "LavaEyeye"
+    "TechType": "LavaEyeye",
+    "Value": 25
   },
   {
-    "TechType": "Oculus"
+    "TechType": "Oculus",
+    "Value": 20
   },
   {
-    "TechType": "Peeper"
+    "TechType": "Peeper",
+    "Value": 15
   },
   {
-    "TechType": "Reginald"
+    "TechType": "Reginald",
+    "Value": 15
   },
   {
-    "TechType": "SpadeFish"
+    "TechType": "SpadeFish",
+    "Value": 15
   },
   {
-    "TechType": "SpineFish"
+    "TechType": "SpineFish",
+    "Value": 20
   },
   {
     "TechType": "AcidMushroomSpore",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "BluePalmSeed",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "EyesPlantSeed",
+    "Value": 15,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "GabesFeatherSeed",
+    "Value": 20,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "KooshChunk",
+    "Value": 15,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "JellyPlantSeed",
+    "Value": 15,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "MembrainTreeSeed",
+    "Value": 15,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "PurpleBrainCoralPiece",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "PurpleBranchesSeed",
+    "Value": 20,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "PurpleFanSeed",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "PurpleStalkSeed",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "PurpleTentacleSeed",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "RedBasketPlantSeed",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "RedBushSeed",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "RedConePlantSeed",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "RedGreenTentacleSeed",
+    "Value": 20,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "RedRollPlantSeed",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "SeaCrownSeed",
+    "Value": 50,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "ShellGrassSeed",
+    "Value": 15,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "SmallFanSeed",
+    "Value": 15,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "SnakeMushroomSpore",
+    "Value": 20,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "SpikePlantSeed",
+    "Value": 10,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "SpottedLeavesPlantSeed",
+    "Value": 20,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "TreeMushroomPiece",
+    "Value": 15,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "WhiteMushroomSpore",
+    "Value": 20,
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
-    "TechType": "BoneSharkEgg"
+    "TechType": "BoneSharkEgg",
+    "Value": 30
   },
   {
-    "TechType": "CrabSnakeEgg"
+    "TechType": "CrabSnakeEgg",
+    "Value": 40
   },
   {
-    "TechType": "CrabSquidEgg"
+    "TechType": "CrabSquidEgg",
+    "Value": 40
   },
   {
-    "TechType": "CrashEgg"
+    "TechType": "CrashEgg",
+    "Value": 15
   },
   {
     "TechType": "CuteFishEgg",
-    "MaxRecipeUsesPerGame": "1"
+    "MaxRecipeUsesPerGame": "1",
+    "Value": 100
   },
   {
-    "TechType": "GasopodEgg"
+    "TechType": "GasopodEgg",
+    "Value": 15
   },
   {
-    "TechType": "JellyRayEgg"
+    "TechType": "JellyRayEgg",
+    "Value": 30
   },
   {
-    "TechType": "LavaLizardEgg"
+    "TechType": "LavaLizardEgg",
+    "Value": 40
   },
   {
-    "TechType": "MesmerEgg"
+    "TechType": "MesmerEgg",
+    "Value": 20
   },
   {
-    "TechType": "RabbitRayEgg"
+    "TechType": "RabbitRayEgg",
+    "Value": 15
   },
   {
-    "TechType": "SandSharkEgg"
+    "TechType": "SandSharkEgg",
+    "Value": 20
   },
   {
-    "TechType": "ShockerEgg"
+    "TechType": "ShockerEgg",
+    "Value": 40
   },
   {
-    "TechType": "SpadeFishEgg"
+    "TechType": "SpadeFishEgg",
+    "Value": 15
   },
   {
-    "TechType": "StalkerEgg"
+    "TechType": "StalkerEgg",
+    "Value": 20
   },
   {
     "TechType": "BoneShark",
+    "Value": 30,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "CrabSnake",
+    "Value": 40,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "CrabSquid",
+    "Value": 40,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "Crash",
+    "Value": 15,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "CuteFish",
+    "Value": 100,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ],
@@ -931,48 +1019,56 @@
   },
   {
     "TechType": "Gasopod",
+    "Value": 15,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "JellyRay",
+    "Value": 30,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "LavaLizard",
+    "Value": 40,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "Mesmer",
+    "Value": 20,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "RabbitRay",
+    "Value": 15,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "SandShark",
+    "Value": 20,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "Shocker",
+    "Value": 40,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
   },
   {
     "TechType": "Stalker",
+    "Value": 20,
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
