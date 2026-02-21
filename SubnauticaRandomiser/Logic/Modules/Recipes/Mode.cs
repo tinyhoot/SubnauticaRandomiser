@@ -62,7 +62,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                 int amount = Mathf.Min(ingredient.Amount, max);
                 ingredients.Add(new LogicIngredient(ingredient.Item, amount));
                 totalSize += GetItemSize(ingredient.Item.TechType) * amount;
-                recipe.Value += ingredient.Item.Value * amount;
+                totalValue += ingredient.Item.Value * amount;
                 _log.Debug($"> Adding ingredient: {ingredient.Item}, {amount}, size: {totalSize}");
                 UpdateNumUsed(ingredient.Item);
             }
@@ -72,7 +72,10 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             recipe.Recipe.Ingredients = ingredients.Select(i => new Ingredient(i.Item.TechType, i.Amount)).ToList();
             recipe.Recipe.CraftAmount = CraftDataHandler.GetRecipeData(recipe.TechType)?.craftAmount ?? 1;
             // Set the recipe's value as the sum total of the value of its ingredients.
-            recipe.Value = totalValue;
+            var recipeInvItem = _entityManager.Find<LogicInventoryItem>(recipe.TechType);
+            if (recipeInvItem != null)
+                recipeInvItem.Value = totalValue;
+            
             return recipe;
         }
 

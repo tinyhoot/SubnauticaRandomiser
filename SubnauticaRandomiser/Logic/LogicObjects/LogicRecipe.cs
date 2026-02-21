@@ -22,9 +22,9 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         public LogicBlueprint Blueprint { get; private set; }
 
         /// <summary>
-        /// The recipe's value in relation to other items or recipes.
+        /// The recipe's target value to reach during randomisation.
         /// </summary>
-        public int Value;
+        public int TargetValue = -1;
 
         public void LinkVanillaRecipe(EntityManager manager, ILogHandler log)
         {

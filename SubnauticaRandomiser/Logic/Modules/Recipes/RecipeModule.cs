@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
-using HootLib.Interfaces;
+using HootLib;
 using HootLib.Objects;
 using Nautilus.Crafting;
 using Nautilus.Handlers;
@@ -13,6 +14,8 @@ using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Exceptions;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
+using UnityEngine;
+using ILogHandler = HootLib.Interfaces.ILogHandler;
 using LogicEntity = SubnauticaRandomiser.Logic.LogicObjects.LogicEntity;
 
 namespace SubnauticaRandomiser.Logic.Modules.Recipes
@@ -66,6 +69,68 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             // - Upgrade chains
             // - Egg getting waterpark as dependency
             // - Assign recipe/ingredient values based on vanilla recipes?
+            
+            SetVanillaRecipeValues(manager);
+        }
+
+        /// <summary>
+        /// Set all recipes' target values based on their vanilla recipe.
+        /// </summary>
+        private void SetVanillaRecipeValues(EntityManager manager)
+        {
+            _log.Debug("Assigning recipe target values based on vanilla recipes.");
+            List<LogicRecipe> recipes = manager.GetAllEntities<LogicRecipe>().ToList();
+            int i = 0;
+            int lastLoopCount = recipes.Count;
+            while (recipes.Count > 0)
+            {
+                var recipe = recipes[i];
+                bool ingredientsReady = true;
+                int total = 0;
+                
+                // Check if all ingredients have been assigned a value. If not, this recipe takes ingredients which
+                // themselves also have recipes (i.e. are craftables).
+                var ingredients = TechData.GetIngredients(recipe.TechType);
+                if (ingredients is null || ingredients.Count == 0)
+                {
+                    _log.Warn($"Recipe has no vanilla recipe, assigning fallback target value: {recipe.TechType}");
+                    total = 100;
+                }
+                foreach (var ingredient in ingredients ?? Enumerable.Empty<Ingredient>())
+                {
+                    int value = manager.Find<LogicInventoryItem>(ingredient.techType).Value;
+                    // If the IItem was not successful try to find a recipe we already assigned a target value to.
+                    if (value <= 0)
+                        value = manager.Find<LogicRecipe>(ingredient.techType)?.TargetValue ?? -1;
+                    if (value <= 0)
+                    {
+                        ingredientsReady = false;
+                        break;
+                    }
+
+                    total += value * ingredient.amount;
+                }
+
+                // If all ingredients had a value, update the recipe's target value.
+                if (ingredientsReady)
+                {
+                    _log.Debug($"Assigning target value {total} to recipe {recipe.TechType}");
+                    recipe.TargetValue = Mathf.FloorToInt(total * _config.RecipeValueMult.Value);
+                    recipes.RemoveAt(i);
+                    i--;
+                }
+                
+                i++;
+                if (i >= recipes.Count)
+                {
+                    // Ensure we don't get stuck infinitely if some recipes are completely isolated.
+                    if (lastLoopCount == recipes.Count)
+                        throw new RandomisationException("Failed to find ingredient values for all recipes! " +
+                                                         $"Remaining: {recipes.ElementsToString()}");
+                    i = 0;
+                    lastLoopCount = recipes.Count;
+                }
+            }
         }
 
         public override void PreEntityRandomisation(IRandomHandler rng, SaveData saveData)

@@ -28,7 +28,7 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// <summary>
         /// The item's value in relation to other items or recipes.
         /// </summary>
-        public int Value = 0;
+        public int Value = -1;
 
         public void AddRecipe(LogicRecipe recipe)
         {

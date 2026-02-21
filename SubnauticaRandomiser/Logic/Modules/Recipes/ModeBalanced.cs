@@ -37,7 +37,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             }
 
             // Now fill up with random materials until the value threshold is more or less met, as defined by fuzziness.
-            while ((recipe.Value - currentValue) > (recipe.Value * _config.RecipeValueVariance.Value / 2))
+            while ((recipe.TargetValue - currentValue) > (recipe.TargetValue * _config.RecipeValueVariance.Value / 2))
             {
                 var ingredient = ChooseSecondaryIngredient(rng, recipe, validIngredients, currentValue);
                 if (ingredient.Item is null || ingredients.Any(i => i.Item.TechType == ingredient.Item.TechType))
@@ -47,8 +47,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                 currentValue += ingredient.Item.Value * ingredient.Amount;
             }
 
-            _log.Debug($"> Recipe is now valued {currentValue} out of {recipe.Value}");
-            recipe.Value = currentValue;
+            _log.Debug($"> Recipe is now valued {currentValue} out of {recipe.TargetValue}");
         }
 
         public override TechType GetScrapMetalReplacement()
@@ -70,8 +69,8 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         private LogicInventoryItem ChoosePrimaryIngredient(IRandomHandler rng, LogicRecipe recipe,
             List<LogicInventoryItem> validIngredients)
         {
-            double maxValue = recipe.Value * (_config.PrimaryIngredientValue.Value + 0.1);
-            double minValue = recipe.Value * (_config.PrimaryIngredientValue.Value - 0.1);
+            double maxValue = recipe.TargetValue * (_config.PrimaryIngredientValue.Value + 0.1);
+            double minValue = recipe.TargetValue * (_config.PrimaryIngredientValue.Value - 0.1);
             List<LogicInventoryItem> pIngredientCandidates = validIngredients
                 .Where(e => minValue < e.Value && e.Value < maxValue).ToList();
 
@@ -93,7 +92,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             var ingredient = rng.Choice(validIngredients);
 
             // What's the maximum number of this ingredient the recipe can still sustain?
-            int max = FindMaximum(ingredient, recipe.Value, currentValue);
+            int max = FindMaximum(ingredient, recipe.TargetValue, currentValue);
             // Figure out how many to actually use.
             int number = rng.Next(1, max + 1, _distribution);
 
