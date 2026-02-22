@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using HootLib;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic.LogicObjects;
 using SubnauticaRandomiser.Serialization;
@@ -26,6 +27,8 @@ namespace SubnauticaRandomiser.Logic
         private List<LogicEntity> _entities = new List<LogicEntity>();
         private Dictionary<string, int> _entityIdMap = new Dictionary<string, int>();
         private Dictionary<TechType, List<int>> _entityTechIds = new Dictionary<TechType, List<int>>();
+        private Dictionary<string, int> _tagMap = new Dictionary<string, int>();
+        private Dictionary<int, List<int>> _taggedEntityIds = new Dictionary<int, List<int>>();
 
         /// <summary>
         /// Try to find a specific entity. Will return null if none match the search criteria.
@@ -130,6 +133,78 @@ namespace SubnauticaRandomiser.Logic
             return entity.Sphere >= 0 && entity.Sphere <= sphereTier;
         }
 
+        #region tagging
+
+        /// <summary>
+        /// Get all entities that were tagged with a specific tag.
+        /// </summary>
+        /// <returns>All entities with that tag, or null if none exist.</returns>
+        public List<LogicEntity> GetAllWithTag(string tag)
+        {
+            if (!_tagMap.TryGetValue(tag, out var tagId))
+            {
+                _log.Warn($"Tried to get all entities with tag '{tag}', but tag was never registered!");
+                return null;
+            }
+
+            if (!_taggedEntityIds.TryGetValue(tagId, out var entityIds))
+            {
+                _log.Warn($"Orphaned tag '{tag}' with id {tagId} is not used by any entities!");
+                return null;
+            }
+
+            return entityIds.Select(Get).ToList();
+        }
+
+        /// <summary>
+        /// Filter entities to only those with a specific tag.
+        /// </summary>
+        public IEnumerable<LogicEntity> FilterByTag(IEnumerable<LogicEntity> entities, string tag)
+        {
+            if (!_tagMap.TryGetValue(tag, out var tagId))
+            {
+                _log.Warn($"Tried to filter entities by tag '{tag}' but tag was never registered!");
+                yield break;
+            }
+
+            foreach (var entity in entities)
+            {
+                foreach (var entityTag in entity.Tags)
+                {
+                    // If any tag matches the search tag, return the entity.
+                    if (_tagMap.TryGetValue(entityTag, out var i) && i == tagId)
+                    {
+                        yield return entity;
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void RegisterTags(LogicEntity entity)
+        {
+            int entityId = _entityIdMap[entity.ToString()];
+            foreach (var tag in entity.Tags)
+            {
+                // Register the tag if we've never seen it before.
+                if (!_tagMap.TryGetValue(tag, out int tagId))
+                {
+                    tagId = _tagMap.Count;
+                    _tagMap.Add(tag, tagId);
+                }
+                
+                // Keep a list of all entities with a specific tag.
+                if (!_taggedEntityIds.TryGetValue(tagId, out var taggedIds))
+                {
+                    taggedIds = new List<int>();
+                    _taggedEntityIds.Add(tagId, taggedIds);
+                }
+                taggedIds.Add(entityId);
+            }
+        }
+
+        #endregion tagging
+
         /// <summary>
         /// Load and parse all entities from their respective files on disk.
         /// </summary>
@@ -141,6 +216,13 @@ namespace SubnauticaRandomiser.Logic
             yield return DeserializeEntitiesAsync<LogicInventoryItem>(EntitiesFolder, InvItemsFile);
             yield return DeserializeEntitiesAsync<LogicRecipe>(EntitiesFolder, RecipesFile);
             yield return DeserializeEntitiesAsync<LogicSpawnable>(EntitiesFolder, SpawnablesFile);
+            
+            _log.Debug($"Loaded {_entities.Count} entities.");
+            foreach (var (tagId, entities) in _taggedEntityIds)
+            {
+                string tag = _tagMap.FirstOrDefault(kv => kv.Value == tagId).Key ?? "NOT FOUND";
+                _log.Debug($"> Tag {tag}: {entities.Count} entities");
+            }
         }
 
         private IEnumerator DeserializeEntitiesAsync<T>(params string[] path) where T : LogicEntity
@@ -175,6 +257,8 @@ namespace SubnauticaRandomiser.Logic
             }
             ids.Add(_entities.Count);
             _entities.Add(entity);
+            // Similarly, register the entity's tags.
+            RegisterTags(entity);
         }
 
         public IEnumerator LinkEntities()
