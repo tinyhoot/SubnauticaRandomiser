@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubnauticaRandomiser", "SubnauticaRandomiser\SubnauticaRandomiser.csproj", "{93BA7EA4-5A77-4B98-A535-A6EAF7717A06}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{04F771FE-CA90-4C9D-B633-6366DE6855E5}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HootLib", "HootLib-Subnautica\HootLib\HootLib.shproj", "{A1EF0757-EDA8-41DC-89D4-C41D81427D00}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataExplorer", "DataExplorer\DataExplorer.csproj", "{02745225-FBDA-4994-B373-18685FEFB386}"
