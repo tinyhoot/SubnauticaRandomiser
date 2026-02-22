@@ -243,30 +243,48 @@
   },
   {
     "TechType": "AirBladder",
+    "Tags": [
+      "Tool"
+    ],
     "Dependencies": [
       "LogicInventoryItem:BladderFish"
     ]
   },
   {
     "TechType": "Builder",
+    "Tags": [
+      "Tool"
+    ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "DiveReel",
+    "Tags": [
+      "Tool"
+    ],
     "Dependencies": [
       "LogicInventoryItem:CreepVinePiece"
     ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
-    "TechType": "Flare"
+    "TechType": "Flare",
+    "Tags": [
+      "Tool"
+    ]
   },
   {
     "TechType": "FlashLight",
+    "Tags": [
+      "Tool"
+    ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "LaserCutter",
+    "Tags": [
+      "Tool"
+    ],
     "Dependencies": [
       "LogicFragment:LaserCutter"
     ],
@@ -280,6 +298,9 @@
   },
   {
     "TechType": "PropulsionCannon",
+    "Tags": [
+      "Tool"
+    ],
     "Dependencies": [
       "LogicFragment:PropulsionCannon"
     ],
@@ -287,10 +308,16 @@
   },
   {
     "TechType": "Scanner",
+    "Tags": [
+      "Tool"
+    ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "StasisRifle",
+    "Tags": [
+      "Tool"
+    ],
     "Dependencies": [
       "LogicFragment:StasisRifle"
     ],
@@ -298,10 +325,16 @@
   },
   {
     "TechType": "Knife",
+    "Tags": [
+      "Tool"
+    ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "Welder",
+    "Tags": [
+      "Tool"
+    ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
@@ -318,6 +351,9 @@
   },
   {
     "TechType": "Compass",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicDatabox:Compass"
     ],
@@ -325,6 +361,9 @@
   },
   {
     "TechType": "DoubleTank",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Tank"
     ],
@@ -332,20 +371,32 @@
   },
   {
     "TechType": "Fins",
+    "Tags": [
+      "Equipment"
+    ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
-    "TechType": "FireExtinguisher"
+    "TechType": "FireExtinguisher",
+    "Tags": [
+      "Tool"
+    ]
   },
   {
     "TechType": "FirstAidKit"
   },
   {
     "TechType": "RadiationSuit",
+    "Tags": [
+      "Equipment"
+    ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
     "TechType": "Rebreather",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicInventoryItem:DoubleTank"
     ],
@@ -353,6 +404,9 @@
   },
   {
     "TechType": "ReinforcedDiveSuit",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicDatabox:ReinforcedDiveSuit"
     ],
@@ -360,6 +414,9 @@
   },
   {
     "TechType": "MapRoomHudChip",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseMapRoom"
     ],
@@ -373,6 +430,9 @@
   },
   {
     "TechType": "WaterFiltrationSuit",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicDatabox:WaterFiltrationSuit"
     ],
@@ -380,6 +440,9 @@
   },
   {
     "TechType": "Tank",
+    "Tags": [
+      "Equipment"
+    ],
     "MaxRecipeUsesPerGame": "3"
   },
   {
@@ -408,12 +471,18 @@
   },
   {
     "TechType": "Seaglide",
+    "Tags": [
+      "Tool"
+    ],
     "Dependencies": [
       "LogicFragment:Seaglide"
     ]
   },
   {
     "TechType": "MapRoomCamera",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseMapRoom"
     ],
@@ -421,6 +490,9 @@
   },
   {
     "TechType": "MapRoomUpgradeScanRange",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseMapRoom"
     ],
@@ -428,6 +500,9 @@
   },
   {
     "TechType": "MapRoomUpgradeScanSpeed",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseMapRoom"
     ],
@@ -435,6 +510,9 @@
   },
   {
     "TechType": "HeatBlade",
+    "Tags": [
+      "Tool"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench"
     ],
@@ -442,6 +520,9 @@
   },
   {
     "TechType": "HighCapacityTank",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench",
       "LogicDatabox:HighCapacityTank"
@@ -450,6 +531,9 @@
   },
   {
     "TechType": "PlasteelTank",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench",
       "LogicDatabox:PlasteelTank"
@@ -458,6 +542,9 @@
   },
   {
     "TechType": "RepulsionCannon",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench",
       "LogicDatabox:RepulsionCannon"
@@ -466,6 +553,9 @@
   },
   {
     "TechType": "SwimChargeFins",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench",
       "LogicDatabox:SwimChargeFins"
@@ -474,6 +564,9 @@
   },
   {
     "TechType": "UltraGlideFins",
+    "Tags": [
+      "Equipment"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench",
       "LogicDatabox:UltraGlideFins"
@@ -482,6 +575,9 @@
   },
   {
     "TechType": "CyclopsHullModule2",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench",
       "LogicDatabox:CyclopsHullModule1"
@@ -490,6 +586,9 @@
   },
   {
     "TechType": "CyclopsHullModule3",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench",
       "LogicDatabox:CyclopsHullModule1"
@@ -498,6 +597,9 @@
   },
   {
     "TechType": "ExoHullModule2",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench"
     ],
@@ -505,6 +607,9 @@
   },
   {
     "TechType": "VehicleHullModule2",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench"
     ],
@@ -512,6 +617,9 @@
   },
   {
     "TechType": "VehicleHullModule3",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:WorkBench"
     ],
@@ -519,6 +627,9 @@
   },
   {
     "TechType": "CyclopsDecoyModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsDecoyModule"
@@ -527,6 +638,9 @@
   },
   {
     "TechType": "CyclopsFireSuppressionModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsFireSuppressionModule"
@@ -535,6 +649,9 @@
   },
   {
     "TechType": "CyclopsHullModule1",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsHullModule1"
@@ -543,6 +660,9 @@
   },
   {
     "TechType": "CyclopsSeaMothRepairModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsSeaMothRepairModule"
@@ -551,6 +671,9 @@
   },
   {
     "TechType": "CyclopsShieldModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsShieldModule"
@@ -559,6 +682,9 @@
   },
   {
     "TechType": "CyclopsSonarModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsSonarModule"
@@ -567,6 +693,9 @@
   },
   {
     "TechType": "CyclopsThermalReactorModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:Cyclops",
       "LogicDatabox:CyclopsThermalReactorModule"
@@ -575,6 +704,9 @@
   },
   {
     "TechType": "ExoHullModule1",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ],
@@ -582,6 +714,9 @@
   },
   {
     "TechType": "ExoSuitDrillArmModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole",
       "LogicFragment:ExosuitDrillArmModule"
@@ -590,6 +725,9 @@
   },
   {
     "TechType": "ExoSuitGrapplingArmModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole",
       "LogicFragment:ExoSuitGrapplingArmModule"
@@ -598,6 +736,9 @@
   },
   {
     "TechType": "ExoSuitJetUpgradeModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ],
@@ -605,6 +746,9 @@
   },
   {
     "TechType": "ExoSuitPropulsionArmModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole",
       "LogicFragment:ExoSuitPropulsionArmModule"
@@ -613,6 +757,9 @@
   },
   {
     "TechType": "ExoSuitThermalReactorModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ],
@@ -620,6 +767,9 @@
   },
   {
     "TechType": "ExoSuitTorpedoArmModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole",
       "LogicFragment:ExoSuitTorpedoArmModule"
@@ -628,54 +778,81 @@
   },
   {
     "TechType": "PowerUpgradeModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:Cyclops"
     ]
   },
   {
     "TechType": "SeaMothElectricalDefense",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "SeaMothSolarCharge",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "SeaMothSonarModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "SeaMothTorpedoModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "VehicleArmorPlating",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "VehicleHullModule1",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "VehiclePowerUpgradeModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ]
   },
   {
     "TechType": "VehicleStorageModule",
+    "Tags": [
+      "Upgrade"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseUpgradeConsole"
     ]
@@ -694,64 +871,109 @@
   },
   {
     "TechType": "BladderFish",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "Boomerang",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "Eyeye",
-    "Value": 20
+    "Value": 20,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "GarryFish",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "HoleFish",
     "MaxRecipeUsesPerGame": "3",
-    "Value": 25
+    "Value": 25,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "HoopFish",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "HoverFish",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "LavaBoomerang",
-    "Value": 25
+    "Value": 25,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "LavaEyeye",
-    "Value": 25
+    "Value": 25,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "Oculus",
-    "Value": 20
+    "Value": 20,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "Peeper",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "Reginald",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "SpadeFish",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "SpineFish",
-    "Value": 20
+    "Value": 20,
+    "Tags": [
+      "Creature"
+    ]
   },
   {
     "TechType": "AcidMushroomSpore",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -759,6 +981,9 @@
   {
     "TechType": "BluePalmSeed",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -766,6 +991,9 @@
   {
     "TechType": "EyesPlantSeed",
     "Value": 15,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -773,6 +1001,9 @@
   {
     "TechType": "GabesFeatherSeed",
     "Value": 20,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -780,6 +1011,9 @@
   {
     "TechType": "KooshChunk",
     "Value": 15,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -787,6 +1021,9 @@
   {
     "TechType": "JellyPlantSeed",
     "Value": 15,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -794,6 +1031,9 @@
   {
     "TechType": "MembrainTreeSeed",
     "Value": 15,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -801,6 +1041,9 @@
   {
     "TechType": "PurpleBrainCoralPiece",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -808,6 +1051,9 @@
   {
     "TechType": "PurpleBranchesSeed",
     "Value": 20,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -815,6 +1061,9 @@
   {
     "TechType": "PurpleFanSeed",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -822,6 +1071,9 @@
   {
     "TechType": "PurpleStalkSeed",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -829,6 +1081,9 @@
   {
     "TechType": "PurpleTentacleSeed",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -836,6 +1091,9 @@
   {
     "TechType": "RedBasketPlantSeed",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -843,6 +1101,9 @@
   {
     "TechType": "RedBushSeed",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -850,6 +1111,9 @@
   {
     "TechType": "RedConePlantSeed",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -857,6 +1121,9 @@
   {
     "TechType": "RedGreenTentacleSeed",
     "Value": 20,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -864,6 +1131,9 @@
   {
     "TechType": "RedRollPlantSeed",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -871,6 +1141,9 @@
   {
     "TechType": "SeaCrownSeed",
     "Value": 50,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -878,6 +1151,9 @@
   {
     "TechType": "ShellGrassSeed",
     "Value": 15,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -885,6 +1161,9 @@
   {
     "TechType": "SmallFanSeed",
     "Value": 15,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -892,6 +1171,9 @@
   {
     "TechType": "SnakeMushroomSpore",
     "Value": 20,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -899,6 +1181,9 @@
   {
     "TechType": "SpikePlantSeed",
     "Value": 10,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -906,6 +1191,9 @@
   {
     "TechType": "SpottedLeavesPlantSeed",
     "Value": 20,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -913,6 +1201,9 @@
   {
     "TechType": "TreeMushroomPiece",
     "Value": 15,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
@@ -920,70 +1211,118 @@
   {
     "TechType": "WhiteMushroomSpore",
     "Value": 20,
+    "Tags": [
+      "Seed"
+    ],
     "Dependencies": [
       "LogicInventoryItem:Knife"
     ]
   },
   {
     "TechType": "BoneSharkEgg",
-    "Value": 30
+    "Value": 30,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "CrabSnakeEgg",
-    "Value": 40
+    "Value": 40,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "CrabSquidEgg",
-    "Value": 40
+    "Value": 40,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "CrashEgg",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "CuteFishEgg",
     "MaxRecipeUsesPerGame": "1",
-    "Value": 100
+    "Value": 100,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "GasopodEgg",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "JellyRayEgg",
-    "Value": 30
+    "Value": 30,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "LavaLizardEgg",
-    "Value": 40
+    "Value": 40,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "MesmerEgg",
-    "Value": 20
+    "Value": 20,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "RabbitRayEgg",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "SandSharkEgg",
-    "Value": 20
+    "Value": 20,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "ShockerEgg",
-    "Value": 40
+    "Value": 40,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "SpadeFishEgg",
-    "Value": 15
+    "Value": 15,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "StalkerEgg",
-    "Value": 20
+    "Value": 20,
+    "Tags": [
+      "Egg"
+    ]
   },
   {
     "TechType": "BoneShark",
     "Value": 30,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -991,6 +1330,9 @@
   {
     "TechType": "CrabSnake",
     "Value": 40,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -998,6 +1340,9 @@
   {
     "TechType": "CrabSquid",
     "Value": 40,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -1005,6 +1350,9 @@
   {
     "TechType": "Crash",
     "Value": 15,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -1012,6 +1360,9 @@
   {
     "TechType": "CuteFish",
     "Value": 100,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ],
@@ -1020,6 +1371,9 @@
   {
     "TechType": "Gasopod",
     "Value": 15,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -1027,6 +1381,9 @@
   {
     "TechType": "JellyRay",
     "Value": 30,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -1034,6 +1391,9 @@
   {
     "TechType": "LavaLizard",
     "Value": 40,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -1041,6 +1401,9 @@
   {
     "TechType": "Mesmer",
     "Value": 20,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -1048,6 +1411,9 @@
   {
     "TechType": "RabbitRay",
     "Value": 15,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -1055,6 +1421,9 @@
   {
     "TechType": "SandShark",
     "Value": 20,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -1062,6 +1431,9 @@
   {
     "TechType": "Shocker",
     "Value": 40,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
@@ -1069,6 +1441,9 @@
   {
     "TechType": "Stalker",
     "Value": 20,
+    "Tags": [
+      "EggCreature"
+    ],
     "Dependencies": [
       "LogicConstructable:BaseWaterPark"
     ]
