@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using HarmonyLib;
 using HootLib;
 using HootLib.Objects;
@@ -33,6 +34,8 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         public override Type HandledEntityType => typeof(LogicRecipe);
         public override string LogPrefix => "[Recipe]";
 
+        private const string SubFolderName = "RecipeModule";
+        private const string OutpostFile = "outpostParts.json";
         private Dictionary<TechType, int> _basicOutpostPieces = new Dictionary<TechType, int>();
         private Dictionary<TechType, TechType> _upgradeChains = new Dictionary<TechType, TechType>();
         private List<LogicInventoryItem> _validIngredients = new List<LogicInventoryItem>();
@@ -41,6 +44,25 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         {
             base.OnRegisterModule(config, logger, monitor);
             _monitor.EntityRandomised += OnEntityRandomised;
+        }
+
+        public override IEnumerable<Task> LoadFilesAsync()
+        {
+            return new List<Task>
+            {
+                LoadOutpostFile()
+            };
+        }
+
+        private async Task LoadOutpostFile()
+        {
+            var json = await SerdeUtils.ReadFileContents(SubFolderName, OutpostFile);
+            _basicOutpostPieces = SerdeUtils.DeserializeObject<Dictionary<TechType, int>>(json);
+            _log.Debug("Loaded outpost pieces:");
+            foreach (var (piece, amt) in _basicOutpostPieces)
+            {
+                _log.Debug($"- {piece.AsString()}: {amt}");
+            }
         }
 
         public override BaseModuleSaveData SetupSaveData()
@@ -65,7 +87,6 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             }
             
             // TODO: Config related setup
-            // - Base outpost pieces
             // - Upgrade chains
             // - Egg getting waterpark as dependency
             // - Assign recipe/ingredient values based on vanilla recipes?
@@ -139,7 +160,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
         public override void RandomiseEntity(IRandomHandler rng, SaveData saveData, LogicEntity entity)
         {
-            var recipe = entity as LogicRecipe;
+            var recipe = (LogicRecipe)entity;
             _log.Debug($"Figuring out ingredients for {recipe}");
             _mode.RandomiseIngredients(rng, recipe, _validIngredients.ShallowCopy());
             saveData.GetModuleData<RecipeSaveData>().AddRecipe(recipe.Recipe.TechType, recipe.Recipe);
