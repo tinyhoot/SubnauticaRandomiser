@@ -167,6 +167,12 @@ namespace SubnauticaRandomiser.Logic
             yield return new RushedCoroutine(_regionManager.ParseFromDiskAsync(), 1f / 30f).Advance();
             yield return _travelDistanceManager.LoadTravelDataFromDiskAsync(_entityManager);
             yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
+            // Ensure we don't continue and the user is notified if some data fails to load.
+            foreach (var t in fileTasks.Where(t => t.IsFaulted))
+            {
+                _log.Error("Extra data required by a module failed to load.");
+                throw t.Exception!;
+            }
         }
 
         /// <summary>
