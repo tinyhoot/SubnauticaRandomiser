@@ -207,8 +207,18 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         {
             var recipe = (LogicRecipe)entity;
             _log.Debug($"Figuring out ingredients for {recipe}");
-            _mode.RandomiseIngredients(rng, recipe, null, _validIngredients.ShallowCopy());
+            var mandatory = GetMandatoryIngredients(recipe, _validIngredients.ShallowCopy());
+            _mode.RandomiseIngredients(rng, recipe, mandatory, _validIngredients.ShallowCopy());
             saveData.GetModuleData<RecipeSaveData>().AddRecipe(recipe.Recipe.TechType, recipe.Recipe);
+        }
+
+        private List<LogicInventoryItem> GetMandatoryIngredients(LogicRecipe recipe, List<LogicInventoryItem> items)
+        {
+            List<LogicInventoryItem> mandatory = new List<LogicInventoryItem>();
+            if (_upgradeChains.TryGetValue(recipe.TechType, out var baseItem))
+                mandatory.Add(items.Find(i => i.TechType == baseItem));
+            
+            return mandatory;
         }
 
         public override void PostEntityRandomisation(IRandomHandler rng, SaveData saveData)
