@@ -207,7 +207,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         {
             var recipe = (LogicRecipe)entity;
             _log.Debug($"Figuring out ingredients for {recipe}");
-            _mode.RandomiseIngredients(rng, recipe, _validIngredients.ShallowCopy());
+            _mode.RandomiseIngredients(rng, recipe, null, _validIngredients.ShallowCopy());
             saveData.GetModuleData<RecipeSaveData>().AddRecipe(recipe.Recipe.TechType, recipe.Recipe);
         }
 

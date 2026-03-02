@@ -22,32 +22,31 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         {
         }
 
-        protected override IEnumerable<LogicIngredient> YieldRandomIngredients(IRandomHandler rng, LogicRecipe recipe, 
-            List<LogicIngredient> ingredients, List<LogicInventoryItem> validIngredients)
+        protected override IEnumerable<LogicInventoryItem> YieldRandomIngredients(IRandomHandler rng, LogicRecipe recipe, 
+            List<LogicInventoryItem> validIngredients)
         {
-            int currentValue = 0;
-            
             // Only choose a primary ingredient if no ingredient has been chosen previously.
-            if (ingredients.Count == 0)
+            if (recipe.Recipe.Ingredients.Count == 0)
             {
                 var primaryIngredient = ChoosePrimaryIngredient(rng, recipe, validIngredients);
-                yield return new LogicIngredient(primaryIngredient, 1);
-                currentValue += primaryIngredient.Value;
+                yield return primaryIngredient;
                 _log.Debug("> Adding primary ingredient " + primaryIngredient);
             }
 
             // Now fill up with random materials until the value threshold is more or less met, as defined by fuzziness.
-            while ((recipe.TargetValue - currentValue) > (recipe.TargetValue * _config.RecipeValueVariance.Value / 2))
+            while ((recipe.TargetValue - recipe.AssignedValue) > (recipe.TargetValue * _config.RecipeValueVariance.Value / 2))
             {
-                var ingredient = ChooseSecondaryIngredient(rng, recipe, validIngredients, currentValue);
-                if (ingredient.Item is null || ingredients.Any(i => i.Item.TechType == ingredient.Item.TechType))
+                var ingredient = rng.Choice(validIngredients);
+                if (ingredient is null || recipe.Recipe.Ingredients.Any(i => i.techType == ingredient.TechType))
                     continue;
                 
                 yield return ingredient;
-                currentValue += ingredient.Item.Value * ingredient.Amount;
             }
+        }
 
-            _log.Debug($"> Recipe is now valued {currentValue} out of {recipe.TargetValue}");
+        protected override int GetRandomIngredientAmt(IRandomHandler rng, LogicRecipe recipe, LogicInventoryItem ingredient)
+        {
+            return rng.Next(1, FindMaximum(ingredient, recipe.TargetValue, recipe.AssignedValue));
         }
 
         public override TechType GetScrapMetalReplacement()
@@ -78,28 +77,12 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             if (pIngredientCandidates.Count == 0)
                 pIngredientCandidates.Add(rng.Choice(validIngredients));
 
-            var primaryIngredient = rng.Choice(pIngredientCandidates);
-
-            return primaryIngredient;
-        }
-
-        /// <summary>
-        /// Find a secondary ingredient for the recipe.
-        /// </summary>
-        private LogicIngredient ChooseSecondaryIngredient(IRandomHandler rng, LogicRecipe recipe,
-            List<LogicInventoryItem> validIngredients,  int currentValue)
-        {
-            var ingredient = rng.Choice(validIngredients);
-
-            // What's the maximum number of this ingredient the recipe can still sustain?
-            int max = FindMaximum(ingredient, recipe.TargetValue, currentValue);
-            // Figure out how many to actually use.
-            int number = rng.Next(1, max + 1, _distribution);
-
-            return new LogicIngredient(ingredient, number);
+            return rng.Choice(pIngredientCandidates);
         }
         
-        /// <inheritdoc cref="Mode.FindMaxIngredientNum"/>
+        /// <summary>
+        /// Find the maximum amount of one ingredient the recipe can contain.
+        /// </summary>
         private int FindMaximum(LogicInventoryItem ingredient, float targetValue, float currentValue)
         {
             int max = (int)((targetValue + ((targetValue * _config.RecipeValueVariance.Value) / 2)) - currentValue) / ingredient.Value;

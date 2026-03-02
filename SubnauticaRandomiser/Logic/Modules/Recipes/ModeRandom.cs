@@ -20,8 +20,8 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         {
         }
 
-        protected override IEnumerable<LogicIngredient> YieldRandomIngredients(IRandomHandler rng, LogicRecipe recipe,
-            List<LogicIngredient> ingredients, List<LogicInventoryItem> validIngredients)
+        protected override IEnumerable<LogicInventoryItem> YieldRandomIngredients(IRandomHandler rng, LogicRecipe recipe,
+            List<LogicInventoryItem> validIngredients)
         {
             int number = rng.Next(1, _config.MaxIngredientsPerRecipe.Value + 1, _distribution);
 
@@ -30,18 +30,21 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                 LogicInventoryItem item = rng.Choice(validIngredients);
 
                 // Prevent duplicates.
-                if (ingredients.Any(ing => ing.Item.TechType == item.TechType))
+                if (recipe.Recipe.Ingredients.Any(ing => ing.techType == item.TechType))
                 {
                     i--;
                     continue;
                 }
-
-                int max = FindMaxIngredientNum(item);
-                yield return new LogicIngredient(item, rng.Next(1, max + 1, _distribution));
+                
+                yield return item;
             }
         }
 
-        
+        protected override int GetRandomIngredientAmt(IRandomHandler rng, LogicRecipe recipe, LogicInventoryItem ingredient)
+        {
+            int max = _config.MaxNumberPerIngredient.Value;
+            return rng.Next(1, max + 1, _distribution);
+        }
 
         public override TechType GetScrapMetalReplacement()
         {

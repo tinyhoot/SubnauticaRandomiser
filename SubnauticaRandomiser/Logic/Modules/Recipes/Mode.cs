@@ -36,45 +36,55 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// </summary>
         /// <param name="rng">The RNG of this seed.</param>
         /// <param name="recipe">The recipe to randomise ingredients for.</param>
+        /// <param name="mandatory">The ingredients that <em>must</em> be included.</param>
         /// <param name="validIngredients">All valid ingredients that can be chosen for the recipe.</param>
         /// <returns>The same modified entity.</returns>
-        public LogicRecipe RandomiseIngredients(IRandomHandler rng, LogicRecipe recipe, List<LogicInventoryItem> validIngredients)
+        public LogicRecipe RandomiseIngredients(IRandomHandler rng, LogicRecipe recipe,
+            List<LogicInventoryItem> mandatory, List<LogicInventoryItem> validIngredients)
         {
             recipe.Recipe.Ingredients = new List<Ingredient>();
-            List<LogicIngredient> ingredients = new List<LogicIngredient>();
+            recipe.AssignedValue = 0;
             int totalSize = 0;
-            int totalValue = 0;
 
             // Get ingredients from the subclass one at a time.
-            foreach (var ingredient in YieldRandomIngredients(rng, recipe, ingredients, validIngredients))
+            foreach (var ingredient in YieldRandomIngredients(rng, recipe, validIngredients))
             {
-                if (ingredients.Count > 0 && CheckForConfigStop(ingredients, recipe, totalSize))
+                _log.Debug($"Proposing next ingredient {ingredient}");
+                LogicInventoryItem item = ingredient;
+                // During the first loop(s), prioritise mandatory ingredients.
+                if (mandatory?.Count > 0)
+                {
+                    item = mandatory[0];
+                    mandatory.RemoveAt(0);
+                    _log.Debug($"Prioritising mandatory ingredient {item}");
+                }
+                
+                if (recipe.Recipe.Ingredients.Count > 0 && CheckForConfigStop(recipe))
                     break;
-                if (ingredient.Item is null || ingredient.Amount < 1)
+                // Something may go wrong in the subclass, so just to be sure.
+                if (item is null)
                     continue;
 
-                // Ensure no number of ingredients can exceed the maximum config value.
-                int max = FindMaxIngredientNum(ingredient.Item, totalSize);
-                // If the maximum of allowable ingredients is less than 1, we hit a config limit and should stop.
-                if (max <= 0)
+                int amount = GetIngredientAmt(rng, recipe, item);
+                // If the amount of this ingredient is less than 1, we hit a config limit and should stop.
+                if (amount <= 0)
                     break;
-
-                int amount = Mathf.Min(ingredient.Amount, max);
-                ingredients.Add(new LogicIngredient(ingredient.Item, amount));
-                totalSize += GetItemSize(ingredient.Item.TechType) * amount;
-                totalValue += ingredient.Item.Value * amount;
-                _log.Debug($"> Adding ingredient: {ingredient.Item}, {amount}, size: {totalSize}");
-                UpdateNumUsed(ingredient.Item);
+                
+                recipe.Recipe.Ingredients.Add(new Ingredient(item.TechType, amount));
+                totalSize += GetItemSize(item.TechType) * amount;
+                recipe.AssignedValue += item.Value * amount;
+                _log.Debug($"> Adding ingredient: {item}, {amount}, size: {totalSize}, value: {recipe.AssignedValue}");
+                UpdateNumUsed(item);
             }
             
             // Update the total size of everything needed to build a basic outpost.
             _outpostSize += totalSize * _outpostPieces.GetOrDefault(recipe.TechType, 0);
-            recipe.Recipe.Ingredients = ingredients.Select(i => new Ingredient(i.Item.TechType, i.Amount)).ToList();
+            // Keep the number of items crafted per click consistent with the vanilla game.
             recipe.Recipe.CraftAmount = CraftDataHandler.GetRecipeData(recipe.TechType)?.craftAmount ?? 1;
-            // Set the recipe's value as the sum total of the value of its ingredients.
+            // If the recipe is for an item that could itself end up as an ingredient, update its value.
             var recipeInvItem = _entityManager.Find<LogicInventoryItem>(recipe.TechType);
             if (recipeInvItem != null)
-                recipeInvItem.Value = totalValue;
+                recipeInvItem.Value = recipe.AssignedValue;
             
             return recipe;
         }
@@ -86,37 +96,51 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// </summary>
         /// <param name="rng">The RNG for this seed.</param>
         /// <param name="recipe">The recipe to randomise ingredients for.</param>
-        /// <param name="ingredients">The existing ingredients of the recipe.</param>
         /// <param name="validIngredients">The potential ingredients to choose from.</param>
         /// <returns>The ingredients for the recipe.</returns>
-        protected abstract IEnumerable<LogicIngredient> YieldRandomIngredients(IRandomHandler rng, LogicRecipe recipe,
-            List<LogicIngredient> ingredients, List<LogicInventoryItem> validIngredients);
+        protected abstract IEnumerable<LogicInventoryItem> YieldRandomIngredients(IRandomHandler rng, LogicRecipe recipe,
+            List<LogicInventoryItem> validIngredients);
+
+        /// <summary>
+        /// Get the definitive amount of an ingredient based on Mode parameters and config values.
+        /// </summary>
+        private int GetIngredientAmt(IRandomHandler rng, LogicRecipe recipe, LogicInventoryItem ingredient)
+        {
+            int desired = GetRandomIngredientAmt(rng, recipe, ingredient);
+            int max = GetMaxAllowed(recipe, ingredient);
+            _log.Debug($"Desired: {desired}, Max: {max}");
+            return Mathf.Min(desired, max);
+        }
+
+        /// <summary>
+        /// For a new ingredient about to be added to the recipe, how many should be required?
+        /// </summary>
+        protected abstract int GetRandomIngredientAmt(IRandomHandler rng, LogicRecipe recipe,
+            LogicInventoryItem ingredient);
 
         /// <summary>
         /// Check whether conditions have been reached that mandate an early stop as defined by config values.
         /// </summary>
-        /// <param name="ingredients">The current list of ingredients.</param>
-        /// <param name="entity">The recipe to randomise ingredients for.</param>
-        /// <param name="totalSize">The current size required by all previously chosen ingredients for the recipe.</param>
+        /// <param name="recipe">The recipe to randomise ingredients for.</param>
         /// <returns>True if the loop needs to stop, false if it can continue running.</returns>
-        private bool CheckForConfigStop(List<LogicIngredient> ingredients, LogicRecipe entity, int totalSize)
+        private bool CheckForConfigStop(LogicRecipe recipe)
         {
             // Respect the maximum number of ingredients set in the config.
-            if (ingredients.Count >= _config.MaxIngredientsPerRecipe.Value)
+            if (recipe.Recipe.Ingredients.Count >= _config.MaxIngredientsPerRecipe.Value)
             {
                 _log.Debug("! Recipe has reached maximum allowed number of ingredients, stopping.");
                 return true;
             }
             
             // If a recipe starts requiring too much space, shut it down early.
-            if (totalSize >= _config.MaxInventorySizePerRecipe.Value)
+            if (GetRecipeSize(recipe) >= _config.MaxInventorySizePerRecipe.Value)
             {
                 _log.Debug("! Recipe is getting too large, stopping.");
                 return true;
             }
             
             // For special case of outpost base parts, be conservative with ingredients.
-            if (_outpostPieces.ContainsKey(entity.TechType)
+            if (_outpostPieces.ContainsKey(recipe.TechType)
                 && _outpostSize > _config.MaxBasicOutpostSize.Value * 0.7)
             {
                 _log.Debug("! Basic outpost size is getting too large, stopping.");
@@ -129,11 +153,10 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// <summary>
         /// Find the highest number of the given ingredient which the recipe can sustain given all config values.
         /// </summary>
-        /// <param name="ingredient">The ingredient to consider.</param>
-        /// <param name="totalSize">The total size of all ingredients added so far.</param>
         /// <returns>A positive integer.</returns>
-        protected int FindMaxIngredientNum(LogicInventoryItem ingredient, int totalSize = 0)
+        private int GetMaxAllowed(LogicRecipe recipe, LogicInventoryItem ingredient)
         {
+            var totalSize = GetRecipeSize(recipe);
             if (totalSize >= _config.MaxInventorySizePerRecipe.Value)
                 return 1;
             
@@ -141,7 +164,6 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             int max = _config.MaxNumberPerIngredient.Value;
             // Account for how much space this new ingredient would take up.
             max = Math.Min(max, (_config.MaxInventorySizePerRecipe.Value - totalSize) / GetItemSize(ingredient.TechType));
-            _log.Debug($"Calc max: {max}");
             
             // TODO: Replace with tagging system
             // Tools and upgrades do not stack, but if the recipe would require several and you have more than one in
@@ -162,6 +184,11 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         {
             var size = TechData.GetItemSize(item);
             return size.x * size.y;
+        }
+
+        private int GetRecipeSize(LogicRecipe recipe)
+        {
+            return recipe.Recipe.Ingredients.Sum(i => GetItemSize(i.techType));
         }
 
         private void UpdateNumUsed(LogicInventoryItem item)

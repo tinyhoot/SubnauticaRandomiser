@@ -26,6 +26,11 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// </summary>
         public int TargetValue = -1;
 
+        /// <summary>
+        /// The total value that was reached for this recipe during randomisation. 
+        /// </summary>
+        public int AssignedValue = -1;
+
         public void LinkVanillaRecipe(EntityManager manager, ILogHandler log)
         {
             Recipe = new Recipe(TechType);
