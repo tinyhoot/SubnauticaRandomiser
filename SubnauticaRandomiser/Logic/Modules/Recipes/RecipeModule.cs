@@ -36,6 +36,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
         private const string SubFolderName = "RecipeModule";
         private const string OutpostFile = "outpostParts.json";
+        private const string UpgradesFile = "upgrades.json";
         private Dictionary<TechType, int> _basicOutpostPieces = new Dictionary<TechType, int>();
         private Dictionary<TechType, TechType> _upgradeChains = new Dictionary<TechType, TechType>();
         private List<LogicInventoryItem> _validIngredients = new List<LogicInventoryItem>();
@@ -50,7 +51,8 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         {
             return new List<Task>
             {
-                LoadOutpostFile()
+                LoadOutpostFile(),
+                LoadUpgradesFile()
             };
         }
 
@@ -62,6 +64,17 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             foreach (var (piece, amt) in _basicOutpostPieces)
             {
                 _log.Debug($"- {piece.AsString()}: {amt}");
+            }
+        }
+
+        private async Task LoadUpgradesFile()
+        {
+            var json = await SerdeUtils.ReadFileContents(SubFolderName, UpgradesFile);
+            _upgradeChains = SerdeUtils.DeserializeObject<Dictionary<TechType, TechType>>(json);
+            _log.Debug("Loaded upgrade chains:");
+            foreach (var (upgrade, prior) in _upgradeChains)
+            {
+                _log.Debug($"- {upgrade.AsString()} made from {prior.AsString()}");
             }
         }
 
@@ -92,6 +105,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             // - Assign recipe/ingredient values based on vanilla recipes?
             
             SetVanillaRecipeValues(manager);
+            PrepareUpgradeChains(manager);
         }
 
         /// <summary>
@@ -151,6 +165,37 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                     i = 0;
                     lastLoopCount = recipes.Count;
                 }
+            }
+        }
+
+        private void PrepareUpgradeChains(EntityManager manager)
+        {
+            if (!_config.VanillaUpgradeChains.Value)
+            {
+                // Chains are disabled, clear whatever vanilla data we have on them.
+                _upgradeChains.Clear();
+                return;
+            }
+            
+            foreach (var (upgrade, baseItem) in _upgradeChains)
+            {
+                var recipe = manager.Find<LogicRecipe>(upgrade);
+                var item = manager.Find<LogicInventoryItem>(baseItem);
+                if (recipe is null)
+                {
+                    _log.Warn($"Upgrade chain defined for {upgrade.AsString()} using base item {baseItem.AsString()} " +
+                              $"where recipe is not defined in {nameof(LogicRecipe)}s!");
+                    continue;
+                }
+
+                if (item is null)
+                {
+                    _log.Warn($"Upgrade chain defined for {upgrade.AsString()} using base item {baseItem.AsString()} " +
+                              $"where base item is not defined in {nameof(LogicInventoryItem)}s!");
+                    continue;
+                }
+                // Add the item to the recipe's dependencies so the item always gets randomised first.
+                recipe.Dependencies.Add(item);
             }
         }
 

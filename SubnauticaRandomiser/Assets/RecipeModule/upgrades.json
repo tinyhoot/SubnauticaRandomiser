@@ -1,0 +1,14 @@
+{
+  "HeatBlade": "Knife",
+  "RepulsionCannon": "PropulsionCannon",
+  "SwimChargeFins": "Fins",
+  "UltraGlideFins": "Fins",
+  "DoubleTank": "Tank",
+  "PlasteelTank": "DoubleTank",
+  "HighCapacityTank": "DoubleTank",
+  "VehicleHullModule2": "VehicleHullModule1",
+  "VehicleHullModule3": "VehicleHullModule2",
+  "ExoHullModule2": "ExoHullModule1",
+  "CyclopsHullModule2": "CyclopsHullModule1",
+  "CyclopsHullModule3": "CyclopsHullModule2"
+}
