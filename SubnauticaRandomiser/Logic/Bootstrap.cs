@@ -183,7 +183,7 @@ namespace SubnauticaRandomiser.Logic
             task.Status = "Randomising - Linking entities";
             yield return null;
             
-            yield return _entityManager.LinkEntities();
+            yield return _entityManager.LinkEntities(_config);
             _regionManager.ReplaceReferences(_entityManager);
         }
 

@@ -1,4 +1,5 @@
 using HootLib.Interfaces;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Objects;
 
 namespace SubnauticaRandomiser.Logic.LogicObjects
@@ -31,10 +32,14 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// </summary>
         public int AssignedValue = -1;
 
-        public void LinkVanillaRecipe(EntityManager manager, ILogHandler log)
+        public void LinkVanillaRecipe(EntityManager manager, ILogHandler log, Config config)
         {
             Recipe = new Recipe(TechType);
             Recipe.CopyVanillaData();
+
+            // Don't mess with dependencies if we know the recipes will be randomised.
+            if (config.EnableRecipeModule.Value)
+                return;
             
             // Link recipe ingredients from the vanilla game.
             // If any other mods have modified the recipes this will be reflected here too.

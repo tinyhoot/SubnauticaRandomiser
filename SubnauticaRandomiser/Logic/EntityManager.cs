@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using HootLib;
+using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic.LogicObjects;
 using SubnauticaRandomiser.Serialization;
@@ -262,11 +263,11 @@ namespace SubnauticaRandomiser.Logic
             RegisterTags(entity);
         }
 
-        public IEnumerator LinkEntities()
+        public IEnumerator LinkEntities(Config config)
         {
             LinkConstructables();
             LinkInventoryItems();
-            LinkRecipes();
+            LinkRecipes(config);
             LinkBlueprints();
             yield return null;
             ReplaceReferences(_entities);
@@ -296,7 +297,7 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
-        private void LinkRecipes()
+        private void LinkRecipes(Config config)
         {
             foreach (var recipe in GetAllEntities<LogicRecipe>())
             {
@@ -304,7 +305,7 @@ namespace SubnauticaRandomiser.Logic
                 if (blueprint != null)
                     recipe.AddBlueprint(blueprint);
                 
-                recipe.LinkVanillaRecipe(this, _log);
+                recipe.LinkVanillaRecipe(this, _log, config);
             }
         }
 
