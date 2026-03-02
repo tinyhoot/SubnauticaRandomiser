@@ -36,6 +36,10 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             // Now fill up with random materials until the value threshold is more or less met, as defined by fuzziness.
             while ((recipe.TargetValue - recipe.AssignedValue) > (recipe.TargetValue * _config.RecipeValueVariance.Value / 2))
             {
+                // Failsafe, otherwise this would hang.
+                if (recipe.Recipe.Ingredients.Count >= validIngredients.Count - 1)
+                    yield break;
+                
                 var ingredient = rng.Choice(validIngredients);
                 if (ingredient is null || recipe.Recipe.Ingredients.Any(i => i.techType == ingredient.TechType))
                     continue;

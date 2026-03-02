@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using SubnauticaRandomiser.Logic.LogicObjects;
-using LogicEntity = SubnauticaRandomiser.Objects.LogicEntity;
 
 namespace SubnauticaRandomiser.Logic
 {
@@ -11,11 +10,12 @@ namespace SubnauticaRandomiser.Logic
     internal class RandomisationContext
     {
         public Region StartingRegion;
-        public List<LogicEntity> StartingEntities;
+        public List<LogicEntity> StartingEntities = new List<LogicEntity>();
 
         public RandomisationContext(Region start)
         {
             StartingRegion = start;
+            StartingEntities.AddRange(StartingRegion.Entities);
         }
     }
 }

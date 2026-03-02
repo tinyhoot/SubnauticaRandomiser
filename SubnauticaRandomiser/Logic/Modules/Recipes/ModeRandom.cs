@@ -32,6 +32,10 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                 // Prevent duplicates.
                 if (recipe.Recipe.Ingredients.Any(ing => ing.techType == item.TechType))
                 {
+                    // *But* check if there are even any options left at all.
+                    if (recipe.Recipe.Ingredients.Count >= validIngredients.Count - 1)
+                        yield break;
+                    
                     i--;
                     continue;
                 }

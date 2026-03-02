@@ -156,6 +156,13 @@ namespace SubnauticaRandomiser.Logic
             var queue = new EntityQueue(entityManager.GetAllEntities(), _rng);
             // Set up the context with vanilla information.
             var context = new RandomisationContext(regionManager.GetRegion("SafeShallows"));
+            // TODO: Replace with actual data once spawning-related modules are done.
+            context.StartingEntities.AddRange(new []
+            {
+                entityManager.Find<LogicInventoryItem>(TechType.Titanium),
+                entityManager.Find<LogicInventoryItem>(TechType.Copper),
+                entityManager.Find<LogicInventoryItem>(TechType.AcidMushroom),
+            });
             // If modules like randomised start need to change the context, they can do so through this event.
             _monitor.TriggerContextCreated(context);
             

@@ -45,6 +45,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         internal override void OnRegisterModule(Config config, ILogHandler logger, LogicMonitor monitor)
         {
             base.OnRegisterModule(config, logger, monitor);
+            _monitor.ContextCreated += OnContextCreated;
             _monitor.EntityRandomised += OnEntityRandomised;
         }
 
@@ -99,11 +100,6 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                 default:
                     throw new RandomisationException("Invalid recipe mode: " + _config.RecipeMode.Value);
             }
-            
-            // TODO: Config related setup
-            // - Upgrade chains
-            // - Egg getting waterpark as dependency
-            // - Assign recipe/ingredient values based on vanilla recipes?
             
             CopyTags(manager);
             AddDependencies(manager);
@@ -280,19 +276,12 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             if (recipe.Tags.Contains(Tag.BasePiece) && _baseTheme != null)
                 mandatory.Add(_baseTheme);
             
-            _log.Debug($"Recipe: {recipe}, tags: {recipe.Tags.ElementsToString()}, contains: {recipe.Tags.Contains(Tag.BasePiece)} mandatory: {mandatory.ElementsToString()}");
             return mandatory;
         }
 
         public override void PostEntityRandomisation(IRandomHandler rng, SaveData saveData)
         {
             saveData.GetModuleData<RecipeSaveData>().ScrapMetalResult = _mode.GetScrapMetalReplacement();
-            // TODO: Modify recipes to fit with config options.
-            // - Reduce recipe sizes belonging to outpost if necessary, starting with the recipes which take up the most
-            //   space to craft.
-            // - Replace one ingredient with upgrade chain bases
-            // - Choose base theme as soon as builder tool is randomised, then use for mandatory ingredients
-            // - Replace one ingredient with base theme
         }
 
         public override void RegisterHarmonyPatches(Harmony harmony, SaveData saveData)
@@ -322,6 +311,15 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             if (recipeSave.RecipeDict is null || recipeSave.RecipeDict.Count == 0)
                 return;
             ChangeScrapMetalResult(TechType.Titanium, recipeSave.ScrapMetalResult);
+        }
+
+        private void OnContextCreated(RandomisationContext context)
+        {
+            foreach (var entity in context.StartingEntities)
+            {
+                if (entity is LogicInventoryItem iitem)
+                    _validIngredients.Add(iitem);
+            }
         }
 
         /// <summary>

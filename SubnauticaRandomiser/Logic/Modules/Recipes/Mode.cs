@@ -63,7 +63,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                     break;
                 // Something may go wrong in the subclass, so just to be sure.
                 if (item is null)
-                    continue;
+                    break;
 
                 int amount = GetIngredientAmt(rng, recipe, item);
                 // If the amount of this ingredient is less than 1, we hit a config limit and should stop.
