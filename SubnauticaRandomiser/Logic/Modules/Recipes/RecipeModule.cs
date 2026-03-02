@@ -40,6 +40,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         private Dictionary<TechType, int> _basicOutpostPieces = new Dictionary<TechType, int>();
         private Dictionary<TechType, TechType> _upgradeChains = new Dictionary<TechType, TechType>();
         private List<LogicInventoryItem> _validIngredients = new List<LogicInventoryItem>();
+        private LogicInventoryItem _baseTheme;
         
         internal override void OnRegisterModule(Config config, ILogHandler logger, LogicMonitor monitor)
         {
@@ -104,8 +105,65 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             // - Egg getting waterpark as dependency
             // - Assign recipe/ingredient values based on vanilla recipes?
             
+            CopyTags(manager);
+            AddDependencies(manager);
             SetVanillaRecipeValues(manager);
             PrepareUpgradeChains(manager);
+        }
+
+        /// <summary>
+        /// Take any tags from <see cref="LogicConstructable"/> and <see cref="LogicInventoryItem"/> and also put them
+        /// onto the corresponding <see cref="LogicRecipe"/>.
+        /// </summary>
+        private void CopyTags(EntityManager manager)
+        {
+            foreach (var constructable in manager.GetAllEntities<LogicConstructable>())
+            {
+                var recipe = manager.Find<LogicRecipe>(constructable.TechType);
+                if (recipe != null)
+                {
+                    recipe.Tags.UnionWith(constructable.Tags);
+                    manager.RegisterTags(recipe);
+                }
+            }
+            foreach (var iitem in manager.GetAllEntities<LogicInventoryItem>())
+            {
+                var recipe = manager.Find<LogicRecipe>(iitem.TechType);
+                if (recipe != null)
+                {
+                    recipe.Tags.UnionWith(iitem.Tags);
+                    manager.RegisterTags(recipe);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Add special dependencies specific to this module to some entities.
+        /// </summary>
+        private void AddDependencies(EntityManager manager)
+        {
+            // Add the builder tool to everything related to base pieces.
+            var builder = manager.Find<LogicInventoryItem>(TechType.Builder);
+            foreach (var entity in manager.GetAllWithTag(Tag.BasePiece))
+            {
+                _log.Debug($"Adding builder dependency to {entity}");
+                entity.Dependencies.Add(builder);
+            }
+            
+            // Require the Alien Containment for full access to any eggs.
+            var acu = manager.Find<LogicConstructable>(TechType.BaseWaterPark);
+            if (!_config.DiscoverEggs.Value)
+            {
+                foreach (var entity in manager.GetAllWithTag(Tag.Egg))
+                {
+                    entity.Dependencies.Add(acu);
+                }
+            }
+            
+            foreach (var entity in manager.GetAllWithTag(Tag.EggCreature))
+            {
+                entity.Dependencies.Add(acu);
+            }
         }
 
         /// <summary>
@@ -215,9 +273,14 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         private List<LogicInventoryItem> GetMandatoryIngredients(LogicRecipe recipe, List<LogicInventoryItem> items)
         {
             List<LogicInventoryItem> mandatory = new List<LogicInventoryItem>();
+            // Try to respect vanilla upgrade chains.
             if (_upgradeChains.TryGetValue(recipe.TechType, out var baseItem))
                 mandatory.Add(items.Find(i => i.TechType == baseItem));
+            // Add base theming for base pieces.
+            if (recipe.Tags.Contains(Tag.BasePiece) && _baseTheme != null)
+                mandatory.Add(_baseTheme);
             
+            _log.Debug($"Recipe: {recipe}, tags: {recipe.Tags.ElementsToString()}, contains: {recipe.Tags.Contains(Tag.BasePiece)} mandatory: {mandatory.ElementsToString()}");
             return mandatory;
         }
 
@@ -228,7 +291,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             // - Reduce recipe sizes belonging to outpost if necessary, starting with the recipes which take up the most
             //   space to craft.
             // - Replace one ingredient with upgrade chain bases
-            // - Choose base theme
+            // - Choose base theme as soon as builder tool is randomised, then use for mandatory ingredients
             // - Replace one ingredient with base theme
         }
 
@@ -272,6 +335,14 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
             if (item.MaxRecipeUses != 0)
                 _validIngredients.Add(item);
+            
+            // Choose a base theme as soon as the builder tool enters the logic.
+            if (_config.BaseTheming.Value && item.TechType == TechType.Builder)
+            {
+                // Choose any decently low value item that does not have special restrictions on it.
+                _baseTheme = _validIngredients.First(ii => ii.Value <= 50 && ii.MaxRecipeUses <= -1);
+                _log.Debug($"Chose {_baseTheme} as base theme.");
+            }
         }
 
         // private void OnSetupBeginning(object sender, EventArgs args)

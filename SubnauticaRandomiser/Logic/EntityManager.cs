@@ -181,7 +181,7 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
-        private void RegisterTags(LogicEntity entity)
+        public void RegisterTags(LogicEntity entity)
         {
             int entityId = _entityIdMap[entity.ToString()];
             foreach (var tag in entity.Tags)
@@ -199,7 +199,8 @@ namespace SubnauticaRandomiser.Logic
                     taggedIds = new List<int>();
                     _taggedEntityIds.Add(tagId, taggedIds);
                 }
-                taggedIds.Add(entityId);
+                if (!taggedIds.Contains(entityId))
+                    taggedIds.Add(entityId);
             }
         }
 
