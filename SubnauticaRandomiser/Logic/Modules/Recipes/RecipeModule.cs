@@ -345,13 +345,48 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             if (item.MaxRecipeUses == 0 || item.MaxRecipeUses - item.TimesUsedInRecipes == 0)
                 return;
 
-            // Some items may be invalid based on config settings.
-            if ((entity.Tags.Contains(Tag.Equipment) && _config.EquipmentAsIngredients.Value == IngredientInclusionLevel.Never)
-                || (entity.Tags.Contains(Tag.Tool) && _config.ToolsAsIngredients.Value == IngredientInclusionLevel.Never)
-                || (entity.Tags.Contains(Tag.Upgrade) && _config.UpgradesAsIngredients.Value == IngredientInclusionLevel.Never))
+            // Some items may be invalid based on tags, especially in combination with config settings.
+            if (!TagsAllowedAsIngredient(item))
                 return;
             
             _validIngredients.Add(item);
+        }
+        
+        /// <summary>
+        /// Check whether an item's tags disqualify it from being an ingredient.
+        /// </summary>
+        /// <returns>True if the ingredient is allowed to be used as such.</returns>
+        private bool TagsAllowedAsIngredient(LogicInventoryItem item)
+        {
+            // If this item *itself* has these tags, do not consider it.
+            if ((item.Tags.Contains(Tag.Equipment) && _config.EquipmentAsIngredients.Value == IngredientInclusionLevel.Never)
+                || (item.Tags.Contains(Tag.Tool) && _config.ToolsAsIngredients.Value == IngredientInclusionLevel.Never)
+                || (item.Tags.Contains(Tag.Upgrade) && _config.UpgradesAsIngredients.Value == IngredientInclusionLevel.Never))
+                return false;
+            
+            // If this item has a recipe and any of its *ingredients* has these tags, do not consider it.
+            // This ensures some tags cannot show up as part of nested recipes.
+            if (item.Recipe != null)
+            {
+                foreach (var ingredient in item.Recipe.Recipe.Ingredients)
+                {
+                    // It is technically possible for an ingredient to be in this recipe but not in the list - which is
+                    // actually fine, we only care about it not being in any future recipes.
+                    var entity = _validIngredients.Find(ii => ii.TechType == ingredient.techType);
+                    if (entity is null)
+                        continue;
+
+                    if ((entity.Tags.Contains(Tag.Equipment) &&
+                         _config.EquipmentAsIngredients.Value == IngredientInclusionLevel.TopLevelOnly)
+                        || (entity.Tags.Contains(Tag.Tool) &&
+                            _config.ToolsAsIngredients.Value == IngredientInclusionLevel.TopLevelOnly)
+                        || (entity.Tags.Contains(Tag.Upgrade) &&
+                            _config.UpgradesAsIngredients.Value == IngredientInclusionLevel.TopLevelOnly))
+                        return false;
+                }
+            }
+            
+            return true;
         }
 
         private void OnRemoveValidIngredient(LogicInventoryItem ingredient)
