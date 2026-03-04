@@ -39,6 +39,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         private const string UpgradesFile = "upgrades.json";
         private Dictionary<TechType, int> _basicOutpostPieces = new Dictionary<TechType, int>();
         private Dictionary<TechType, TechType> _upgradeChains = new Dictionary<TechType, TechType>();
+        private Dictionary<TechType, LogicInventoryItem> _upgradeItems = new Dictionary<TechType, LogicInventoryItem>();
         private List<LogicInventoryItem> _validIngredients = new List<LogicInventoryItem>();
         private LogicInventoryItem _baseTheme;
         
@@ -230,6 +231,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             {
                 // Chains are disabled, clear whatever vanilla data we have on them.
                 _upgradeChains.Clear();
+                _upgradeItems.Clear();
                 return;
             }
             
@@ -250,6 +252,9 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                               $"where base item is not defined in {nameof(LogicInventoryItem)}s!");
                     continue;
                 }
+                
+                // Keep the base item ready for later.
+                _upgradeItems.Add(upgrade, item);
                 // Add the item to the recipe's dependencies so the item always gets randomised first.
                 recipe.Dependencies.Add(item);
             }
@@ -272,8 +277,8 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         {
             List<LogicInventoryItem> mandatory = new List<LogicInventoryItem>();
             // Try to respect vanilla upgrade chains.
-            if (_upgradeChains.TryGetValue(recipe.TechType, out var baseItem))
-                mandatory.Add(items.Find(i => i.TechType == baseItem));
+            if (_upgradeItems.TryGetValue(recipe.TechType, out var baseItem))
+                mandatory.Add(baseItem);
             // Add base theming for base pieces.
             if (recipe.Tags.Contains(Tag.BasePiece) && _baseTheme != null)
                 mandatory.Add(_baseTheme);
