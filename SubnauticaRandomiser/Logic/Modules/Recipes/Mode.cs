@@ -123,6 +123,11 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// </summary>
         protected abstract int GetRandomIngredientAmt(IRandomHandler rng, LogicRecipe recipe,
             LogicInventoryItem ingredient);
+        
+        /// <summary>
+        /// Get the TechType of the material to deconstruct scrap metal into.
+        /// </summary>
+        public abstract TechType GetScrapMetalReplacement(IRandomHandler rng, List<LogicInventoryItem> validItems);
 
         /// <summary>
         /// Check whether conditions have been reached that mandate an early stop as defined by config values.
@@ -207,11 +212,6 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                 _log.Debug($"Item {item} has reached max usage, removed from valid ingredient pool.");
             }
         }
-
-        /// <summary>
-        /// Get the TechType of the material to deconstruct scrap metal into.
-        /// </summary>
-        public abstract TechType GetScrapMetalReplacement();
 
         /// <summary>
         /// Remove all entities from the valid ingredients list which contain the given entity as an ingredient.

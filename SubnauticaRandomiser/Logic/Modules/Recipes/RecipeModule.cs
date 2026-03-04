@@ -288,7 +288,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
         public override void PostEntityRandomisation(IRandomHandler rng, SaveData saveData)
         {
-            saveData.GetModuleData<RecipeSaveData>().ScrapMetalResult = _mode.GetScrapMetalReplacement();
+            saveData.GetModuleData<RecipeSaveData>().ScrapMetalResult = _mode.GetScrapMetalReplacement(rng, _validIngredients);
         }
 
         public override void RegisterHarmonyPatches(Harmony harmony, SaveData saveData)

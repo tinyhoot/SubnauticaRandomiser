@@ -53,16 +53,11 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             return rng.Next(1, FindMaximum(ingredient, recipe.TargetValue, recipe.AssignedValue));
         }
 
-        public override TechType GetScrapMetalReplacement()
+        public override TechType GetScrapMetalReplacement(IRandomHandler rng, List<LogicInventoryItem> validItems)
         {
-            // TODO
-            return TechType.Copper;
-
-            // if (_baseTheme?.GetBaseTheme() != null)
-            //     return _baseTheme.GetBaseTheme().TechType;
-            //
-            // var options = _entityHandler.GetAllRawMaterials();
-            // return _rng.Choice(options).TechType;
+            // Only include spawnables that are accessible early on.
+            var options = validItems.Where(ii => ii.Recipe is null && ii.Sphere <= 1);
+            return rng.Choice(options.ToList()).TechType;
         }
 
         /// <summary>

@@ -50,13 +50,10 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             return rng.Next(1, max + 1, _distribution);
         }
 
-        public override TechType GetScrapMetalReplacement()
+        public override TechType GetScrapMetalReplacement(IRandomHandler rng, List<LogicInventoryItem> validItems)
         {
-            // TODO
-            return TechType.AcidMushroom;
-            
-            // var options = _entityHandler.GetAllRawMaterials();
-            // return _rng.Choice(options).TechType;
+            // Choosing any item with a recipe will always skip at least *some* progression, so do not include those.
+            return rng.Choice(validItems.Where(ii => ii.Recipe is null).ToList()).TechType;
         }
     }
 }
