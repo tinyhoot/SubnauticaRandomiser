@@ -330,9 +330,6 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             // Only things you can hold in your inventory can be ingredients.
             if (!(entity is LogicInventoryItem item))
                 return;
-
-            if (item.MaxRecipeUses != 0)
-                _validIngredients.Add(item);
             
             // Choose a base theme as soon as the builder tool enters the logic.
             if (_config.BaseTheming.Value && item.TechType == TechType.Builder)
@@ -341,6 +338,18 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                 _baseTheme = _validIngredients.First(ii => ii.Value <= 50 && ii.MaxRecipeUses <= -1);
                 _log.Debug($"Chose {_baseTheme} as base theme.");
             }
+            
+            // This is not a valid ingredient if it has been marked as forbidden/used up.
+            if (item.MaxRecipeUses == 0 || item.MaxRecipeUses - item.TimesUsedInRecipes == 0)
+                return;
+
+            // Some items may be invalid based on config settings.
+            if ((entity.Tags.Contains(Tag.Equipment) && _config.EquipmentAsIngredients.Value == IngredientInclusionLevel.Never)
+                || (entity.Tags.Contains(Tag.Tool) && _config.ToolsAsIngredients.Value == IngredientInclusionLevel.Never)
+                || (entity.Tags.Contains(Tag.Upgrade) && _config.UpgradesAsIngredients.Value == IngredientInclusionLevel.Never))
+                return;
+            
+            _validIngredients.Add(item);
         }
 
         // private void OnSetupBeginning(object sender, EventArgs args)

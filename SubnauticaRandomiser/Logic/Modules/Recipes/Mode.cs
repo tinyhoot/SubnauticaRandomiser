@@ -164,18 +164,14 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             int max = _config.MaxNumberPerIngredient.Value;
             // Account for how much space this new ingredient would take up.
             max = Math.Min(max, (_config.MaxInventorySizePerRecipe.Value - totalSize) / GetItemSize(ingredient.TechType));
-            
-            // TODO: Replace with tagging system
+
             // Tools and upgrades do not stack, but if the recipe would require several and you have more than one in
             // inventory, it will consume all of them.
-            // if (ingredient.Category.Equals(TechTypeCategory.Tools) 
-            //     || ingredient.Category.Equals(TechTypeCategory.VehicleUpgrades) 
-            //     || ingredient.Category.Equals(TechTypeCategory.WorkBenchUpgrades))
-            //     max = Math.Min(max, 1);
-            //
-            // // Never require more than one (default) egg. That's tedious.
-            // if (ingredient.Category.Equals(TechTypeCategory.Eggs))
-            //     max = Math.Min(max, _config.MaxEggsAsSingleIngredient.Value);
+            if (ingredient.Tags.Overlaps(new[] { Tag.Equipment, Tag.Tool, Tag.Upgrade }))
+                max = Math.Min(max, 1);
+            // Never require more than one (default) egg. That's tedious.
+            if (ingredient.Tags.Overlaps(new[] { Tag.Egg, Tag.EggCreature }))
+                max = Math.Min(max, _config.MaxEggsAsSingleIngredient.Value);
 
             return max;
         }
