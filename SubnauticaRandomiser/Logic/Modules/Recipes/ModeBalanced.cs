@@ -10,7 +10,7 @@ using ILogHandler = HootLib.Interfaces.ILogHandler;
 namespace SubnauticaRandomiser.Logic.Modules.Recipes
 {
     /// <summary>
-    /// Aims to provide a balanced, curated, sane approach to recipe randomisation. Has many checks and balances in
+    /// Aims to provide a balanced, curated, sane approach to recipe randomisation. Has checks and balances in
     /// place to prevent recipes from becoming grindy or unfun.
     /// </summary>
     internal class ModeBalanced : Mode
@@ -90,41 +90,5 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             
             return max;
         }
-        
-        // /// <summary>
-        // /// Replace an undesirable ingredient with one of similar value. Start with a range of 10% in each direction,
-        // /// increasing if no valid replacement can be found.
-        // /// </summary>
-        // /// <param name="undesirable">The ingredient to replace.</param>
-        // /// <returns>A different ingredient of roughly similar value, or a random raw material as fallback.</returns>
-        // private LogicEntity ReplaceWithSimilarValue(LogicEntity undesirable)
-        // {
-        //     int value = undesirable.Value;
-        //     double range = 0.1;
-        //
-        //     List<LogicEntity> betterOptions = new List<LogicEntity>();
-        //     _log.Debug("Replacing undesirable ingredient " + undesirable);
-        //
-        //     // Progressively increase the search radius if no replacement is found,
-        //     // but stop before it gets out of hand.
-        //     while (betterOptions.Count == 0 && range < 1.0)
-        //     {
-        //         double maxValue = undesirable.Value + (undesirable.Value * range);
-        //         double minValue = undesirable.Value - (undesirable.Value * range);
-        //         // Add all items of the same category with value +- range%
-        //         betterOptions.AddRange(_validIngredients.Where(x => x.Category.Equals(undesirable.Category)
-        //                                                             && minValue < x.Value
-        //                                                             && x.Value < maxValue
-        //         ));
-        //         range += 0.2;
-        //     }
-        //
-        //     // If the loop above exited due to the range getting too large, just
-        //     // use any unlocked raw material instead.
-        //     if (betterOptions.Count == 0)
-        //         betterOptions.AddRange(_validIngredients.Where(x => x.Category.Equals(TechTypeCategory.RawMaterials)));
-        //
-        //     return _rng.Choice(betterOptions);
-        // }
     }
 }
