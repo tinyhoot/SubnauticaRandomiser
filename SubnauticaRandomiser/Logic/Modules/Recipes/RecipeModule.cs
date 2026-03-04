@@ -13,6 +13,7 @@ using SubnauticaRandomiser.Logic.LogicObjects;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Objects.Exceptions;
+using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
@@ -42,6 +43,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         private Dictionary<TechType, LogicInventoryItem> _upgradeItems = new Dictionary<TechType, LogicInventoryItem>();
         private List<LogicInventoryItem> _validIngredients = new List<LogicInventoryItem>();
         private LogicInventoryItem _baseTheme;
+        private EntityManager _entityManager;
         
         internal override void OnRegisterModule(Config config, ILogHandler logger, LogicMonitor monitor)
         {
@@ -88,6 +90,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
         public override void PrepareRandomisation(EntityManager manager)
         {
+            _entityManager = manager;
             _validIngredients = new List<LogicInventoryItem>();
             
             switch (_config.RecipeMode.Value)
@@ -262,6 +265,10 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
         public override void PreEntityRandomisation(IRandomHandler rng, SaveData saveData)
         {
+            var save = saveData.GetModuleData<RecipeSaveData>();
+            // Grab all eggs for patching later if auto-discovery is enabled.
+            if (_config.DiscoverEggs.Value)
+                save.EggsToAutoDiscover = _entityManager.GetAllWithTag(Tag.Egg).Select(e => e.TechType).ToList();
         }
 
         public override void RandomiseEntity(IRandomHandler rng, SaveData saveData, LogicEntity entity)
@@ -293,7 +300,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
         public override void RegisterHarmonyPatches(Harmony harmony, SaveData saveData)
         {
-            // No patches necessary, it's all going through Nautilus.
+            harmony.PatchAll(typeof(EggPatcher));
         }
 
         public override void ApplySerializedState(SaveData saveData)

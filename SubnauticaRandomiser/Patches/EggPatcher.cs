@@ -1,6 +1,7 @@
+using System.Linq;
 using HarmonyLib;
 using SubnauticaRandomiser.Logic;
-using SubnauticaRandomiser.Objects.Enums;
+using SubnauticaRandomiser.Serialization.Modules;
 
 namespace SubnauticaRandomiser.Patches
 {
@@ -14,9 +15,12 @@ namespace SubnauticaRandomiser.Patches
         [HarmonyPatch(typeof(Player), nameof(Player.Start))]
         public static void UnlockEggs()
         {
-            foreach (var egg in CoreLogic.Main.EntityHandler.GetByCategory(TechTypeCategory.Eggs))
+            if (Bootstrap.SaveData.GetModuleData<RecipeSaveData>() is { } save)
             {
-                KnownTech.Add(egg.TechType);
+                foreach (var egg in save.EggsToAutoDiscover ?? Enumerable.Empty<TechType>())
+                {
+                    KnownTech.Add(egg);
+                }
             }
         }
     }

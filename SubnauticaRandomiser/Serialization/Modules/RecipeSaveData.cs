@@ -7,7 +7,7 @@ namespace SubnauticaRandomiser.Serialization.Modules
     internal class RecipeSaveData : BaseModuleSaveData
     {
         public Dictionary<TechType, Recipe> RecipeDict = new Dictionary<TechType, Recipe>();
-        public bool DiscoverEggs;
+        public List<TechType> EggsToAutoDiscover = new List<TechType>();
         public TechType ScrapMetalResult;
         
         public bool AddRecipe(TechType type, Recipe r)
