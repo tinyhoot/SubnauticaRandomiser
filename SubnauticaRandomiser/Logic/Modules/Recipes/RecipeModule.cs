@@ -100,6 +100,8 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                 default:
                     throw new RandomisationException("Invalid recipe mode: " + _config.RecipeMode.Value);
             }
+
+            _mode.RemoveValidIngredient += OnRemoveValidIngredient;
             
             CopyTags(manager);
             AddDependencies(manager);
@@ -350,6 +352,11 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                 return;
             
             _validIngredients.Add(item);
+        }
+
+        private void OnRemoveValidIngredient(LogicInventoryItem ingredient)
+        {
+            _validIngredients.Remove(ingredient);
         }
 
         // private void OnSetupBeginning(object sender, EventArgs args)

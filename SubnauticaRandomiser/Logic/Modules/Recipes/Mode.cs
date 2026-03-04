@@ -23,6 +23,11 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         private int _outpostSize;
         protected RandomDistribution _distribution;
 
+        /// <summary>
+        /// Invoked whenever an ingredient should no longer be considered valid for all future recipes.
+        /// </summary>
+        public event Action<LogicInventoryItem> RemoveValidIngredient;
+
         protected Mode(Config config, EntityManager manager, Dictionary<TechType, int> outpostPieces)
         {
             _config = config;
@@ -66,15 +71,16 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
                     break;
 
                 int amount = GetIngredientAmt(rng, recipe, item);
-                // If the amount of this ingredient is less than 1, we hit a config limit and should stop.
+                // If the amount of this ingredient is less than 1, something about this specific ingredient was wrong.
+                // Try again with a different one.
                 if (amount <= 0)
-                    break;
+                    continue;
                 
                 recipe.Recipe.Ingredients.Add(new Ingredient(item.TechType, amount));
                 totalSize += GetItemSize(item.TechType) * amount;
                 recipe.AssignedValue += item.Value * amount;
                 _log.Debug($"> Adding ingredient: {item}, {amount}, size: {totalSize}, value: {recipe.AssignedValue}");
-                UpdateNumUsed(item);
+                UpdateNumUsed(validIngredients, item);
             }
             
             // Update the total size of everything needed to build a basic outpost.
@@ -187,7 +193,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             return recipe.Recipe.Ingredients.Sum(i => GetItemSize(i.techType));
         }
 
-        private void UpdateNumUsed(LogicInventoryItem item)
+        private void UpdateNumUsed(List<LogicInventoryItem> validItems, LogicInventoryItem item)
         {
             // Only do this for items that actually need tracking.
             if (item.MaxRecipeUses < 0)
@@ -196,7 +202,9 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             item.TimesUsedInRecipes++;
             if (item.MaxRecipeUses - item.TimesUsedInRecipes <= 0)
             {
-                // TODO: Remove from valid ingredients, remove parent recipe too.
+                RemoveValidIngredient?.Invoke(item);
+                RemoveParentRecipes(validItems, item);
+                _log.Debug($"Item {item} has reached max usage, removed from valid ingredient pool.");
             }
         }
 
@@ -205,32 +213,26 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// </summary>
         public abstract TechType GetScrapMetalReplacement();
 
-        protected bool IsAllowedAsIngredient(LogicRecipe recipe, TechType ingredient)
-        {
-            // TODO: Check for tags of constructable, equipment, tools, upgrade.
-            return true;
-        }
-
         /// <summary>
         /// Remove all entities from the valid ingredients list which contain the given entity as an ingredient.
         /// </summary>
-        private void RemoveParentRecipes(LogicEntity entity)
+        private void RemoveParentRecipes(List<LogicInventoryItem> validItems, LogicInventoryItem entity)
         {
-            // TODO
-        }
-
-        /// <summary>
-        /// Exists for convenience, and so that we don't have to look up the InventoryItem via the manager all the time.
-        /// </summary>
-        protected struct LogicIngredient
-        {
-            public LogicInventoryItem Item;
-            public int Amount;
-
-            public LogicIngredient(LogicInventoryItem item, int amount)
+            foreach (var item in validItems)
             {
-                Item = item;
-                Amount = amount;
+                // Some entities, like pure spawnables, may not have recipes at all.
+                if (item.Recipe is null)
+                    continue;
+
+                foreach (var ingredient in item.Recipe.Recipe.Ingredients)
+                {
+                    if (ingredient.techType == entity.TechType)
+                    {
+                        // Found parent, remove it.
+                        RemoveValidIngredient?.Invoke(item);
+                        break;
+                    }
+                }
             }
         }
     }
