@@ -363,6 +363,13 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         /// <returns>True if the ingredient is allowed to be used as such.</returns>
         private bool TagsAllowedAsIngredient(LogicInventoryItem item)
         {
+            if ((item.Tags.Contains(Tag.Creature) || item.Tags.Contains(Tag.EggCreature)) && !_config.UseFish.Value)
+                return false;
+            if (item.Tags.Contains(Tag.Egg) && !_config.UseFish.Value)
+                return false;
+            if (item.Tags.Contains(Tag.Seed) && !_config.UseSeeds.Value)
+                return false;
+            
             // If this item *itself* has these tags, do not consider it.
             if ((item.Tags.Contains(Tag.Equipment) && _config.EquipmentAsIngredients.Value == IngredientInclusionLevel.Never)
                 || (item.Tags.Contains(Tag.Tool) && _config.ToolsAsIngredients.Value == IngredientInclusionLevel.Never)
