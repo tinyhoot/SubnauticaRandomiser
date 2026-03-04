@@ -27,9 +27,8 @@ namespace SubnauticaRandomiser.Logic
         private PrefixLogHandler _log = PrefixLogHandler.Get("[EntityManager]");
         private List<LogicEntity> _entities = new List<LogicEntity>();
         private Dictionary<string, int> _entityIdMap = new Dictionary<string, int>();
-        private Dictionary<TechType, List<int>> _entityTechIds = new Dictionary<TechType, List<int>>();
-        private Dictionary<string, int> _tagMap = new Dictionary<string, int>();
-        private Dictionary<int, List<int>> _taggedEntityIds = new Dictionary<int, List<int>>();
+        private Dictionary<TechType, List<int>> _techToEntityIds = new Dictionary<TechType, List<int>>();
+        private Dictionary<string, List<int>> _tagToEntityIds = new Dictionary<string, List<int>>();
 
         /// <summary>
         /// Try to find a specific entity. Will return null if none match the search criteria.
@@ -109,7 +108,7 @@ namespace SubnauticaRandomiser.Logic
         /// <returns>The entity ids, or null if no entity with that TechType exists.</returns>
         public List<int> GetAllIdsByTechType(TechType techType)
         {
-            if (!_entityTechIds.TryGetValue(techType, out List<int> ids))
+            if (!_techToEntityIds.TryGetValue(techType, out List<int> ids))
                 return null;
 
             return ids.ShallowCopy();
@@ -142,15 +141,9 @@ namespace SubnauticaRandomiser.Logic
         /// <returns>All entities with that tag, or null if none exist.</returns>
         public List<LogicEntity> GetAllWithTag(string tag)
         {
-            if (!_tagMap.TryGetValue(tag, out var tagId))
+            if (!_tagToEntityIds.TryGetValue(tag, out var entityIds))
             {
                 _log.Warn($"Tried to get all entities with tag '{tag}', but tag was never registered!");
-                return null;
-            }
-
-            if (!_taggedEntityIds.TryGetValue(tagId, out var entityIds))
-            {
-                _log.Warn($"Orphaned tag '{tag}' with id {tagId} is not used by any entities!");
                 return null;
             }
 
@@ -162,7 +155,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         public IEnumerable<LogicEntity> FilterByTag(IEnumerable<LogicEntity> entities, string tag)
         {
-            if (!_tagMap.TryGetValue(tag, out var tagId))
+            if (!_tagToEntityIds.ContainsKey(tag))
             {
                 _log.Warn($"Tried to filter entities by tag '{tag}' but tag was never registered!");
                 yield break;
@@ -170,15 +163,9 @@ namespace SubnauticaRandomiser.Logic
 
             foreach (var entity in entities)
             {
-                foreach (var entityTag in entity.Tags)
-                {
-                    // If any tag matches the search tag, return the entity.
-                    if (_tagMap.TryGetValue(entityTag, out var i) && i == tagId)
-                    {
-                        yield return entity;
-                        break;
-                    }
-                }
+                // If any tag matches the search tag, return the entity.
+                if (entity.Tags.Contains(tag))
+                    yield return entity;
             }
         }
 
@@ -187,18 +174,11 @@ namespace SubnauticaRandomiser.Logic
             int entityId = _entityIdMap[entity.ToString()];
             foreach (var tag in entity.Tags)
             {
-                // Register the tag if we've never seen it before.
-                if (!_tagMap.TryGetValue(tag, out int tagId))
-                {
-                    tagId = _tagMap.Count;
-                    _tagMap.Add(tag, tagId);
-                }
-                
                 // Keep a list of all entities with a specific tag.
-                if (!_taggedEntityIds.TryGetValue(tagId, out var taggedIds))
+                if (!_tagToEntityIds.TryGetValue(tag, out var taggedIds))
                 {
                     taggedIds = new List<int>();
-                    _taggedEntityIds.Add(tagId, taggedIds);
+                    _tagToEntityIds.Add(tag, taggedIds);
                 }
                 if (!taggedIds.Contains(entityId))
                     taggedIds.Add(entityId);
@@ -220,9 +200,8 @@ namespace SubnauticaRandomiser.Logic
             yield return DeserializeEntitiesAsync<LogicSpawnable>(EntitiesFolder, SpawnablesFile);
             
             _log.Debug($"Loaded {_entities.Count} entities.");
-            foreach (var (tagId, entities) in _taggedEntityIds)
+            foreach (var (tag, entities) in _tagToEntityIds)
             {
-                string tag = _tagMap.FirstOrDefault(kv => kv.Value == tagId).Key ?? "NOT FOUND";
                 _log.Debug($"> Tag {tag}: {entities.Count} entities");
             }
         }
@@ -252,10 +231,10 @@ namespace SubnauticaRandomiser.Logic
         {
             // The numerical ID of an entity is its registration number.
             _entityIdMap[entity.ToString()] = _entities.Count;
-            if (!_entityTechIds.TryGetValue(entity.TechType, out List<int> ids))
+            if (!_techToEntityIds.TryGetValue(entity.TechType, out List<int> ids))
             {
                 ids = new List<int>();
-                _entityTechIds[entity.TechType] = ids;
+                _techToEntityIds[entity.TechType] = ids;
             }
             ids.Add(_entities.Count);
             _entities.Add(entity);
