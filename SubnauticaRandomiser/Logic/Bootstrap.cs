@@ -8,6 +8,7 @@ using HootLib;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Handlers;
+using SubnauticaRandomiser.Logic.LogicObjects;
 using SubnauticaRandomiser.Logic.Modules;
 using SubnauticaRandomiser.Logic.Modules.Recipes;
 using SubnauticaRandomiser.Patches;
@@ -36,6 +37,7 @@ namespace SubnauticaRandomiser.Logic
         private EntityManager _entityManager;
         private RegionManager _regionManager;
         private TravelDistanceManager _travelDistanceManager;
+        private TaskResult<List<PriorityRule>> _priorityRules;
         private GameStateSynchroniser _sync;
         private readonly List<BaseLogicModule> _modules = new List<BaseLogicModule>();
 
@@ -75,6 +77,7 @@ namespace SubnauticaRandomiser.Logic
                 _entityManager = new EntityManager();
                 _regionManager = new RegionManager();
                 _travelDistanceManager = new TravelDistanceManager(_config);
+                _priorityRules = new TaskResult<List<PriorityRule>>();
                 yield return EnableModules(task);
                 _log.Debug($"Modules - {Time.realtimeSinceStartup - startTime}");
                 yield return InitSaveData(task);
@@ -88,7 +91,7 @@ namespace SubnauticaRandomiser.Logic
                 yield return ValidateSetupStage(task);
                 _log.Debug($"ValidateSetup - {Time.realtimeSinceStartup - startTime}");
                 // Randomise the game and save the final state to the SaveData.
-                yield return _coreLogic.Randomise(task, SaveData, _entityManager, _regionManager, _travelDistanceManager);
+                yield return _coreLogic.Randomise(task, SaveData, _entityManager, _regionManager, _travelDistanceManager, _priorityRules.value);
             }
             else
             {
@@ -166,6 +169,7 @@ namespace SubnauticaRandomiser.Logic
             yield return new RushedCoroutine(_entityManager.ParseEntitiesFromDiskAsync(), 1f / 30f).Advance();
             yield return new RushedCoroutine(_regionManager.ParseFromDiskAsync(), 1f / 30f).Advance();
             yield return _travelDistanceManager.LoadTravelDataFromDiskAsync(_entityManager);
+            yield return PriorityRule.LoadFromDiskAsync(_entityManager, _priorityRules);
             yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
             // Ensure we don't continue and the user is notified if some data fails to load.
             foreach (var t in fileTasks.Where(t => t.IsFaulted))

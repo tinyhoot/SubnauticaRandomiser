@@ -1,0 +1,65 @@
+[
+  {
+    "Entities": [
+      "LogicInventoryItem:Scanner",
+      "LogicInventoryItem:Welder",
+      "LogicInventoryItem:SmallStorage"
+    ],
+    "RequireAllEntities": true,
+    "ForceBySphere": 0
+  },
+  {
+    "Entities": [
+      "LogicInventoryItem:Builder",
+      "LogicInventoryItem:Seaglide",
+      "LogicInventoryItem:Tank",
+      "LogicFragment:LaserCutter",
+      "LogicConstructable:BaseRoom",
+      "LogicConstructable:BaseHatch",
+      "LogicConstructable:Fabricator"
+    ],
+    "RequireAllEntities": true,
+    "ForceBySphere": 1
+  },
+  {
+    "Entities": [
+      "LogicInventoryItem:Battery",
+      "LogicConstructable:BatteryCharger"
+    ],
+    "RequireAllEntities": false,
+    "ForceBySphere": 1
+  },
+  {
+    "Entities": [
+      "LogicConstructable:BaseBioReactor",
+      "LogicConstructable:SolarPanel"
+    ],
+    "RequireAllEntities": false,
+    "ForceBySphere": 3
+  },
+  {
+    "Entities": [
+      "LogicConstructable:BaseBulkhead",
+      "LogicConstructable:BaseFoundation",
+      "LogicConstructable:BaseReinforcement"
+    ],
+    "RequireAllEntities": false,
+    "ForceBySphere": 3
+  },
+  {
+    "Entities": [
+      "LogicInventoryItem:PowerCell",
+      "LogicConstructable:PowerCellCharger",
+      "LogicInventoryItem:SeamothSolarCharge"
+    ],
+    "RequireAllEntities": false,
+    "ForceBySphere": 3
+  },
+  {
+    "Entities": [
+      "LogicConstructable:BaseWaterPark"
+    ],
+    "RequireAllEntities": true,
+    "ForceBySphere": 4
+  }
+]

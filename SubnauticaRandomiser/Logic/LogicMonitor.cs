@@ -13,32 +13,30 @@ namespace SubnauticaRandomiser.Logic
         /// be used to modify said state.
         /// </summary>
         public event Action<RandomisationContext> ContextCreated;
-        
-        /// <summary>
-        /// Triggered during the setup stage as every <see cref="LogicEntity"/> is randomly assigned its priority in
-        /// the logic. This event can be used to override individual entities' priorities, e.g. to force certain QoL
-        /// items to appear relatively early.
-        /// </summary>
-        public event Action<LogicEntity> PrioritySetup;
 
         /// <summary>
         /// Triggered after an entity was successfully randomised.
         /// </summary>
         public event Action<LogicEntity> EntityRandomised;
 
+        /// <summary>
+        /// Triggered whenever a new <see cref="Sphere"/> is created during the main loop.
+        /// </summary>
+        public event Action<Sphere> SphereCreated;
+
         internal void TriggerContextCreated(RandomisationContext ctx)
         {
             ContextCreated?.Invoke(ctx);
         }
 
-        internal void TriggerPrioritySetup(LogicEntity entity)
-        {
-            PrioritySetup?.Invoke(entity);
-        }
-
         internal void TriggerEntityRandomised(LogicEntity entity)
         {
             EntityRandomised?.Invoke(entity);
+        }
+
+        internal void TriggerSphereCreated(Sphere sphere)
+        {
+            SphereCreated?.Invoke(sphere);
         }
     }
 }

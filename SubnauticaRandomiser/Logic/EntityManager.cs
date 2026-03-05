@@ -326,5 +326,27 @@ namespace SubnauticaRandomiser.Logic
                 }
             }
         }
+
+        /// <summary>
+        /// Try to replace <see cref="LogicEntityReference"/>s in a list with their proper equivalents.
+        /// </summary>
+        public void ReplaceReferencesInPlace(List<LogicEntity> referenceEntities)
+        {
+            for (int i = 0; i < referenceEntities.Count; i++)
+            {
+                var reference = referenceEntities[i] as LogicEntityReference;
+                if (reference is null)
+                    continue;
+                
+                var replacement = Find(reference.EntityType, reference.TechType);
+                if (replacement is null)
+                {
+                    _log.Warn($"Failed to replace reference entity {reference}");
+                    continue;
+                }
+
+                referenceEntities[i] = replacement;
+            }
+        }
     }
 }

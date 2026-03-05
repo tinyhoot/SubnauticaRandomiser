@@ -93,7 +93,7 @@ namespace SubnauticaRandomiser.Logic
         /// locking up / freezing.
         /// </summary>
         internal IEnumerator Randomise(WaitScreenHandler.WaitScreenTask task, SaveData saveData, 
-            EntityManager entityManager, RegionManager regionManager, TravelDistanceManager travelManager)
+            EntityManager entityManager, RegionManager regionManager, TravelDistanceManager travelManager, List<PriorityRule> rules)
         {
             _rng = new RandomHandler(GetSeedFromConfig());
             
@@ -103,7 +103,7 @@ namespace SubnauticaRandomiser.Logic
             
             task.Status = "Randomising entities (this may take a while)";
             yield return null;
-            yield return RandomiseEntities(saveData, entityManager, regionManager, travelManager);
+            yield return RandomiseEntities(saveData, entityManager, regionManager, travelManager, rules);
             
             task.Status = "Randomising after entities";
             yield return null;
@@ -143,17 +143,10 @@ namespace SubnauticaRandomiser.Logic
         }
 
         private IEnumerator RandomiseEntities(SaveData saveData, EntityManager entityManager, RegionManager regionManager,
-            TravelDistanceManager travelManager)
+            TravelDistanceManager travelManager, List<PriorityRule> rules)
         {
-            // Create new sphere
-            // Explore all regions and transitions as far as possible
-            // Prune inward facing transitions (only keep ones to new regions) and keep a list of all transitions
-            // Fill priority items
-            // Fill regular items
-            // Repeat
-            
             // Set up the queue with every known entity.
-            var queue = new EntityQueue(entityManager.GetAllEntities(), _rng);
+            var queue = new EntityQueue(entityManager.GetAllEntities(), _rng, rules, _monitor);
             // Set up the context with vanilla information.
             var context = new RandomisationContext(regionManager.GetRegion("SafeShallows"));
             // TODO: Replace with actual data once spawning-related modules are done.
@@ -214,6 +207,7 @@ namespace SubnauticaRandomiser.Logic
                     sphere = new Sphere(sphere, newRegions);
                     spheres.Add(sphere);
                     _log.Debug($"--- Entity {entity} unlocked new sphere tier {sphere.Tier} ---");
+                    _monitor.TriggerSphereCreated(sphere);
                 }
 
                 yield return null;
