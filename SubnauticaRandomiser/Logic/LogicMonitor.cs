@@ -12,7 +12,7 @@ namespace SubnauticaRandomiser.Logic
         /// Triggered during the setup stage as the initial state for <see cref="Sphere"/> zero is determined. Can
         /// be used to modify said state.
         /// </summary>
-        public event Action<RandomisationContext> ContextCreated;
+        public event Action<StartingState> StartingStateCreated;
 
         /// <summary>
         /// Triggered after an entity was successfully randomised.
@@ -24,9 +24,9 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         public event Action<Sphere> SphereCreated;
 
-        internal void TriggerContextCreated(RandomisationContext ctx)
+        internal void TriggerStartingStateCreated(StartingState ctx)
         {
-            ContextCreated?.Invoke(ctx);
+            StartingStateCreated?.Invoke(ctx);
         }
 
         internal void TriggerEntityRandomised(LogicEntity entity)

@@ -33,11 +33,8 @@ namespace SubnauticaRandomiser.Logic
         private ILogHandler _log = PrefixLogHandler.Get("[Bootstrap]");
         
         private CoreLogic _coreLogic;
+        private RandoContext _context;
         private LogicMonitor _monitor;
-        private EntityManager _entityManager;
-        private RegionManager _regionManager;
-        private TravelDistanceManager _travelDistanceManager;
-        private TaskResult<List<PriorityRule>> _priorityRules;
         private GameStateSynchroniser _sync;
         private readonly List<BaseLogicModule> _modules = new List<BaseLogicModule>();
 
@@ -74,10 +71,7 @@ namespace SubnauticaRandomiser.Logic
             if (SaveData.SaveVersion < 0)
             {
                 _log.Info("Starting new game, randomising...");
-                _entityManager = new EntityManager();
-                _regionManager = new RegionManager();
-                _travelDistanceManager = new TravelDistanceManager(_config);
-                _priorityRules = new TaskResult<List<PriorityRule>>();
+                _context = new RandoContext(_config);
                 yield return EnableModules(task);
                 _log.Debug($"Modules - {Time.realtimeSinceStartup - startTime}");
                 yield return InitSaveData(task);
@@ -91,7 +85,7 @@ namespace SubnauticaRandomiser.Logic
                 yield return ValidateSetupStage(task);
                 _log.Debug($"ValidateSetup - {Time.realtimeSinceStartup - startTime}");
                 // Randomise the game and save the final state to the SaveData.
-                yield return _coreLogic.Randomise(task, SaveData, _entityManager, _regionManager, _travelDistanceManager, _priorityRules.value);
+                yield return _coreLogic.Randomise(task, SaveData, _context);
             }
             else
             {
@@ -166,10 +160,12 @@ namespace SubnauticaRandomiser.Logic
             }
             
             // These files are always required, as they form the backbone of the entity-region model.
-            yield return new RushedCoroutine(_entityManager.ParseEntitiesFromDiskAsync(), 1f / 30f).Advance();
-            yield return new RushedCoroutine(_regionManager.ParseFromDiskAsync(), 1f / 30f).Advance();
-            yield return _travelDistanceManager.LoadTravelDataFromDiskAsync(_entityManager);
-            yield return PriorityRule.LoadFromDiskAsync(_entityManager, _priorityRules);
+            yield return new RushedCoroutine(_context.EntityManager.ParseEntitiesFromDiskAsync(), 1f / 30f).Advance();
+            yield return new RushedCoroutine(_context.RegionManager.ParseFromDiskAsync(), 1f / 30f).Advance();
+            yield return _context.TravelManager.LoadTravelDataFromDiskAsync(_context.EntityManager);
+            var rules = new TaskResult<List<PriorityRule>>();
+            yield return PriorityRule.LoadFromDiskAsync(_context.EntityManager, rules);
+            _context.PriorityRules = rules.value;
             yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
             // Ensure we don't continue and the user is notified if some data fails to load.
             foreach (var t in fileTasks.Where(t => t.IsFaulted))
@@ -187,8 +183,8 @@ namespace SubnauticaRandomiser.Logic
             task.Status = "Randomising - Linking entities";
             yield return null;
             
-            yield return _entityManager.LinkEntities(_config);
-            _regionManager.ReplaceReferences(_entityManager);
+            yield return _context.EntityManager.LinkEntities(_config);
+            _context.RegionManager.ReplaceReferences(_context.EntityManager);
         }
 
         /// <summary>
@@ -199,7 +195,7 @@ namespace SubnauticaRandomiser.Logic
             task.Status = "Randomising - Letting modules do individual setup";
             yield return null;
             
-            _modules.ForEach(m => m.PrepareRandomisation(_entityManager));
+            _modules.ForEach(m => m.PrepareRandomisation(_context.EntityManager));
         }
 
         /// <summary>
@@ -210,8 +206,8 @@ namespace SubnauticaRandomiser.Logic
             task.Status = "Randomising - Validating setup data";
             yield return null;
             
-            Validator.ValidateEntityReferenceLinking(_entityManager.GetAllEntities());
-            Validator.ValidateRegionLinking(_regionManager);
+            Validator.ValidateEntityReferenceLinking(_context.EntityManager.GetAllEntities());
+            Validator.ValidateRegionLinking(_context.RegionManager);
         }
 
         /// <summary>
@@ -253,9 +249,7 @@ namespace SubnauticaRandomiser.Logic
             _log.Debug("Destroying logic object.");
             _coreLogic = null;
             _monitor = null;
-            _entityManager = null;
-            _regionManager = null;
-            _travelDistanceManager = null;
+            _context = null;
         }
 
         /// <summary>

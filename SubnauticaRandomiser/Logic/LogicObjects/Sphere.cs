@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using SubnauticaRandomiser.Handlers;
@@ -34,18 +33,19 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         /// <summary>
         /// The entities that are accessible within this sphere. Includes all entities from previous spheres.
         /// </summary>
-        public HashSet<int> Entities = new HashSet<int>();
+        public List<LogicEntity> Entities = new List<LogicEntity>();
         
         private PrefixLogHandler _log = PrefixLogHandler.Get("[Sphere]");
         private EntityManager _entityManager;
         private TravelDistanceManager _travelManager;
 
-        public Sphere(RandomisationContext context, EntityManager entities, TravelDistanceManager travelManager)
+        public Sphere(StartingState start, EntityManager entities, TravelDistanceManager travelManager)
         {
             Tier = 0;
             _entityManager = entities;
             _travelManager = travelManager;
-            Regions.Add(context.StartingRegion);
+            Regions.Add(start.StartingRegion);
+            start.StartingEntities.ForEach(AddEntity);
             // Keep tier 0 very small, intentionally.
             PopulateEdges();
         }
@@ -56,8 +56,14 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
             _entityManager = innerSphere._entityManager;
             _travelManager = innerSphere._travelManager;
             Regions = new List<Region>(innerSphere.Regions.Concat(newRegions));
-            Entities = new HashSet<int>(innerSphere.Entities);
+            Entities = new List<LogicEntity>(innerSphere.Entities);
             AddAllReachableRegions();
+        }
+
+        public void AddEntity(LogicEntity entity)
+        {
+            Entities.Add(entity);
+            entity.Sphere = Tier;
         }
 
         private void AddAllReachableRegions()
@@ -144,21 +150,6 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         private bool CanUnlockRegion(Region region)
         {
             return !Regions.Contains(region) && _travelManager.CanReach(region.Depth);
-        }
-
-        public void PriorityFill()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Fill()
-        {
-            // Fill the sphere with random things until everything is populated.
-            // After the sphere is full, expand to the next sphere.
-            // We *know* that, in order to expand to the next-next sphere, at least one transition has to get unblocked.
-            // That means picking one transition goal for the next sphere, possibly at random.
-            // The transition goal becomes a priority fill that is handled first, along with all its dependencies.
-            throw new NotImplementedException();
         }
     }
 }

@@ -48,7 +48,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
         internal override void OnRegisterModule(Config config, ILogHandler logger, LogicMonitor monitor)
         {
             base.OnRegisterModule(config, logger, monitor);
-            _monitor.ContextCreated += OnContextCreated;
+            _monitor.StartingStateCreated += OnStartingStateCreated;
             _monitor.EntityRandomised += OnEntityRandomised;
         }
 
@@ -327,7 +327,7 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             ChangeScrapMetalResult(TechType.Titanium, recipeSave.ScrapMetalResult);
         }
 
-        private void OnContextCreated(RandomisationContext context)
+        private void OnStartingStateCreated(StartingState context)
         {
             foreach (var entity in context.StartingEntities)
             {

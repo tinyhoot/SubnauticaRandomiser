@@ -92,10 +92,21 @@ namespace SubnauticaRandomiser.Logic
         /// Running this as a coroutine spaces the logic out over several frames, which prevents the game from
         /// locking up / freezing.
         /// </summary>
-        internal IEnumerator Randomise(WaitScreenHandler.WaitScreenTask task, SaveData saveData, 
-            EntityManager entityManager, RegionManager regionManager, TravelDistanceManager travelManager, List<PriorityRule> rules)
+        internal IEnumerator Randomise(WaitScreenHandler.WaitScreenTask task, SaveData saveData, RandoContext context)
         {
             _rng = new RandomHandler(GetSeedFromConfig());
+            
+            // Set up the context with vanilla information.
+            var startingState = new StartingState(context.RegionManager.GetRegion("SafeShallows"));
+            // TODO: Replace with actual data once spawning-related modules are done.
+            startingState.StartingEntities.AddRange(new []
+            {
+                context.EntityManager.Find<LogicInventoryItem>(TechType.Titanium),
+                context.EntityManager.Find<LogicInventoryItem>(TechType.Copper),
+                context.EntityManager.Find<LogicInventoryItem>(TechType.AcidMushroom),
+            });
+            // If modules like randomised start need to change the context, they can do so through this event.
+            _monitor.TriggerStartingStateCreated(startingState);
             
             task.Status = "Randomising before entities";
             yield return null;
@@ -103,7 +114,7 @@ namespace SubnauticaRandomiser.Logic
             
             task.Status = "Randomising entities (this may take a while)";
             yield return null;
-            yield return RandomiseEntities(saveData, entityManager, regionManager, travelManager, rules);
+            yield return RandomiseEntities(saveData, context, startingState);
             
             task.Status = "Randomising after entities";
             yield return null;
@@ -142,33 +153,26 @@ namespace SubnauticaRandomiser.Logic
             }
         }
 
-        private IEnumerator RandomiseEntities(SaveData saveData, EntityManager entityManager, RegionManager regionManager,
-            TravelDistanceManager travelManager, List<PriorityRule> rules)
+        private IEnumerator RandomiseEntities(SaveData saveData, RandoContext context, StartingState startingState)
         {
             // Set up the queue with every known entity.
-            var queue = new EntityQueue(entityManager.GetAllEntities(), _rng, rules, _monitor);
-            // Set up the context with vanilla information.
-            var context = new RandomisationContext(regionManager.GetRegion("SafeShallows"));
-            // TODO: Replace with actual data once spawning-related modules are done.
-            context.StartingEntities.AddRange(new []
-            {
-                entityManager.Find<LogicInventoryItem>(TechType.Titanium),
-                entityManager.Find<LogicInventoryItem>(TechType.Copper),
-                entityManager.Find<LogicInventoryItem>(TechType.AcidMushroom),
-            });
-            // If modules like randomised start need to change the context, they can do so through this event.
-            _monitor.TriggerContextCreated(context);
+            var queue = new EntityQueue(context.EntityManager.GetAllEntities(), _rng, context.PriorityRules, _monitor);
             
             // Set up the starting sphere.
-            List<Sphere> spheres = new List<Sphere>();
-            Sphere sphere = new Sphere(context, entityManager, travelManager);
-            spheres.Add(sphere);
-            List<Region> newRegions;
+            Sphere sphere = new Sphere(startingState, context.EntityManager, context.TravelManager);
+            List<Sphere> spheres = new List<Sphere> { sphere };
 
             // Keep going until every last entity has been randomised.
             foreach (var entity in queue)
             {
                 _log.Debug($"> Picked entity {entity}");
+                if (entity.Sphere >= 0)
+                {
+                    _log.Debug($"Entity {entity} was already randomised, skipping.");
+                    queue.RemoveCurrent();
+                    continue;
+                }
+                
                 if (!entity.Dependencies.TrueForAll(e => e.Sphere >= 0))
                 {
                     // This isn't ready yet. Delay it before trying again.
@@ -183,15 +187,12 @@ namespace SubnauticaRandomiser.Logic
 
                 // Hand the entity off to one of the modules for randomising.
                 if (_entityRandomisers.TryGetValue(entity.GetType(), out BaseLogicModule module))
-                {
                     module.RandomiseEntity(_rng, saveData, entity);
-                    _log.Debug($"{entity} randomised into sphere {sphere.Tier}");
-                }
                 else
-                {
                     _log.Debug($"Entity {entity} does not have a handler, skipping.");
-                }
-                entity.Sphere = sphere.Tier;
+                
+                sphere.AddEntity(entity);
+                _log.Debug($"{entity} randomised into sphere {sphere.Tier}");
                 queue.RemoveCurrent();
                 _monitor.TriggerEntityRandomised(entity);
                 // TODO: Check whether all entities of this techtype have been done.
@@ -200,9 +201,9 @@ namespace SubnauticaRandomiser.Logic
                 // This helps e.g. RecipeModule for spawnable-->inventoryitem availability.
                 
                 // TODO: Assemble dynamic list of things that *can* cause progress, only update when that is rando'd.
-                travelManager.UpdateDepths(entityManager);
+                context.TravelManager.UpdateDepths(context.EntityManager);
                 // After every fill, check whether a transition lock can be opened.
-                if (sphere.TryUnlockEdges(out newRegions))
+                if (sphere.TryUnlockEdges(out var newRegions))
                 {
                     sphere = new Sphere(sphere, newRegions);
                     spheres.Add(sphere);

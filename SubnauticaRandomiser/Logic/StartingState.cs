@@ -4,15 +4,14 @@ using SubnauticaRandomiser.Logic.LogicObjects;
 namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
-    /// Represents the context in which randomising takes place. The data in this class determines the initial state
-    /// of <see cref="Sphere"/> 0.
+    /// Represents the initial state of <see cref="Sphere"/> 0.
     /// </summary>
-    internal class RandomisationContext
+    internal class StartingState
     {
         public Region StartingRegion;
         public List<LogicEntity> StartingEntities = new List<LogicEntity>();
 
-        public RandomisationContext(Region start)
+        public StartingState(Region start)
         {
             StartingRegion = start;
             StartingEntities.AddRange(StartingRegion.Entities);
