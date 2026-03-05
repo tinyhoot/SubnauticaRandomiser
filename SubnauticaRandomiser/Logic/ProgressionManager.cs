@@ -376,7 +376,7 @@ namespace SubnauticaRandomiser.Logic
                 _log.Debug($"Adding priority entity {entity} to priority queue for depth {depth}");
             }
 
-            _coreLogic.AddPriorityEntities(additions);
+            // _coreLogic.AddPriorityEntities(additions);
         }
     }
 }
