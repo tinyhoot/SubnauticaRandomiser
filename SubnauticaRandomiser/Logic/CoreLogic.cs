@@ -47,6 +47,7 @@ namespace SubnauticaRandomiser.Logic
             _Config = Initialiser._Config;
             _log = PrefixLogHandler.Get("[Core]");
             EntityHandler = new EntityHandler();
+            _spoilerLog = new SpoilerLog(_monitor);
             
             // _manager = gameObject.EnsureComponent<ProgressionManager>();
             // _spoilerLog = gameObject.EnsureComponent<SpoilerLog>();
@@ -89,6 +90,8 @@ namespace SubnauticaRandomiser.Logic
             yield return null;
             saveData.SetEnabledModules(Bootstrap.Main.GetActiveModuleTypes());
             saveData.Save();
+            _monitor.TriggerRandomisingComplete();
+            yield return _spoilerLog.WriteSpoilerLog(saveData);
             
             // This makes the loading screen longer than it needs to be but informing the user is worth it.
             task.Status = "Success!";

@@ -24,6 +24,11 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         public event Action<Sphere> SphereCreated;
 
+        /// <summary>
+        /// Triggered when a seed has been successfully randomised.
+        /// </summary>
+        public event Action RandomisingComplete;
+
         internal void TriggerStartingStateCreated(StartingState ctx)
         {
             StartingStateCreated?.Invoke(ctx);
@@ -37,6 +42,11 @@ namespace SubnauticaRandomiser.Logic
         internal void TriggerSphereCreated(Sphere sphere)
         {
             SphereCreated?.Invoke(sphere);
+        }
+
+        internal void TriggerRandomisingComplete()
+        {
+            RandomisingComplete?.Invoke();
         }
     }
 }

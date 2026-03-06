@@ -1,30 +1,30 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using HootLib;
 using SubnauticaRandomiser.Handlers;
+using SubnauticaRandomiser.Logic.LogicObjects;
 using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
-using SubnauticaRandomiser.Objects.Events;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
+using LogicEntity = SubnauticaRandomiser.Logic.LogicObjects.LogicEntity;
 
 namespace SubnauticaRandomiser.Logic
 {
     /// <summary>
     /// Keeps track of events and progress during randomisation and writes a spoilerlog to disk at the end.
     /// </summary>
-    [RequireComponent(typeof(CoreLogic), typeof(ProgressionManager))]
-    internal class SpoilerLog : MonoBehaviour
+    internal class SpoilerLog
     {
-        private CoreLogic _coreLogic;
-        private ProgressionManager _manager;
-        private ILogHandler _log;
-        private readonly List<Tuple<TechType, int>> _progression = new List<Tuple<TechType, int>>();
+        private readonly ILogHandler _log = PrefixLogHandler.Get("[Spoiler]");
+        private readonly List<Progress> _progression = new List<Progress>();
+        private StartingState _startingState;
         private string _spoilerDirectory;
         
         private string[] _contentHeader;
@@ -41,18 +41,13 @@ namespace SubnauticaRandomiser.Logic
             { EntityType.Craftable, "recipe_spoilers.txt" },
         };
 
-        private void Awake()
+        public SpoilerLog(LogicMonitor monitor)
         {
-            _coreLogic = GetComponent<CoreLogic>();
-            _manager = GetComponent<ProgressionManager>();
-            _log = PrefixLogHandler.Get("[Spoiler]");
             _spoilerDirectory = GetSpoilerDirectory();
             PrepareStrings();
-
-            // Register events.
-            _coreLogic.MainLoopCompleted += OnMainLoopCompleted;
-            _manager.DepthIncreased += OnDepthIncrease;
-            _manager.HasProgressed += OnProgression;
+            
+            monitor.StartingStateCreated += OnStartingStateCreated;
+            monitor.SphereCreated += OnSphereCreated;
         }
 
         /// <summary>
@@ -65,35 +60,34 @@ namespace SubnauticaRandomiser.Logic
             return Path.Combine(Hootils.GetModDirectory(), _DirName, dateTime);
         }
 
-        /// <summary>
-        /// When a progression entity causes the reachable depth to increase, update the responsible entity.
-        /// </summary>
-        private void OnDepthIncrease(object sender, EntityEventArgs args)
+        private void OnStartingStateCreated(StartingState state)
         {
-            UpdateLastProgressionEntry(_manager.ReachableDepth);
+            _startingState = state;
         }
 
-        /// <summary>
-        /// Once the main loop completes, all randomising is over. Write the spoiler log to disk.
-        /// </summary>
-        private void OnMainLoopCompleted(object sender, EventArgs args)
+        private void OnSphereCreated(Sphere sphere)
         {
-            // Start writing and discard the Task. Gets rid of a compiler warning.
-            _ = WriteLogFilesAsync(Bootstrap.SaveData);
+            // Add a dummy in place of sphere zero.
+            if (sphere.Tier == 1)
+                _progression.Add(new Progress { TotalRegions = 1 });
+            
+            int lastRegions = _progression.Last().TotalRegions;
+            _progression.Add(new Progress
+                {
+                    KeyEntity = sphere.Entities.Last(),
+                    Sphere = sphere,
+                    NewRegions = sphere.Regions.Count - lastRegions,
+                    TotalRegions = sphere.Regions.Count
+                }
+            );
         }
 
-        /// <summary>
-        /// Log every progression entity as soon as it unlocks.
-        /// </summary>
-        private void OnProgression(object sender, EntityEventArgs args)
+        public IEnumerator WriteSpoilerLog(SaveData saveData)
         {
-            AddProgressionEntry(args.LogicEntity.TechType, _manager.ReachableDepth);
-        }
-
-        private void AddProgressionEntry(TechType techType, int depth)
-        {
-            Tuple<TechType, int> entry = new Tuple<TechType, int>(techType, depth);
-            _progression.Add(entry);
+            var task = WriteLogFilesAsync(saveData);
+            yield return new WaitUntil(() => task.IsCompleted);
+            if (task.IsFaulted)
+                throw task.Exception!;
         }
 
         /// <summary>
@@ -178,26 +172,20 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// Prepare a human readable way to tell what must be crafted to reach greater depths.
+        /// Prepare a human-readable way to tell what must be crafted/gathered/found to progress.
         /// </summary>
-        /// <returns>The prepared log entries.</returns>
         private IEnumerable<string> GetProgressionPath()
         {
-            // When recipes are not randomised, this spoiler hint does more or less nothing; go with default value.
-            if (_progression.Count == 0)
-                return new[] { "Vanilla" };
-            
-            List <string> preparedProgressionPath = new List<string>();
-            int lastDepth = 0;
+            List<string> preparedProgressionPath = new List<string>();
 
-            foreach (Tuple<TechType, int> pair in _progression)
+            foreach (var progress in _progression)
             {
-                if (pair.Item2 > lastDepth)
-                    preparedProgressionPath.Add($"Craft {pair.Item1} to reach {pair.Item2}m");
-                else
-                    preparedProgressionPath.Add($"Unlocked {pair.Item1}.");
-
-                lastDepth = pair.Item2;
+                if (progress.Sphere is null)
+                    continue;
+                
+                // TODO: Add start, add end goal, also insert any entities that are of note along the way.
+                preparedProgressionPath.Add($"Get {progress.KeyEntity}");
+                preparedProgressionPath.Add($"{progress.NewRegions} new regions unlocked.");
             }
 
             return preparedProgressionPath;
@@ -228,26 +216,9 @@ namespace SubnauticaRandomiser.Logic
         }
 
         /// <summary>
-        /// When a progression item first gets unlocked, its depth reflects the depth required to reach it, rather than
-        /// what it makes accessible; update that here.
-        /// Always changes the latest addition to the spoiler log.
-        /// </summary>
-        /// <param name="depth">The new depth to update the entry with.</param>
-        private void UpdateLastProgressionEntry(int depth)
-        {
-            if (_progression.Count == 0)
-                return;
-
-            // Since this is a list of immutable tuples, it must be removed and replaced entirely.
-            TechType type = _progression[_progression.Count - 1].Item1;
-            _progression.RemoveAt(_progression.Count - 1);
-            AddProgressionEntry(type, depth);
-        }
-
-        /// <summary>
         /// Write the log files to disk.
         /// </summary>
-        public async Task WriteLogFilesAsync(SaveData saveData)
+        private async Task WriteLogFilesAsync(SaveData saveData)
         {
             Directory.CreateDirectory(_spoilerDirectory);
 
@@ -284,6 +255,14 @@ namespace SubnauticaRandomiser.Logic
                     await file.WriteLineAsync(line);
                 }
             }
+        }
+
+        private struct Progress
+        {
+            public Sphere Sphere;
+            public LogicEntity KeyEntity;
+            public int NewRegions;
+            public int TotalRegions;
         }
     }
 }
