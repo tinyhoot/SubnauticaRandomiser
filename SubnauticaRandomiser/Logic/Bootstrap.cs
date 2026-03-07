@@ -165,7 +165,7 @@ namespace SubnauticaRandomiser.Logic
             yield return _context.TravelManager.LoadTravelDataFromDiskAsync(_context.EntityManager);
             var rules = new TaskResult<List<PriorityRule>>();
             yield return PriorityRule.LoadFromDiskAsync(_context.EntityManager, rules);
-            _context.PriorityRules = rules.value;
+            _context.AddPriorityRules(rules.value);
             yield return new WaitUntil(() => fileTasks.TrueForAll(fTask => fTask.IsCompleted));
             // Ensure we don't continue and the user is notified if some data fails to load.
             foreach (var t in fileTasks.Where(t => t.IsFaulted))

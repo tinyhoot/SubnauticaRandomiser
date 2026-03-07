@@ -12,14 +12,19 @@ namespace SubnauticaRandomiser.Logic
     /// </summary>
     internal class RandoContext
     {
-        public EntityManager EntityManager = new EntityManager();
-        public RegionManager RegionManager = new RegionManager();
-        public TravelDistanceManager TravelManager;
-        public List<PriorityRule> PriorityRules = new List<PriorityRule>();
+        public readonly EntityManager EntityManager = new EntityManager();
+        public readonly RegionManager RegionManager = new RegionManager();
+        public readonly TravelDistanceManager TravelManager;
+        public readonly List<PriorityRule> PriorityRules = new List<PriorityRule>();
 
         public RandoContext(Config config)
         {
             TravelManager = new TravelDistanceManager(config);
+        }
+
+        public void AddPriorityRules(IEnumerable<PriorityRule> rules)
+        {
+            PriorityRules.AddRange(rules);
         }
     }
 }
