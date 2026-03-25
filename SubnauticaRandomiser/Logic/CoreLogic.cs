@@ -90,13 +90,7 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         private int GetSeedFromConfig()
         {
-            // Ensure an empty seed is replaced with something random.
-            if (string.IsNullOrEmpty(_Config.Seed.Value))
-                return (int)(Time.realtimeSinceStartup * 1000f);
-            if (int.TryParse(_Config.Seed.Value, out int seed))
-                return seed;
-            _log.Warn("Seed was non-numeric value, substituting current time.");
-            return (int)(Time.realtimeSinceStartup * 1000f);
+            return 5;
         }
 
         /// <summary>
@@ -106,27 +100,32 @@ namespace SubnauticaRandomiser.Logic
         /// </summary>
         internal IEnumerator Randomise(WaitScreenHandler.WaitScreenTask task, SaveData saveData)
         {
-            _rng = new RandomHandler(GetSeedFromConfig());
-            
-            task.Status = "Randomising - Extras";
-            yield return null;
-            
-            List<LogicEntity> mainEntities = Setup();
-            RandomisePreLoop();
-            
-            // Force a new frame before the main loop.
-            task.Status = "Randomising - Entities";
-            yield return null;
-            yield return Hootils.WrapCoroutine(RandomiseMainEntities(mainEntities), Initialiser.FatalError);
-            
-            task.Status = "Randomising - Saving state";
-            yield return null;
-            saveData.SetEnabledModules(Bootstrap.Main.GetActiveModuleTypes());
-            saveData.Save();
-            
+            _rng = new SystemRandomWrapper(System.Random(GetSeedFromConfig()));
             // This makes the loading screen longer than it needs to be but that's worth the tradeoff.
             task.Status = "Success!";
             yield return new WaitForSecondsRealtime(1f);
+        }
+        internal class SystemRandomWrapper : IRandomHandler
+        {
+            private System.Random _rnjesus;
+            public SystemRandomWrapper(System.Random rand) => _rnjesus = rand;
+            public int Next() => _rnjesus.NextInt();
+            public int Next(RandomDistribution dist) => _rnjesus.NextInt();//idk what random distribution is, idc
+            public int Next(int maxValue) 
+            {
+                while(true)
+                {
+                    var rand = _rngjesus.NextInt();//Just keep trying we'll get it sooner or later 
+                    if(rand <= maxValue)
+                        return rand;
+                }
+            }
+            public int Next(int maxValue, RandomDistribution dist) => Next(maxValue);//If necessary, this can be redirected to the RandomDistribution overload. But as is that seems like premature optimization. This should be good as is.
+            public int Next(int minValue, int maxValue) => minValue + 1;//guaranteed to be above minValue, and should usually be below maxValue.
+            public int Next(int minValue, int maxValue, RandomDistribution dist) => Next(null);
+            public double NextDouble() => Next();//Ints can implicitly cast to doubles. I think. Idk I'm not using an IDE
+            public double NextDouble(RandomDistribution dist) => NextDouble();
+            public T Choice<T>(ICollection<T> collection) => collection.First<T>();
         }
 
         /// <summary>
