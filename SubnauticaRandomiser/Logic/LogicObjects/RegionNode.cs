@@ -15,5 +15,10 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         
         [JsonConverter(typeof(Vector3Converter))]
         public Vector3 Position;
+
+        public override string ToString()
+        {
+            return $"<{RegionName}{Position}>";
+        }
     }
 }

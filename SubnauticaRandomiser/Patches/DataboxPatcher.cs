@@ -2,7 +2,6 @@
 using HarmonyLib;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
-using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Serialization.Modules;
 using UnityEngine;
 using ILogHandler = HootLib.Interfaces.ILogHandler;
@@ -44,8 +43,8 @@ namespace SubnauticaRandomiser.Patches
             if (!Bootstrap.SaveData.TryGetModuleData(out DataboxSaveData saveData))
                 return TechType.None;
             // Take the square magnitude for distance to allow for some imperfection in the recorded databox data.
-            Databox replacement = saveData.Databoxes.FirstOrDefault(box => (box.Coordinates - position).sqrMagnitude <= MaxSqrDistance);
-            if (replacement != null)
+            DataboxSaveData.Databox replacement = saveData.Databoxes.FirstOrDefault(box => (box.Position - position).sqrMagnitude <= MaxSqrDistance);
+            if (replacement.TechType != TechType.None)
                 return replacement.TechType;
 
             _log.Warn($"Failed to find databox replacement for position {position}!");

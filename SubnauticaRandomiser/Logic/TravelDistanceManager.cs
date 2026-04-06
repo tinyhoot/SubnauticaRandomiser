@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SubnauticaRandomiser.Configuration;
 using SubnauticaRandomiser.Logic.LogicObjects;
+using SubnauticaRandomiser.Logic.LogicObjects.Transitions;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Converters;
 using UnityEngine;
@@ -33,6 +34,7 @@ namespace SubnauticaRandomiser.Logic
         private const string TravelDataFile = "travelData.json";
         private TravelData _travelData;
         private Config _config;
+        private LogicEntity _goal;
 
         public TravelDistanceManager(Config config)
         {
@@ -46,6 +48,52 @@ namespace SubnauticaRandomiser.Logic
 
             _travelData = JsonConvert.DeserializeObject<TravelData>(task.Result, new StringEnumConverter(),
                 new StringEntityConverter(entities));
+            
+            // For now, hardcode the goal like this.
+            // TODO: Allow for more dynamic and/or more complex compound goals.
+            _goal = entities.Find<LogicConstructable>(TechType.RocketStage3);
+        }
+
+        /// <summary>
+        /// Get all entities that can unlock new <see cref="Region"/>s and thus cause a new <see cref="Sphere"/> to be
+        /// created.
+        /// </summary>
+        public List<LogicEntity> GetProgressionEntities(EntityManager entityManager, RegionManager regionManager)
+        {
+            var important = new Dictionary<string, LogicEntity>();
+            foreach (var fin in _travelData.FinSpeeds.Keys)
+            {
+                var entity = entityManager.Find<LogicInventoryItem>(fin);
+                important[entity.ToString()] = entity;
+            }
+
+            foreach (var tank in _travelData.TankCapacities)
+            {
+                var entity = entityManager.Find<LogicInventoryItem>(tank.TechType);
+                important[entity.ToString()] = entity;
+            }
+
+            foreach (var vehicleData in _travelData.VehicleDepths)
+            {
+                foreach (var vehicle in vehicleData.Entities)
+                {
+                    important[vehicle.ToString()] = vehicle;
+                }
+            }
+
+            foreach (var transition in regionManager.GetAllTransitions())
+            {
+                foreach (var transLock in transition.Locks ?? Enumerable.Empty<TransitionLock>())
+                {
+                    if (transLock is ItemLock il)
+                    {
+                        var entity = entityManager.Find<LogicInventoryItem>(il.RequiredItem);
+                        important[entity.ToString()] = entity;
+                    }
+                }
+            }
+
+            return important.Values.ToList();
         }
 
         /// <summary>

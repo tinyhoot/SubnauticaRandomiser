@@ -111,8 +111,8 @@ namespace SubnauticaRandomiser.Logic
                 RegisterModule<LifepodModule>();
             // if (_config.RandomiseDoorCodes.Value || _config.RandomiseSupplyBoxes.Value)
             //     RegisterModule<AuroraLogic>();
-            // if (_config.RandomiseDataboxes.Value)
-            //     RegisterModule<DataboxLogic>();
+            if (_config.RandomiseDataboxes.Value)
+                RegisterModule<DataboxModule>();
             // if (_config.EnableFragmentModule.Value &&
             //     (_config.RandomiseFragments.Value || _config.RandomiseNumFragments.Value
             //                                       || _config.RandomiseDuplicateScans.Value))

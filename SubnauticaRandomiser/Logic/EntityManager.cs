@@ -113,6 +113,25 @@ namespace SubnauticaRandomiser.Logic
 
             return ids.ShallowCopy();
         }
+
+        /// <summary>
+        /// Get all dependencies of all <see cref="LogicEntity"/>s sharing the given TechType.
+        /// </summary>
+        /// <returns>All dependencies, or null if no entity with that TechType exists.</returns>
+        public List<LogicEntity> GetAllDependencies(TechType techType)
+        {
+            if (!_techToEntityIds.TryGetValue(techType, out List<int> ids))
+                return null;
+
+            List<LogicEntity> deps = new List<LogicEntity>();
+            foreach (var entiyId in ids)
+            {
+                var entity = Get(entiyId);
+                deps.AddRange(entity.Dependencies);
+            }
+
+            return deps.Distinct().ToList();
+        }
         
         /// <summary>
         /// Check whether the given entity is accessible in the given sphere (or lower).
