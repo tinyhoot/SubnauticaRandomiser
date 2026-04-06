@@ -5,7 +5,6 @@ using System.Linq;
 using HarmonyLib;
 using Nautilus.Handlers;
 using SubnauticaRandomiser.Configuration;
-using SubnauticaRandomiser.CsvReader;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Interfaces;
 using SubnauticaRandomiser.Objects;
@@ -470,9 +469,9 @@ namespace SubnauticaRandomiser.Logic.Modules
         
         private async Task ParseDataFileAsync()
         {
-            List<Biome> biomes = await CSVReader.ParseDataFileAsync(Initialiser._BiomeFile, CSVReader.ParseBiomeLine);
+            // List<Biome> biomes = await CSVReader.ParseDataFileAsync(Initialiser._BiomeFile, CSVReader.ParseBiomeLine);
             // Set up the lists of biomes.
-            _allBiomes = biomes.Where(b => b.FragmentRate != null).ToList();
+            // _allBiomes = biomes.Where(b => b.FragmentRate != null).ToList();
             _availableBiomes = _allBiomes.FindAll(b => !b.Name.ToLower().Contains("barrier")
                                                        && !b.Name.Contains("Ship"));
         }

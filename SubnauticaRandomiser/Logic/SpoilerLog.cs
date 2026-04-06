@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using HootLib;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic.LogicObjects;
-using SubnauticaRandomiser.Objects;
 using SubnauticaRandomiser.Objects.Enums;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
@@ -135,9 +134,9 @@ namespace SubnauticaRandomiser.Logic
                 return new [] { "Not randomised, all in vanilla locations." };
 
             List<string> preparedDataboxes = new List<string>();
-            foreach (Databox databox in saveData.Databoxes) 
+            foreach (DataboxSaveData.Databox databox in saveData.Databoxes) 
             {
-                preparedDataboxes.Add(databox.TechType.AsString() + " can be found at " + databox.Coordinates);
+                preparedDataboxes.Add(databox.TechType.AsString() + " can be found at " + databox.Position);
             }
             preparedDataboxes.Sort();
 
