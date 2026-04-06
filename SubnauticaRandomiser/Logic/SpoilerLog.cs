@@ -66,6 +66,10 @@ namespace SubnauticaRandomiser.Logic
 
         private void OnSphereCreated(Sphere sphere)
         {
+            // Ignore the starting sphere.
+            if (sphere.Tier == 0)
+                return;
+            
             // Add a dummy in place of sphere zero.
             if (sphere.Tier == 1)
                 _progression.Add(new Progress { TotalRegions = 1 });

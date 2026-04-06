@@ -73,6 +73,8 @@ namespace SubnauticaRandomiser.Logic
             });
             // If modules like randomised start need to change the context, they can do so through this event.
             _monitor.TriggerStartingStateCreated(startingState);
+            // Now that starting state is locked in, calculate the initial movement range of the player.
+            context.TravelManager.UpdateDepths(context.EntityManager);
             
             task.Status = "Randomising before entities";
             yield return null;
@@ -129,6 +131,7 @@ namespace SubnauticaRandomiser.Logic
             // Set up the starting sphere.
             Sphere sphere = new Sphere(startingState, context.EntityManager, context.TravelManager);
             List<Sphere> spheres = new List<Sphere> { sphere };
+            _monitor.TriggerSphereCreated(sphere);
 
             // Keep going until every last entity has been randomised.
             foreach (var entity in queue)
