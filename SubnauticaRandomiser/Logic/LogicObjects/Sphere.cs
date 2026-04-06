@@ -45,18 +45,23 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
             _entityManager = entities;
             _travelManager = travelManager;
             Regions.Add(start.StartingRegion);
+            AddEntitiesFromRegions(new[] { start.StartingRegion });
+            // Add the entities that the player starts with, like initial items inside the lifepod.
             start.StartingEntities.ForEach(AddEntity);
             // Keep tier 0 very small, intentionally.
             PopulateEdges();
         }
 
-        public Sphere(Sphere innerSphere, IEnumerable<Region> newRegions)
+        public Sphere(Sphere innerSphere, List<Region> newRegions)
         {
             Tier = innerSphere.Tier + 1;
             _entityManager = innerSphere._entityManager;
             _travelManager = innerSphere._travelManager;
-            Regions = new List<Region>(innerSphere.Regions.Concat(newRegions));
+            // Ensure this sphere's regions and entities are independent of the previous sphere's.
+            Regions = innerSphere.Regions.Concat(newRegions).ToList();
             Entities = new List<LogicEntity>(innerSphere.Entities);
+            AddEntitiesFromRegions(newRegions);
+            // Check for any additional regions that may unlock in a chain reaction.
             AddAllReachableRegions();
         }
 
@@ -64,6 +69,24 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
         {
             Entities.Add(entity);
             entity.Sphere = Tier;
+        }
+        
+        /// <summary>
+        /// Populate the sphere with entities that are acquired simply by gaining access to a specific region.
+        /// </summary>
+        private void AddEntitiesFromRegions(IEnumerable<Region> regions)
+        {
+            foreach (var region in regions)
+            {
+                if (region.Entities is null || region.Entities.Count == 0)
+                    continue;
+                
+                _log.Debug($"Adding {region.Entities} guaranteed entities from region {region.Name}.");
+                foreach (var entity in region.Entities)
+                {
+                    AddEntity(entity);
+                }
+            }
         }
 
         private void AddAllReachableRegions()
@@ -78,6 +101,8 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
                 {
                     _log.Debug($"Unlocking {unlocked.Count} regions.");
                     Regions.AddRange(unlocked);
+                    // Instantly unlock the entities that are guaranteed to be in these regions.
+                    AddEntitiesFromRegions(unlocked);
                 }
             } while (unlocked?.Count > 0);
         }
