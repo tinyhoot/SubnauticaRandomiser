@@ -81,7 +81,7 @@ namespace SubnauticaRandomiser.Logic.LogicObjects
                 if (region.Entities is null || region.Entities.Count == 0)
                     continue;
                 
-                _log.Debug($"Adding {region.Entities} guaranteed entities from region {region.Name}.");
+                _log.Debug($"Adding {region.Entities.Count} guaranteed entities from region {region.Name}.");
                 foreach (var entity in region.Entities)
                 {
                     AddEntity(entity);
