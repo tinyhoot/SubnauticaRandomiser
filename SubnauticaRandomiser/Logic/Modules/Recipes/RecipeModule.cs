@@ -88,18 +88,18 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
             return new RecipeSaveData();
         }
 
-        public override void PrepareRandomisation(EntityManager manager)
+        public override void PrepareRandomisation(RandoContext context)
         {
-            _entityManager = manager;
+            _entityManager = context.EntityManager;
             _validIngredients = new List<LogicInventoryItem>();
             
             switch (_config.RecipeMode.Value)
             {
                 case RecipeDifficultyMode.Balanced:
-                    _mode = new ModeBalanced(_config, manager, _basicOutpostPieces);
+                    _mode = new ModeBalanced(_config, _entityManager, _basicOutpostPieces);
                     break;
                 case RecipeDifficultyMode.Chaotic:
-                    _mode = new ModeRandom(_config, manager, _basicOutpostPieces);
+                    _mode = new ModeRandom(_config, _entityManager, _basicOutpostPieces);
                     break;
                 default:
                     throw new RandomisationException("Invalid recipe mode: " + _config.RecipeMode.Value);
@@ -107,10 +107,10 @@ namespace SubnauticaRandomiser.Logic.Modules.Recipes
 
             _mode.RemoveValidIngredient += OnRemoveValidIngredient;
             
-            CopyTags(manager);
-            AddDependencies(manager);
-            SetVanillaRecipeValues(manager);
-            PrepareUpgradeChains(manager);
+            CopyTags(_entityManager);
+            AddDependencies(_entityManager);
+            SetVanillaRecipeValues(_entityManager);
+            PrepareUpgradeChains(_entityManager);
         }
 
         /// <summary>

@@ -195,7 +195,7 @@ namespace SubnauticaRandomiser.Logic
             task.Status = "Randomising - Letting modules do individual setup";
             yield return null;
             
-            _modules.ForEach(m => m.PrepareRandomisation(_context.EntityManager));
+            _modules.ForEach(m => m.PrepareRandomisation(_context));
         }
 
         /// <summary>

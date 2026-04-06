@@ -65,7 +65,7 @@ namespace SubnauticaRandomiser.Logic.Modules
         /// Perform setup necessary for the module to function properly during randomisation. Only called if randomising
         /// is actually necessary, i.e. only during first load of a new game.
         /// </summary>
-        public virtual void PrepareRandomisation(EntityManager manager)
+        public virtual void PrepareRandomisation(RandoContext context)
         {
         }
 
