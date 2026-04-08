@@ -45,7 +45,6 @@
       "589bf5a6-6866-4828-90b2-7266661bb6ed"
     ],
     "Spawns": [
-      "FragmentBaseBioReactor",
       "GrassyPlateaus_Grass",
       "GrassyPlateaus_Sand",
       "GrassyPlateaus_TechSite_Scattered",
@@ -59,7 +58,6 @@
       "8ed7c383-1f55-462c-a7fe-f7be6bcce8a5"
     ],
     "Spawns": [
-      "FragmentBaseBulkhead"
     ]
   },
   {
@@ -72,7 +70,6 @@
       "BloodKelp_TechSite_Barrier",
       "BloodKelp_TechSite_Scatter",
       "BloodKelp_TrenchFloor",
-      "FragmentBaseNuclearReactor",
       "JellyShroomCaves_AbandonedBase_Outside",
       "Mountains_Sand",
       "Mountains_TechSite_Scatter",
@@ -85,7 +82,6 @@
       "deb8581f-842f-4854-b984-bff1c44ff220"
     ],
     "Spawns": [
-      "FragmentBaseRoom"
     ]
   },
   {
@@ -120,7 +116,6 @@
       "64351d31-de9a-406a-8061-c7e8be5dd66c"
     ],
     "Spawns": [
-      "FragmentBatteryCharger",
       "GrassyPlateaus_TechSite",
       "GrassyPlateaus_TechSite_Barrier"
     ]
@@ -323,7 +318,6 @@
       "817eef98-97af-4f88-b87b-f489b59c55b8"
     ],
     "Spawns": [
-      "FragmentConstructor",
       "GrassyPlateaus_TechSite",
       "GrassyPlateaus_TechSite_Barrier",
       "Kelp_GrassDense",
@@ -418,7 +412,6 @@
     ],
     "Spawns": [
       "CrashZone_TrenchSand",
-      "FragmentCyclopsBridge",
       "MushroomForest_Grass",
       "MushroomForest_Sand",
       "MushroomForest_TechSite",
@@ -437,7 +430,6 @@
     "Spawns": [
       "CragField_Grass",
       "CrashZone_TrenchSand",
-      "FragmentCyclopsEngine",
       "Mountains_Grass",
       "Mountains_Sand",
       "Mountains_TechSite_Scatter",
@@ -453,8 +445,6 @@
     ],
     "Spawns": [
       "CrashZone_Sand",
-      "FragmentCyclopsHullLarge",
-      "FragmentCyclopsHullMedium",
       "MushroomForest_Grass",
       "MushroomForest_Sand",
       "MushroomForest_TechSite",
@@ -710,7 +700,6 @@
       "d70c8458-4b19-4dbc-ba67-afa654af1999"
     ],
     "Spawns": [
-      "FragmentExosuit"
     ]
   },
   {
@@ -1431,7 +1420,6 @@
     "Spawns": [
       "Dunes_TechSite",
       "Dunes_TechSite_Barrier",
-      "FragmentPowerCellCharger",
       "JellyShroomCaves_AbandonedBase_Outside",
       "MushroomForest_TechSite",
       "MushroomForest_TechSite_Barrier",
@@ -1761,7 +1749,6 @@
       "79134cca-9eb5-4af0-8fa3-ff15565d7117"
     ],
     "Spawns": [
-      "FragmentSeamoth",
       "GrassyPlateaus_Grass",
       "GrassyPlateaus_Sand",
       "GrassyPlateaus_TechSite_Scattered"
@@ -2023,7 +2010,6 @@
       "Dunes_TechSite",
       "Dunes_TechSite_Barrier",
       "Dunes_TechSite_Scatter",
-      "FragmentThermalPlant",
       "GrandReef_Grass",
       "GrandReef_Ground",
       "GrandReef_TechSite",
@@ -2114,7 +2100,6 @@
     "Spawns": [
       "BloodKelp_TechSite",
       "CragField_Ground",
-      "FragmentWorkbench",
       "GrassyPlateaus_TechSite_Barrier",
       "JellyShroomCaves_AbandonedBase_Outside",
       "KooshZone_TechSite",
