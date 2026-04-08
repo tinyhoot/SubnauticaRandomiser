@@ -1,6 +1,9 @@
 [
   {
     "TechType": "AluminumOxide",
+    "ClassIds": [
+      "87293f19-cca3-46e6-bb3d-6e8dc579e27b"
+    ],
     "Spawns": [
       "BloodKelp_TrenchWall",
       "BloodKelp_Wall",
@@ -38,6 +41,9 @@
   },
   {
     "TechType": "BaseBioReactorFragment",
+    "ClassIds": [
+      "589bf5a6-6866-4828-90b2-7266661bb6ed"
+    ],
     "Spawns": [
       "FragmentBaseBioReactor",
       "GrassyPlateaus_Grass",
@@ -49,12 +55,18 @@
   },
   {
     "TechType": "BaseBulkheadFragment",
+    "ClassIds": [
+      "8ed7c383-1f55-462c-a7fe-f7be6bcce8a5"
+    ],
     "Spawns": [
       "FragmentBaseBulkhead"
     ]
   },
   {
     "TechType": "BaseNuclearReactorFragment",
+    "ClassIds": [
+      "f38898b1-2c55-4069-af58-dffa7ef315a0"
+    ],
     "Spawns": [
       "BloodKelp_TechSite",
       "BloodKelp_TechSite_Barrier",
@@ -69,12 +81,18 @@
   },
   {
     "TechType": "BaseRoomFragment",
+    "ClassIds": [
+      "deb8581f-842f-4854-b984-bff1c44ff220"
+    ],
     "Spawns": [
       "FragmentBaseRoom"
     ]
   },
   {
     "TechType": "BaseUpgradeConsoleFragment",
+    "ClassIds": [
+      "c3d844cf-19cc-4430-949d-32d6416f59e3"
+    ],
     "Spawns": [
       "CrashZone_Sand",
       "DeepGrandReef_AbandonedBase_Exterior",
@@ -85,6 +103,9 @@
   },
   {
     "TechType": "BaseWaterParkFragment",
+    "ClassIds": [
+      "8928dc78-e8fe-414d-aeff-e53709eb6930"
+    ],
     "Spawns": [
       "BloodKelp_TechSite",
       "DeepGrandReef_BlueCoral",
@@ -95,6 +116,9 @@
   },
   {
     "TechType": "BatteryChargerFragment",
+    "ClassIds": [
+      "64351d31-de9a-406a-8061-c7e8be5dd66c"
+    ],
     "Spawns": [
       "FragmentBatteryCharger",
       "GrassyPlateaus_TechSite",
@@ -103,6 +127,9 @@
   },
   {
     "TechType": "BeaconFragment",
+    "ClassIds": [
+      "a50c91eb-f7cf-4fbf-8157-0aa8d444820c"
+    ],
     "Spawns": [
       "Kelp_TechSite",
       "Kelp_TechSite_Scattered",
@@ -113,6 +140,9 @@
   },
   {
     "TechType": "Biter",
+    "ClassIds": [
+      "4064a71a-c464-4db2-942a-56391fe69951"
+    ],
     "Spawns": [
       "GrassyPlateaus_CaveFloor",
       "GrassyPlateaus_Grass",
@@ -126,6 +156,9 @@
   },
   {
     "TechType": "Bladderfish",
+    "ClassIds": [
+      "bf9ccd04-60af-4144-aaa1-4ac184c686c2"
+    ],
     "Spawns": [
       "Dunes_ThermalVent_Grass",
       "Dunes_ThermalVent_Rock",
@@ -150,6 +183,9 @@
   },
   {
     "TechType": "Bleeder",
+    "ClassIds": [
+      "3406b655-0390-4ea7-8b75-a5c4705fc568"
+    ],
     "Spawns": [
       "BonesField_Lake_Floor",
       "BonesField_LakePit_Open_CreatureOnly",
@@ -166,6 +202,9 @@
   },
   {
     "TechType": "Blighter",
+    "ClassIds": [
+      "eed4ec38-0363-40de-84dc-de6dd9b9e876"
+    ],
     "Spawns": [
       "BloodKelp_CaveFloor",
       "BloodKelp_Grass",
@@ -174,6 +213,9 @@
   },
   {
     "TechType": "BloodOil",
+    "ClassIds": [
+      "18229b4b-3ed3-4b35-ae30-43b1c31a6d8d"
+    ],
     "Spawns": [
       "BloodKelp_CaveRoots",
       "BloodKelp_Roots",
@@ -182,6 +224,9 @@
   },
   {
     "TechType": "Bloom",
+    "ClassIds": [
+      "0e67804e-4a59-449d-929a-cd3fc2bef82c"
+    ],
     "Spawns": [
       "TreeCove_Ceiling",
       "TreeCove_Ground",
@@ -190,6 +235,9 @@
   },
   {
     "TechType": "BoneShark",
+    "ClassIds": [
+      "66072588-f5aa-4a41-a8d4-bb7e8dffee51"
+    ],
     "Spawns": [
       "CragField_OpenShallow_CreatureOnly",
       "CragField_Sand",
@@ -207,6 +255,9 @@
   },
   {
     "TechType": "BonesharkEgg",
+    "ClassIds": [
+      "43ba333e-2eb6-4b6f-ac74-6b6188e82297"
+    ],
     "Spawns": [
       "KooshZone_Grass",
       "MushroomForest_GiantTreeInteriorFloor",
@@ -215,6 +266,9 @@
   },
   {
     "TechType": "Boomerang",
+    "ClassIds": [
+      "fa4cfe65-4eaf-4d51-ba0d-e8cc9632fd47"
+    ],
     "Spawns": [
       "CragField_OpenShallow_CreatureOnly",
       "CragField_Rock",
@@ -247,6 +301,9 @@
   },
   {
     "TechType": "CaveCrawler",
+    "ClassIds": [
+      "3e0a11f1-e2b2-4c4f-9a8e-0b0a77dcc065"
+    ],
     "Spawns": [
       "Dunes_CaveFloor",
       "Dunes_Rock",
@@ -261,10 +318,16 @@
   },
   {
     "TechType": "ConstructorFragment",
+    "ClassIds": [
+      "abfd2c46-f49e-41af-a965-73048dc9bf28",
+      "817eef98-97af-4f88-b87b-f489b59c55b8"
+    ],
     "Spawns": [
       "FragmentConstructor",
       "GrassyPlateaus_TechSite",
       "GrassyPlateaus_TechSite_Barrier",
+      "Kelp_GrassDense",
+      "Kelp_Sand",
       "Kelp_TechSite",
       "Kelp_TechSite_Barrier",
       "SafeShallows_TechSite_Barrier"
@@ -272,24 +335,36 @@
   },
   {
     "TechType": "Copper",
+    "ClassIds": [
+      "63e251a6-fb65-454b-84b0-4493e19f73cd"
+    ],
     "Spawns": [
       "InactiveLavaZone_Chamber_MagmaTree"
     ]
   },
   {
     "TechType": "Crabsnake",
+    "ClassIds": [
+      "911afe46-6178-4594-b23c-e577e7633622"
+    ],
     "Spawns": [
       "JellyShroomCaves_CrabSnake"
     ]
   },
   {
     "TechType": "CrabsnakeEgg",
+    "ClassIds": [
+      "8a211aaf-d471-48f0-b73f-eddc22b8c025"
+    ],
     "Spawns": [
       "JellyShroomCaves_InsideShroom"
     ]
   },
   {
     "TechType": "CrabSquid",
+    "ClassIds": [
+      "4c2808fe-e051-44d2-8e64-120ddcdc8abb"
+    ],
     "Spawns": [
       "BloodKelp_UniqueCreatures",
       "BonesField_Corridor_CreatureOnly",
@@ -301,6 +376,9 @@
   },
   {
     "TechType": "CrabsquidEgg",
+    "ClassIds": [
+      "472c6412-a6b3-48c7-bc0b-57e0c7469f09"
+    ],
     "Spawns": [
       "BloodKelp_Grass",
       "DeepGrandReef_BlueCoral"
@@ -308,24 +386,36 @@
   },
   {
     "TechType": "CrashEgg",
+    "ClassIds": [
+      "932fc808-9183-4f90-bee2-1eec1b30ee73"
+    ],
     "Spawns": [
       "SafeShallows_CaveFloor"
     ]
   },
   {
     "TechType": "CrashHome",
+    "ClassIds": [
+      "eb38de5d-c3df-4446-a37a-d770fb0f92bb"
+    ],
     "Spawns": [
       "SafeShallows_UniqueCreatureCave"
     ]
   },
   {
     "TechType": "CrashPowder",
+    "ClassIds": [
+      "1ce074ee-1a58-439b-bb5b-e5e3d9f0886f"
+    ],
     "Spawns": [
       "CrashHome"
     ]
   },
   {
     "TechType": "CyclopsBridgeFragment",
+    "ClassIds": [
+      "4c19a96d-ec33-4ccd-a7b1-0d8835c32cc8"
+    ],
     "Spawns": [
       "CrashZone_TrenchSand",
       "FragmentCyclopsBridge",
@@ -341,6 +431,9 @@
   },
   {
     "TechType": "CyclopsEngineFragment",
+    "ClassIds": [
+      "e04a1f29-2f36-414e-b1a4-82f320cf6999"
+    ],
     "Spawns": [
       "CragField_Grass",
       "CrashZone_TrenchSand",
@@ -354,6 +447,10 @@
   },
   {
     "TechType": "CyclopsHullFragment",
+    "ClassIds": [
+      "b3cb0fcd-5bff-4152-8188-955172484705",
+      "35cd770e-59ed-4592-8b52-ff9f7bab62e8"
+    ],
     "Spawns": [
       "CrashZone_Sand",
       "FragmentCyclopsHullLarge",
@@ -371,6 +468,9 @@
   },
   {
     "TechType": "Diamond",
+    "ClassIds": [
+      "ee7ef0cf-21ab-4c0c-871d-e477c5dfa1ce"
+    ],
     "Spawns": [
       "BonesField_Cave_Wall",
       "BonesField_Wall",
@@ -386,6 +486,9 @@
   },
   {
     "TechType": "DrillableCopper",
+    "ClassIds": [
+      "601ee500-1744-4697-8279-59ef35160edb"
+    ],
     "Spawns": [
       "BloodKelp_CaveFloor",
       "BloodKelp_Floor",
@@ -398,6 +501,9 @@
   },
   {
     "TechType": "DrillableGold",
+    "ClassIds": [
+      "a05fe1c9-ae0d-43db-a12c-865992808cb2"
+    ],
     "Spawns": [
       "BloodKelp_CaveFloor",
       "BloodKelp_Floor",
@@ -414,7 +520,23 @@
     ]
   },
   {
+    "TechType": "DrillableKyanite",
+    "ClassIds": [
+      "4f441e53-7a9a-44dc-83a4-b1791dc88ffd",
+      "853a9c5b-aba3-4d6b-a547-34553aa73fa9"
+    ],
+    "Spawns": [
+      "ActiveLavaZone_Chamber_Floor_Far",
+      "ActiveLavaZone_Falls_Floor_Far",
+      "InactiveLavaZone_CastleTunnel_Floor",
+      "InactiveLavaZone_Chamber_Floor_Far"
+    ]
+  },
+  {
     "TechType": "DrillableLead",
+    "ClassIds": [
+      "1efa1a20-3a39-4f56-ace0-154211d6af12"
+    ],
     "Spawns": [
       "BloodKelp_Floor",
       "BloodKelp_TrenchFloor",
@@ -430,6 +552,9 @@
   },
   {
     "TechType": "DrillableLithium",
+    "ClassIds": [
+      "846c3df6-ffbf-4206-b591-72f5ba11ed40"
+    ],
     "Spawns": [
       "BonesField_Cave_Ground",
       "BonesField_LakePit_Floor",
@@ -446,12 +571,18 @@
   },
   {
     "TechType": "DrillableMagnetite",
+    "ClassIds": [
+      "f67c158c-3b83-473c-ad52-93fd2eeef66b"
+    ],
     "Spawns": [
       "JellyshroomCaves_CaveFloor"
     ]
   },
   {
     "TechType": "DrillableNickel",
+    "ClassIds": [
+      "9c8f56e6-3380-42e4-a758-e8d733b5ddec"
+    ],
     "Spawns": [
       "BonesField_Lake_Floor",
       "BonesField_LakePit_Floor",
@@ -461,6 +592,9 @@
   },
   {
     "TechType": "DrillableQuartz",
+    "ClassIds": [
+      "b3db72b6-f0cf-4234-be74-d98bd4c49797"
+    ],
     "Spawns": [
       "CragField_Ground",
       "Dunes_CaveFloor",
@@ -478,6 +612,9 @@
   },
   {
     "TechType": "DrillableSalt",
+    "ClassIds": [
+      "793b4079-ef3b-43da-9fc7-3ec5cbc3ae19"
+    ],
     "Spawns": [
       "Dunes_CaveFloor",
       "Dunes_SandDune",
@@ -491,6 +628,9 @@
   },
   {
     "TechType": "DrillableSilver",
+    "ClassIds": [
+      "026d91e2-430b-4c6d-8bd4-b51e270d5eed"
+    ],
     "Spawns": [
       "BonesField_Ground",
       "CragField_Ground",
@@ -509,6 +649,9 @@
   },
   {
     "TechType": "DrillableTitanium",
+    "ClassIds": [
+      "9f855246-76c4-438b-8e4d-9cd6d7ce4224"
+    ],
     "Spawns": [
       "BonesField_Corridor_Ground",
       "BonesField_Ground",
@@ -529,6 +672,9 @@
   },
   {
     "TechType": "DrillableUranium",
+    "ClassIds": [
+      "fb5de2b6-1fe8-44fc-a555-dc0a09dc292a"
+    ],
     "Spawns": [
       "BloodKelp_CaveFloor",
       "BonesField_LakePit_Floor",
@@ -540,6 +686,9 @@
   },
   {
     "TechType": "ExosuitDrillArmFragment",
+    "ClassIds": [
+      "ad23314d-256d-4b8a-ab4e-e49502f62723"
+    ],
     "Spawns": [
       "BloodKelp_TechSite",
       "BloodKelp_TechSite_Barrier",
@@ -554,12 +703,21 @@
   },
   {
     "TechType": "ExosuitFragment",
+    "ClassIds": [
+      "54a7d6b6-280a-43d5-8bdd-eada3dd5f6c3",
+      "740258f8-bf36-484b-bdb8-d9e5dc3f1e3e",
+      "c3d6cad0-1981-4dfd-9a11-62eb0490b130",
+      "d70c8458-4b19-4dbc-ba67-afa654af1999"
+    ],
     "Spawns": [
       "FragmentExosuit"
     ]
   },
   {
     "TechType": "ExosuitGrapplingArmFragment",
+    "ClassIds": [
+      "4904e113-8765-4d27-a750-33d89d50a8ae"
+    ],
     "Spawns": [
       "BloodKelp_TechSite",
       "Dunes_TechSite",
@@ -572,6 +730,9 @@
   },
   {
     "TechType": "ExosuitPropulsionArmFragment",
+    "ClassIds": [
+      "9abc15fc-433c-4fbd-b3e6-d1b2cc73abb2"
+    ],
     "Spawns": [
       "Mountains_TechSite",
       "Mountains_TechSite_Barrier",
@@ -584,6 +745,9 @@
   },
   {
     "TechType": "ExosuitTorpedoArmFragment",
+    "ClassIds": [
+      "1c953310-8436-4012-8e0d-3b4634f07e57"
+    ],
     "Spawns": [
       "BloodKelp_TechSite",
       "BloodKelp_TechSite_Barrier",
@@ -595,6 +759,9 @@
   },
   {
     "TechType": "Eyeye",
+    "ClassIds": [
+      "79c1aef0-e505-469c-ab36-c22c76aeae44"
+    ],
     "Spawns": [
       "CrashZone_TrenchRock",
       "Dunes_Grass",
@@ -616,12 +783,18 @@
   },
   {
     "TechType": "FirstAidKit",
+    "ClassIds": [
+      "bc70e8c8-f750-4c8e-81c1-4884fe1af34e"
+    ],
     "Spawns": [
       "Medkit_Storage"
     ]
   },
   {
     "TechType": "GarryFish",
+    "ClassIds": [
+      "5de7d617-c04c-4a83-b663-ebf1d3dd90a1"
+    ],
     "Spawns": [
       "Dunes_Grass",
       "Dunes_SandDune",
@@ -634,6 +807,9 @@
   },
   {
     "TechType": "Gasopod",
+    "ClassIds": [
+      "3c13b3a4-ac02-4601-8030-b9d7482cde1e"
+    ],
     "Spawns": [
       "Dunes_ThermalVent_Rock",
       "Mesas_Open",
@@ -642,6 +818,9 @@
   },
   {
     "TechType": "GasopodEgg",
+    "ClassIds": [
+      "b6c3cde4-739a-4a1a-b93b-78501ca9ae82"
+    ],
     "Spawns": [
       "Dunes_ThermalVent_Grass",
       "Mesas_Top",
@@ -650,6 +829,9 @@
   },
   {
     "TechType": "GhostRayBlue",
+    "ClassIds": [
+      "1826f338-40d2-4b85-8d15-08ea3fa669ad"
+    ],
     "Spawns": [
       "Canyon_Open_CreatureOnly",
       "GhostTree_Open_CreatureOnly",
@@ -665,6 +847,9 @@
   },
   {
     "TechType": "GhostRayRed",
+    "ClassIds": [
+      "575109e0-0adc-4b73-a8cf-cfb49d1571c3"
+    ],
     "Spawns": [
       "ActiveLavaZone_Chamber_Open_CreatureOnly",
       "ActiveLavaZone_Falls_Open_CreatureOnly",
@@ -674,6 +859,9 @@
   },
   {
     "TechType": "Gold",
+    "ClassIds": [
+      "3c5bd4db-953d-4d23-92be-f5a3b76b2e25"
+    ],
     "Spawns": [
       "InactiveLavaZone_Chamber_MagmaBubble",
       "InactiveLavaZone_LavaPit_Floor"
@@ -681,6 +869,9 @@
   },
   {
     "TechType": "GravSphereFragment",
+    "ClassIds": [
+      "6e4f85c2-ad1d-4d0a-b20c-1158204ee424"
+    ],
     "Spawns": [
       "Kelp_TechSite",
       "Kelp_TechSite_Barrier",
@@ -690,6 +881,9 @@
   },
   {
     "TechType": "HoleFish",
+    "ClassIds": [
+      "495befa0-0e6b-400d-9734-227e5a732f75"
+    ],
     "Spawns": [
       "CrashZone_Sand",
       "MushroomForest_CavePlants",
@@ -702,6 +896,9 @@
   },
   {
     "TechType": "Hoopfish",
+    "ClassIds": [
+      "284ceeb6-b437-4aca-a8bd-d54f336cbef8"
+    ],
     "Spawns": [
       "BloodKelp_OpenShallow_CreatureOnly",
       "CragField_Rock",
@@ -728,6 +925,11 @@
   },
   {
     "TechType": "HoopfishSchool",
+    "ClassIds": [
+      "8ffbb5b5-21b4-4687-9118-730d59330c9a",
+      "08cb3290-504b-4191-97ee-6af1588af5c0",
+      "2d3ea578-e4fa-4246-8bc9-ed8e66dec781"
+    ],
     "Spawns": [
       "BloodKelp_OpenDeep_CreatureOnly",
       "BloodKelp_OpenShallow_CreatureOnly",
@@ -800,6 +1002,9 @@
   },
   {
     "TechType": "Hoverfish",
+    "ClassIds": [
+      "0a993944-87d3-441e-b21d-6c314f723cc7"
+    ],
     "Spawns": [
       "CrashZone_Rock",
       "CrashZone_Sand",
@@ -813,6 +1018,9 @@
   },
   {
     "TechType": "JellyPlant",
+    "ClassIds": [
+      "bd4d4fa1-d10e-40e5-8ec6-67efd0ba03af"
+    ],
     "Spawns": [
       "BloodKelp_Grass",
       "BloodKelp_TrenchFloor",
@@ -834,6 +1042,9 @@
   },
   {
     "TechType": "Jellyray",
+    "ClassIds": [
+      "5550502d-552b-4f22-8bf2-479d73a7646c"
+    ],
     "Spawns": [
       "DeepGrandReef_Wall",
       "JellyshroomCaves_CaveSand",
@@ -844,6 +1055,9 @@
   },
   {
     "TechType": "JellyrayEgg",
+    "ClassIds": [
+      "344b5156-838c-4054-b9bb-0f065a2488f8"
+    ],
     "Spawns": [
       "MushroomForest_GiantTreeInteriorFloor",
       "MushroomForest_Grass",
@@ -852,6 +1066,9 @@
   },
   {
     "TechType": "Jumper",
+    "ClassIds": [
+      "fa7fa15c-5515-497f-872d-d6d579a39f60"
+    ],
     "Spawns": [
       "CragField_Rock",
       "CrashZone_Rock",
@@ -884,6 +1101,9 @@
   },
   {
     "TechType": "Kyanite",
+    "ClassIds": [
+      "6e7f3d62-7e76-4415-af64-5dcd88fc3fe4"
+    ],
     "Spawns": [
       "InactiveLavaZone_CastleChamber_Wall",
       "InactiveLavaZone_CastleTunnel_Wall"
@@ -891,13 +1111,21 @@
   },
   {
     "TechType": "LaserCutterFragment",
+    "ClassIds": [
+      "aeff4dad-8256-475b-a764-d5e7028220ce",
+      "f0721fd2-dac9-4730-8e73-fb602daa225e"
+    ],
     "Spawns": [
+      "GrassyPlateaus_Sand",
       "GrassyPlateaus_TechSite",
       "GrassyPlateaus_TechSite_Barrier"
     ]
   },
   {
     "TechType": "LavaBoomerang",
+    "ClassIds": [
+      "04c3c51a-fa9c-4fe4-bc89-24061ffa6f26"
+    ],
     "Spawns": [
       "ActiveLavaZone_Chamber_Open_CreatureOnly",
       "ActiveLavaZone_Falls_Open_CreatureOnly",
@@ -910,6 +1138,9 @@
   },
   {
     "TechType": "LavaEyeye",
+    "ClassIds": [
+      "f9006f3c-1694-4711-9532-624577e4ac7d"
+    ],
     "Spawns": [
       "ActiveLavaZone_Chamber_Open_CreatureOnly",
       "ActiveLavaZone_Falls_Open_CreatureOnly",
@@ -922,6 +1153,9 @@
   },
   {
     "TechType": "LavaLarva",
+    "ClassIds": [
+      "423a8e49-eabe-473b-9b45-4aa52de1596f"
+    ],
     "Spawns": [
       "ActiveLavaZone_Chamber_Open_CreatureOnly",
       "InactiveLavaZone_Chamber_Lava",
@@ -932,6 +1166,9 @@
   },
   {
     "TechType": "LavaLizard",
+    "ClassIds": [
+      "2fbb2894-a01a-46b4-8748-e871bf23f646"
+    ],
     "Spawns": [
       "ActiveLavaZone_Chamber_Open_CreatureOnly",
       "ActiveLavaZone_Falls_Open_CreatureOnly",
@@ -944,18 +1181,27 @@
   },
   {
     "TechType": "LavaLizardEgg",
+    "ClassIds": [
+      "a1447801-44c0-4217-b050-2313c3a6db50"
+    ],
     "Spawns": [
       "InactiveLavaZone_CastleTunnel_Floor"
     ]
   },
   {
     "TechType": "Lead",
+    "ClassIds": [
+      "b334fbb1-224b-4082-bb69-d4a39051aaca"
+    ],
     "Spawns": [
       "InactiveLavaZone_LavaPit_Wall"
     ]
   },
   {
     "TechType": "LEDLightFragment",
+    "ClassIds": [
+      "c1f8aa68-0ac0-419e-81ec-b7a388027c24"
+    ],
     "Spawns": [
       "MushroomForest_TechSite",
       "MushroomForest_TechSite_Barrier",
@@ -965,6 +1211,9 @@
   },
   {
     "TechType": "LimestoneChunk",
+    "ClassIds": [
+      "7e07fce9-0ad6-4c54-9da7-e43eb1e38cea"
+    ],
     "Spawns": [
       "BonesField_Corridor_Ground",
       "CragField_Rock",
@@ -997,6 +1246,9 @@
   },
   {
     "TechType": "Lithium",
+    "ClassIds": [
+      "f65beedb-2d76-466b-abc8-37c474228157"
+    ],
     "Spawns": [
       "BonesField_ThermalVent",
       "CragField_Rock",
@@ -1022,6 +1274,9 @@
   },
   {
     "TechType": "Magnetite",
+    "ClassIds": [
+      "5462a145-fdc1-464d-ad61-ec81920ec7e3"
+    ],
     "Spawns": [
       "BloodKelp_CaveWall",
       "BloodKelp_Wall",
@@ -1042,6 +1297,9 @@
   },
   {
     "TechType": "MercuryOre",
+    "ClassIds": [
+      "779ef413-44b0-4eab-b94c-dfaadb1d2df0"
+    ],
     "Spawns": [
       "BloodKelp_Grass",
       "CragField_Rock",
@@ -1056,6 +1314,9 @@
   },
   {
     "TechType": "Mesmer",
+    "ClassIds": [
+      "ad18b555-9073-445e-808a-d8b39d72f22e"
+    ],
     "Spawns": [
       "BonesField_LedgeTop",
       "CragField_Grass",
@@ -1067,6 +1328,9 @@
   },
   {
     "TechType": "MesmerEgg",
+    "ClassIds": [
+      "3caf2f09-9cb2-4b9e-9432-6481f83fde4c"
+    ],
     "Spawns": [
       "BonesField_LedgeTop",
       "KooshZone_CaveFloor",
@@ -1075,6 +1339,9 @@
   },
   {
     "TechType": "MoonpoolFragment",
+    "ClassIds": [
+      "485196ae-a0a0-44a1-9b3e-dabf708ea724"
+    ],
     "Spawns": [
       "BloodKelp_TechSite_Barrier",
       "BloodKelp_TechSite_Scatter",
@@ -1092,6 +1359,9 @@
   },
   {
     "TechType": "Nickel",
+    "ClassIds": [
+      "7815b1b7-2830-418b-9b5d-19949b0ae9ec"
+    ],
     "Spawns": [
       "BonesField_Cave_Wall",
       "BonesField_Wall",
@@ -1106,6 +1376,9 @@
   },
   {
     "TechType": "Oculus",
+    "ClassIds": [
+      "aefe2153-9e68-41cf-9615-253aa6f965aa"
+    ],
     "Spawns": [
       "JellyshroomCaves_CaveFloor",
       "PrisonAquarium_CaveCeiling",
@@ -1114,6 +1387,9 @@
   },
   {
     "TechType": "Peeper",
+    "ClassIds": [
+      "3fcd548b-781f-46ba-b076-7412608deeef"
+    ],
     "Spawns": [
       "Dunes_Grass",
       "Dunes_OpenDeep_CreatureOnly",
@@ -1149,6 +1425,9 @@
   },
   {
     "TechType": "PowerCellChargerFragment",
+    "ClassIds": [
+      "3e09729a-2c2d-4b93-9089-c62d82963ef3"
+    ],
     "Spawns": [
       "Dunes_TechSite",
       "Dunes_TechSite_Barrier",
@@ -1165,6 +1444,9 @@
   },
   {
     "TechType": "PowerTransmitterFragment",
+    "ClassIds": [
+      "7436aeba-f8df-4887-b369-e630fa01f716"
+    ],
     "Spawns": [
       "CrashZone_Sand",
       "KooshZone_TechSite",
@@ -1176,12 +1458,35 @@
   },
   {
     "TechType": "PowerUpgradeModule",
+    "ClassIds": [
+      "049d2afa-ae76-4eef-855d-3466828654c4"
+    ],
     "Spawns": [
       "Aurora_UpgradeConsole"
     ]
   },
   {
+    "TechType": "PropulsionCannonFragment",
+    "ClassIds": [
+      "ac997abf-659f-4fbe-a318-64606a161d7e"
+    ],
+    "Spawns": [
+      "CrashZone_Sand",
+      "GrassyPlateaus_TechSite",
+      "GrassyPlateaus_TechSite_Barrier",
+      "MushroomForest_TechSite",
+      "MushroomForest_TechSite_Barrier",
+      "UnderwaterIslands_TechSite",
+      "UnderwaterIslands_TechSite_Barrier",
+      "UnderwaterIslands_ValleyFloor",
+      "UnderwaterIslands_ValleyLedge"
+    ]
+  },
+  {
     "TechType": "Quartz",
+    "ClassIds": [
+      "8ef17c52-2aa8-46b6-ada3-c3e3c4a78dd6"
+    ],
     "Spawns": [
       "BloodKelp_Roots",
       "BloodKelp_Wall",
@@ -1222,6 +1527,9 @@
   },
   {
     "TechType": "RabbitRay",
+    "ClassIds": [
+      "01872776-2ff8-4214-805b-495001cf183d"
+    ],
     "Spawns": [
       "Kelp_Sand",
       "PrisonAquarium_Open_CreatureOnly",
@@ -1231,12 +1539,18 @@
   },
   {
     "TechType": "RabbitrayEgg",
+    "ClassIds": [
+      "66910d41-da61-4ee6-8bf2-da6a449fe3f4"
+    ],
     "Spawns": [
       "SafeShallows_Plants"
     ]
   },
   {
     "TechType": "ReaperLeviathan",
+    "ClassIds": [
+      "f78942c3-87e7-4015-865a-5ae4d8bd9dcb"
+    ],
     "Spawns": [
       "CrashZone_Rock",
       "CrashZone_Sand",
@@ -1247,6 +1561,9 @@
   },
   {
     "TechType": "Reginald",
+    "ClassIds": [
+      "cf171ce2-e3d2-4cec-9757-60dbd480e486"
+    ],
     "Spawns": [
       "Canyon_Open_CreatureOnly",
       "CragField_Ground",
@@ -1270,6 +1587,9 @@
   },
   {
     "TechType": "ReinforceHullFragment",
+    "ClassIds": [
+      "47ca9b30-9bf2-4956-8f30-2407567496ac"
+    ],
     "Spawns": [
       "BloodKelp_Floor",
       "BloodKelp_TechSite",
@@ -1283,6 +1603,9 @@
   },
   {
     "TechType": "Rockgrub",
+    "ClassIds": [
+      "8e82dc63-5991-4c63-a12c-2aa39373a7cf"
+    ],
     "Spawns": [
       "Dunes_CaveCeiling",
       "Dunes_CaveWall",
@@ -1302,6 +1625,9 @@
   },
   {
     "TechType": "Salt",
+    "ClassIds": [
+      "f654e870-3101-4ff3-8bb4-528dceef43a5"
+    ],
     "Spawns": [
       "BloodKelp_Grass",
       "CragField_Grass",
@@ -1323,6 +1649,9 @@
   },
   {
     "TechType": "Sandshark",
+    "ClassIds": [
+      "5e5f00b4-1531-45c0-8aca-84cbd3b580a4"
+    ],
     "Spawns": [
       "CrashZone_Sand",
       "Dunes_Grass",
@@ -1332,12 +1661,18 @@
   },
   {
     "TechType": "SandsharkEgg",
+    "ClassIds": [
+      "bc0f2b09-1c5c-4573-bdcb-087883677a5f"
+    ],
     "Spawns": [
       "GrassyPlateaus_Grass"
     ]
   },
   {
     "TechType": "SandstoneChunk",
+    "ClassIds": [
+      "5b702ef7-7403-49ee-99c5-1f67ab04954a"
+    ],
     "Spawns": [
       "BonesField_Ground",
       "CragField_Ground",
@@ -1371,6 +1706,9 @@
   },
   {
     "TechType": "ScannerRoomFragment",
+    "ClassIds": [
+      "ba258aad-07e9-4c9b-b517-2ce7400db7b2"
+    ],
     "Spawns": [
       "BloodKelp_TrenchFloor",
       "CragField_Sand",
@@ -1383,6 +1721,12 @@
   },
   {
     "TechType": "ScrapMetal",
+    "ClassIds": [
+      "947f2823-c42a-45ef-94e4-52a9f1d3459c",
+      "7e507655-9fbf-42e0-8422-163ddd668747",
+      "7cd86cbf-0708-41dc-84d7-58c648e25b06",
+      "b2d10d9b-878e-4ff8-b71f-cd578e0d2038"
+    ],
     "Spawns": [
       "CragField_Sand",
       "CrashZone_Sand",
@@ -1395,7 +1739,27 @@
     ]
   },
   {
+    "TechType": "SeaglideFragment",
+    "ClassIds": [
+      "4b79418e-b3d7-4c14-923c-f3e47a6284e1"
+    ],
+    "Spawns": [
+      "BloodKelp_TechSite_Barrier",
+      "Kelp_GrassDense",
+      "Kelp_GrassSparse",
+      "Kelp_TechSite",
+      "SafeShallows_Grass",
+      "SafeShallows_SandFlat",
+      "SafeShallows_TechSite",
+      "SafeShallows_TechSite_Barrier",
+      "SafeShallows_TechSite_Scattered"
+    ]
+  },
+  {
     "TechType": "SeamothFragment",
+    "ClassIds": [
+      "79134cca-9eb5-4af0-8fa3-ff15565d7117"
+    ],
     "Spawns": [
       "FragmentSeamoth",
       "GrassyPlateaus_Grass",
@@ -1405,6 +1769,9 @@
   },
   {
     "TechType": "ShaleChunk",
+    "ClassIds": [
+      "814fa303-8697-48ef-b126-cf22e703cefd"
+    ],
     "Spawns": [
       "BloodKelp_CaveWall",
       "BloodKelp_Floor",
@@ -1449,6 +1816,9 @@
   },
   {
     "TechType": "Shocker",
+    "ClassIds": [
+      "e69be2e8-a2e3-4c4c-a979-281fbf221729"
+    ],
     "Spawns": [
       "BloodKelp_UniqueCreatures",
       "BloodKelp_WreckCreatures",
@@ -1458,6 +1828,9 @@
   },
   {
     "TechType": "ShockerEgg",
+    "ClassIds": [
+      "0c8a460a-3b93-4652-abd1-4a930b32a0a6"
+    ],
     "Spawns": [
       "BloodKelp_ShockerEggs",
       "KooshZone_Grass",
@@ -1466,6 +1839,9 @@
   },
   {
     "TechType": "Shuttlebug",
+    "ClassIds": [
+      "830a8fa0-d92d-4683-a193-7531e6968042"
+    ],
     "Spawns": [
       "BloodKelp_CaveFloor",
       "Canyon_Algae",
@@ -1475,18 +1851,27 @@
   },
   {
     "TechType": "Silver",
+    "ClassIds": [
+      "439b4b17-2f86-4706-8abd-8d2f68df782b"
+    ],
     "Spawns": [
       "InactiveLavaZone_Chamber_Lava"
     ]
   },
   {
     "TechType": "Skyray",
+    "ClassIds": [
+      "6a1b444f-138f-46fa-88bb-d673a2ceb689"
+    ],
     "Spawns": [
       "Mountains_Birds"
     ]
   },
   {
     "TechType": "Spadefish",
+    "ClassIds": [
+      "d040bec1-0368-4f7c-aed6-93b5e1852d45"
+    ],
     "Spawns": [
       "Dunes_Rock",
       "Dunes_SandPlateau",
@@ -1508,6 +1893,9 @@
   },
   {
     "TechType": "SpadefishEgg",
+    "ClassIds": [
+      "94d3c568-67d1-4ee7-9c56-0994adc403a9"
+    ],
     "Spawns": [
       "GrandReef_Grass",
       "GrassyPlateaus_CaveFloor",
@@ -1519,6 +1907,9 @@
   },
   {
     "TechType": "SpineEel",
+    "ClassIds": [
+      "e82d3c24-5a58-4307-a775-4741050c8a78"
+    ],
     "Spawns": [
       "BonesField_Skeleton_Open_CreatureOnly",
       "GhostTree_Open_Big_CreatureOnly",
@@ -1529,6 +1920,9 @@
   },
   {
     "TechType": "Spinefish",
+    "ClassIds": [
+      "539af52c-f4b8-402b-ae88-e641aa031685"
+    ],
     "Spawns": [
       "BloodKelp_Grass",
       "BloodKelp_OpenDeep_CreatureOnly",
@@ -1559,6 +1953,9 @@
   },
   {
     "TechType": "Stalker",
+    "ClassIds": [
+      "cf8794a1-5cd6-492e-8acf-7da7c940ef70"
+    ],
     "Spawns": [
       "CrashZone_Rock",
       "Kelp_UniqueCreature",
@@ -1568,12 +1965,35 @@
   },
   {
     "TechType": "StalkerEgg",
+    "ClassIds": [
+      "e2e5bb2d-6427-431c-ac3d-036c22083222"
+    ],
     "Spawns": [
       "Kelp_VineBase"
     ]
   },
   {
+    "TechType": "StasisRifleFragment",
+    "ClassIds": [
+      "8bdb65a9-1057-4e6d-bf40-94cf6dc5a129"
+    ],
+    "Spawns": [
+      "FloatingIslands_AbandonedBase_Outside",
+      "Kelp_TechSite_Barrier",
+      "KooshZone_TechSite",
+      "KooshZone_TechSite_Barrier",
+      "SafeShallows_TechSite_Barrier",
+      "UnderwaterIslands_IslandTop",
+      "UnderwaterIslands_TechSite",
+      "UnderwaterIslands_TechSite_Barrier",
+      "UnderwaterIslands_ValleyFloor"
+    ]
+  },
+  {
     "TechType": "Sulphur",
+    "ClassIds": [
+      "f08a4013-5852-4b33-bd7d-466aae6b6969"
+    ],
     "Spawns": [
       "ActiveLavaZone_Chamber_Floor",
       "ActiveLavaZone_Falls_Floor",
@@ -1595,6 +2015,9 @@
   },
   {
     "TechType": "ThermalPlantFragment",
+    "ClassIds": [
+      "1a406cdc-3e96-4ce2-a24a-81404af65619"
+    ],
     "Spawns": [
       "Dunes_SandDune",
       "Dunes_TechSite",
@@ -1612,6 +2035,9 @@
   },
   {
     "TechType": "TimeCapsule",
+    "ClassIds": [
+      "c129d979-4f68-41d8-b9bc-557676d18a5a"
+    ],
     "Spawns": [
       "BloodKelp_Floor",
       "CrashZone_Sand",
@@ -1627,6 +2053,9 @@
   },
   {
     "TechType": "Titanium",
+    "ClassIds": [
+      "c66b5dfa-7fe9-4688-b165-d2e2f4caa8d9"
+    ],
     "Spawns": [
       "InactiveLavaZone_Chamber_MagmaTree",
       "InactiveLavaZone_LavaPit_Wall"
@@ -1634,6 +2063,9 @@
   },
   {
     "TechType": "UraniniteCrystal",
+    "ClassIds": [
+      "3b52098a-4b58-467c-a29a-1d1b6d92ec3e"
+    ],
     "Spawns": [
       "BloodKelp_CaveFloor",
       "BloodKelp_CaveWall",
@@ -1656,6 +2088,9 @@
   },
   {
     "TechType": "WarperSpawner",
+    "ClassIds": [
+      "510a71f0-ab6d-4c6a-aa54-a19b3f1c436c"
+    ],
     "Spawns": [
       "ActiveLavaZone_Chamber_Open_CreatureOnly",
       "ActiveLavaZone_Falls_Open_CreatureOnly",
@@ -1673,6 +2108,9 @@
   },
   {
     "TechType": "WorkbenchFragment",
+    "ClassIds": [
+      "3adf441d-01f9-4d35-a3c2-2423c0769be5"
+    ],
     "Spawns": [
       "BloodKelp_TechSite",
       "CragField_Ground",
