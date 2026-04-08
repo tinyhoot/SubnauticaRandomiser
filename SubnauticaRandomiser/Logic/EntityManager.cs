@@ -312,7 +312,7 @@ namespace SubnauticaRandomiser.Logic
             // Add spawnables to fragments for cases like seamoth fragments.
             foreach (var fragment in GetAllEntities<LogicFragment>())
             {
-                var spawnable = Find<LogicSpawnable>(fragment.TechType);
+                var spawnable = Find<LogicSpawnable>(fragment.SpawnableTechType);
                 if (spawnable != null)
                     fragment.Dependencies.Add(spawnable);
             }
