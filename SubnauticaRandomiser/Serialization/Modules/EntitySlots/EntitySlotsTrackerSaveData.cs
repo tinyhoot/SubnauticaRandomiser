@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HootLib;
 using HootLib.Interfaces;
+using MonoMod.Utils;
 using SubnauticaRandomiser.Handlers;
 using UWE;
 
@@ -13,9 +14,15 @@ namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
         public Dictionary<BiomeType, SlotCounts> SlotsData = new Dictionary<BiomeType, SlotCounts>();
         public Dictionary<BiomeType, EntityCounts> EntityData = new Dictionary<BiomeType, EntityCounts>();
         public Dictionary<TechType, Spawnable> Spawnables = new Dictionary<TechType, Spawnable>();
+        public Dictionary<string, TechType> ClassIds = new Dictionary<string, TechType>();
 
         [NonSerialized]
         private ILogHandler _log = PrefixLogHandler.Get("[TrackerSaveData]");
+
+        public void AddClassIds(Dictionary<string, TechType> classIds)
+        {
+            ClassIds.AddRange(classIds);
+        }
 
         public void SetupSlots(List<SlotCounts> slotsData)
         {
@@ -45,16 +52,15 @@ namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
             _log.Debug($"Found {WorldEntityDatabase.main.infos.Count} entries in WEDB");
             foreach (var (classId, info) in WorldEntityDatabase.main.infos)
             {
-                // There's a ton of things that can spawn but don't have a TechType associated with them, like random
-                // decoratives. Do not consider those.
-                if (info.techType == TechType.None)
+                // Only look at those prefabs we actually want to modify.
+                if (!ClassIds.TryGetValue(classId, out var techType))
                     continue;
                 
-                if (!Spawnables.TryGetValue(info.techType, out var spawnable))
+                if (!Spawnables.TryGetValue(techType, out var spawnable))
                 {
                     spawnable = new Spawnable();
-                    spawnable.TechType = info.techType;
-                    Spawnables[info.techType] = spawnable;
+                    spawnable.TechType = techType;
+                    Spawnables.Add(techType, spawnable);
                 }
                 spawnable.AddClassId(classId);
                 spawnable.SlotType |= SlotCounts.ConvertToPlaceholderType(info.slotType);
@@ -93,13 +99,12 @@ namespace SubnauticaRandomiser.Serialization.Modules.EntitySlots
                 // _log.Warn($"Tried to add spawned entity '{filler.classId}' for biome '{biome}' which has no entry.");
                 return;
             }
+
+            // Only count classIds we were actually expecting. There will still be tons of unrelated stuff spawning.
+            if (!ClassIds.TryGetValue(filler.classId, out var techType))
+                return;
             
-            if (!WorldEntityDatabase.TryGetInfo(filler.classId, out var info))
-            {
-                throw new KeyNotFoundException($"Filler classId '{filler.classId}' is not in WorldEntityDB!");
-            }
-            
-            counts.CountSpawn(info.techType, filler.count);
+            counts.CountSpawn(techType, filler.count);
         }
     }
 }
