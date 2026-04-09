@@ -144,6 +144,14 @@ namespace DataExplorer
             }
         }
 
+        public static void LogPDAScanner()
+        {
+            foreach (var kvpair in PDAScanner.mapping)
+            {
+                Initialiser._Log.LogDebug($"{kvpair.Key} - {kvpair.Value.totalFragments}");
+            }
+        }
+
         public static void LogPrefabs()
         {
             // Cache the ids, otherwise this logs nothing.

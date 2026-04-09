@@ -23,7 +23,7 @@ namespace DataExplorer
         {
             if (n.data is null || n.data.Count < 1)
             {
-                ErrorMessage.AddMessage("Options: biomes, databoxes, ency, knownTech, loot, prefabs");
+                ErrorMessage.AddMessage("Options: biomes, databoxes, ency, knownTech, loot, prefabs, scannables");
                 return;
             }
 
@@ -48,6 +48,10 @@ namespace DataExplorer
                     break;
                 case "prefabs":
                     DumpPrefabs();
+                    break;
+                case "scannables":
+                    ErrorMessage.AddMessage("Dumping scannables");
+                    DataDumper.LogPDAScanner();
                     break;
                 default:
                     ErrorMessage.AddMessage("Bad option!");
