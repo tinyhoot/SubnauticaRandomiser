@@ -74,12 +74,12 @@ namespace SubnauticaRandomiser.Logic
                 _context = new RandoContext(_config);
                 yield return EnableModules(task);
                 _log.Debug($"Modules - {Time.realtimeSinceStartup - startTime}");
-                yield return InitSaveData(task);
-                _log.Debug($"SaveData - {Time.realtimeSinceStartup - startTime}");
                 yield return LoadRandomisationInfoFiles(task);
                 _log.Debug($"InfoFiles - {Time.realtimeSinceStartup - startTime}");
                 yield return BuildEntityRegionModel(task);
                 _log.Debug($"EntityModel - {Time.realtimeSinceStartup - startTime}");
+                yield return InitSaveData(task);
+                _log.Debug($"SaveData - {Time.realtimeSinceStartup - startTime}");
                 yield return LetModulesSetup(task);
                 _log.Debug($"ModuleSetup - {Time.realtimeSinceStartup - startTime}");
                 yield return ValidateSetupStage(task);
