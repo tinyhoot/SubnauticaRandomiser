@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
+using HootLib;
 using HootLib.Interfaces;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic;
@@ -12,7 +13,32 @@ namespace SubnauticaRandomiser.Patches
     [HarmonyPatch]
     internal class FragmentPatcher
     {
-        private static ILogHandler _log => PrefixLogHandler.Get("[F]");
+        private static ILogHandler _log => PrefixLogHandler.Get("[FragmentPatcher]");
+
+        /// <summary>
+        /// Edit the required number of scans per fragment. This data re-initialises after every return to main menu
+        /// and therefore does not need to be restored to a vanilla state.
+        /// </summary>
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(PDAScanner), nameof(PDAScanner.Initialize))]
+        private static void EditScanNumberData()
+        {
+            var saveData = Bootstrap.SaveData.GetModuleData<FragmentSaveData>();
+            if (saveData?.TotalFragmentsToUnlock is null || saveData.TotalFragmentsToUnlock.Count == 0)
+                return;
+            
+            _log.Debug("Patching fragment scan numbers.");
+            foreach (var (techType, n) in saveData.TotalFragmentsToUnlock)
+            {
+                if (!PDAScanner.mapping.TryGetValue(techType, out var entryData))
+                {
+                    _log.Error($"Tried to edit required scan numbers for {techType}, but TechType is not in PDAScanner!");
+                    continue;
+                }
+
+                entryData.totalFragments = n;
+            }
+        }
         
         /// <summary>
         /// This method patches a few lines into PDAScanner.Scan() to intercept the game's normal operations.

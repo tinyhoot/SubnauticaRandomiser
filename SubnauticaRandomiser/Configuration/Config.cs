@@ -47,7 +47,7 @@ namespace SubnauticaRandomiser.Configuration
         // Fragments
         public ConfigEntryWrapper<bool> EnableFragmentModule;
         public ConfigEntryWrapper<bool> RandomiseFragments;
-        public ConfigEntryWrapper<bool> RandomiseNumFragments;
+        public ConfigEntryWrapper<bool> RandomiseTotalScans;
         public ConfigEntryWrapper<int> MaxFragmentsToUnlock;
         public ConfigEntryWrapper<int> MaxBiomesPerFragment;
         public ConfigEntryWrapper<bool> RandomiseDuplicateScans;
@@ -215,9 +215,9 @@ namespace SubnauticaRandomiser.Configuration
                 "Randomise fragment locations?",
                 null
             );
-            RandomiseNumFragments = RegisterEntry(
+            RandomiseTotalScans = RegisterEntry(
                 section: SectionFragments,
-                key: nameof(RandomiseNumFragments),
+                key: nameof(RandomiseTotalScans),
                 defaultValue: true,
                 description: "Randomises how many fragments need to be scanned for the blueprint to unlock."
             ).WithDescription(
@@ -586,7 +586,7 @@ namespace SubnauticaRandomiser.Configuration
             modOptions.AddSeparator();
             modOptions.AddItem(EnableFragmentModule.ToModToggleOption());
             modOptions.AddItem(RandomiseFragments.ToModToggleOption());
-            modOptions.AddItem(RandomiseNumFragments.ToModToggleOption());
+            modOptions.AddItem(RandomiseTotalScans.ToModToggleOption());
             modOptions.AddItem(MaxFragmentsToUnlock.ToModSliderOption(1, 20));
             modOptions.AddItem(MaxBiomesPerFragment.ToModSliderOption(3, 10));
             modOptions.AddItem(RandomiseDuplicateScans.ToModToggleOption());

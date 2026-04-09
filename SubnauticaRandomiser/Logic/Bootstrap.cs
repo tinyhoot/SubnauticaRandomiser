@@ -11,6 +11,7 @@ using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Logic.LogicObjects;
 using SubnauticaRandomiser.Logic.Modules;
 using SubnauticaRandomiser.Logic.Modules.Recipes;
+using SubnauticaRandomiser.Logic.Modules.Spawnables;
 using SubnauticaRandomiser.Patches;
 using SubnauticaRandomiser.Serialization;
 using SubnauticaRandomiser.Serialization.Modules;
@@ -113,14 +114,12 @@ namespace SubnauticaRandomiser.Logic
             //     RegisterModule<AuroraLogic>();
             if (_config.RandomiseDataboxes.Value)
                 RegisterModule<DataboxModule>();
-            // if (_config.EnableFragmentModule.Value &&
-            //     (_config.RandomiseFragments.Value || _config.RandomiseNumFragments.Value
-            //                                       || _config.RandomiseDuplicateScans.Value))
-            // {
-            //     RegisterModule<FragmentLogic>();
-            //     RegisterModule<EntitySlotsTracker>();
-            // }
-            //
+            if (_config.EnableFragmentModule.Value)
+            {
+                RegisterModule<FragmentModule>();
+                RegisterModule<EntitySlotsTracker>();
+            }
+            
             if (_config.EnableRecipeModule.Value && _config.RandomiseRecipes.Value)
             {
                 // RegisterModule<RawMaterialLogic>();

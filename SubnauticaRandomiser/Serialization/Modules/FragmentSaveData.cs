@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using HootLib;
+using HootLib.Interfaces;
 using SubnauticaRandomiser.Handlers;
 using SubnauticaRandomiser.Objects;
 
@@ -9,27 +11,17 @@ namespace SubnauticaRandomiser.Serialization.Modules
     {
         public LootTable<TechType> FragmentMaterialYield = new LootTable<TechType>();
         public int MaxMaterialYield = 2;
-        public Dictionary<TechType, int> NumFragmentsToUnlock = new Dictionary<TechType, int>();
+        public Dictionary<TechType, int> TotalFragmentsToUnlock = new Dictionary<TechType, int>();
         public Dictionary<TechType, List<SpawnData>> SpawnDataDict = new Dictionary<TechType, List<SpawnData>>();
         
-        public bool AddFragmentUnlockNum(TechType type, int number)
-        {
-            if (NumFragmentsToUnlock.ContainsKey(type))
-            {
-                PrefixLogHandler.Get("[SaveData]").Warn($"Tried to add duplicate key {type.AsString()} to "
-                                                        + $"FragmentNum master dictionary!");
-                return false;
-            }
-            NumFragmentsToUnlock.Add(type, number);
-            return true;
-        }
+        [NonSerialized]
+        private ILogHandler _log = PrefixLogHandler.Get("[SaveData]");
         
         public bool AddSpawnData(TechType type, List<SpawnData> data)
         {
             if (SpawnDataDict.ContainsKey(type))
             {
-                PrefixLogHandler.Get("[SaveData]").Warn($"Tried to add duplicate key {type.AsString()} to "
-                                                        + $"SpawnData master dictionary!");
+                _log.Warn($"Tried to add duplicate key {type.AsString()} to SpawnData master dictionary!");
                 return false;
             }
             SpawnDataDict.Add(type, data);
