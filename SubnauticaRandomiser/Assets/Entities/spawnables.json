@@ -61,6 +61,21 @@
     ]
   },
   {
+    "TechType": "BaseMapRoomFragment",
+    "ClassIds": [
+      "ba258aad-07e9-4c9b-b517-2ce7400db7b2"
+    ],
+    "Spawns": [
+      "BloodKelp_TrenchFloor",
+      "CragField_Sand",
+      "DeepGrandReef_AbandonedBase_Exterior",
+      "GrandReef_TechSite_Scattered",
+      "GrassyPlateaus_Sand",
+      "GrassyPlateaus_TechSite_Scattered",
+      "KooshZone_TechSite_Scatter"
+    ]
+  },
+  {
     "TechType": "BaseNuclearReactorFragment",
     "ClassIds": [
       "f38898b1-2c55-4069-af58-dffa7ef315a0"
@@ -1690,21 +1705,6 @@
       "SparseReef_DeepFloor",
       "TreeCove_Ground",
       "UnderwaterIslands_IslandTop"
-    ]
-  },
-  {
-    "TechType": "ScannerRoomFragment",
-    "ClassIds": [
-      "ba258aad-07e9-4c9b-b517-2ce7400db7b2"
-    ],
-    "Spawns": [
-      "BloodKelp_TrenchFloor",
-      "CragField_Sand",
-      "DeepGrandReef_AbandonedBase_Exterior",
-      "GrandReef_TechSite_Scattered",
-      "GrassyPlateaus_Sand",
-      "GrassyPlateaus_TechSite_Scattered",
-      "KooshZone_TechSite_Scatter"
     ]
   },
   {

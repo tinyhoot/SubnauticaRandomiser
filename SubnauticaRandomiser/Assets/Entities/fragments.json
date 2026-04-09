@@ -73,7 +73,7 @@
   },
   {
     "TechType": "BaseMapRoom",
-    "SpawnableTechType": "ScannerRoomFragment"
+    "SpawnableTechType": "BaseMapRoomFragment"
   },
   {
     "TechType": "BaseMoonPool",
